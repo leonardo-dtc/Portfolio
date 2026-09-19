@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Avery Lindholm — Student-Athlete</title>
+<meta name="description" content="Academic, athletic and extracurricular record. Template with fictional sample content.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Familjen+Grotesk:wght@400..700&family=IBM+Plex+Mono:wght@300;400;500&display=swap">
+<style>
+/* ============================================================
+   HONOUR BOARD
+
+   The object is a school honours board cut from Portoro — black
+   marble with gold veins. The front page is the slab itself: one
+   viewport, no scroll, the name incised into stone that breathes,
+   and three struck plates that open the three records.
+
+   SINGLE-THEME BY DECISION. There is deliberately no light mode
+   and no prefers-color-scheme block: black and gold IS the object,
+   and an inverted variant would destroy it. `body` paints an
+   explicit token ground so the page holds on any host.
+   ============================================================ */
+
+:root{
+  /* stone */
+  --pitch:     #0A0A0B;   /* page ground — near-black, a hair cool so gold reads warm on it */
+  --stone:     #111113;
+  --plaque:    #16161A;   /* raised surfaces */
+
+  /* gilding — THREE stops, because leaf is a reflective surface, not a hue */
+  --gold-deep: #7E5F14;   /* the shadow side of the metal */
+  --gold:      #C9A227;   /* the base */
+  --gold-lit:  #F2E3AC;   /* champagne highlight */
+
+  /* ink */
+  --bone:      #E9E5DB;   /* body text — warm off-white, NOT #FFF */
+  --dim:       #918D82;   /* secondary */
+  --faint:     #63605A;   /* tertiary */
+  --rule:      #262319;   /* hairlines — warm dark, not neutral grey */
+  --rule-lit:  rgba(201,162,39,.22);
+
+  --f-disp: "Bodoni Moda", Didot, "Bodoni MT", Georgia, "Times New Roman", serif;
+  --f-body: "Familjen Grotesk", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --u: 8px;
+  --ease: cubic-bezier(.2,.65,.2,1);
+  --bar: 34px;            /* height of the fixed template notice */
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--pitch);          /* explicit, non-transparent, from a token */
+  color:var(--bone);
+  font-family:var(--f-body);
+  font-size:16px; line-height:1.62; font-weight:400;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+h1,h2,h3,p,ul,ol,figure,table{margin:0;padding:0}
+ul,ol{list-style:none}
+a{color:inherit;text-decoration:none}
+[hidden]{display:none!important}
+b,strong{font-weight:500}
+:where(a,button,[tabindex]):focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+main:focus{outline:none}
+
+/* ============================================================
+   THE SLAB — black marble, gold veined, breathing.
+
+   The veining is expensive to compute and cheap to move: each
+   layer's noise is rasterised ONCE from an SVG filter, then the
+   breath is pure transform + opacity, so it stays on the
+   compositor and never re-runs feTurbulence.
+   ============================================================ */
+.marble{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:var(--pitch)}
+.m-layers{position:absolute;inset:0;transition:opacity .9s var(--ease)}
+.m-layers>i{position:absolute;inset:-16%;display:block;background-size:cover;
+  transform:translateZ(0);will-change:transform,opacity}
+
+/* broad stone mottle — the body of the marble, never more than a
+   few percent of luminance so text contrast holds over it */
+.m-body{opacity:.40;mix-blend-mode:screen;animation:breathe-body 19s ease-in-out infinite;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.005 0.009' numOctaves='5' seed='3' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0.105 0 0 0 0 0.100 0 0 0 0 0.092 0.75 0 0 0 -0.24'/%3E%3C/filter%3E%3Crect width='1200' height='1200' filter='url(%23b)'/%3E%3C/svg%3E")}
+
+/* primary gold veining. A single contour level through low-frequency
+   noise is what gives thin wandering veins rather than clouds: put the
+   noise's red channel into alpha, then keep only a narrow band of it.
+   The band must be the MASK (in2) and the gold the source (in) — the
+   other way round composites the veins black. */
+.m-v1{opacity:.16;animation:breathe-v1 9.5s ease-in-out infinite;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1400' height='1400'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0015 0.0048' numOctaves='5' seed='9' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a' result='band'%3E%3CfeFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3CfeGaussianBlur in='band' stdDeviation='0.5' result='soft'/%3E%3CfeComposite in='SourceGraphic' in2='soft' operator='in'/%3E%3C/filter%3E%3Crect width='1400' height='1400' fill='%23C9A227' filter='url(%23v)'/%3E%3C/svg%3E")}
+
+/* secondary calcite veining — finer, paler, cut across the other way */
+.m-v2{opacity:.08;animation:breathe-v2 13.5s ease-in-out infinite;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1100' height='1100'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0034 0.011' numOctaves='4' seed='23' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a' result='band'%3E%3CfeFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3CfeGaussianBlur in='band' stdDeviation='0.4' result='soft'/%3E%3CfeComposite in='SourceGraphic' in2='soft' operator='in'/%3E%3C/filter%3E%3Crect width='1100' height='1100' fill='%23E9E5DB' filter='url(%23w)'/%3E%3C/svg%3E")}
+
+/* the light on the stone, swelling on the same cycle as the veins */
+.m-bloom{inset:0;animation:bloom 9.5s ease-in-out infinite;
+  background:radial-gradient(56% 58% at 52% 60%, rgba(201,162,39,.062), rgba(201,162,39,0) 72%)}
+
+/* Text has to sit on this. The scrim keeps the marble expressive out
+   at the edges while every line of copy sits on something close to
+   pitch; the record pages take a flat, heavier one because their text
+   runs the full height of the viewport. */
+.m-scrim{position:absolute;inset:0;pointer-events:none;transition:background .9s var(--ease);
+  background:radial-gradient(86% 82% at 43% 46%,
+    rgba(10,10,11,.97) 0%, rgba(10,10,11,.86) 50%, rgba(10,10,11,.14) 88%)}
+body[data-view="section"] .m-scrim,
+body[data-view="guide"]   .m-scrim{background:rgba(10,10,11,.66)}
+
+/* the slab is lit from above centre and falls off to the edges, which
+   also buys back contrast for anything sitting near the frame */
+.marble::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(126% 104% at 50% 36%, rgba(0,0,0,0) 26%, rgba(0,0,0,.62) 100%)}
+
+@keyframes breathe-body{0%,100%{transform:scale(1.02);opacity:.30} 50%{transform:scale(1.06);opacity:.44}}
+@keyframes breathe-v1{0%,100%{transform:rotate(-9deg) scale(1.10) translate3d(0,0,0);opacity:.11}
+                      50%    {transform:rotate(-9deg) scale(1.15) translate3d(-1.1%,-.7%,0);opacity:.19}}
+@keyframes breathe-v2{0%,100%{transform:rotate(6deg) scale(1.14) translate3d(0,0,0);opacity:.05}
+                      50%    {transform:rotate(6deg) scale(1.08) translate3d(1.3%,.9%,0);opacity:.10}}
+@keyframes bloom{0%,100%{opacity:.5} 50%{opacity:1}}
+
+/* the record pages sit on the same slab, turned down so the
+   marble never competes with a line of body copy */
+body[data-view="section"] .m-layers,
+body[data-view="guide"]   .m-layers{opacity:.42}
+
+/* --- grain: real stone is not flat digital black ------------------ */
+.grain{
+  position:fixed; inset:0; z-index:9; pointer-events:none;
+  opacity:.05; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --- the plaque frame: ties the whole page into one object -------- */
+.frame{position:fixed;inset:16px;z-index:8;pointer-events:none;border:1px solid var(--rule-lit)}
+.frame::before,.frame::after,.frame i{
+  content:"";position:absolute;width:17px;height:17px;border:1px solid var(--gold);opacity:.62}
+.frame::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.frame::after {top:-1px;right:-1px;border-left:0;border-bottom:0}
+.frame .c3{bottom:-1px;left:-1px;border-right:0;border-top:0}
+.frame .c4{bottom:-1px;right:-1px;border-left:0;border-top:0}
+
+/* --- the gilt system --------------------------------------------- */
+@property --sweep{syntax:'<percentage>';inherits:false;initial-value:-60%}
+
+.gilt{
+  --sweep:30%;
+  background-image:linear-gradient(104deg,
+    var(--gold-deep) 0%,
+    var(--gold)      calc(var(--sweep) + 14%),
+    var(--gold-lit)  calc(var(--sweep) + 26%),
+    var(--gold)      calc(var(--sweep) + 38%),
+    var(--gold-deep) 100%);
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent; -webkit-text-fill-color:transparent;
+  /* text-shadow does NOT work with background-clip:text — the shadow is
+     painted from the colour, which is transparent. filter:drop-shadow()
+     operates on the rendered alpha, so it does. The paired light-above /
+     dark-below pass is what makes the letter read as INCISED. */
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.9))
+         drop-shadow(0 -1px 0 rgba(242,227,172,.10));
+}
+/* Small gilt. At display size the gold-deep stop reads as the unlit face
+   of the metal; under ~28px it just reads as a dark, half-legible glyph.
+   Small figures get a short ramp with no shadow side, which also keeps
+   the whole glyph at the 8.18:1 floor instead of dipping to 3.3:1. */
+.gilt.sm,.rec .mk,.foot .mark,.plate .p-title{
+  background-image:linear-gradient(104deg,
+    var(--gold) 0%, var(--gold-lit) calc(var(--sweep) + 26%), var(--gold) 100%);
+}
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .gilt{background-image:none;color:var(--gold);-webkit-text-fill-color:currentColor}
+}
+/* light passes in from off-left and settles at the ambient position —
+   no snap when it ends, because it ends where rest is */
+@keyframes strike{from{--sweep:-60%}to{--sweep:30%}}
+.struck{animation:strike 1.9s var(--ease) backwards}
+#name.struck{animation-duration:1.6s;animation-delay:.3s}
+
+/* the signature move: the hero catches light as the reader moves.
+   Gate only — concentrating it is what makes it read as a decision. */
+.gilt-live{
+  background-image:
+    radial-gradient(58% 190% at var(--sx,50%) var(--sy,42%),
+      rgba(255,250,228,.92), rgba(255,250,228,0) 58%),
+    linear-gradient(104deg,
+      var(--gold-deep) 0%,
+      var(--gold)      calc(var(--sweep) + 14%),
+      var(--gold-lit)  calc(var(--sweep) + 26%),
+      var(--gold)      calc(var(--sweep) + 38%),
+      var(--gold-deep) 100%);
+}
+
+/* --- reveals ------------------------------------------------------ */
+.rv{opacity:0;transform:translateY(14px);
+    transition:opacity .72s var(--ease),transform .72s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rule{height:1px;transform:scaleX(0);transform-origin:0 50%;
+  transition:transform .9s var(--ease);
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold-deep) 26%,var(--rule) 62%,transparent 100%)}
+.rule.in{transform:scaleX(1)}
+
+/* ============================================================
+   VIEWS — one file, three records, hash-routed.
+   ============================================================ */
+#gate,#view,#guide{position:relative;z-index:1;display:none}
+body[data-view="gate"]    #gate {display:flex}
+body[data-view="section"] #view {display:block}
+body[data-view="guide"]   #guide{display:block}
+body[data-view="gate"]{overflow:hidden}          /* the slab does not scroll */
+
+/* --- template notice: fixed, one line, out of the composition ----- */
+.notice{position:fixed;top:17px;left:17px;right:17px;z-index:10;height:var(--bar);
+  display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 13px;
+  border-bottom:1px dashed var(--rule);background:rgba(10,10,11,.86);
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.05em;color:var(--dim)}
+.notice p{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notice code{color:var(--bone)}
+.notice a{border-bottom:1px solid var(--rule);transition:border-color .25s}
+.notice a:hover{border-bottom-color:var(--gold-deep)}
+.notice .x{flex:none;font:inherit;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;
+  background:none;border:1px solid var(--rule);color:var(--faint);padding:3px 10px;
+  transition:color .25s,border-color .25s}
+.notice .x:hover{color:var(--bone);border-color:var(--gold-deep)}
+body.no-notice{--bar:0px}
+
+/* ============================================================
+   THE GATE — one viewport, no scroll.
+   Type is sized off min(vw,vh) so it shrinks on short screens
+   instead of overflowing, and the two softest elements are shed
+   entirely below 780px and 640px of height.
+   ============================================================ */
+#gate{flex-direction:column;justify-content:center;min-height:100vh;min-height:100svh;
+  padding:calc(var(--bar) + clamp(22px,4vh,44px)) clamp(22px,5vw,66px) clamp(22px,4vh,44px)}
+.gate-in{width:100%;max-width:1000px;margin:0 auto}
+
+.g-crest{font-family:var(--f-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:clamp(8px,1.4vh,14px)}
+.g-eyebrow{display:flex;align-items:center;gap:18px;font-family:var(--f-mono);font-size:11px;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--dim);margin-bottom:clamp(14px,2.4vh,26px)}
+.g-eyebrow i{display:block;height:1px;flex:1 1 0;min-width:0;max-width:300px;
+  background:linear-gradient(90deg,var(--rule) 0%,transparent 100%)}
+
+#name{font-family:var(--f-disp);font-variation-settings:"opsz" 96;
+  font-size:clamp(38px,min(9.6vw,12.2vh),122px);line-height:.94;letter-spacing:.02em;
+  text-transform:uppercase;text-wrap:balance;margin-bottom:clamp(18px,3vh,34px)}
+#name span{display:block}
+#name .n1{font-weight:400}
+#name .n2{font-weight:700}
+
+.g-role{font-size:clamp(15px,min(1.5vw,2.1vh),20px);line-height:1.45;color:var(--bone);
+  max-width:52ch;text-wrap:balance;margin-bottom:clamp(10px,1.8vh,20px)}
+.g-role em{font-style:normal;color:var(--gold)}
+.g-statement{font-size:clamp(13px,min(1.06vw,1.55vh),15px);line-height:1.6;color:var(--dim);
+  max-width:60ch;margin-bottom:clamp(22px,3.6vh,42px)}
+
+/* --- the three plates -------------------------------------------- */
+.plates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(10px,1.4vw,20px);margin-bottom:clamp(20px,3.4vh,40px)}
+.plate{position:relative;display:flex;flex-direction:column;min-width:0;
+  min-height:clamp(92px,14.5vh,146px);
+  padding:clamp(13px,2vh,20px) clamp(14px,1.6vw,22px);
+  border:1px solid var(--rule);background:rgba(22,22,26,.5);
+  transition:background-color .34s var(--ease),border-color .34s var(--ease),
+             transform .34s var(--ease)}
+/* the plate's top rule ignites — the same gesture as a section rule */
+.plate::before{content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:1px;
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold-deep) 32%,transparent 100%);
+  transform:scaleX(0);transform-origin:0 50%;transition:transform .5s var(--ease)}
+.plate:hover,.plate:focus-visible{background:rgba(22,22,26,.88);border-color:#302c1f;
+  transform:translateY(-2px)}
+.plate:hover::before,.plate:focus-visible::before{transform:scaleX(1)}
+.plate .p-num{font-family:var(--f-mono);font-size:10px;letter-spacing:.24em;color:var(--faint);
+  font-variant-numeric:tabular-nums}
+.plate .p-title{font-family:var(--f-disp);font-variation-settings:"opsz" 40;font-weight:600;
+  font-size:clamp(16px,1.75vw,23px);line-height:1.06;letter-spacing:.05em;text-transform:uppercase;
+  text-wrap:balance;margin-top:auto;padding-top:clamp(12px,2.4vh,26px)}
+.plate .p-foot{display:flex;align-items:baseline;gap:10px;min-width:0;
+  margin-top:clamp(7px,1.1vh,13px)}
+.plate .p-fig{font-family:var(--f-disp);font-variation-settings:"opsz" 30;font-weight:600;
+  font-size:clamp(15px,1.5vw,20px);letter-spacing:.01em;font-variant-numeric:tabular-nums;flex:none}
+.plate .p-lab{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--faint);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.g-contact{display:flex;flex-wrap:wrap;gap:6px clamp(20px,3vw,42px);
+  font-family:var(--f-mono);font-size:11px;line-height:1.5}
+.g-contact .k{font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--faint);margin-right:9px}
+.g-contact .v{color:var(--bone);font-variant-numeric:tabular-nums}
+.g-contact a.v{border-bottom:1px solid var(--rule);padding-bottom:1px;transition:border-color .25s}
+.g-contact a.v:hover{border-bottom-color:var(--gold-deep)}
+
+/* ============================================================
+   THE RECORD PAGES
+   ============================================================ */
+.wrap{width:100%;max-width:1000px;margin:0 auto;padding:0 clamp(22px,5vw,66px)}
+#view{padding-bottom:clamp(44px,7vh,84px)}
+
+.topbar{position:sticky;top:0;z-index:6;
+  padding-top:calc(var(--bar) + clamp(15px,2.4vh,25px));padding-bottom:clamp(13px,2vh,21px);
+  background:linear-gradient(var(--pitch) 0%,var(--pitch) 56%,rgba(10,10,11,.9) 80%,rgba(10,10,11,0) 100%)}
+.topbar-in{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.back{display:flex;align-items:baseline;gap:11px;min-width:0}
+.back .ar{font-family:var(--f-mono);font-size:13px;color:var(--faint);transition:color .28s,transform .28s var(--ease)}
+.back:hover .ar{color:var(--gold-deep);transform:translateX(-3px)}
+.back .wm{font-family:var(--f-disp);font-variation-settings:"opsz" 30;font-weight:600;
+  font-size:15px;letter-spacing:.15em;text-transform:uppercase;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.tabs ol{display:flex;gap:clamp(14px,2vw,30px)}
+.tabs a{display:flex;align-items:center;gap:9px;padding:4px 0;font-family:var(--f-mono);
+  font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
+  transition:color .3s var(--ease)}
+.tabs .tick{display:block;width:14px;height:1px;background:currentColor;flex:none;
+  transition:width .38s var(--ease),background-color .38s var(--ease)}
+.tabs .tn{font-variant-numeric:tabular-nums;flex:none}
+.tabs a:hover{color:var(--dim)}
+.tabs a.on{color:var(--bone)}
+.tabs a.on .tick{width:28px;background:var(--gold)}
+
+.sec{padding-top:clamp(34px,5.5vh,68px)}
+.sec-num{font-family:var(--f-mono);font-size:11px;letter-spacing:.24em;color:var(--faint);
+  margin-bottom:calc(var(--u)*1.5);font-variant-numeric:tabular-nums}
+.sec-title{font-family:var(--f-disp);font-variation-settings:"opsz" 72;font-weight:600;
+  font-size:clamp(30px,4.4vw,52px);line-height:1.04;letter-spacing:.03em;
+  text-transform:uppercase;text-wrap:balance;margin-bottom:calc(var(--u)*2)}
+.sec-kicker{color:var(--dim);max-width:60ch;font-size:15px;margin-bottom:calc(var(--u)*3.5)}
+
+/* the section's own record band — the figures that belong to it */
+/* cells are capped, not stretched: one figure must not sprawl across the
+   whole band, and the section rule above already serves as the top edge */
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),300px));
+  justify-content:start;border-bottom:1px solid var(--rule);
+  margin-top:clamp(26px,4vh,46px);padding-top:clamp(4px,1vh,10px)}
+.fig-cell{padding:calc(var(--u)*4) calc(var(--u)*3.5);border-left:1px solid var(--rule);min-width:0}
+.fig-cell:first-child{border-left:0;padding-left:0}
+.fig-cell .fig{font-family:var(--f-disp);font-variation-settings:"opsz" 72;font-weight:600;
+  font-size:clamp(38px,4.6vw,60px);line-height:1;letter-spacing:.005em;
+  font-variant-numeric:tabular-nums;margin-bottom:calc(var(--u)*1.75)}
+.fig-cell .lab{font-family:var(--f-mono);font-size:10px;font-weight:500;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--bone);margin-bottom:6px}
+.fig-cell .sub{font-family:var(--f-mono);font-size:11px;font-weight:300;line-height:1.5;
+  color:var(--faint);font-variant-numeric:tabular-nums;text-wrap:balance}
+
+/* --- entries: two axes, content-left and date-right ---------------- */
+.entries{max-width:1000px;margin-top:clamp(40px,5.5vh,64px)}
+.entry{position:relative;z-index:0;display:grid;
+  grid-template-columns:minmax(0,1fr) 172px;gap:0 34px}
+.entry+.entry{margin-top:clamp(38px,5vh,58px)}
+.entry::before{content:"";position:absolute;inset:-16px -20px;z-index:-1;
+  background:var(--plaque);opacity:0;transition:opacity .32s var(--ease);pointer-events:none}
+.entry:hover::before{opacity:.6}
+.entry-main{min-width:0}
+.org{font-size:19px;font-weight:600;line-height:1.32;color:var(--bone)}
+.erole{font-size:15.5px;color:var(--gold);margin-top:3px}
+.eplace{font-family:var(--f-mono);font-size:11px;font-weight:300;letter-spacing:.09em;
+  color:var(--faint);margin-top:7px}
+.bul{margin-top:calc(var(--u)*2.25)}
+.bul li{position:relative;padding-left:26px;color:var(--dim);font-size:15px;line-height:1.6;max-width:60ch}
+.bul li+li{margin-top:calc(var(--u)*1.25)}
+.bul li::before{content:"";position:absolute;left:0;top:.62em;width:14px;height:1px;background:var(--gold-deep)}
+.bul b{color:var(--bone);font-weight:500}
+/* the right column carries years AND tags together — years alone leave
+   a dead void the eye has to cross */
+.meta{text-align:right;min-width:0}
+.years{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--dim);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.tags{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;margin-top:calc(var(--u)*1.75)}
+.tags li{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--faint);border:1px solid var(--rule);padding:3px 8px;white-space:nowrap}
+
+/* --- marks table --------------------------------------------------- */
+.rec{width:100%;border-collapse:collapse;margin-top:clamp(44px,6vh,68px)}
+.rec caption{display:block;text-align:left;font-family:var(--f-mono);font-size:11px;
+  font-weight:300;letter-spacing:.06em;color:var(--faint);margin-bottom:calc(var(--u)*2.5)}
+.rec thead,.rec tbody{display:block}
+.rec tr{display:grid;grid-template-columns:minmax(0,1fr) 132px minmax(0,1.1fr) 62px;
+  gap:0 20px;align-items:baseline;padding:calc(var(--u)*2) 0;border-bottom:1px solid var(--rule)}
+.rec thead tr{padding:0 0 calc(var(--u)*1.5)}
+.rec tbody tr:last-child{border-bottom:0}
+.rec th,.rec td{text-align:left;font-weight:400;min-width:0}
+.rec .h{font-family:var(--f-mono);font-size:10px;font-weight:500;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--faint)}
+.rec .h.r{text-align:right}
+.rec .ev{font-size:15.5px;font-weight:500;color:var(--bone)}
+.rec .mk{font-family:var(--f-disp);font-variation-settings:"opsz" 40;font-weight:600;
+  font-size:23px;letter-spacing:.01em;font-variant-numeric:tabular-nums;line-height:1.1}
+.rec .cx{font-size:13.5px;color:var(--dim)}
+.rec .yr{font-family:var(--f-mono);font-size:12px;color:var(--faint);
+  font-variant-numeric:tabular-nums;text-align:right}
+
+/* --- next / previous record ---------------------------------------- */
+.secnav{display:flex;gap:24px;margin-top:clamp(60px,9vh,110px);
+  padding-top:calc(var(--u)*4);border-top:1px solid var(--rule)}
+.secnav a{display:block;max-width:47%;min-width:0}
+.secnav .nx{margin-left:auto;text-align:right}
+.secnav .lab{display:block;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--faint);transition:color .28s}
+.secnav .t{display:block;font-family:var(--f-disp);font-variation-settings:"opsz" 30;font-weight:600;
+  font-size:clamp(17px,2.2vw,25px);letter-spacing:.045em;text-transform:uppercase;
+  line-height:1.1;margin-top:7px}
+.secnav a:hover .lab{color:var(--dim)}
+
+/* --- footer -------------------------------------------------------- */
+.foot{margin-top:clamp(56px,8vh,96px);padding-top:calc(var(--u)*4);border-top:1px solid var(--rule)}
+.foot-top{display:flex;flex-wrap:wrap;gap:14px 40px;align-items:baseline;justify-content:space-between}
+.foot .mark{font-family:var(--f-disp);font-variation-settings:"opsz" 30;font-weight:600;
+  font-size:17px;letter-spacing:.16em;text-transform:uppercase}
+.foot .g-contact{margin-top:calc(var(--u)*3)}
+.foot .note{font-family:var(--f-mono);font-size:11px;font-weight:300;letter-spacing:.05em;
+  color:var(--faint);max-width:64ch;margin-top:calc(var(--u)*3)}
+
+/* --- fill-in guide (template chrome — delete before sending) ------- */
+#guide{padding-bottom:clamp(44px,7vh,84px)}
+.guide{margin-top:clamp(24px,4vh,48px);border:1px solid var(--rule);
+  background:rgba(17,17,19,.86);padding:clamp(24px,3.4vw,40px)}
+.guide h1{font-family:var(--f-mono);font-size:11px;font-weight:500;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--bone);margin-bottom:calc(var(--u)*3.5)}
+.guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(var(--u)*4)}
+.guide h2{font-family:var(--f-mono);font-size:10px;font-weight:500;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:calc(var(--u)*1.5)}
+.guide p{font-size:14px;line-height:1.62;color:var(--dim);max-width:46ch}
+.guide p+p{margin-top:calc(var(--u)*1.5)}
+.guide code{font-family:var(--f-mono);font-size:12.5px;color:var(--bone)}
+
+/* --- responsive ---------------------------------------------------- */
+@media (max-width:880px){
+  .plates{grid-template-columns:minmax(0,1fr);gap:9px}
+  .plate{flex-direction:row;align-items:center;flex-wrap:wrap;min-height:0;gap:0 14px;
+    padding:clamp(11px,1.7vh,16px) 15px}
+  .plate .p-num{flex:none;width:26px}
+  .plate .p-title{flex:1 1 auto;margin-top:0;padding-top:0;font-size:clamp(17px,4.4vw,22px)}
+  .plate .p-foot{flex:0 0 100%;margin-top:5px;padding-left:40px}
+}
+@media (max-width:860px){
+  .entry{grid-template-columns:minmax(0,1fr);gap:0}
+  .meta{order:-1;text-align:left;display:flex;flex-wrap:wrap;align-items:center;
+    gap:8px 16px;margin-bottom:calc(var(--u)*1.5)}
+  .meta .years{color:var(--gold)}
+  .tags{margin-top:0;justify-content:flex-start}
+  .guide-grid{grid-template-columns:minmax(0,1fr);gap:calc(var(--u)*3.5)}
+}
+@media (max-width:760px){
+  .rec tr{grid-template-columns:minmax(0,1fr) auto;gap:4px 18px}
+  .rec .cx{grid-column:1;grid-row:2}
+  .rec .yr{grid-column:2;grid-row:2}
+  .rec .mk,.rec .h.m{text-align:right}
+}
+@media (max-width:600px){
+  .secnav{flex-direction:column;gap:26px}
+  .secnav a{max-width:100%}
+  .secnav .nx{margin-left:0;text-align:left}
+  .tabs .tt{display:none}
+  .tabs ol{gap:16px}
+  .rec .mk{font-size:20px}
+}
+/* short viewports: shed the softest elements rather than scroll the slab */
+@media (max-height:780px){ .g-statement{display:none} }
+@media (max-height:660px){ .g-crest{display:none} }
+@media (max-height:580px){ .g-role{display:none} }
+@media (max-height:500px){ .g-eyebrow{display:none} }
+/* landscape phone — the plates go back to one row so the slab still fits */
+@media (max-height:520px) and (min-width:600px){
+  .plates{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .plate{flex-direction:column;align-items:stretch;min-height:0;padding:10px 14px}
+  .plate .p-num{width:auto}
+  .plate .p-title{margin-top:6px;padding-top:0;font-size:clamp(15px,1.9vw,19px)}
+  .plate .p-foot{flex:0 0 auto;width:auto;padding-left:0;margin-top:4px}
+}
+
+/* --- reduced motion: the stone holds its breath --------------------- */
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:1ms!important;animation-delay:0ms!important;
+    animation-iteration-count:1!important;transition-duration:1ms!important}
+  .m-body,.m-v1,.m-v2,.m-bloom{animation:none!important}
+  .m-body{opacity:.34}.m-v1{opacity:.15;transform:rotate(-9deg) scale(1.12)}
+  .m-v2{opacity:.07;transform:rotate(6deg) scale(1.11)}.m-bloom{opacity:.75}
+  .rv{opacity:1!important;transform:none!important}
+  .rule{transform:scaleX(1)!important}
+  .struck{animation:none!important}
+}
+</style>
+</head>
+<body data-view="gate">
+
+<div class="marble" aria-hidden="true"><div class="m-layers">
+  <i class="m-body"></i><i class="m-v1"></i><i class="m-v2"></i><i class="m-bloom"></i>
+</div><i class="m-scrim"></i></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="frame" aria-hidden="true"><i class="c3"></i><i class="c4"></i></div>
+
+<!-- TEMPLATE CHROME — delete this element before sending the page out -->
+<div class="notice" id="notice">
+  <p>Fictional sample content. Every string lives in the <code>RESUME</code> object at the top of the script — <a href="#guide">read the fill-in guide</a>.</p>
+  <button type="button" class="x" id="notice-dismiss">Dismiss</button>
+</div>
+
+<main id="app">
+
+  <!-- THE SLAB -->
+  <div id="gate" tabindex="-1">
+    <div class="gate-in">
+      <p class="g-crest" id="crest"></p>
+      <p class="g-eyebrow"><span id="eyebrow"></span><i aria-hidden="true"></i></p>
+      <h1 class="gilt" id="name"></h1>
+      <p class="g-role" id="role"></p>
+      <p class="g-statement" id="statement"></p>
+      <nav class="plates" id="plates" aria-label="Records"></nav>
+      <ul class="g-contact" id="contact"></ul>
+    </div>
+  </div>
+
+  <!-- THE RECORD PAGES — rendered on route -->
+  <div id="view" tabindex="-1"></div>
+
+  <!-- TEMPLATE CHROME — delete this element before sending the page out -->
+  <div id="guide" tabindex="-1">
+    <div class="topbar"><div class="wrap topbar-in">
+      <a class="back" href="#"><span class="ar" aria-hidden="true">&#8592;</span><span class="wm gilt sm" id="guide-wm"></span></a>
+    </div></div>
+    <div class="wrap">
+      <div class="guide">
+        <h1>Filling this in</h1>
+        <div class="guide-grid">
+          <div>
+            <h2>Where the copy lives</h2>
+            <p>One object, <code>RESUME</code>, at the top of the script, inside a comment banner. Identity and sections are all there, and the markup is generated from it.</p>
+            <p>Each section owns its own <code>figures</code>. The first one is struck onto that section's plate on the front page; the rest appear in the record band at the head of the page it belongs to.</p>
+            <p>Add a fourth section and the plates, the roman numerals, the tabs and the next/previous links all follow on their own. No other edit.</p>
+          </div>
+          <div>
+            <h2>How to write a bullet</h2>
+            <p>Verb, then scope, then the number. <em>Anchored the 4&#215;800 relay to a school record of 7:58.21 at the district final.</em> Never more than two lines.</p>
+            <p>Wrap the figure in <code>&lt;b&gt;</code> to lift it from grey to white. That is the entire emphasis system, and it is what lets a coach skim a page for numbers alone.</p>
+            <p>One phrase in the front-page role line can be wrapped in <code>&lt;em&gt;</code> to take the gold.</p>
+          </div>
+          <div>
+            <h2>What not to touch</h2>
+            <p>Everything below the <code>RESUME</code> object. The palette, the four roles gold is allowed to play, the type scale and the motion are the design — changing one unbalances the others.</p>
+            <p><b>Four figures in total</b>, counted across every section, and only figures a coach or an admissions reader would care about cold. The front page does not scroll; anything added to it has to earn its height.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+<script>
+(function(){
+"use strict";
+
+/* ██████████████████████████████████████████████████████████████████████
+   ██                                                                  ██
+   ██   EDIT EVERYTHING HERE — AND ONLY HERE                           ██
+   ██                                                                  ██
+   ██   Every string on every page comes out of this one object. The   ██
+   ██   front page, the three record pages, the plates, the numerals,  ██
+   ██   the tabs and the next/previous links are all generated from    ██
+   ██   it. Swapping clients means editing RESUME and nothing else.    ██
+   ██                                                                  ██
+   ██   Markup inside a string is deliberate and supported:            ██
+   ██     <em> in `role`      — the one gold phrase in the role line   ██
+   ██     <b>  in a bullet    — lifts a figure from grey to white      ██
+   ██                                                                  ██
+   ██   FOUR `figures` IN TOTAL across all sections. The first figure  ██
+   ██   of each section is struck onto its plate on the front page.    ██
+   ██                                                                  ██
+   ██   ALL CONTENT BELOW IS FICTIONAL SAMPLE DATA.                    ██
+   ██                                                                  ██
+   ██████████████████████████████████████████████████████████████████████ */
+
+var RESUME = {
+
+  identity: {
+    crest:     "Northridge Preparatory Academy",
+    eyebrow:   "Student–Athlete · Class of 2027",
+    first:     "Avery",
+    last:      "Lindholm",
+    role:      "Middle-distance runner and <em>four-year varsity captain</em>, recruiting for Division I track alongside a degree in biomedical engineering.",
+    statement: "Four seasons of year-round training next to eleven honours and AP courses, and a tutoring network built from nothing to four schools. Three records, listed the way they were earned — season by season, with the numbers left in.",
+    contact: [
+      { k: "Email",     v: "avery.lindholm@example.com", href: "mailto:avery.lindholm@example.com" },
+      { k: "Phone",     v: "+1 555-0142",                href: "tel:+15550142" },
+      { k: "Based",     v: "Northridge, Oregon" },
+      { k: "Race film", v: "film.example.com/lindholm",  href: "https://film.example.com/lindholm" }
+    ]
+  },
+
+  sections: [
+    {
+      id: "academic",
+      title: "Academic",
+      kicker: "Coursework, research and honours, listed by the year each was earned.",
+      figures: [
+        { fig: "4.42", lab: "Weighted GPA", sub: "3.94 unweighted · 11 honours & AP" },
+        { fig: "1510", lab: "SAT",          sub: "760 Math · 750 EBRW · one sitting" }
+      ],
+      entries: [
+        {
+          org: "Northridge Preparatory Academy",
+          role: "Honours Diploma Candidate — STEM Concentration",
+          place: "Northridge, OR",
+          years: "2023 — 2027",
+          tags: ["GPA 4.42", "AP Scholar"],
+          bullets: [
+            "Carried <b>eleven</b> honours and AP courses across four years while ranked <b>3rd of 214</b> in the class of 2027.",
+            "Elected to the National Honour Society as a sophomore, <b>two years</b> below the usual threshold."
+          ]
+        },
+        {
+          org: "Cascade Institute Summer Scholars",
+          role: "Research Assistant, Biomechanics Laboratory",
+          place: "Portland, OR",
+          years: "Summer 2026",
+          tags: ["Research", "1 in 40"],
+          bullets: [
+            "Selected from <b>640 applicants</b> for a nine-week placement in gait-analysis research.",
+            "Processed motion-capture data for <b>28 subjects</b> and co-authored the poster presented at the state symposium."
+          ]
+        },
+        {
+          org: "Northridge Science Olympiad",
+          role: "Team Captain, Build Events",
+          place: "Northridge, OR",
+          years: "2024 — 2027",
+          tags: ["Captain", "State"],
+          bullets: [
+            "Led a <b>15-member</b> team to a <b>2nd-place</b> state finish, the school's best in nine years.",
+            "Coached four underclassmen through a first regional; three of them medalled."
+          ]
+        }
+      ]
+    },
+    {
+      id: "athletic",
+      title: "Athletic",
+      kicker: "Four seasons of cross country and track, and the marks that stand behind them.",
+      figures: [
+        { fig: "1:53.8", lab: "800 m best", sub: "Junior season · electronically timed" }
+      ],
+      entries: [
+        {
+          org: "Northridge Preparatory — Track & Field",
+          role: "Varsity Captain, Middle Distance",
+          place: "Northridge, OR",
+          years: "2023 — 2027",
+          tags: ["Captain", "4× Varsity"],
+          bullets: [
+            "Anchored the 4×800 relay to a <b>school record</b> of 7:58.21 at the district final.",
+            "Dropped the open 800 by <b>6.4 seconds</b> over three seasons of year-round training."
+          ]
+        },
+        {
+          org: "Northridge Preparatory — Cross Country",
+          role: "Varsity, 5,000 m",
+          place: "Northridge, OR",
+          years: "2023 — 2026",
+          tags: ["All-League"],
+          bullets: [
+            "Placed <b>4th</b> at the league championship and took first-team all-league as a junior.",
+            "Logged <b>52 miles</b> a week through build phases with no session lost to injury in two years."
+          ]
+        },
+        {
+          org: "Cascade Elite Track Club",
+          role: "Distance Squad",
+          place: "Portland, OR",
+          years: "2025 — Present",
+          tags: ["Club", "Off-season"],
+          bullets: [
+            "Trained year-round under a USATF Level 2 coach and raced <b>nine</b> regional invitationals.",
+            "Ran <b>1:53.80</b> for the open 800 at the Cascade Summer Series, a personal best by 1.9 seconds."
+          ]
+        }
+      ],
+      record: {
+        caption: "Personal bests — fully automatic timing unless noted.",
+        cols: ["Event", "Mark", "Context", "Year"],
+        rows: [
+          { ev: "800 m",                 mk: "1:53.80", cx: "Cascade Summer Series",           yr: "2026" },
+          { ev: "1,600 m",               mk: "4:18.44", cx: "District Championship",           yr: "2026" },
+          { ev: "3,200 m",               mk: "9:31.07", cx: "Northridge Invitational",         yr: "2026" },
+          { ev: "4 × 800 m relay",       mk: "7:58.21", cx: "District final · school record",  yr: "2026" },
+          { ev: "5,000 m cross country", mk: "15:42.9", cx: "League Championship · hand timed", yr: "2025" }
+        ]
+      }
+    },
+    {
+      id: "extracurricular",
+      title: "Extracurricular",
+      kicker: "Work carried outside the classroom and the track, and what it produced.",
+      figures: [
+        { fig: "312", lab: "Students tutored", sub: "Four Title I schools since 2024" }
+      ],
+      entries: [
+        {
+          org: "Open Table Tutoring",
+          role: "Founder & Director",
+          place: "Northridge, OR",
+          years: "2024 — Present",
+          tags: ["Founder", "Nonprofit"],
+          bullets: [
+            "Built a free tutoring network that has now served <b>312 students</b> across four Title I schools.",
+            "Recruited and scheduled <b>41 volunteer tutors</b> and raised <b>$6,800</b> for materials and transport."
+          ]
+        },
+        {
+          org: "Northridge Youth Council",
+          role: "Student Representative, Parks & Recreation",
+          place: "Northridge, OR",
+          years: "2025 — 2027",
+          tags: ["Elected", "Civic"],
+          bullets: [
+            "Presented a resurfacing proposal that secured <b>$140,000</b> for the public track.",
+            "Represented <b>2,100</b> district students at monthly council sessions."
+          ]
+        },
+        {
+          org: "Cascade Ridge Trail Alliance",
+          role: "Volunteer Crew Lead",
+          place: "Hood River, OR",
+          years: "2023 — Present",
+          tags: ["Service"],
+          bullets: [
+            "Logged <b>220 service hours</b> maintaining eleven miles of public trail.",
+            "Led weekend crews of <b>eight to twelve</b> volunteers through spring restoration work."
+          ]
+        }
+      ]
+    }
+  ],
+
+  footNote: "This page is a template. Every name, mark, figure and contact detail on it is fictional sample content."
+};
+
+/* ██████████████████████████████████████████████████████████████████████
+   ██   NOTHING BELOW THIS LINE NEEDS EDITING TO CHANGE THE CONTENT.   ██
+   ██████████████████████████████████████████████████████████████████████ */
+
+var $ = function(id){ return document.getElementById(id); };
+var BODY = document.body;
+var ROMAN = ["","I","II","III","IV","V","VI","VII","VIII","IX","X"];
+function roman(n){ return ROMAN[n] || String(n); }
+function fullName(){ return RESUME.identity.first + " " + RESUME.identity.last; }
+
+var REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var HAS_IO = "IntersectionObserver" in window;
+var booted = false;
+
+/* ---------- shared fragments -------------------------------------- */
+
+function contactHTML(){
+  return RESUME.identity.contact.map(function(c){
+    var v = c.href
+      ? '<a class="v" href="' + c.href + '">' + c.v + '</a>'
+      : '<span class="v">' + c.v + '</span>';
+    return '<li><span class="k">' + c.k + '</span>' + v + '</li>';
+  }).join("");
+}
+
+/* ---------- the slab ---------------------------------------------- */
+
+function renderGate(){
+  var i = RESUME.identity;
+  $("crest").textContent     = i.crest;
+  $("eyebrow").textContent   = i.eyebrow;
+  $("name").innerHTML        = '<span class="n1">' + i.first + '</span><span class="n2">' + i.last + '</span>';
+  $("role").innerHTML        = i.role;
+  $("statement").textContent = i.statement;
+  $("contact").innerHTML     = contactHTML();
+  $("guide-wm").textContent  = fullName();
+
+  /* each plate carries its section's headline figure — the buttons are
+     the record board, which is why the front page needs nothing else */
+  $("plates").innerHTML = RESUME.sections.map(function(s, n){
+    var f = s.figures && s.figures[0];
+    return '<a class="plate rv" href="#' + s.id + '">'
+      + '<span class="p-num">' + roman(n + 1) + '</span>'
+      + '<span class="p-title gilt">' + s.title + '</span>'
+      + (f ? '<span class="p-foot"><span class="p-fig gilt sm">' + f.fig + '</span>'
+             + '<span class="p-lab">' + f.lab + '</span></span>' : "")
+      + '</a>';
+  }).join("");
+}
+
+/* ---------- a record page ------------------------------------------ */
+
+function topbarHTML(activeId){
+  return '<div class="topbar"><div class="wrap topbar-in">'
+    + '<a class="back" href="#"><span class="ar" aria-hidden="true">←</span>'
+    +   '<span class="wm gilt sm">' + fullName() + '</span></a>'
+    + '<nav class="tabs" aria-label="Records"><ol>'
+    + RESUME.sections.map(function(s, n){
+        var on = s.id === activeId;
+        return '<li><a href="#' + s.id + '"' + (on ? ' class="on" aria-current="page"' : "") + '>'
+          + '<i class="tick" aria-hidden="true"></i>'
+          + '<span class="tn">' + roman(n + 1) + '</span>'
+          + '<span class="tt">' + s.title + '</span></a></li>';
+      }).join("")
+    + '</ol></nav></div></div>';
+}
+
+function figsHTML(figures){
+  if (!figures || !figures.length) return "";
+  return '<div class="figs">' + figures.map(function(f){
+    return '<div class="fig-cell rv">'
+      + '<p class="fig gilt">' + f.fig + '</p>'
+      + '<p class="lab">' + f.lab + '</p>'
+      + '<p class="sub">' + f.sub + '</p></div>';
+  }).join("") + '</div>';
+}
+
+function entryHTML(e){
+  return '<article class="entry rv">'
+    + '<div class="entry-main">'
+      + '<h2 class="org">' + e.org + '</h2>'
+      + '<p class="erole">' + e.role + '</p>'
+      + '<p class="eplace">' + e.place + '</p>'
+      + '<ul class="bul">' + e.bullets.map(function(b){ return '<li>' + b + '</li>'; }).join("") + '</ul>'
+    + '</div>'
+    + '<div class="meta">'
+      + '<p class="years">' + e.years + '</p>'
+      + (e.tags && e.tags.length
+          ? '<ul class="tags">' + e.tags.map(function(t){ return '<li>' + t + '</li>'; }).join("") + '</ul>'
+          : "")
+    + '</div></article>';
+}
+
+/* A real table, kept semantic with explicit roles because the rows are
+   laid out with display:grid (which otherwise strips table semantics). */
+function recordHTML(r){
+  var cls = ["ev", "mk gilt", "cx", "yr"];
+  var hcl = ["h", "h m", "h", "h r"];
+  return '<table class="rec" role="table">'
+    + '<caption>' + r.caption + '</caption>'
+    + '<thead role="rowgroup"><tr role="row">'
+    + r.cols.map(function(c, n){
+        return '<th role="columnheader" scope="col" class="' + hcl[n] + '">' + c + '</th>';
+      }).join("")
+    + '</tr></thead><tbody role="rowgroup">'
+    + r.rows.map(function(row){
+        var v = [row.ev, row.mk, row.cx, row.yr];
+        return '<tr role="row" class="rec-row rv">'
+          + '<th role="rowheader" scope="row" class="' + cls[0] + '">' + v[0] + '</th>'
+          + '<td role="cell" class="' + cls[1] + '">' + v[1] + '</td>'
+          + '<td role="cell" class="' + cls[2] + '">' + v[2] + '</td>'
+          + '<td role="cell" class="' + cls[3] + '">' + v[3] + '</td></tr>';
+      }).join("")
+    + '</tbody></table>';
+}
+
+function secnavHTML(prev, next){
+  if (!prev && !next) return "";
+  function link(s, dir, lab){
+    return '<a class="' + dir + '" href="#' + s.id + '">'
+      + '<span class="lab">' + lab + '</span>'
+      + '<span class="t gilt sm">' + s.title + '</span></a>';
+  }
+  return '<nav class="secnav" aria-label="Other records">'
+    + (prev ? link(prev, "pv", "Previous record") : "")
+    + (next ? link(next, "nx", "Next record")     : "")
+    + '</nav>';
+}
+
+function footHTML(){
+  return '<footer class="foot">'
+    + '<div class="foot-top"><p class="mark gilt"><a href="#">' + fullName() + '</a></p></div>'
+    + '<ul class="g-contact">' + contactHTML() + '</ul>'
+    + '<p class="note">' + RESUME.footNote + '</p></footer>';
+}
+
+function renderSection(s, i){
+  $("view").innerHTML = topbarHTML(s.id)
+    + '<div class="wrap">'
+    +   '<section class="sec">'
+    +     '<p class="sec-num">' + roman(i + 1) + '</p>'
+    +     '<h1 class="sec-title gilt">' + s.title + '</h1>'
+    +     '<p class="sec-kicker">' + s.kicker + '</p>'
+    +     '<div class="rule" aria-hidden="true"></div>'
+    +     figsHTML(s.figures)
+    +     '<div class="entries">' + s.entries.map(entryHTML).join("") + '</div>'
+    +     (s.record ? recordHTML(s.record) : "")
+    +   '</section>'
+    +   secnavHTML(RESUME.sections[i - 1], RESUME.sections[i + 1])
+    +   footHTML()
+    + '</div>';
+}
+
+/* ---------- motion ------------------------------------------------- */
+
+function reveals(root){
+  var nodes = [].slice.call(root.querySelectorAll(".rv, .rule"));
+  if (REDUCE || !HAS_IO){ nodes.forEach(function(n){ n.classList.add("in"); }); return; }
+  var io = new IntersectionObserver(function(entries, obs){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      e.target.classList.add("in");
+      obs.unobserve(e.target);
+    });
+  }, { rootMargin: "0px 0px -7% 0px", threshold: 0.08 });
+  nodes.forEach(function(n){
+    var sibs = n.parentElement
+      ? [].filter.call(n.parentElement.children, function(c){ return c.classList.contains("rv"); })
+      : [];
+    n.style.transitionDelay = Math.min(Math.max(0, sibs.indexOf(n)), 7) * 55 + "ms";
+    io.observe(n);
+  });
+}
+
+function titleStrikes(root){
+  if (REDUCE || !HAS_IO) return;
+  var io = new IntersectionObserver(function(entries, obs){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      e.target.classList.add("struck");
+      obs.unobserve(e.target);
+    });
+  }, { threshold: 0.55 });
+  [].forEach.call(root.querySelectorAll(".sec-title"), function(t){ io.observe(t); });
+}
+
+/* the signature move — the slab catches light as the reader moves.
+   Element-relative, throttled through a single rAF, clamped so the
+   highlight can travel off-glyph without inverting. Front page only. */
+function specular(){
+  if (REDUCE || !window.matchMedia("(hover: hover)").matches) return;
+  var n = $("name"), gate = $("gate");
+  n.classList.add("gilt-live");
+  var raf = 0, x = 50, y = 42;
+  function apply(){
+    raf = 0;
+    n.style.setProperty("--sx", x.toFixed(2) + "%");
+    n.style.setProperty("--sy", y.toFixed(2) + "%");
+  }
+  gate.addEventListener("pointermove", function(ev){
+    var r = n.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    x = Math.max(-14, Math.min(114, ((ev.clientX - r.left) / r.width)  * 100));
+    y = Math.max(-40, Math.min(140, ((ev.clientY - r.top)  / r.height) * 100));
+    if (!raf) raf = requestAnimationFrame(apply);
+  }, { passive: true });
+  gate.addEventListener("pointerleave", function(){
+    x = 50; y = 42;
+    if (!raf) raf = requestAnimationFrame(apply);
+  }, { passive: true });
+}
+
+/* ---------- routing ------------------------------------------------ */
+
+function indexOfSection(id){
+  for (var i = 0; i < RESUME.sections.length; i++) if (RESUME.sections[i].id === id) return i;
+  return -1;
+}
+
+function route(){
+  var hash = (location.hash || "").replace(/^#/, "");
+  var i = indexOfSection(hash);
+  var panel;
+
+  if (hash === "guide"){
+    BODY.dataset.view = "guide";
+    panel = $("guide");
+  } else if (i > -1){
+    renderSection(RESUME.sections[i], i);
+    BODY.dataset.view = "section";
+    panel = $("view");
+    reveals(panel);
+    titleStrikes(panel);
+  } else {
+    if (location.hash && location.hash !== "#") location.replace("#");
+    BODY.dataset.view = "gate";
+    panel = $("gate");
+  }
+
+  window.scrollTo(0, 0);
+  if (booted && panel) panel.focus({ preventScroll: true });
+}
+
+/* ---------- boot ---------------------------------------------------- */
+
+renderGate();
+specular();
+route();
+window.addEventListener("hashchange", route);
+
+/* the load strike, landing just after paint, then the plates arrive */
+requestAnimationFrame(function(){
+  if (!REDUCE) $("name").classList.add("struck");
+  var plates = document.querySelectorAll("#plates .rv");
+  [].forEach.call(plates, function(p, n){
+    if (REDUCE){ p.classList.add("in"); return; }
+    p.style.transitionDelay = (620 + n * 90) + "ms";
+    requestAnimationFrame(function(){ p.classList.add("in"); });
+  });
+  booted = true;
+});
+
+var dismiss = $("notice-dismiss");
+if (dismiss) dismiss.addEventListener("click", function(){
+  $("notice").hidden = true;
+  BODY.classList.add("no-notice");
+});
+
+})();
+</script>
+</body>
+</html>

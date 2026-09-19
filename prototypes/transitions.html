@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transition options — Leonardo Carvalho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0E0E; --bg-rgb:14,14,14;
+  --ink:#EDEBE3; --ink-rgb:237,235,227;
+  --dim:#A09EA8; --faint:#4A4952;
+  --ac:#F2455A; --ac-rgb:242,69,90; --ac-hi:#F7A8AF; --ac-ink:#F5F3EE;
+  --serif:"Bodoni Moda",Didot,Georgia,serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;padding:40px clamp(18px,4vw,56px) 90px}
+h1,h2,h3,p{margin:0}
+a{color:var(--ac)}
+
+.head{max-width:900px;margin-bottom:38px}
+.head .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--ac);text-transform:lowercase}
+.head .eyebrow::before{content:"// ";opacity:.55}
+.head h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4.4vw,52px);line-height:1;margin:12px 0 14px}
+.head p{color:rgba(var(--ink-rgb),.78);max-width:70ch;font-size:13px}
+.head b{color:var(--ac);font-weight:500}
+
+.grid{display:grid;gap:26px;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));max-width:1500px}
+@media(max-width:520px){.grid{grid-template-columns:1fr}}
+
+.opt{border:1px solid rgba(var(--ac-rgb),.22);border-radius:3px;overflow:hidden;background:rgba(var(--ink-rgb),.015)}
+.opt__head{display:flex;align-items:baseline;gap:12px;padding:14px 16px 10px}
+.opt__n{font-family:var(--serif);font-size:26px;color:var(--ac);line-height:1}
+.opt__t{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+.opt__d{padding:0 16px 12px;font-size:12px;line-height:1.6;color:rgba(var(--ink-rgb),.7)}
+.opt__d em{color:var(--ac-hi);font-style:normal}
+
+/* the little stage each option animates inside */
+.stage{position:relative;height:330px;overflow:hidden;border-top:1px solid rgba(var(--ac-rgb),.18);
+  border-bottom:1px solid rgba(var(--ac-rgb),.18);background:rgba(0,0,0,.28)}
+.demo{position:absolute;inset:0;padding:18px 20px;display:flex;flex-direction:column;gap:9px}
+.d-num{font-family:var(--serif);font-size:52px;line-height:.78;color:transparent;-webkit-text-stroke:1px rgba(var(--ac-rgb),.6)}
+.d-name{font-size:10px;letter-spacing:.2em;color:var(--ac);text-transform:lowercase}
+.d-name::before{content:"// ";opacity:.55}
+.d-lede{font-style:italic;font-size:12px;color:rgba(var(--ink-rgb),.8);max-width:34ch}
+.d-rows{margin-top:4px;display:flex;flex-direction:column}
+.row{border-top:1px solid rgba(var(--ac-rgb),.18);padding:7px 0}
+.row:last-child{border-bottom:1px solid rgba(var(--ac-rgb),.18)}
+.row__t{font-family:var(--serif);font-size:16px;line-height:1.15;cursor:pointer}
+.row__m{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--ac);margin-top:3px}
+.row__more{overflow:hidden;height:0;opacity:0}
+.row__more p{font-size:11px;line-height:1.55;color:rgba(var(--ink-rgb),.72);padding-top:7px}
+
+.bar{display:flex;gap:10px;padding:11px 16px;flex-wrap:wrap}
+.btn{background:none;border:1px solid rgba(var(--ink-rgb),.18);color:var(--ink);font:inherit;font-size:11px;
+  letter-spacing:.06em;padding:5px 10px;border-radius:2px;cursor:pointer;transition:border-color .2s,color .2s}
+.btn:hover{border-color:var(--ac);color:var(--ac)}
+.btn--rec{border-color:rgba(var(--ac-rgb),.5);color:var(--ac)}
+.tag{margin-left:auto;align-self:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.tag.is-rec{color:var(--ac)}
+
+/* ── 1 · CRT scanline sweep ───────────────────────────────────────────── */
+.sweep{position:absolute;inset:0;pointer-events:none;opacity:0}
+.sweep i{position:absolute;left:0;right:0;height:2px;background:var(--ac-hi);
+  box-shadow:0 0 18px 5px rgba(var(--ac-rgb),.75);top:0}
+.s1 .demo{clip-path:inset(0 0 100% 0)}
+.s1.run .demo{animation:crtOpen 820ms cubic-bezier(.16,1,.3,1) forwards}
+.s1.run .sweep{opacity:1;animation:crtFade 820ms linear forwards}
+.s1.run .sweep i{animation:crtLine 820ms cubic-bezier(.16,1,.3,1) forwards}
+@keyframes crtOpen{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes crtLine{from{top:0}to{top:100%}}
+@keyframes crtFade{0%,80%{opacity:1}100%{opacity:0}}
+.s1.run .demo > *{animation:crtJit 820ms steps(1) forwards}
+@keyframes crtJit{0%{transform:translateX(-3px)}12%{transform:translateX(2px)}26%{transform:none}100%{transform:none}}
+
+/* ── 2 · Camera dolly ─────────────────────────────────────────────────── */
+.s2 .demo{transform:scale(1.16);opacity:0;filter:blur(9px)}
+.s2.run .demo{animation:dolly 760ms cubic-bezier(.16,1,.3,1) forwards}
+@keyframes dolly{to{transform:none;opacity:1;filter:blur(0)}}
+/* expansion: the frame pushes into the clicked row and the siblings fall back */
+.s2 .d-rows{transition:transform .55s var(--ease-out)}
+.s2 .row{transition:opacity .45s ease,transform .55s var(--ease-out),filter .45s ease}
+.s2.zoom .row{opacity:.12;filter:blur(2px)}
+.s2.zoom .row.is-open{opacity:1;filter:none;transform:scale(1.06);transform-origin:left center}
+
+/* ── 3 · Terminal buffer print ────────────────────────────────────────── */
+.s3 .demo > *{clip-path:inset(0 100% 0 0)}
+.s3.run .demo > *{animation:print 420ms steps(24) forwards}
+.s3.run .demo > *:nth-child(1){animation-delay:0ms}
+.s3.run .demo > *:nth-child(2){animation-delay:90ms}
+.s3.run .demo > *:nth-child(3){animation-delay:180ms}
+.s3.run .demo > *:nth-child(4){animation-delay:270ms}
+@keyframes print{to{clip-path:inset(0 0 0 0)}}
+.s3 .caret{position:absolute;width:8px;height:15px;background:var(--ac);opacity:0;pointer-events:none}
+.s3.run .caret{animation:caretRun 1100ms steps(1) forwards}
+@keyframes caretRun{0%{opacity:1}92%{opacity:1}100%{opacity:0}}
+
+/* ── 4 · Column shutter ───────────────────────────────────────────────── */
+.shut{position:absolute;inset:0;display:flex;pointer-events:none}
+.shut b{flex:1;background:var(--bg);border-right:1px solid rgba(var(--ac-rgb),.14);transform:translateY(0)}
+.s4.run .shut b{animation:shutUp 700ms cubic-bezier(.16,1,.3,1) forwards}
+.s4.run .shut b:nth-child(1){animation-delay:0ms}
+.s4.run .shut b:nth-child(2){animation-delay:55ms}
+.s4.run .shut b:nth-child(3){animation-delay:110ms}
+.s4.run .shut b:nth-child(4){animation-delay:165ms}
+.s4.run .shut b:nth-child(5){animation-delay:220ms}
+.s4.run .shut b:nth-child(6){animation-delay:275ms}
+.s4.run .shut b:nth-child(7){animation-delay:330ms}
+.s4.run .shut b:nth-child(8){animation-delay:385ms}
+@keyframes shutUp{to{transform:translateY(-101%)}}
+
+.foot{margin-top:40px;max-width:900px;font-size:12.5px;color:rgba(var(--ink-rgb),.72);line-height:1.7}
+.foot h2{font-size:11px;letter-spacing:.2em;text-transform:lowercase;color:var(--ac);margin-bottom:10px}
+.foot h2::before{content:"// ";opacity:.55}
+.foot b{color:var(--ac);font-weight:500}
+.foot ul{margin:10px 0 0;padding-left:18px}
+.foot li{margin-bottom:6px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <p class="eyebrow">transition options</p>
+  <h1>Four ways off the hero.</h1>
+  <p>The glyph wave and scramble-settle are now the hero's alone. These are the candidates for
+  <b>everything else</b> — the page-to-page transition and the subsection expansion. Hit
+  <em>page</em> to replay a panel arriving, and <em>subsection</em> (or any title) to open a row.
+  Each is built from the tokens the real site already uses.</p>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="foot">
+  <h2>my read</h2>
+  <p><b>3 for pages, 2 for subsections.</b> The buffer print is the most honestly terminal thing
+  here and it is the only one that stays legible while it runs — you can start reading before it
+  finishes, which matters on a panel someone is scanning for facts. It is also clearly a different
+  gesture from the hero's glyph wave rather than a quieter version of it.</p>
+  <p>The dolly earns the subsection, because that is the one place a <em>camera</em> metaphor is
+  literally true: you are pushing into one item and letting its neighbours fall out of focus. Used
+  on whole pages it starts to feel like a slideshow.</p>
+  <ul>
+    <li><b>1 · CRT sweep</b> — the most visually impressive in isolation, and the most tiring on the
+      fifth visit. The bloom also fights the field behind it.</li>
+    <li><b>2 · Camera dolly</b> — the blur is expensive to composite full-page; scoped to one row it
+      is cheap and reads beautifully.</li>
+    <li><b>3 · Buffer print</b> — cheapest, calmest, most readable, most terminal. Scales to any
+      amount of content.</li>
+    <li><b>4 · Column shutter</b> — mechanical and striking, but it hides the content until it is
+      done, and it reads more departure-board than terminal.</li>
+  </ul>
+  <p>They can also be mixed — that is what I would do.</p>
+</div>
+
+<script>
+const OPTS = [
+  {n:'1', k:'s1', t:'CRT scanline sweep', d:'A bright line runs down the frame; everything above it is already drawn, everything below is still dark. One <em>steps()</em> jitter as the line passes, the way a tube settles.'},
+  {n:'2', k:'s2', t:'Camera dolly', d:'The frame pushes in from a blur. On a subsection the camera keeps going — the row you opened holds focus while its neighbours fall back and defocus.'},
+  {n:'3', k:'s3', t:'Terminal buffer print', d:'Lines paint left to right, top to bottom, with a block caret running ahead of the text. Readable the whole way through — you can start reading line one while line four is still printing.'},
+  {n:'4', k:'s4', t:'Column shutter', d:'The panel is masked by vertical strips that lift away one after another, like a departure board clearing. Mechanical and fast.'}
+];
+const REC = {s2:'recommended · subsections', s3:'recommended · pages'};
+
+const DEMO = `
+  <p class="d-num">IV</p>
+  <p class="d-name">research</p>
+  <p class="d-lede">Drug safety after approval, a knee that helps you walk again, and two products in build.</p>
+  <div class="d-rows">
+    <div class="row"><p class="row__t">Aducanumab, after approval <span style="font-size:.5em;vertical-align:.35em;color:var(--ac)">+</span></p><p class="row__m">Pharmacovigilance · Scholarly Review</p><div class="row__more"><p>Pharmacovigilance is the part of a drug's life that begins after the trials end: what the adverse-event record says once a therapy meets a population far larger and less tidy than any cohort.</p></div></div>
+    <div class="row"><p class="row__t">Genuvalens <span style="font-size:.5em;vertical-align:.35em;color:var(--ac)">+</span></p><p class="row__m">Robotic knee exoskeleton · ACL</p><div class="row__more"><p>Reconstruction repairs the ligament; it does not repair the shutdown of the muscle around it. The design question is how much assistance to give, and when to take it away.</p></div></div>
+    <div class="row"><p class="row__t">Loquar <span style="font-size:.5em;vertical-align:.35em;color:var(--ac)">+</span></p><p class="row__m">Open-world language learning</p><div class="row__more"><p>The premise is that drills teach recognition and situations teach language.</p></div></div>
+  </div>`;
+
+document.getElementById('grid').innerHTML = OPTS.map(o => `
+  <section class="opt">
+    <div class="opt__head"><span class="opt__n">${o.n}</span><span class="opt__t">${o.t}</span></div>
+    <p class="opt__d">${o.d}</p>
+    <div class="stage ${o.k}" id="${o.k}">
+      <div class="demo">${DEMO}</div>
+      ${o.k==='s1' ? '<div class="sweep"><i></i></div>' : ''}
+      ${o.k==='s3' ? '<span class="caret"></span>' : ''}
+      ${o.k==='s4' ? '<div class="shut">'+'<b></b>'.repeat(8)+'</div>' : ''}
+    </div>
+    <div class="bar">
+      <button class="btn" data-play="${o.k}">▸ page</button>
+      <button class="btn" data-expand="${o.k}">▸ subsection</button>
+      <span class="tag ${REC[o.k]?'is-rec':''}">${REC[o.k]||''}</span>
+    </div>
+  </section>`).join('');
+
+/* replay a page arrival */
+function play(k){
+  const st = document.getElementById(k);
+  st.classList.remove('run','zoom');
+  st.querySelectorAll('.row.is-open').forEach(r=>close(r));
+  void st.offsetWidth;
+  st.classList.add('run');
+  if (k === 's3') runCaret(st);
+}
+/* the caret that runs ahead of the printed text */
+function runCaret(st){
+  const caret = st.querySelector('.caret');
+  const lines = [...st.querySelectorAll('.demo > *')];
+  lines.forEach((el, i) => setTimeout(() => {
+    const r = el.getBoundingClientRect(), s = st.getBoundingClientRect();
+    caret.style.top = (r.top - s.top + Math.min(4, r.height*0.1)) + 'px';
+    caret.style.height = Math.min(18, r.height) + 'px';
+    caret.style.left = (r.left - s.left) + 'px';
+    caret.animate(
+      [{left:(r.left-s.left)+'px'},{left:(r.left-s.left+Math.min(r.width, 260))+'px'}],
+      {duration:420, easing:'steps(24)', fill:'forwards'});
+  }, i*90));
+}
+
+/* open / close a subsection, in the idiom of the option it belongs to */
+function open(row, k){
+  const more = row.querySelector('.row__more');
+  row.classList.add('is-open');
+  more.style.transition = 'height .44s var(--ease-out), opacity .34s ease';
+  more.style.height = more.scrollHeight + 'px';
+  more.style.opacity = '1';
+  if (k === 's2') row.closest('.stage').classList.add('zoom');
+  if (k === 's1' || k === 's3') {
+    more.style.clipPath = 'inset(0 100% 0 0)';
+    more.animate([{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0 0 0)'}],
+      {duration:460, easing:k==='s3'?'steps(22)':'cubic-bezier(.16,1,.3,1)', fill:'forwards'});
+  }
+}
+function close(row){
+  const more = row.querySelector('.row__more');
+  row.classList.remove('is-open');
+  more.style.height = '0px';
+  more.style.opacity = '0';
+  const st = row.closest('.stage');
+  if (!st.querySelector('.row.is-open')) st.classList.remove('zoom');
+}
+function toggle(row, k){
+  const st = row.closest('.stage');
+  const wasOpen = row.classList.contains('is-open');
+  st.querySelectorAll('.row.is-open').forEach(close);
+  if (!wasOpen) open(row, k);
+}
+
+document.addEventListener('click', e => {
+  const p = e.target.closest('[data-play]');
+  if (p) return play(p.dataset.play);
+  const x = e.target.closest('[data-expand]');
+  if (x) { const st = document.getElementById(x.dataset.expand); return toggle(st.querySelector('.row'), x.dataset.expand); }
+  const t = e.target.closest('.row__t');
+  if (t) { const row = t.closest('.row'); return toggle(row, row.closest('.stage').id); }
+});
+
+/* show each one once on arrival, staggered */
+OPTS.forEach((o,i) => setTimeout(() => play(o.k), 300 + i*260));
+</script>
+</body>
+</html>

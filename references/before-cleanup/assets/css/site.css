@@ -1,0 +1,576 @@
+/* ============================================================
+   LEONARDO CARVALHO — portfolio
+
+   FIELD      priyandesai.com's hero background: a full-viewport ASCII
+              noise field (assets/js/field.js), pointer-reactive, dimmed
+              behind the chapters, tuned from the panel (T).
+   NAME CARD  sergzorin.com's terminal header on the intro panel: typed
+              prompt, gradient-clipped ASCII block name, highlight tag,
+              CRT scanlines, status line (namecard.js).
+   DOSSIER    references/repo ("Horizon"): six panels, the preloader
+              counter, the big serif pager + rail, chapter typography
+              (Bodoni Moda display, JetBrains Mono everything else),
+              outlined numerals, stats, entries, ring cursor (app.js).
+   NAV        priyandesai.com's letter-flip links.
+
+   Panels do not slide. Leaving one collapses its content toward the
+   pager (the reverse of the load wave); the next blooms outward from
+   it. Under 900×620 the same markup is a vertical document and each
+   panel populates as it scrolls into view.
+
+   Themes: dark by default; `html[data-theme="light"]` swaps the ground
+   tokens. The accent (--ac & co.) is set per theme by namecard.js.
+   ============================================================ */
+:root{
+  color-scheme:dark;
+  --bg:#0E0E0E;            --bg-rgb:14,14,14;
+  --ink:#EDEBE3;           --ink-rgb:237,235,227;
+  --dim:#A09EA8;
+  --faint:#4A4952;
+  --line:rgba(237,235,227,.14);
+  --ac:#F2455A;            /* palette- and theme-driven */
+  --ac-rgb:242,69,90;
+  --ac-hi:#F7A8AF;
+  --ac-ink:#F5F3EE;
+  --hair:rgba(var(--ac-rgb),.18);
+  --hair-soft:rgba(var(--ac-rgb),.16);
+  --hair-lift:rgba(var(--ac-rgb),.55);
+  --hair-rule:rgba(var(--ac-rgb),.22);
+  --serif:"Bodoni Moda",Didot,"Bodoni MT",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --sans:var(--mono);
+  --art:ui-monospace,Menlo,Consolas,"DejaVu Sans Mono",monospace;
+  --gutter:clamp(20px,3vw,40px);
+  --pad-x:clamp(22px,5vw,92px);
+  --pad-t:clamp(94px,12vh,120px);
+  --pad-b:clamp(110px,14vh,132px);
+  --nav-h:45px;
+  --wrap:760px;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+html[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F4F2EC;            --bg-rgb:244,242,236;
+  --ink:#151418;           --ink-rgb:21,20,24;
+  --dim:#5C5B64;
+  --faint:#C6C4CC;
+  --line:rgba(21,20,24,.14);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-color:var(--faint) transparent}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+html,body{margin:0;background:var(--bg);overflow-x:hidden}
+body{color:var(--ink);font-family:var(--mono);font-weight:400;font-size:15px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;
+  transition:background .4s ease,color .4s ease}
+body.is-loading{overflow:hidden}
+h1,h2,h3,p,dl,dd,dt,figure,pre{margin:0}
+a{color:var(--ac);text-decoration:none}
+a:hover{color:var(--ac-hi)}
+::selection{background:var(--ac);color:var(--ac-ink)}
+::-webkit-scrollbar{width:9px}
+::-webkit-scrollbar-thumb{background:var(--faint);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:var(--ac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:4px;border-radius:3px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.skip-link{position:fixed;top:12px;left:12px;z-index:150;padding:9px 13px;background:var(--ac);color:var(--ac-ink);
+  font-family:var(--mono);font-size:.8rem;border:0;border-radius:3px;transform:translateY(-200%);transition:transform .15s}
+.skip-link:focus{transform:none}
+
+@keyframes cue{0%{transform:translateX(0);opacity:0}25%{opacity:1}100%{transform:translateX(11px);opacity:0}}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- fixed backdrop: the field + CRT ---------- */
+.field{position:fixed;inset:0;z-index:0;width:100vw;height:100vh;height:100svh;display:block;pointer-events:none}
+.crt{position:fixed;inset:0;z-index:40;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0 1px,transparent 1px 3px)}
+.crt::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 200px rgba(0,0,0,.7)}
+html[data-theme="light"] .crt{background:repeating-linear-gradient(0deg,rgba(0,0,0,.028) 0 1px,transparent 1px 3px)}
+html[data-theme="light"] .crt::after{box-shadow:inset 0 0 160px rgba(0,0,0,.13)}
+
+/* ---------- chrome that waves in after the loader ---------- */
+body.can-animate [data-wave]{opacity:0;transform:translateY(6px);transition:opacity .55s ease,transform .55s var(--ease-out)}
+body.can-animate [data-wave].is-in{opacity:1;transform:none}
+
+/* ---------- preloader (Horizon) ---------- */
+/* The curtain is a boot log: the command is typed, then each real milestone
+   (the two typefaces, the field, the document) reports itself as it lands, with
+   the counter running against the same progress underneath. */
+.preloader{position:fixed;inset:0;z-index:140;background:var(--bg);display:flex;align-items:flex-end;justify-content:space-between;
+  gap:20px;padding:0 var(--pad-x) 52px;transition:opacity .4s ease}
+.boot{position:absolute;left:var(--pad-x);top:clamp(84px,16vh,150px);right:var(--pad-x);
+  font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--dim);pointer-events:none}
+.boot__cmd{color:var(--dim);margin-bottom:10px}
+.boot__cmd .ac{color:var(--ac)}
+.boot__log{list-style:none;margin:0;padding:0}
+.boot__log li{opacity:0;transform:translateY(4px);transition:opacity .3s ease,transform .3s var(--ease-out);white-space:nowrap}
+.boot__log li.is-in{opacity:1;transform:none}
+.boot__log b{color:var(--ac);font-weight:400}
+.boot__log i{font-style:normal;color:rgba(var(--ink-rgb),.82)}
+.boot__log .dots{color:var(--faint)}
+@media(prefers-reduced-motion:reduce){.boot__log li{transition:none}}
+@media(max-width:620px){.boot{font-size:11px}.boot__log li{white-space:normal}}
+.preloader.is-done{opacity:0;pointer-events:none}
+.preloader__pct{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:clamp(30px,5vw,58px);line-height:1;color:var(--ac);letter-spacing:-.04em}
+.preloader__sym{font-size:.3em;color:var(--dim);margin-left:.35em}
+.preloader__label{font-family:var(--mono);font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);padding-bottom:14px;text-align:right}
+
+/* ---------- nav (priyandesai.com) ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  height:var(--nav-h);padding:0 20px;font-family:var(--mono);font-size:14px;letter-spacing:-.02em;line-height:1;color:var(--ink)}
+.nav::before{content:"";position:absolute;inset:0 0 -22px 0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(var(--bg-rgb),.82) 0%,rgba(var(--bg-rgb),.5) 60%,rgba(var(--bg-rgb),0) 100%)}
+.nav a{color:inherit}
+.nav__links{display:flex;align-items:center;gap:24px}
+.nav__btn[aria-current="true"]{color:var(--ac)}
+.nav__btn{transition:color .35s ease}
+.flip{display:inline-flex;white-space:pre;overflow:hidden;padding:3px 0}
+.flip .ch{position:relative;display:inline-block;overflow:hidden}
+.flip .ch i{display:block;font-style:normal;transition:transform .35s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i) * 18ms)}
+.flip .ch i + i{position:absolute;inset:0;transform:translateY(120%)}
+.flip:hover .ch i:first-child,.flip:focus-visible .ch i:first-child{transform:translateY(-120%)}
+.flip:hover .ch i + i,.flip:focus-visible .ch i + i{transform:none}
+@media(prefers-reduced-motion:reduce){.flip .ch i{transition:none}}
+@media(max-width:760px){
+  :root{--nav-h:82px}
+  .nav{flex-wrap:wrap;height:auto;min-height:var(--nav-h);padding:10px 16px;row-gap:6px;justify-content:flex-start}
+  /* the links wrap onto a second line rather than scrolling sideways: a scroll
+     container clips the letter-flip glyphs, and a phone has no wheel for it */
+  .nav__links{order:3;width:100%;flex-wrap:wrap;overflow:visible;padding-bottom:2px;gap:6px 18px}
+}
+
+/* ---------- track & panels ---------- */
+.track{position:relative;z-index:5}
+.panel{position:relative;width:100%;min-height:100vh;min-height:100svh;
+  padding:var(--pad-t) var(--pad-x) var(--pad-b);display:flex;flex-direction:column;justify-content:center;gap:clamp(26px,5vh,44px)}
+/* every animated piece of a panel: hidden until its panel populates, replayed on each entry */
+body.can-animate [data-anim]{opacity:0;transform:translateY(18px)}
+body.can-animate [data-anim].is-pre{transition:none!important;opacity:0;transform:translateY(18px)}
+body.can-animate [data-anim].is-in{opacity:1;transform:none;transition:opacity .7s var(--ease-out),transform .7s var(--ease-out)}
+body.can-animate [data-anim].is-out{opacity:0;transform:translateY(-10px);transition:opacity .26s ease,transform .26s ease}
+
+/* ---------- 00 intro: the name card (sergzorin.com) ---------- */
+.panel--intro{padding:0;justify-content:flex-start;align-items:flex-start}
+.panel--intro::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(var(--bg-rgb),.55) 0%,rgba(var(--bg-rgb),.4) 40%,rgba(var(--bg-rgb),0) 70%)}
+.card{position:relative;z-index:2;width:100%;max-width:var(--wrap);padding:calc(var(--nav-h) + 34px) var(--gutter) 64px;font-size:15.5px;line-height:1.75}
+.prompt{padding:0 0 4px;color:var(--dim);font-size:.82rem}
+.prompt .ac{color:var(--ac)}
+.cursor-caret{display:inline-block;width:.55em;height:1.05em;background:var(--ac);vertical-align:-.16em;margin-left:.1em;animation:blink 1.1s steps(1) infinite}
+@media(prefers-reduced-motion:reduce){.cursor-caret{animation:none}}
+.nameblock{position:relative;display:block;width:100%;padding:18px 0 6px;background:none;border:0;font:inherit;
+  color:inherit;text-align:left;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.nameart{position:relative;z-index:1;font-family:var(--art);white-space:pre;margin:0;line-height:1;max-width:100%;overflow:hidden;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.nameart + .nameart{margin-top:.45em}
+.role{margin:24px 0 0}
+/* sergzorin.com's key-phrase highlight. Lit (solid) by default so noscript and
+   reduced-motion readers get the finished state; app.js only takes the box away
+   under `.can-animate`, then wipes it back in once the line has settled. */
+.hl{background-image:linear-gradient(var(--ac),var(--ac));background-repeat:no-repeat;
+  background-position:left center;background-size:100% 100%;
+  color:var(--ac-ink);padding:.04em .34em;border-radius:1px;font-weight:500;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+body.can-animate .hl{background-size:0% 100%;color:var(--ink);
+  transition:background-size .46s var(--ease-out),color 1ms linear .19s}
+body.can-animate .hl.is-lit{background-size:100% 100%;color:var(--ac-ink)}
+@media(prefers-reduced-motion:reduce){body.can-animate .hl{transition:none}}
+
+/* The ASCII portrait is drawn by the field itself (portrait.js → field.js),
+   out of the field's own cells, so there is no DOM layer for it. */
+
+/* ---------- shared dossier type (Horizon; mono for the descriptive text) ---------- */
+.eyebrow,.chapter-name{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.2em;
+  text-transform:lowercase;color:var(--ac)}
+.eyebrow::before,.chapter-name::before{content:"// ";opacity:.55}
+.eyebrow{margin-bottom:clamp(18px,3vh,34px)}
+.headline{font-family:var(--serif);font-weight:400;font-size:clamp(38px,9vw,92px);line-height:.94;letter-spacing:-.02em;color:var(--ink);margin-bottom:clamp(18px,3vh,34px);text-wrap:balance}
+.headline em{font-style:italic;color:var(--ac)}
+/* [grad]: sentence-length text cannot become block art, so the headline takes
+   the other half of the hero treatment — the palette gradient clipped to type. */
+.headline.is-grad{-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;background-repeat:no-repeat;
+  /* oversize the ramp so a multi-line headline only ever samples its brighter
+     two-thirds — the hero name can afford the dark stop, running text cannot */
+  background-size:100% 155%;background-position:0 0}
+.headline.is-grad em{color:inherit;-webkit-text-fill-color:transparent}
+.lede{font-family:var(--mono);font-size:clamp(13.5px,1.05vw,15.5px);line-height:1.7;color:rgba(var(--ink-rgb),.84);max-width:60ch;text-wrap:pretty}
+.lede + .lede{margin-top:12px}
+.lede b{font-weight:500;color:var(--ac)}
+/* the character sketch under the ledes: quieter than a lede, louder than a fact */
+.short{border-top:1px solid var(--hair-rule);padding-top:clamp(10px,1.6vh,16px);margin-top:clamp(14px,2.2vh,22px)}
+.short__k{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
+.short__v{font-family:var(--mono);font-size:clamp(12.5px,.95vw,14px);line-height:1.62;color:rgba(var(--ink-rgb),.74);max-width:62ch;text-wrap:pretty}
+/* About carries the contact block too, so everything but the lead stacks in a column beside it */
+.about__aside{display:flex;flex-direction:column;gap:clamp(14px,2.2vh,24px);min-width:0}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,2.4vw,40px);border-top:1px solid var(--hair-rule);padding-top:20px;max-width:1040px}
+.fact__k{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.fact__v{font-family:var(--serif);font-size:clamp(15px,1.3vw,20px);color:var(--ink)}
+.links{display:flex;gap:22px;flex-wrap:wrap;font-family:var(--mono);font-size:.92rem}
+
+/* ---------- link hover: the rule wipes in from the left, then never settles ----------
+   One shared treatment for every inline link. The resting hairline stays put so
+   links are still findable; ::after lays the accent rule over it, wiping in from
+   the left on enter and retracting to the right on leave. */
+.links a,.entry__body a,.entry__more a,.link,.contact__v a{position:relative;display:inline;
+  color:var(--ink);border-bottom:1px solid rgba(var(--ink-rgb),.16);padding-bottom:2px;
+  transition:color .3s ease}
+.links a::after,.entry__body a::after,.entry__more a::after,.link::after,.contact__v a::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;
+  background:var(--ac);
+  transform:scaleX(0);transform-origin:right center;
+  transition:transform .32s var(--ease-out)}
+.links a:hover,.entry__body a:hover,.entry__more a:hover,.link:hover,.contact__v a:hover,
+.links a:focus-visible,.entry__body a:focus-visible,.link:focus-visible{color:var(--ac)}
+.links a:hover::after,.entry__body a:hover::after,.entry__more a:hover::after,.link:hover::after,.contact__v a:hover::after,
+.links a:focus-visible::after,.entry__body a:focus-visible::after,.link:focus-visible::after{
+  transform:scaleX(1);transform-origin:left center}
+
+.chapter__side{display:flex;flex-direction:column;justify-content:center}
+.numeral{font-family:var(--serif);font-size:clamp(64px,20vw,178px);line-height:.78;color:transparent;
+  -webkit-text-stroke:1px rgba(var(--ac-rgb),.6);letter-spacing:-.03em;margin-bottom:clamp(12px,2vh,24px);font-variant-numeric:tabular-nums}
+/* Contact leads with a headline, so its figure shares a baseline with the
+   section mark instead of standing over it: "07  // contact" costs one line,
+   which is all that panel has to spare. About carries the chapters' stacked
+   mark instead, the figure over "// about". */
+.lead-mark{display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(14px,2.4vh,28px)}
+.lead-mark .numeral,.lead-mark .eyebrow{margin-bottom:0}
+.numeral--sm{font-size:clamp(30px,7vw,52px)}
+/* [block]: the same 5x7 raster the hero name is built from, clipped to the live
+   palette gradient. app.js writes the glyphs and the font-size (height-driven,
+   since the raster is 14 rows tall where the serif figure is one). */
+.numeral.is-art{font-family:var(--art);white-space:pre;line-height:1;letter-spacing:0;
+  -webkit-text-stroke:0;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  background-repeat:no-repeat;overflow:hidden}
+.chapter-name{margin-bottom:14px}
+.about__lead .chapter-name{margin-bottom:clamp(18px,3vh,34px)}
+.chapter-lede{font-family:var(--mono);font-style:italic;font-size:clamp(13.5px,1.05vw,15px);line-height:1.65;color:rgba(var(--ink-rgb),.8);max-width:34ch;margin-bottom:clamp(18px,3vh,34px)}
+.stat{display:flex;align-items:baseline;gap:14px;padding:10px 0;border-top:1px solid var(--hair-soft)}
+.stat__n{font-family:var(--serif);font-size:clamp(26px,2.5vw,36px);color:var(--ac);line-height:1;font-variant-numeric:tabular-nums}
+.stat__k{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+
+.entries{display:flex;flex-direction:column;justify-content:center}
+.entry{position:relative;display:grid;grid-template-columns:62px minmax(0,1fr);gap:16px;
+  padding:clamp(9px,1.7vh,19px) 14px clamp(9px,1.7vh,19px) 0;
+  border-top:1px solid var(--hair);align-items:start;transition:background .4s ease,border-color .4s ease}
+.entries .entry:last-child{border-bottom:1px solid var(--hair)}
+.entry:hover{background:linear-gradient(90deg,rgba(var(--ac-rgb),.09),rgba(var(--ac-rgb),0) 62%);border-top-color:var(--hair-lift)}
+/* a rule that draws itself down the left edge on enter */
+.entry::before{content:"";position:absolute;left:-14px;top:-1px;bottom:-1px;width:2px;background:var(--ac);
+  transform:scaleY(0);transform-origin:top center;transition:transform .42s var(--ease-out)}
+.entry:hover::before{transform:scaleY(1)}
+.entry:hover .entry__year{color:var(--ac)}
+/* the title takes the accent flat, the same hover every link on the page gets */
+.entry:hover .entry__open,.entry__open:focus-visible{color:var(--ac)}
+
+/* ---------- the print transition ----------
+   While a panel prints, its blocks are revealed by clip-path, so the opacity /
+   transform cascade has to get out of the way or it fades over the top. */
+body.can-animate .panel.is-print [data-anim],
+body.can-animate .panel.is-print [data-anim].is-in{opacity:1;transform:none;transition:none}
+/* one locked-width cell per character, so a swapped glyph cannot move the line */
+.cs{display:inline-block;text-align:center;white-space:pre}
+.print-caret{position:fixed;z-index:120;width:8px;height:15px;background:var(--ac);
+  opacity:0;pointer-events:none;transition:opacity .18s ease}
+
+/* ---------- a subsection as its own page ---------- */
+.subpage{display:flex;flex-direction:column;gap:clamp(8px,1.4vh,14px);
+  max-width:min(760px,88%);align-self:center;width:100%;margin-block:auto;position:relative;z-index:0}
+/* The pictures sit under all the copy, and a dense one under a paragraph costs
+   legibility. A soft pool of the ground behind each block of text dims the
+   picture there and leaves it whole around; the same idea on the chapters'
+   side and list, lighter, since their type is larger and shorter. */
+.subpage::before,.chapter__side::before,.entries::before,.about__lead::before,.about__aside::before{content:"";position:absolute;z-index:-1;pointer-events:none;border-radius:40px;
+  inset:-28px -40px;background:radial-gradient(ellipse at 40% 45%,rgba(var(--bg-rgb),.82) 0%,rgba(var(--bg-rgb),.62) 55%,rgba(var(--bg-rgb),0) 100%)}
+.chapter__side,.entries,.about__lead,.about__aside{position:relative;z-index:0}
+.chapter__side::before,.entries::before,.about__lead::before,.about__aside::before{background:radial-gradient(ellipse at 45% 50%,rgba(var(--bg-rgb),.66) 0%,rgba(var(--bg-rgb),.42) 55%,rgba(var(--bg-rgb),0) 100%)}
+/* centred while it fits; when it is taller than the window the auto margins
+   collapse and it scrolls from the top, so `cd ..` is always where the page
+   begins. (justify-content:center would push the top of a long page above the
+   edge, where nothing can scroll to it.) */
+body.mode-panels .panel.is-sub{display:flex;flex-direction:column;justify-content:flex-start}
+/* the way back is the command it stands for, and it prints after the page it
+   belongs to (data-last), so the escape hatch arrives once there is something
+   to escape from */
+.sub__back{align-self:flex-start;background:none;border:0;padding:14px 22px 14px 12px;margin:-12px 0 -8px -12px;
+  min-height:44px;min-width:96px;text-align:left;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--dim);
+  cursor:pointer;transition:color .25s ease}
+.sub__back__p{color:var(--ac)}
+.sub__back__c{display:inline-block;width:.5em;height:1em;background:var(--ac);
+  vertical-align:-.14em;margin-left:.15em;opacity:0;transition:opacity .2s ease}
+.sub__back:hover{color:var(--ink)}
+.sub__back:hover .sub__back__c,.sub__back:focus-visible .sub__back__c{opacity:1;animation:blink 1.1s steps(1) infinite}
+/* ---------- the terminal: three programs behind "Sites and programs" ----------
+   `$ ./games` is a prompt line the way `$ cd ..` is; pressing it clears the
+   detail and puts a screen in its place. The screen is a <pre> the games
+   write whole, in the site's mono, with a status line and the keys under it. */
+.term-go{background:none;border:0;padding:10px 18px 10px 10px;margin:-8px 0 -6px -10px;min-height:40px;text-align:left;
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--dim);cursor:pointer;transition:color .25s ease}
+.term-go__p{color:var(--ac)}
+.term-go__c{display:inline-block;width:.5em;height:1em;background:var(--ac);vertical-align:-.14em;margin-left:.15em;opacity:0;transition:opacity .2s ease}
+.term-go:hover{color:var(--ink)}
+.term-go:hover .term-go__c,.term-go:focus-visible .term-go__c{opacity:1;animation:blink 1.1s steps(1) infinite}
+.term{display:flex;flex-direction:column;gap:8px;outline:none;max-width:100%}
+.term__prompt,.term__status,.term__hint{margin:0;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--dim)}
+.term__p{color:var(--ac)}
+.term__screen{margin:0;font-family:var(--mono);font-size:clamp(11px,.85vw,13px);line-height:1.22;white-space:pre;color:var(--ink);
+  background:rgba(var(--ink-rgb),.04);border:1px solid var(--hair-rule);border-radius:2px;padding:10px 12px;
+  overflow-x:auto;max-width:100%;cursor:default;user-select:none;-webkit-user-select:none}
+.term__status{color:var(--ink);letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.sub__title{font-family:var(--serif);font-weight:400;font-size:clamp(26px,4.2vw,54px);
+  line-height:1.02;letter-spacing:-.015em;color:var(--ink);text-wrap:balance}
+.subpage .entry__meta{margin-bottom:4px}
+.sub__body{display:flex;flex-direction:column;gap:9px;border-top:1px solid var(--hair-rule);padding-top:14px}
+.sub__body p{font-family:var(--mono);font-size:clamp(13px,1vw,14.5px);line-height:1.68;
+  color:rgba(var(--ink-rgb),.78);max-width:64ch;text-wrap:pretty}
+.sub__body .sub__lede{font-size:clamp(14px,1.1vw,16px);color:rgba(var(--ink-rgb),.88)}
+
+/* ---------- the path: a season-by-season timeline ----------
+   Lives inside an entry's detail, so it only ever appears on a sub-page. Stops
+   are buttons: hover or focus reads a season out, click pins it. */
+.tl{position:relative;display:flex;align-items:flex-start;gap:2px;margin:16px 0 0}
+.tl__line{position:absolute;left:4%;right:4%;top:3px;height:1px;background:var(--hair-rule)}
+.tl__stop{position:relative;flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:9px;
+  background:none;border:0;padding:0;cursor:pointer;color:var(--dim);
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;font-variant-numeric:tabular-nums;
+  transition:color .25s ease}
+.tl__dot{width:7px;height:7px;border-radius:50%;border:1px solid var(--hair-lift);background:var(--bg);
+  transition:background .25s ease,border-color .25s ease,transform .25s var(--ease-out)}
+.tl__stop:hover,.tl__stop:focus-visible,.tl__stop[data-on="1"]{color:var(--ac)}
+.tl__stop:hover .tl__dot,.tl__stop:focus-visible .tl__dot,.tl__stop[data-on="1"] .tl__dot{
+  background:var(--ac);border-color:var(--ac);transform:scale(1.35)}
+.sub__body .tl__out{font-family:var(--mono);font-size:12px;line-height:1.6;color:rgba(var(--ink-rgb),.82);
+  border-top:1px solid var(--hair-rule);padding-top:11px;margin-top:14px;max-width:none}
+.sub__body .tl__out b{font-weight:400;color:var(--ac);letter-spacing:.12em;margin-right:11px;font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){.tl__dot,.tl__stop{transition:none}}
+
+/* ---------- expandable subsections ----------
+   The title is the control. `.entry__more` is measured and animated from 0 to
+   its own height, so the row opens in place without a layout jump; app.js owns
+   the [hidden] attribute so the detail is still there for search and noscript. */
+/* inline, so the button's box is the words themselves — hovering the empty
+   space beside a title must not start it decoding */
+.entry__open{display:inline;width:auto;margin:0;padding:0;background:none;border:0;
+  font:inherit;color:inherit;letter-spacing:inherit;text-align:left;cursor:pointer}
+/* .28em of a .62em glyph is the same optical lift .35em of a .5em one was, so
+   the arrow grows without leaving the title's baseline */
+.entry__open::after{content:" →";font-family:var(--mono);font-size:.62em;vertical-align:.28em;
+  color:var(--ac);opacity:.5;transition:opacity .3s ease}
+.entry:hover .entry__open::after{opacity:1}
+/* a season line: not shown in the list, shown on the sub-page */
+.entry__stats{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ac);
+  border-left:2px solid var(--hair-lift);padding-left:11px;margin-bottom:9px;font-variant-numeric:tabular-nums}
+.entry__more{display:none}          /* the source for the sub-page, never shown in place */
+/* A panel with four or more entries has to hold the same screen as one with
+   three, so the rows tighten instead of the list scrolling. Hidden entries are
+   still counted here, which is right: they take no height either way. */
+.entries:has(.entry:nth-of-type(4)) .entry{padding-top:clamp(5px,.9vh,11px);padding-bottom:clamp(5px,.9vh,11px)}
+.entries:has(.entry:nth-of-type(4)) .entry__title{margin-bottom:3px}
+.entries:has(.entry:nth-of-type(4)) .entry__meta{margin-bottom:5px}
+.entries:has(.entry:nth-of-type(4)) .entry__body{line-height:1.52}
+.entries:has(.entry:nth-of-type(5)) .entry__body{font-size:clamp(12px,.9vw,13.5px)}
+.entry__year{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--dim);padding-top:7px;transition:color .3s ease}
+.entry__title{font-family:var(--serif);font-size:clamp(18px,1.6vw,24px);font-weight:500;line-height:1.15;color:var(--ink);margin-bottom:5px}
+.entry__meta{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);margin-bottom:8px}
+.entry__body{font-family:var(--mono);font-size:clamp(12.5px,.95vw,14px);line-height:1.6;color:rgba(var(--ink-rgb),.8);max-width:62ch;text-wrap:pretty}
+
+/* ---------- 05 contact (Horizon) ---------- */
+.portrait{position:relative;width:100%;max-width:210px;aspect-ratio:3/4;border:1px solid rgba(var(--ac-rgb),.3);overflow:hidden}
+.portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.portrait__empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;
+  background:rgba(var(--ac-rgb),.05);font-family:var(--mono);font-size:9px;line-height:1.6;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.portrait.is-filled .portrait__empty{display:none}
+.contact{display:flex;flex-direction:column;justify-content:center}
+.contact .eyebrow{margin-bottom:18px}
+.contact-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(14px,1.8vw,30px);border-top:1px solid var(--hair-rule);padding-top:20px;max-width:700px}
+.contact__k{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
+.contact__v{font-family:var(--serif);font-size:clamp(14px,1.2vw,18px);color:var(--ink)}
+.link--email{display:inline-block;font-family:var(--serif);font-size:clamp(12px,.95vw,15.5px);line-height:1.3;word-break:break-word}
+.contact__foot{display:flex;flex-wrap:wrap;gap:14px;margin-top:clamp(20px,3.4vh,38px);align-items:center}
+.note{font-family:var(--mono);font-size:clamp(12px,.9vw,13px);line-height:1.6;color:rgba(var(--ink-rgb),.78);max-width:48ch}
+
+/* ---------- bottom bar: Horizon's counter + rail, sergzorin.com's status line ---------- */
+.sbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  padding:26px var(--pad-x) 18px;pointer-events:none;
+  background:linear-gradient(0deg,rgba(var(--bg-rgb),.94) 34%,rgba(var(--bg-rgb),0) 100%)}
+.sbar button{pointer-events:auto}
+/* [hide]: nothing on the page but the field, the cursor, and the button that
+   brings the page back, to look at a picture without the text over it. A
+   development aid, like the rest of the bar's toggles and the tuner. */
+/* the display toggles and the tuner are development aids: shown only with ?dev in the address */
+.tune--dev{display:none}
+html.is-dev .tune--dev{display:inline}
+html.is-bare .nav,html.is-bare .track,html.is-bare .sbar__left,html.is-bare .sbar__mid,html.is-bare .sbar__prompt,
+html.is-bare .sbar__toggles>:not(#ui-toggle),html.is-bare .print-caret,html.is-bare .tuner{opacity:0!important;pointer-events:none}
+html.is-bare .sbar{background:none}
+/* the picture's caption, shown only with the page hidden */
+.bare-caption{position:fixed;left:var(--pad-x);bottom:22px;z-index:61;max-width:64ch;margin:0;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;line-height:1.6;color:var(--dim);
+  opacity:0;transition:opacity .3s ease;pointer-events:none}
+.bare-caption::before{content:"// ";color:var(--ac);opacity:.7}
+.bare-caption:empty{display:none}
+html.is-bare .bare-caption{opacity:1}
+.sbar__left{display:flex;flex-direction:column;gap:6px}
+/* The middle is a single centred slot with the hint and the rail stacked in it;
+   only ever one of them is lit, so they share the cell. */
+.sbar__mid{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);
+  display:grid;place-items:center;pointer-events:none}
+.sbar__mid > *{grid-area:1/1}
+.counter{display:flex;align-items:baseline;gap:9px}
+.counter__i{font-family:var(--serif);font-size:34px;line-height:1;color:var(--ac);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.counter__t{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--dim)}
+.rail{position:relative;width:min(420px,28vw);height:1px;background:rgba(var(--ac-rgb),.2)}
+/* scaled, not widened: the progress fill animates on the compositor rather than
+   re-laying out on every panel change */
+.rail i{position:absolute;left:0;top:0;height:1px;width:100%;background:var(--ac);
+  transform:scaleX(0);transform-origin:left center;transition:transform .9s var(--ease-out)}
+.hint{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.hint i{display:inline-block;font-style:normal;color:var(--ac);animation:cue 1.8s ease-in-out infinite;margin-left:6px}
+.sbar__right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;padding-bottom:2px;
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;color:var(--dim)}
+.sbar__toggles{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:11px}
+/* the corner is the prompt: sergzorin.com's host line, typed out on arrival */
+.sbar__prompt{white-space:nowrap;color:var(--dim)}
+.sbar__prompt .host{color:var(--ac)}
+.sbar__prompt .pwd{color:var(--ink)}
+.sbar__prompt .cmd{color:var(--ink)}
+.sbar__prompt .cursor-caret{height:.9em;vertical-align:-.1em}
+.sbar .tune{background:none;border:0;padding:0;font:inherit;letter-spacing:inherit;color:var(--dim);cursor:pointer;transition:color .25s ease}
+.sbar .tune:hover,.sbar .tune.is-on{color:var(--ac)}
+
+/* Everything but the hint waits for the reader to leave the hero once; the hint
+   itself belongs to the home panel and comes back whenever the hero does. */
+body.can-animate .sbar [data-bar]{opacity:0;transform:translateY(7px);pointer-events:none;
+  transition:opacity .6s ease,transform .6s var(--ease-out)}
+body.can-animate.bar-on .sbar [data-bar]{opacity:1;transform:none;pointer-events:auto}
+body.can-animate .hint{opacity:0;transition:opacity .5s ease}
+body.can-animate.hint-on .hint{opacity:1}
+@media(prefers-reduced-motion:reduce){
+  body.can-animate .sbar [data-bar],body.can-animate .hint{transition:none}
+}
+
+@media(max-width:900px){.rail{width:min(300px,34vw)}}
+@media(max-width:760px){.sbar{padding:16px 16px 12px;gap:12px}.counter__i{font-size:26px}
+  .sbar__mid{display:none}.sbar__toggles{gap:9px}.sbar__right{font-size:.62rem}}
+@media(max-width:520px){.sbar__prompt{display:none}}
+@media(prefers-reduced-motion:reduce){.hint i{animation:none}.rail i{transition:none}}
+
+/* ---------- ring cursor (Horizon) ---------- */
+.cursor{position:fixed;top:0;left:0;width:32px;height:32px;border:1px solid var(--ac);border-radius:50%;
+  transform:translate(-50%,-50%);pointer-events:none;z-index:130;opacity:0;transition:width .3s ease,height .3s ease,background .3s ease,opacity .3s ease}
+.cursor--dot{width:4px;height:4px;background:var(--ac);border:none;z-index:131;transition:opacity .3s ease}
+.cursor.is-hot{width:62px;height:62px;background:rgba(var(--ac-rgb),.12)}
+.cursor--dot.is-hot{width:4px;height:4px;background:var(--ac)}
+body.custom-cursor,body.custom-cursor a,body.custom-cursor button,body.custom-cursor input,body.custom-cursor textarea{cursor:none}
+body.is-commenting,body.is-commenting *{cursor:crosshair!important}
+
+/* ---------- tuner + comments ---------- */
+.tuner{position:fixed;right:14px;bottom:78px;z-index:70;width:270px;max-height:calc(100vh - 110px);overflow:auto;padding:14px 14px 12px;
+  background:rgba(var(--bg-rgb),.94);border:1px solid var(--line);border-radius:4px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--dim);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);scrollbar-width:thin}
+.tuner__head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tuner__head b,.tuner__sub{font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:9.5px;color:var(--ac)}
+.tuner__sub{display:block;margin:14px 0 6px;padding-top:12px;border-top:1px solid var(--line)}
+.tuner__x{background:none;border:0;color:var(--dim);cursor:pointer;font:inherit;padding:2px 4px}
+.tuner__x:hover{color:var(--ink)}
+.tuner__row{display:grid;grid-template-columns:1fr 50px;gap:8px;align-items:end;margin:7px 0}
+.tuner__row label{display:block;margin-bottom:4px}
+.tuner__row input[type=range]{display:block;width:100%;accent-color:var(--ac);margin:0}
+.tuner__val{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums;padding-bottom:1px}
+.tuner__foot{display:flex;gap:8px;margin-top:12px}
+.tuner__btn{flex:1;background:transparent;border:1px solid var(--line);color:var(--ink);font:inherit;padding:6px 8px;cursor:pointer;border-radius:2px;letter-spacing:.08em}
+.tuner__btn:hover,.tuner__btn.is-on{border-color:var(--ac);color:var(--ac)}
+.tuner__note{margin-top:8px;font-size:9.5px;color:var(--dim);line-height:1.5}
+.tuner__list{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tuner__item{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:start;padding:6px 0;border-top:1px solid var(--line);line-height:1.45}
+.tuner__item b{color:var(--ac);font-weight:500}
+.tuner__item button{background:none;border:0;color:var(--dim);cursor:pointer;font:inherit;padding:0 2px}
+.tuner__item button:hover{color:var(--ac)}
+.tuner__item .where{display:block;color:var(--faint);font-size:9px;word-break:break-all}
+.tuner__item .what{display:block;color:var(--ink)}
+.tuner__item .where,.tuner__item .what{cursor:pointer}
+.lc-hover{outline:1px dashed var(--ac)!important;outline-offset:3px}
+.lc-pin{position:fixed;z-index:72;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ac);color:var(--ac-ink);
+  font-family:var(--mono);font-size:10px;font-weight:500;line-height:18px;text-align:center;pointer-events:none;transform:translate(-40%,-40%);box-shadow:0 0 0 2px rgba(var(--bg-rgb),.85)}
+.lc-note{position:fixed;z-index:73;width:260px;padding:10px;background:rgba(var(--bg-rgb),.97);border:1px solid var(--ac);border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--ink)}
+.lc-note .where{display:block;color:var(--dim);font-size:9px;margin-bottom:6px;word-break:break-all}
+.lc-note textarea{display:block;width:100%;min-height:64px;resize:vertical;background:rgba(var(--ink-rgb),.05);border:1px solid var(--line);color:var(--ink);font:inherit;padding:6px;border-radius:2px}
+.lc-note textarea:focus{border-color:var(--ac);outline:none}
+.lc-note .row{display:flex;gap:8px;margin-top:8px}
+
+/* ══ desktop (Horizon) ══ */
+@media(min-width:900px){
+  .headline{font-size:clamp(40px,5.6vw,92px)}
+  .numeral{font-size:clamp(84px,12vw,178px)}
+  .numeral--sm{font-size:clamp(42px,4vw,62px)}
+  .panel--about{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);grid-template-rows:minmax(0,1fr) auto minmax(0,1fr);
+    align-content:start;align-items:center;gap:0 clamp(28px,5vw,80px)}
+  .about__lead{max-width:none;align-self:center}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .panel--chapter{display:grid;grid-template-columns:minmax(280px,32%) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto minmax(0,1fr);gap:0 clamp(30px,5vw,86px);align-content:start}
+  /* A grid centred with align-content overflows at both ends once its content
+     is taller than the window, and the top end cannot be scrolled to: that was
+     the list whose last entries were out of reach. So the centring is done by
+     an empty 1fr row above and below the content instead, which share the free
+     space while there is any and shrink to nothing when there is none, and the
+     panel then scrolls from its top. */
+  .panel--about>*,.panel--chapter>*{grid-row:2}
+  .panel--chapter>.subpage{grid-column:1/-1}
+  .panel--about::before,.panel--about::after,.panel--chapter:not(.is-sub)::before,.panel--chapter:not(.is-sub)::after{content:"";grid-column:1/-1}
+  .panel--about::before,.panel--chapter::before{grid-row:1}
+  .panel--about::after,.panel--chapter::after{grid-row:3}
+  .entry{grid-template-columns:98px minmax(0,1fr);gap:24px}
+  .panel--contact{display:grid;grid-template-columns:minmax(180px,220px) minmax(0,1fr);gap:clamp(30px,5vw,74px);align-content:center;align-items:center}
+  .portrait{max-width:none}
+  .panel{--pad-t:clamp(70px,9vh,100px);--pad-b:clamp(86px,10vh,104px)}
+}
+@media(min-width:900px) and (max-height:720px){
+  .panel{--pad-t:64px;--pad-b:70px;gap:clamp(18px,3vh,30px)}
+  .numeral{font-size:clamp(72px,10vw,140px);margin-bottom:10px}
+  .numeral--sm{font-size:clamp(38px,3.4vw,52px)}
+  .lead-mark{margin-bottom:12px}
+  .chapter-lede{margin-bottom:10px;font-size:13px}
+  .stat{padding:4px 0}
+  .entry{padding-top:6px;padding-bottom:6px}
+  /* About carries a headline, two ledes, four facts and the link row in the
+     same height the chapters use for a list, so it needs its own trim here. */
+  .panel--about{gap:clamp(8px,1.2vh,14px)}
+  .headline{font-size:clamp(34px,4.4vw,64px);margin-bottom:clamp(10px,1.8vh,20px)}
+  .lede + .lede{margin-top:8px}
+  .facts{padding-top:12px}
+  .eyebrow{margin-bottom:clamp(10px,1.8vh,20px)}
+  /* the bar has to give ground too, or About's link row lands on the counter */
+  .sbar{padding-top:15px;padding-bottom:11px}
+  .sbar__left{gap:4px}
+  .counter__i{font-size:24px}
+  .chapter__side{justify-content:flex-start;padding-top:2vh}
+  .entry__title{font-size:clamp(17px,1.5vw,21px)}
+  .entry__body{font-size:12.5px;line-height:1.5}
+  .entry__meta{margin-bottom:5px}
+}
+
+/* ══ panel mode (added by app.js at >=900×620): panels stack in place, one active ══ */
+body.mode-panels{overflow:hidden;height:100%}
+body.mode-panels .track{position:relative;height:100vh;height:100svh}
+body.mode-panels .panel{position:absolute;inset:0;width:100%;height:100vh;height:100svh;min-height:0;overflow:hidden;
+  opacity:0;visibility:hidden;pointer-events:none}
+body.mode-panels .panel.is-active{opacity:1;visibility:visible;pointer-events:auto}
+body.mode-panels .panel--chapter,body.mode-panels .panel--about,body.mode-panels .panel--contact{overflow-y:auto;scrollbar-width:none}
+body.mode-panels .panel::-webkit-scrollbar{display:none}
+
+/* ══ reduced motion ══ */
+@media(prefers-reduced-motion:reduce){
+  body.can-animate [data-anim],body.can-animate [data-anim].is-in,body.can-animate [data-anim].is-out,body.can-animate [data-wave]{transition:none}
+  /* the hover states still land — they just stop moving once they are there */
+  .entry:hover .entry__open,.entry__open:focus-visible,
+  .links a:hover::after,.entry__body a:hover::after,.entry__more a:hover::after,.link:hover::after,.contact__v a:hover::after,
+  .links a:focus-visible::after,.entry__body a:focus-visible::after,.link:focus-visible::after{animation:none}
+  .entry::before,.links a::after,.entry__body a::after,.entry__more a::after,.link::after,.contact__v a::after{transition:none}
+  *{scroll-behavior:auto!important}
+}
+
+/* ══ phones: the fact and contact grids stack, after the base rules so they win ══ */
+@media(max-width:620px){.facts,.contact-grid{grid-template-columns:1fr}.fact__v,.contact__v{overflow-wrap:anywhere}}

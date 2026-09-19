@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "prototypes/transitions.html"
+        ],
+        "createdAt": "2026-09-08T03:03:53.503Z",
+        "reason": "Throwaway comparison fixture: the scanline bloom is the CRT effect under evaluation, not decoration. Claude's call; delete this file once the transition is chosen."
+      }
+    ]
+  }
+}

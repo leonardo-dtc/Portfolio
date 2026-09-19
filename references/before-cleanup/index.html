@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Leonardo Carvalho</title>
+<meta name="description" content="Leonardo Carvalho, Groton School Class of 2028: goaltender, biomedical engineering track, founder of OCAPEX, violist.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0E0E0E">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230E0E0E%22/><text x=%2250%22 y=%2268%22 font-size=%2248%22 text-anchor=%22middle%22 fill=%22%23E61E32%22 font-family=%22Menlo,monospace%22>LC</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script>(function(){try{var m=location.search.match(/[?&]theme=(light|dark)/);var t=(m&&m[1])||localStorage.getItem("lc-theme");if(t==="light")document.documentElement.setAttribute("data-theme","light");if(/[?&]dev\b/.test(location.search))document.documentElement.classList.add("is-dev");}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body class="is-loading">
+<a class="skip-link" href="#about">Skip to content</a>
+
+<canvas class="field" id="field" aria-hidden="true" data-hi="#E61E32" data-deep="#7C1E2A" data-grey="#4A4A4A" data-lit="#F7A8AF"></canvas>
+
+<header class="nav" id="nav" data-wave>
+  <nav class="nav__links" aria-label="Sections">
+    <a class="flip nav__btn" href="#intro" data-nav="0" aria-current="true">HOME</a>
+    <a class="flip nav__btn" href="#about" data-nav="1">ABOUT</a>
+    <a class="flip nav__btn" href="#athletics" data-nav="2">ATHLETICS</a>
+    <a class="flip nav__btn" href="#academics" data-nav="3">ACADEMICS</a>
+    <a class="flip nav__btn" href="#leadership" data-nav="4">LEADERSHIP</a>
+    <a class="flip nav__btn" href="#research" data-nav="5">RESEARCH</a>
+    <a class="flip nav__btn" href="#music" data-nav="6">MUSIC</a>
+    <a class="flip nav__btn" href="#build" data-nav="7">BUILD</a>
+  </nav>
+</header>
+
+<main class="track" id="track">
+
+  <!-- ─── 00 · Intro — the name card on the field ─────────────────────────── -->
+  <section class="panel panel--intro" id="intro" data-sect="intro" aria-label="Introduction">
+    <div class="card">
+      <p class="prompt" data-anim aria-hidden="true"><span class="ac">leonardo@carvalho</span> ~ % <span id="typed" data-cmd="./portfolio"></span><span class="cursor-caret"></span></p>
+      <h1 class="sr-only">Leonardo Carvalho: goaltender, researcher, founder. Groton School Class of 2028.</h1>
+      <button type="button" class="nameblock" id="nameblock" data-line1="Leonardo" data-line2="Carvalho" aria-label="Shuffle the ASCII name artwork">
+        <pre class="nameart" id="art1" aria-hidden="true"></pre>
+        <pre class="nameart" id="art2" aria-hidden="true"></pre>
+      </button>
+      <p class="role" data-anim><span class="hl">goaltender · researcher · founder · groton ’28</span></p>
+    </div>
+  </section>
+
+  <!-- ─── I · About, with the contact block folded in ────────────────────── -->
+  <section class="panel panel--about" id="about" data-sect="about" aria-label="I · About">
+    <div class="about__lead">
+      <p class="numeral" data-anim data-num data-n="1" aria-hidden="true">I</p>
+      <h2 class="chapter-name" data-anim data-scramble>About</h2>
+      <p class="lede" data-anim>Groton School Fifth Former, Class of 2028. A goaltender working toward college hockey, a <span class="hl">4.0 GPA</span> student on a biomedical engineering track, and the founder and president of <span class="hl">OCAPEX</span>, a student-run music nonprofit.</p>
+      <p class="lede" data-anim>Off the ice, author of a <span class="hl">pharmacovigilance study</span> of aducanumab’s complete FDA adverse-event record; designer of an assist-as-needed knee exoskeleton with Georgia Tech’s EPIC Lab; and <span class="hl">principal violist</span> of the Groton School Chamber Orchestra.</p>
+      <div class="short" data-anim>
+        <p class="short__k" data-scramble>In short</p>
+        <p class="short__v">Supportive: the loudest voice on the bench and the last line behind it. Play to the buzzer no matter the score. Put an idea on the table and welcome the argument. Goldfish memory for the rest: a bad goal or a bad shift, gone by the next whistle and owned after the game. Not the biggest goalie on the ice, so read the play instead.</p>
+      </div>
+    </div>
+
+    <div class="about__aside">
+      <dl class="facts" data-anim>
+        <div class="fact"><dt class="fact__k">Born</dt><dd class="fact__v">August 24, 2009</dd></div>
+        <div class="fact"><dt class="fact__k">Hometown</dt><dd class="fact__v">Lake Worth, Florida</dd></div>
+        <div class="fact"><dt class="fact__k">Languages</dt><dd class="fact__v">English&nbsp;·&nbsp;Mandarin&nbsp;·&nbsp;Spanish</dd></div>
+        <div class="fact"><dt class="fact__k">Focus</dt><dd class="fact__v">Biomedical engineering</dd></div>
+      </dl>
+
+      <dl class="contact-grid" id="contact" data-anim>
+        <div><dt class="contact__k">Correspondence</dt><dd class="contact__v"><a class="link link--email" href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a></dd></div>
+        <div><dt class="contact__k">Profiles</dt><dd class="contact__v"><a class="link" href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" target="_blank" rel="noopener">Elite Prospects</a>&nbsp;·&nbsp;<a class="link" href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" target="_blank" rel="noopener">NCSA</a></dd></div>
+        <div><dt class="contact__k">Organization</dt><dd class="contact__v"><a class="link" href="https://ocapex.com" target="_blank" rel="noopener">ocapex.com</a>&nbsp;·&nbsp;<a class="link" href="https://www.youtube.com/@OCApex" target="_blank" rel="noopener">YouTube</a></dd></div>
+        <div><dt class="contact__k">Coaches</dt><dd class="contact__v"><a class="link" href="mailto:wriley@groton.org">William Riley</a>, head&nbsp;·&nbsp;<a class="link" href="mailto:zlubinski@groton.org">Zachary Lubinski</a>, assistant&nbsp;·&nbsp;<a class="link" href="mailto:pasqualespano33@gmail.com">Patrick Spano</a>, goaltending</dd></div>
+        <div hidden><dt class="contact__k">Résumé</dt><dd class="contact__v">PDF to be added</dd></div>
+      </dl>
+
+      <div class="links" data-anim data-scramble>
+        <a href="mailto:leonardo.dtc2009@gmail.com">email</a>
+        <a href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" target="_blank" rel="noopener">elite prospects</a>
+        <a href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" target="_blank" rel="noopener">ncsa</a>
+        <a href="https://ocapex.com" target="_blank" rel="noopener">ocapex</a>
+        <a href="#research">paper</a>
+      </div>
+      <p class="note" data-anim>Groton School&nbsp;·&nbsp;Class of 2028. <span class="hl">Transcript, film, and coach references</span> on request.</p>
+    </div>
+  </section>
+
+  <!-- ─── II · Athletics ─────────────────────────────────────────── -->
+  <section class="panel panel--chapter" id="athletics" data-sect="athletics" aria-label="II · Athletics">
+    <div class="chapter__side">
+      <p class="numeral" data-anim data-num data-n="2" aria-hidden="true">II</p>
+      <h2 class="chapter-name" data-anim data-scramble>Athletics</h2>
+      <p class="chapter-lede" data-anim>Aggressive, positional goaltender focusing on positioning, reflexes and skating rather than size. Thirteen years on the ice, eleven in the crease, and <span class="hl">college hockey</span> as the next goal.</p>
+      <div class="stat" data-anim><span class="stat__n" data-num>5′11″</span><span class="stat__k" data-scramble>170 lb&nbsp;·&nbsp;catches left</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>2009</span><span class="stat__k" data-scramble>birth year&nbsp;·&nbsp;class of 2028</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>11</span><span class="stat__k" data-scramble>seasons in the crease</span></div>
+    </div>
+    <div class="entries">
+      <article class="entry" data-anim>
+        <p class="entry__year">2025 to now</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="goaltender" type="button" aria-expanded="false" aria-controls="d-ath-1">Goaltender, Groton Boys’ Varsity Hockey</button></h3>
+          <p class="entry__meta" data-scramble>Groton School&nbsp;·&nbsp;NEPSAC&nbsp;·&nbsp;ISL&nbsp;·&nbsp;#1 (#30 in 2025-26)</p>
+          <p class="entry__body">Second season in the Groton crease. Butterfly base, positional depth, a fast push east to west, a left catching glove. Working toward college hockey; <span class="hl">Division I is the goal</span>.</p>
+          <div class="entry__more" id="d-ath-1" hidden>
+            <p class="entry__stats">2025-26, second goaltender: 2 GP&nbsp;·&nbsp;2-0-0&nbsp;·&nbsp;1 GA&nbsp;·&nbsp;0.50 GAA&nbsp;·&nbsp;1 SO</p>
+            <p>Team record 14-12-1, out of the playoffs by a few points. The one shutout was a 15 to 20 save game. 2026-27 numbers follow as the season runs.</p>
+            <p>Strengths: positioning, reflexes, skating. This year’s work: reflexes, agility, balance. The best part of the net is the save, then the quiet after it, when the only job was to stop the puck.</p>
+            <p>Summers with goaltending coach Patrick Spano in Florida, remote advice in season; helping coach the younger goalies at his clinics. NCAA Eligibility Center and USA Hockey registered; Hockey Canada until 2019.</p>
+            <p>Coaches: <a href="mailto:wriley@groton.org">William Riley</a>, head&nbsp;·&nbsp;<a href="mailto:zlubinski@groton.org">Zachary Lubinski</a>, assistant&nbsp;·&nbsp;<a href="mailto:pasqualespano33@gmail.com">Patrick Spano</a>, goaltending.</p>
+            <p>Film and profiles on <a href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" target="_blank" rel="noopener">Elite Prospects</a> and <a href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" target="_blank" rel="noopener">NCSA</a>. Transcript and references on request.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2025 to 2026</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="prep-and-showcase" type="button" aria-expanded="false" aria-controls="d-ath-2">Prep, showcase and camp</button></h3>
+          <p class="entry__meta" data-scramble>NEFPHL&nbsp;·&nbsp;Northern Cyclones&nbsp;·&nbsp;Chowder Cup&nbsp;·&nbsp;NCD&nbsp;·&nbsp;Jon Elkin</p>
+          <p class="entry__body">Fall prep with NEFPHL 16U (2025) and Northern Cyclones Maroon 18U Prep (2026); the Chowder Cup Jr. A with the Boston Jr. Rangers (2026).</p>
+          <div class="entry__more" id="d-ath-2" hidden>
+            <p>Camps: the National Collegiate Development Camp (2025) and the Jon Elkin Goaltending Camp (2026).</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2016 to 2024</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="road-to-groton" type="button" aria-expanded="false" aria-controls="d-ath-3">The road to Groton</button></h3>
+          <p class="entry__meta" data-scramble>Ontario&nbsp;·&nbsp;Florida&nbsp;·&nbsp;New Jersey</p>
+          <p class="entry__body">On skates at five in Ontario; in the crease since 2016. Nine seasons of travel and AAA hockey across two states and a province before Groton.</p>
+          <div class="entry__more" id="d-ath-3" hidden>
+            <div class="tl" role="group" aria-label="Teams by season">
+              <div class="tl__line" aria-hidden="true"></div>
+              <button class="tl__stop" type="button" data-team="Heartland Dragons, Mississauga" aria-label="2016: Heartland Dragons, Mississauga"><span class="tl__dot"></span><span class="tl__yr">2016</span></button>
+              <button class="tl__stop" type="button" data-team="Brampton 45s AAA" aria-label="2017: Brampton 45s AAA"><span class="tl__dot"></span><span class="tl__yr">2017</span></button>
+              <button class="tl__stop" type="button" data-team="Brampton 45s AAA" aria-label="2018: Brampton 45s AAA"><span class="tl__dot"></span><span class="tl__yr">2018</span></button>
+              <button class="tl__stop" type="button" data-team="Florida Alliance AAA" aria-label="2019: Florida Alliance AAA"><span class="tl__dot"></span><span class="tl__yr">2019</span></button>
+              <button class="tl__stop" type="button" data-team="Florida Alliance AAA" aria-label="2020: Florida Alliance AAA"><span class="tl__dot"></span><span class="tl__yr">2020</span></button>
+              <button class="tl__stop" type="button" data-team="Florida Alliance AAA" aria-label="2021: Florida Alliance AAA"><span class="tl__dot"></span><span class="tl__yr">2021</span></button>
+              <button class="tl__stop" type="button" data-team="NJ Rockets AAA" aria-label="2022: NJ Rockets AAA"><span class="tl__dot"></span><span class="tl__yr">2022</span></button>
+              <button class="tl__stop" type="button" data-team="NJ Rockets AAA" aria-label="2023: NJ Rockets AAA"><span class="tl__dot"></span><span class="tl__yr">2023</span></button>
+              <button class="tl__stop" type="button" data-team="Palm Beach Breakers U16 AA" aria-label="2024: Palm Beach Breakers U16 AA"><span class="tl__dot"></span><span class="tl__yr">2024</span></button>
+              <button class="tl__stop" type="button" data-team="Groton School, ISL" aria-label="2025: Groton School, ISL"><span class="tl__dot"></span><span class="tl__yr">2025</span></button>
+              <button class="tl__stop is-now" type="button" data-team="Groton School, ISL" data-on="1" aria-label="Now: Groton School, ISL"><span class="tl__dot"></span><span class="tl__yr">NOW</span></button>
+            </div>
+            <p class="tl__out" aria-live="polite"><b>NOW</b> Groton School, ISL</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">Spring 2026</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="crew" type="button" aria-expanded="false" aria-controls="d-ath-5">Groton Varsity Crew</button></h3>
+          <p class="entry__meta" data-scramble>Nashua River&nbsp;·&nbsp;NEIRA Regatta&nbsp;·&nbsp;fours</p>
+          <p class="entry__body">Sweep rowing in a first spring on the Nashua River: starboard side, seats two and three, in the fours Groton races. Called up to the third boat the night before NEIRAs; rowed the morning heat with a crew that had never rowed together and made the <span class="hl">grand final</span>.</p>
+          <div class="entry__more" id="d-ath-5" hidden>
+            <p>The season began in the fifth boat. Crew built the aerobic base and the posterior chain, two things a season in the crease does not build on its own. NEIRAs took place on Lake Quinsigamond.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">Fall 2026</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="soccer" type="button" aria-expanded="false" aria-controls="d-ath-4">Groton JV Soccer</button></h3>
+          <p class="entry__meta" data-scramble>attacking midfielder</p>
+          <p class="entry__body">Fall season on the pitch as an attacking midfielder, working on footwork and field IQ. Thirds in 2025, JV in 2026.</p>
+          <div class="entry__more" id="d-ath-4" hidden>
+            <p>The lateral agility and read-and-react habits built over a season carry back into the crease. Three seasons, three sports; the off-ice work builds athleticism.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ─── III · Academics ─────────────────────────────────────────── -->
+  <section class="panel panel--chapter" id="academics" data-sect="academics" aria-label="III · Academics">
+    <div class="chapter__side">
+      <p class="numeral" data-anim data-num data-n="3" aria-hidden="true">III</p>
+      <h2 class="chapter-name" data-anim data-scramble>Academics</h2>
+      <p class="chapter-lede" data-anim>Groton Fifth Former on a biomedical engineering track: <span class="hl">4.0 GPA</span>, Honor Roll every term, nine AP exams and nine fives, and a STEM-heavy advanced course load. SAT 1490, PSAT 1480, sitting again in the Fifth Form.</p>
+      <div class="stat" data-anim><span class="stat__n" data-num>4.0</span><span class="stat__k" data-scramble>GPA, Groton School</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>1490</span><span class="stat__k" data-scramble>SAT</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>9 × 5</span><span class="stat__k" data-scramble>AP exams&nbsp;·&nbsp;every score a five</span></div>
+    </div>
+    <div class="entries">
+      <article class="entry" data-anim>
+        <p class="entry__year">2025 to now</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="groton" type="button" aria-expanded="false" aria-controls="d-aca-1">Groton School</button></h3>
+          <p class="entry__meta" data-scramble>Groton, Massachusetts&nbsp;·&nbsp;Fifth Form&nbsp;·&nbsp;Class of 2028</p>
+          <p class="entry__body">Arrived as a Fourth Former in 2025. <span class="hl">Honor Roll all three terms</span>; teachers’ comments single out preparation, intuition and contribution to class discussion.</p>
+          <div class="entry__more" id="d-aca-1" hidden>
+            <p>Fifth Form: English, Multivariable Calculus, Advanced Physics: Mechanics (AP Physics C), Organic Chemistry 1 and 2, United States History (AP), Chamber Orchestra, Select Chamber Music, viola and voice lessons.</p>
+            <p>Fourth Form: English, AP Calculus BC, AP Statistics, AP Computer Science, AP Chemistry, Chamber Orchestra, Select Chamber Music.</p>
+            <p>Biology Club, Biomed Club; founding an OCAPEX club this year.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2024 to 2026</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="ap-exams" type="button" aria-expanded="false" aria-controls="d-aca-2">Advanced Placement exams</button></h3>
+          <p class="entry__meta" data-scramble>American Heritage (2024, 2025)&nbsp;·&nbsp;Groton (2026)</p>
+          <p class="entry__body">Human Geography (2024); Biology, World History: Modern, Spanish Language and Culture, Precalculus (2025); Statistics, Computer Science Principles, Calculus BC, Chemistry (2026). <span class="hl">A 5 earned on every one.</span></p>
+          <div class="entry__more" id="d-aca-2" hidden>
+            <p>Physics C: Mechanics, English Literature, English Language, and United States History follow in 2027.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2019 to 2025</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="american-heritage" type="button" aria-expanded="false" aria-controls="d-aca-4">American Heritage School, Delray Beach</button></h3>
+          <p class="entry__meta" data-scramble>grades 5 to 10&nbsp;·&nbsp;Pre-Engineering track</p>
+          <p class="entry__body">4.0 unweighted on the Pre-Engineering track. Outstanding Student Award in ninth grade, one per grade; Best Student in Biology Honors, Algebra II Honors, English I Honors and Architecture I (ninth grade), and in AP Biology and AP Precalculus (tenth). National Junior Honor Society, grades 7 to 9; National Honor Society, grade 10.</p>
+          <div class="entry__more" id="d-aca-4" hidden>
+            <p>Music and academic merit scholarships (2023-24). Engineering involvement includes Intro to Engineering Design Honors and Principles of Engineering Honors (RIT Project Lead the Way) as well as Pre-Engineering Society.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2021 to 2025</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="robotics" type="button" aria-expanded="false" aria-controls="d-aca-5">Robotics and rocketry</button></h3>
+          <p class="entry__meta" data-scramble>FRC 5472 Wyld Stallyns&nbsp;·&nbsp;FTC 16759 Wyld Stallyns Untamed&nbsp;·&nbsp;TARC</p>
+          <p class="entry__body">Programmer (Java) on FRC 5472 Wyld Stallyns, helped reach the state championship, and on FTC 16759 Wyld Stallyns Untamed, plus the electrical work there; basic mechanical work on both. VEX Robotics in Python before that (2021). The American Rocketry Challenge: created a contender for nationals.</p>
+          <div class="entry__more" id="d-aca-5" hidden>
+            <p>Where the coding started: Scratch in 2016, Python through the Hatch program in 2018 and with the VEX team in 2021, Java with FTC and FRC from 2023.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2026 to 2028</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="track-ahead" type="button" aria-expanded="false" aria-controls="d-aca-3">The track ahead</button></h3>
+          <p class="entry__meta" data-scramble>fourteen to seventeen advanced courses at graduation</p>
+          <p class="entry__body">Multivariable Calculus, Organic Chemistry, Biochemistry, Molecular and Immunobiology, AP Psychology, and AP Physics C in both Mechanics and Electricity &amp; Magnetism.</p>
+          <div class="entry__more" id="d-aca-3" hidden>
+            <p>Chosen as the prerequisite stack for biomedical engineering: the mathematics and physics for the mechanics, the organic and biochemistry for the tissue, the immunobiology for pathology and systems.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ─── IV · Leadership ─────────────────────────────────────────── -->
+  <section class="panel panel--chapter" id="leadership" data-sect="leadership" aria-label="IV · Leadership">
+    <div class="chapter__side">
+      <p class="numeral" data-anim data-num data-n="4" aria-hidden="true">IV</p>
+      <h2 class="chapter-name" data-anim data-scramble>Leadership</h2>
+      <p class="chapter-lede" data-anim>A music nonprofit founded in 2022, now more than fifty performances and two official partners; a free coding program; and a Congressional Award in progress.</p>
+      <div class="stat" data-anim><span class="stat__n" data-num>50+</span><span class="stat__k" data-scramble>performances by OCAPEX students</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>3,000+</span><span class="stat__k" data-scramble>community members reached</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>$13.5k+</span><span class="stat__k" data-scramble>raised for charitable causes</span></div>
+    </div>
+    <div class="entries">
+      <article class="entry" data-anim>
+        <p class="entry__year">2022 to now</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="ocapex" type="button" aria-expanded="false" aria-controls="d-lea-1">Founder and President, OCAPEX</button></h3>
+          <p class="entry__meta" data-scramble>501(c)(3)&nbsp;·&nbsp;student-led&nbsp;·&nbsp;South Florida&nbsp;·&nbsp;ocapex.com</p>
+          <p class="entry__body">Founded in 2022 and run entirely by students: a registered 501(c)(3) with more than seventy musicians aged 6 to 20 bringing live music to senior living communities, memory care, rehabilitation centers, hospitals, and community festivals across South Florida. <span class="hl">More than fifty performances</span>, three thousand community members reached, two thousand service hours, and more than a hundred pieces performed.</p>
+          <div class="entry__more" id="d-lea-1" hidden>
+            <p>It started in 2022 with a visit to a senior living community arranged by viola teacher Alberto Zilberstein: the residents got up out of their chairs. A few student musicians were gathered and the group became OCAPEX.</p>
+            <p>The calendar runs all year. Sunscape Boca Raton, Aston Gardens at Parkland Commons, The Arbor at Delray, Covenant Village and Cleveland Clinic Weston Hospital are the communities OCAPEX keeps returning to, alongside two standing partners: the Ann Storck Center, serving people with developmental disabilities of all ages, and the Imagina Children’s Foundation. Every performance is planned, rehearsed and led by students.</p>
+            <p>Two benefit concerts in 2026, Notes for Tomorrow (Lynn University, April 11) and the Sound of Giving (August 8), raised over $13,500 for Imagina. Running the organization means booking the facilities, coordinating performers, making the programs and the promotional material. Vice President Ziqi Qin; Secretary, brother Adriano Carvalho.</p>
+            <p>Featured twice by the Asiana Post. A Groton chapter, sponsored by the head of the school’s music department, starts this year.</p>
+            <p>The name is the values: Opportunity, Compassion, Action, Purpose, Empowerment, eXperience. Footage on <a href="https://www.youtube.com/@OCApex" target="_blank" rel="noopener">YouTube</a>.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2026 to now</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="freecode" type="button" aria-expanded="false" aria-controls="d-lea-3">President and Co-founder, FreeCode Juniors</button></h3>
+          <p class="entry__meta" data-scramble>free coding classes&nbsp;·&nbsp;NSU Alvin Sherman Library&nbsp;·&nbsp;under UStartTeaching</p>
+          <p class="entry__body">A <span class="hl">free coding program</span> for children aged 8 and up, Scratch then Python, for kids who do not have access to those resources or cannot get to them. Began in June 2026: four sessions so far, more than forty students reached, around ten taught personally, and classes grew from three or four students to six to ten.</p>
+          <div class="entry__more" id="d-lea-3" hidden>
+            <p>Monthly in-person sessions at Nova Southeastern University’s Alvin Sherman Library, organized under UStartTeaching, a nonprofit that gives student projects structure. From Groton, remote teaching is performed, the program is managed, and structure and leadership are provided.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2025 to now</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="imagina" type="button" aria-expanded="false" aria-controls="d-lea-2">Imagina Children’s Foundation</button></h3>
+          <p class="entry__meta" data-scramble>Junior Ambassador since August 2026&nbsp;·&nbsp;standing partner</p>
+          <p class="entry__body">Since 2025, managed the inventory of around 200 handmade items made by children in León, Mexico, sold at auction to fund Imagina’s music and education programs. Junior Ambassador since August 2026.</p>
+          <div class="entry__more" id="d-lea-2" hidden>
+            <p>The Sound of Giving was live-streamed on YouTube to the children in León it was raising money for. The fundraising around it ran on flyers at supermarkets, friends and family, and promotional material for sponsors and donors. Everything raised went to Imagina’s programs.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2026</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="congressional-award" type="button" aria-expanded="false" aria-controls="d-lea-4">Congressional Award</button></h3>
+          <p class="entry__meta" data-scramble>Bronze submitted&nbsp;·&nbsp;Silver requirements met</p>
+          <p class="entry__body">Bronze Medal submitted in September 2026. The Silver Medal’s requirements are already met: 232 hours of voluntary public service, 163.5 of personal development, 251.75 of physical fitness, and a three-day expedition in the Florida Keys. It waits only on the program’s twelve-month minimum, in February.</p>
+          <div class="entry__more" id="d-lea-4" hidden>
+            <p>The United States Congress’s award for young Americans, earned on recorded hours and set goals rather than nomination.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ─── V · Research ─────────────────────────────────────────── -->
+  <section class="panel panel--chapter" id="research" data-sect="research" aria-label="V · Research">
+    <div class="chapter__side">
+      <p class="numeral" data-anim data-num data-n="5" aria-hidden="true">V</p>
+      <h2 class="chapter-name" data-anim data-scramble>Research</h2>
+      <p class="chapter-lede" data-anim>Two questions from two sides of medicine: what a therapy’s safety record says once it leaves the trial, and how much a rebuilt knee should be helped before the help gets in the way. One paper, one exoskeleton design.</p>
+      <div class="stat" data-anim><span class="stat__n" data-num>1</span><span class="stat__k" data-scramble>paper submitted&nbsp;·&nbsp;Scholarly Review Journal</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>486</span><span class="stat__k" data-scramble>adverse-event cases analysed</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>98%</span><span class="stat__k" data-scramble>knee extension under adaptive assist</span></div>
+    </div>
+    <div class="entries">
+      <article class="entry" data-anim>
+        <p class="entry__year">2026</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="aducanumab" type="button" aria-expanded="false" aria-controls="d-res-1">Aducanumab’s complete post-marketing record</button></h3>
+          <p class="entry__meta" data-scramble>Pharmacovigilance&nbsp;·&nbsp;first author&nbsp;·&nbsp;Scholarly Review Journal</p>
+          <p class="entry__body">A comparative pharmacovigilance analysis of every FDA adverse-event report filed for aducanumab, the Alzheimer’s antibody approved on amyloid clearance rather than cognitive benefit: <span class="hl">486 cases, 2016 to 2024</span>, set beside its successors lecanemab and donanemab.</p>
+          <div class="entry__more" id="d-res-1" hidden>
+            <p>Amyloid-Related Imaging Abnormalities Dominate Aducanumab’s Complete Post-Marketing Record: A Comparative Pharmacovigilance Analysis. Researched, analysed and written solo, with the guidance of Dr. Sujata K. Bhatia, MD, PhD, PE, of Harvard University.</p>
+            <p>The results show amyloid-related imaging abnormalities (ARIA) in 37.2% of cases, against 25.7% for lecanemab and 34.0% for donanemab; ARIA reported by healthcare professionals far more often than other events (69.6% compared to 48.2%); and a near-even sex split among reports for a disease that mostly affects women, the mark of a reporting stream that came from the trials rather than the clinic. Four hypotheses, four tests.</p>
+            <p>Pharmacovigilance is the part of a drug’s life that begins after the trials end. Aducanumab’s life was brief, approved in 2021 over the advice of its own advisory committee, withdrawn in 2024.</p>
+            <p>The question started at home, when Alzheimer’s disease took a grandfather.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">Summer 2026</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="genuvalens" type="button" aria-expanded="false" aria-controls="d-res-2">Genuvalens</button></h3>
+          <p class="entry__meta" data-scramble>Georgia Tech&nbsp;·&nbsp;Dr. Aaron Young&nbsp;·&nbsp;Dongho Park, EPIC Lab</p>
+          <p class="entry__body">An <span class="hl">assist-as-needed knee exoskeleton</span> for the months after ACL reconstruction, designed and simulated as a solo project at Georgia Tech under Dr. Aaron Young and doctoral student Dongho Park of the EPIC Lab.</p>
+          <div class="entry__more" id="d-res-2" hidden>
+            <p>Reconstruction repairs the ligament; it does not repair the quadriceps inhibition around it. The design question, how much to help and when to take the help away, is answered by a torque law with an added asymmetry term, switched by a logistic-regression phase classifier reading knee angle and velocity each timestep. The instructors called the asymmetry term an original idea and the concept that makes the controller adaptive in a meaningful sense.</p>
+            <p>In a two-leg squat-to-stand simulation, no support achieved 87.2% extension at 9.6 N·m from the athlete; fixed assist overshot to 113.9% at 23.3 N·m; adaptive assist extended to 98.0% at 3.6 N·m, tapering 11.8% as capacity recovered. Seven-page IEEE-format report created, with five figures, two tables, and a hardware layout drawn by hand; presented August 23, 2026.</p>
+            <p>The personal affiliation is three sports, all of them requiring heavy legwork. ACL tears are common in each one, and rehabilitation is the part nobody designs for. Named for the genu, the knee, and valens, healthy.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">Why</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="the-question" type="button" aria-expanded="false" aria-controls="d-res-3">The question underneath</button></h3>
+          <p class="entry__meta" data-scramble>Pharmaceuticals&nbsp;·&nbsp;rehabilitation robotics&nbsp;·&nbsp;biomedical engineering</p>
+          <p class="entry__body">Both projects are the same question from two sides: what a treatment does to a body once it leaves the controlled setting, and how a machine should help a body heal without doing the work for it.</p>
+          <div class="entry__more" id="d-res-3" hidden>
+            <p>The interest is the cell: its structure, its failure, and the point where treating that failure becomes an engineering problem rather than only a biological one. Biomedical engineering is where the two roads meet.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">Methods</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="toolkit" type="button" aria-expanded="false" aria-controls="d-res-4">The toolkit</button></h3>
+          <p class="entry__meta" data-scramble>Python&nbsp;·&nbsp;statistics&nbsp;·&nbsp;simulation&nbsp;·&nbsp;manuscripts</p>
+          <p class="entry__body">Python since 2018: NumPy, pandas, Matplotlib, SciPy, scikit-learn. The tests from AP Statistics, chi-square and z-tests, run on the pharmacovigilance record. A PD controller with an adaptive assist term and a logistic-regression classifier for the knee. Manuscripts to IEEE and APA standard, figures rebuilt from source.</p>
+          <div class="entry__more" id="d-res-4" hidden>
+            <p>Also use Java, Lua, JavaScript, TypeScript, HTML and CSS, and shell to create websites and small projects. Best in Python and Java.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ─── VI · Music ─────────────────────────────────────────── -->
+  <section class="panel panel--chapter" id="music" data-sect="music" aria-label="VI · Music">
+    <div class="chapter__side">
+      <p class="numeral" data-anim data-num data-n="6" aria-hidden="true">VI</p>
+      <h2 class="chapter-name" data-anim data-scramble>Music</h2>
+      <p class="chapter-lede" data-anim>Violin at six, viola at thirteen, Carnegie Hall at sixteen, and a quartet that stuck.</p>
+      <div class="stat" data-anim><span class="stat__n" data-num>1st</span><span class="stat__k" data-scramble>stand viola&nbsp;·&nbsp;Florida All-State</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>5</span><span class="stat__k" data-scramble>FFMC state wins</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>2025</span><span class="stat__k" data-scramble>Carnegie Hall&nbsp;·&nbsp;NY Classical Debut Awards</span></div>
+    </div>
+    <div class="entries">
+      <article class="entry" data-anim>
+        <p class="entry__year">2026 to now</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="chamber-orchestra" type="button" aria-expanded="false" aria-controls="d-mus-1">Principal Violist, Groton School Chamber Orchestra</button></h3>
+          <p class="entry__meta" data-scramble>audition-based&nbsp;·&nbsp;assistant principal in 2025-26</p>
+          <p class="entry__body"><span class="hl">Principal violist</span> from the Fifth Form; assistant principal in the first year. Studying with Dorcas McCall at Groton and Alberto Zilberstein at home; five years on the viola, twelve on the violin.</p>
+          <div class="entry__more" id="d-mus-1" hidden>
+            <p>Walton’s Viola Concerto, first movement, on a student recital last spring. The repertoire on viola includes Walton, Bartók, the Bach (Casadesus) concerto in C minor, and Bach’s first cello suite.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">November 15, 2025</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="carnegie-hall" type="button" aria-expanded="false" aria-controls="d-mus-3">Carnegie Hall</button></h3>
+          <p class="entry__meta" data-scramble>NY Classical Debut Awards Gala&nbsp;·&nbsp;Violin Concerto Winners’ Concert&nbsp;·&nbsp;Weill Recital Hall</p>
+          <p class="entry__body">Bruch’s Violin Concerto No. 1 at <span class="hl">Carnegie Hall</span>, on the NY Classical Debut Awards winners’ concert, with brother Adriano at the piano.</p>
+          <div class="entry__more" id="d-mus-3" hidden>
+            <p>The NY Classical Debut Awards is an international competition for musicians of all ages, the Gala concert being a showcase of the winners from over ten countries.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2026 to now</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="amora" type="button" aria-expanded="false" aria-controls="d-mus-2">Amora, string quartet</button></h3>
+          <p class="entry__meta" data-scramble>Select Chamber Music&nbsp;·&nbsp;one form, four arrangers</p>
+          <p class="entry__body">A Select Chamber quartet that outlasted the term it was formed in: all four in the same form, so it stayed together and took a name. Dvořák’s “American” Quartet, first movement, played last spring at an assisted living community, at Revisit Day Chapel and at the spring concerts; a Mendelssohn quartet this fall.</p>
+          <div class="entry__more" id="d-mus-2" hidden>
+            <p>This season’s project: Vivaldi’s The Four Seasons arranged for string quartet, one season per player; arranging Summer. Also arranged The Phantom of the Opera for quartet.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2019 to 2025</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="honors" type="button" aria-expanded="false" aria-controls="d-mus-4">Competitions and festivals</button></h3>
+          <p class="entry__meta" data-scramble>Florida All-State&nbsp;·&nbsp;All-County&nbsp;·&nbsp;FFMC&nbsp;·&nbsp;Charleston&nbsp;·&nbsp;Peel</p>
+          <p class="entry__body">Florida All-State Orchestra (grades 9 to 10), first and second stand viola (2023, 2024). Palm Beach All-County Orchestra, second stand viola (2023, 2024). Florida Federation of Music Clubs State Junior Convention, <span class="hl">five first places</span> across 2024 and 2025: string quartet, viola concerto, viola solo, viola sight-playing, violin-viola duet. Charleston International Music Competition, winner (2025), with Mozart’s Piano Quartet in G minor, K. 478, and a Passacaglia arranged for violin and viola. Peel Music Festival, violin, winner (2019).</p>
+          <div class="entry__more" id="d-mus-4" hidden>
+            <p>Music merit scholarship to American Heritage School (2023-24).</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2020 to 2024</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="fyo" type="button" aria-expanded="false" aria-controls="d-mus-5">Florida Youth Orchestra</button></h3>
+          <p class="entry__meta" data-scramble>Symphony Orchestra, first violin (2022)&nbsp;·&nbsp;Principal Orchestra, second violin (2023, 2024)</p>
+          <p class="entry__body">Four seasons: first violin in the Symphony Orchestra, then second violin in the Principal Orchestra. The years the viola became the instrument, and the years OCAPEX began.</p>
+          <div class="entry__more" id="d-mus-5" hidden>
+            <p>Voice lessons and open mics at Groton. Recitals for Alberto Zilberstein and for violin teacher Huifang Chen.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ─── VII · Build ─────────────────────────────────────────── -->
+  <section class="panel panel--chapter" id="build" data-sect="build" aria-label="VII · Build">
+    <div class="chapter__side">
+      <p class="numeral" data-anim data-num data-n="7" aria-hidden="true">VII</p>
+      <h2 class="chapter-name" data-anim data-scramble>Build</h2>
+      <p class="chapter-lede" data-anim>A language product, a co-op horror game, and this page. All in progress.</p>
+      <div class="stat" data-anim><span class="stat__n" data-num>2</span><span class="stat__k" data-scramble>ventures co-founded</span></div>
+      <div class="stat" data-anim><span class="stat__n" data-num>9</span><span class="stat__k" data-scramble>languages&nbsp;·&nbsp;best in Python and Java</span></div>
+    </div>
+    <div class="entries">
+      <article class="entry" data-anim>
+        <p class="entry__year">In progress</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="loquar" type="button" aria-expanded="false" aria-controls="d-bld-1">Loquar</button></h3>
+          <p class="entry__meta" data-scramble>language learning&nbsp;·&nbsp;Chinese first&nbsp;·&nbsp;co-founder and CTO</p>
+          <p class="entry__body">A language-learning web app built as an <span class="hl">open world rather than a lesson list</span>: learn the language by needing it, with a companion to speak to. Co-founder and CTO.</p>
+          <div class="entry__more" id="d-bld-1" hidden>
+            <p>Co-founded with friends and run as a venture, not a class project. Focused on the systems, the UI, the code, and the small things that make an app pleasant to use. The Mandarin is native, Beijing-standard and spoken at home.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">In development</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="daedalus" type="button" aria-expanded="false" aria-controls="d-bld-2">Daedalus</button></h3>
+          <p class="entry__meta" data-scramble>co-op survival horror&nbsp;·&nbsp;Roblox&nbsp;·&nbsp;Gompurkle</p>
+          <p class="entry__body">A first-person co-op survival-horror game for a group, set inside the Labyrinth as Daedalus’s still-running machine. Main builder on a three-person team under the studio name Gompurkle; roles shift to whatever is needed.</p>
+          <div class="entry__more" id="d-bld-2" hidden>
+            <p>Game design is limited to schedules and free time. Alpha and beta releases before the game is fully ready for traditional release.</p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim>
+        <p class="entry__year">2026</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="this-site" type="button" aria-expanded="false" aria-controls="d-bld-3">Sites and programs</button></h3>
+          <p class="entry__meta" data-scramble>HTML, CSS, JavaScript&nbsp;·&nbsp;no build step</p>
+          <p class="entry__body">This site was built by hand. A canvas ASCII field, rasterised typography, a working terminal prompt in the corner, and built-in programs. No framework, no build step. One HTML file and a few scripts.</p>
+          <div class="entry__more" id="d-bld-3" hidden>
+            <p>Three programs run in the terminal: the dinosaur game, tetris, and snake. Scores are kept.</p>
+            <p><button class="term-go" type="button" data-games><span class="term-go__p">$</span> ./games<span class="term-go__c"></span></button></p>
+          </div>
+        </div>
+      </article>
+      <article class="entry" data-anim hidden>
+        <p class="entry__year">Ahead</p>
+        <div class="entry__main">
+          <h3 class="entry__title"><button class="entry__open" data-slug="blog" type="button">The STEM blog</button></h3>
+          <p class="entry__meta" data-scramble>writing on new technology</p>
+          <p class="entry__body">Short pieces on breakthroughs in science and engineering as they land: what changed, why it matters, what it costs.</p>
+          <div class="entry__more" id="d-bld-4" hidden>
+            <p>Not yet written.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<div class="crt" aria-hidden="true"></div>
+
+<p class="bare-caption" id="bare-caption" aria-hidden="true"></p>
+<footer class="sbar" id="sbar" data-wave>
+  <div class="sbar__left" data-bar aria-hidden="true">
+    <p class="counter"><span class="counter__i" id="counter">00</span><span class="counter__t" id="counter-total">/ 07</span></p>
+  </div>
+  <div class="sbar__mid">
+    <p class="hint" id="hint" aria-hidden="true">scroll or use arrows<i>→</i></p>
+    <div class="rail" data-bar aria-hidden="true"><i id="rail-bar"></i></div>
+  </div>
+  <div class="sbar__right">
+    <div class="sbar__toggles">
+      <button type="button" class="tune tune--dev" id="num-format" title="Numerals: 00 or Roman">[00]</button>
+      <button type="button" class="tune tune--dev" id="num-style" title="Numerals: outlined or hero block art">[block]</button>
+      <button type="button" class="tune tune--dev" id="head-style" title="Headlines: flat or hero gradient">[grad]</button>
+      <button type="button" class="tune tune--dev" id="cs-hover" title="Decode answers to the title text, or the whole row">[row]</button>
+      <button type="button" class="tune" id="theme-toggle">[light]</button>
+      <button type="button" class="tune tune--dev" id="tune-toggle">[tune]</button>
+      <button type="button" class="tune" id="ui-toggle" title="Hide everything but the field, to look at a picture">[hide]</button>
+    </div>
+    <p class="sbar__prompt" data-bar aria-hidden="true"><span class="host" id="sbar-host"></span> <span class="pwd" id="sbar-pwd">~</span> % <span class="cmd" id="sbar-cmd"></span><span class="cursor-caret"></span></p>
+  </div>
+</footer>
+
+<span class="print-caret" id="print-caret" aria-hidden="true"></span>
+
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="cursor cursor--dot" id="cursorDot" aria-hidden="true"></div>
+
+<aside class="tuner" id="tuner" hidden aria-label="Field tuner"></aside>
+
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="boot" id="boot">
+    <p class="boot__cmd"><span class="ac">leonardo@carvalho</span> ~ % <span id="boot-typed"></span><span class="cursor-caret"></span></p>
+    <ol class="boot__log" id="boot-log"></ol>
+  </div>
+  <p class="preloader__pct"><span id="pct">000</span><span class="preloader__sym">%</span></p>
+  <p class="preloader__label">Leonardo Carvalho &nbsp;·&nbsp; MMXXVI</p>
+</div>
+
+<noscript><style>.preloader,.cursor,.sbar{display:none!important}[data-anim],[data-wave]{opacity:1!important;transform:none!important}.entry__more{display:block!important}</style></noscript>
+
+<script src="assets/js/field.js"></script>
+<script src="assets/js/namecard.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/games.js"></script>
+<script src="../../assets/data/portrait.js"></script>
+<script src="../../assets/js/portrait.js"></script>
+<script src="../../assets/data/mask.js"></script>
+<script src="assets/js/mask.js"></script>
+<script src="../../assets/data/crest.js"></script>
+<script src="../../assets/js/crest.js"></script>
+<script src="../../assets/data/subart.js"></script>
+<script src="../../assets/js/subart.js"></script>
+<script src="assets/js/live.js"></script>
+<script src="assets/js/pieces.js"></script>
+<script src="assets/js/tuner.js"></script>
+</body>
+</html>

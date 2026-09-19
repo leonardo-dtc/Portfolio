@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leonardo Carvalho</title>
+<meta name="description" content="The portfolio of Leonardo &quot;Leo&quot; Carvalho, Groton School class of 2028: athletics, academics and passions.">
+<meta property="og:title" content="Leonardo Carvalho">
+<meta property="og:description" content="Groton School, Class of 2028. Goaltender, bioengineering, All-State viola.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%239E1B32%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22 font-weight=%22bold%22>LC</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+</head>
+<body>
+<style>
+:root{
+  --paper:#FFFFFF; --paper2:#F7F5F5; --ink:#000000; --ink2:#4A4A4A; --ink3:#8A8A8A;
+  --crimson:#9E1B32; --crimson-hi:#A6192E; --wash:rgba(158,27,50,.07);
+  --line:rgba(0,0,0,.16); --line-soft:rgba(0,0,0,.09);
+  --display:"Anton","Archivo Black","Arial Black",sans-serif;
+  --sans:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --cut:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  --ease:cubic-bezier(.3,.9,.35,1);
+  --gutter:clamp(20px,4vw,56px);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+:where(a,button,input):focus-visible{outline:2.5px solid var(--crimson);outline-offset:3px}
+.lbl{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ink3)}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:var(--gutter)}
+
+/* ================= GATE ================= */
+.gate{position:fixed;inset:0;z-index:100;background:var(--paper);display:flex;
+  align-items:center;justify-content:center;padding:24px}
+.gate[hidden]{display:none}
+.gate-box{width:min(420px,100%);border-top:3px solid var(--crimson);padding-top:22px}
+.gate .lc{font-family:var(--display);font-size:30px;letter-spacing:.04em;color:var(--ink);
+  transform:skewX(-8deg);display:inline-block;margin-bottom:6px}
+.gate .lc b{color:var(--crimson);font-weight:400}
+.gate p{margin:0 0 18px;color:var(--ink2);font-size:14px}
+.gate form{display:flex;gap:8px}
+.gate input{flex:1;min-width:0;font:inherit;font-family:var(--mono);font-size:14px;padding:12px 14px;
+  border:1px solid var(--line);background:var(--paper2);color:var(--ink);letter-spacing:.06em}
+.gate input:focus{border-color:var(--crimson);outline:none}
+.gate button{font-family:var(--sans);font-weight:700;font-style:italic;font-size:11px;
+  letter-spacing:.18em;text-transform:uppercase;color:#fff;background:var(--crimson);
+  padding:0 18px;clip-path:var(--cut);transition:background .16s}
+.gate button:hover{background:var(--crimson-hi)}
+.gate .err{margin:10px 0 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+  color:var(--crimson);min-height:1.4em}
+.gate .foot{margin-top:28px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink3)}
+.site[hidden]{display:none}
+
+/* ================= TOP BAR ================= */
+.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line-soft)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding-block:14px}
+.mark{display:flex;align-items:center;gap:12px}
+.mark .lc{font-family:var(--display);font-size:24px;letter-spacing:.04em;color:var(--ink);
+  transform:skewX(-8deg);display:inline-block}
+.mark .lc b{color:var(--crimson);font-weight:400}
+.mark .of{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink3);border-left:2px solid var(--crimson);padding-left:11px}
+.top nav{display:flex;gap:clamp(14px,2.4vw,30px)}
+.top nav button{font-family:var(--sans);font-weight:700;font-style:italic;font-size:12px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);padding:6px 2px;
+  position:relative;transition:color .16s}
+.top nav button::after{content:"";position:absolute;left:0;right:100%;bottom:2px;height:2px;
+  background:var(--crimson);transform:skewX(-30deg);transition:right .22s var(--ease)}
+.top nav button:hover{color:var(--ink)}
+.top nav button:hover::after{right:0}
+.btn{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:#fff;background:var(--ink);
+  padding:9px 14px;display:inline-flex;gap:8px;align-items:center;
+  clip-path:var(--cut);transition:background .16s}
+.btn:hover{background:var(--crimson)}
+.btn i{width:6px;height:6px;background:var(--crimson);flex:none;
+  clip-path:polygon(2px 0,100% 0,calc(100% - 2px) 100%,0 100%)}
+.btn:hover i{background:#fff}
+@media(max-width:760px){.top nav{display:none}.mark .of{display:none}}
+
+/* ================= HERO ================= */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line-soft)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);
+  gap:clamp(24px,4vw,56px);align-items:end;padding-block:clamp(28px,5vh,56px) 0}
+@media(max-width:820px){.hero .wrap{grid-template-columns:1fr}}
+.ghost{position:absolute;z-index:0;right:-2vw;top:-2vh;font-family:var(--display);
+  font-size:clamp(120px,22vw,320px);line-height:1;letter-spacing:.01em;color:transparent;
+  -webkit-text-stroke:1px rgba(0,0,0,.07);transform:skewX(-8deg);
+  pointer-events:none;user-select:none;white-space:nowrap}
+.id{position:relative;z-index:1;padding-bottom:clamp(28px,5vh,56px)}
+.rise{opacity:0;transform:translateY(18px);animation:rise .7s var(--ease) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.d1{animation-delay:.05s}.d2{animation-delay:.16s}.d3{animation-delay:.3s}.d4{animation-delay:.42s}
+.kicker{display:inline-flex;align-items:center;gap:10px;margin:0 0 14px;
+  font-family:var(--sans);font-weight:700;font-style:italic;font-size:12px;
+  letter-spacing:.28em;text-transform:uppercase;color:#fff;
+  background:var(--crimson);padding:7px 16px 7px 13px;clip-path:var(--cut)}
+.name{font-family:var(--display);color:var(--ink);margin:0;line-height:.9;
+  letter-spacing:.015em;text-transform:uppercase;font-weight:400}
+.name .first{display:block;font-size:clamp(20px,3vw,40px);color:var(--ink2);
+  letter-spacing:.2em;margin-bottom:.1em}
+.name .last{display:block;font-size:clamp(58px,9.5vw,132px);position:relative}
+.name .last::after{content:"";position:absolute;left:2px;bottom:.04em;height:.09em;
+  width:1.6em;background:var(--crimson);transform:skewX(-30deg);transform-origin:left}
+.motto{display:flex;align-items:center;gap:12px;margin:clamp(16px,2.8vh,26px) 0 0}
+.motto .sl{font-family:var(--display);color:var(--crimson);font-size:17px;transform:skewX(-8deg)}
+.motto p{margin:0;font-family:var(--sans);font-weight:700;font-style:italic;
+  font-size:clamp(15px,1.9vw,20px);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+.role{margin:9px 0 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink2)}
+.role b{color:var(--ink);font-weight:600}
+.vitals{display:flex;gap:clamp(14px,2.2vw,30px);flex-wrap:wrap;
+  border-top:1px solid var(--line-soft);padding-top:14px;margin:clamp(20px,3vh,30px) 0 0}
+.vitals dt{font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink3);margin:0 0 2px}
+.vitals dd{margin:0;font-family:var(--display);font-size:16px;letter-spacing:.05em;
+  color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hero-pic{position:relative;z-index:1;align-self:end}
+.hero-pic figure{margin:0;position:relative;overflow:hidden;
+  clip-path:polygon(24px 0,100% 0,100% 100%,0 100%,0 24px)}
+.hero-pic img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:62% 30%}
+.hero-pic figcaption{position:absolute;inset:auto 0 0 0;padding:28px 16px 12px;
+  background:linear-gradient(transparent,rgba(0,0,0,.78));font-family:var(--mono);
+  font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#fff}
+@media(max-width:820px){.hero-pic img{aspect-ratio:16/10}}
+
+/* index of chapters */
+.index{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-block:18px 28px}
+@media(max-width:700px){.index{grid-template-columns:1fr}}
+.ix{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;
+  padding:14px 18px 14px 14px;text-align:left;border:1px solid var(--line);
+  background:var(--paper);clip-path:var(--cut);
+  transition:background .16s,border-color .16s,transform .2s var(--ease)}
+.ix:hover{background:var(--wash);border-color:var(--crimson);transform:translateY(-3px)}
+.ix .n{font-family:var(--display);font-size:22px;color:transparent;
+  -webkit-text-stroke:1px var(--crimson);letter-spacing:.02em;transform:skewX(-8deg)}
+.ix .t{font-family:var(--display);font-size:clamp(17px,1.7vw,21px);color:var(--ink);
+  letter-spacing:.06em;text-transform:uppercase}
+.ix .s{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);margin-top:1px}
+.ix .a{font-family:var(--display);font-size:18px;color:var(--ink3);
+  transition:transform .18s var(--ease),color .16s;transform:skewX(-8deg)}
+.ix:hover .a{transform:skewX(-8deg) translateX(5px);color:var(--crimson)}
+
+/* ================= TICKER ================= */
+.tick{border-block:1px solid var(--line-soft);background:var(--ink);overflow:hidden}
+.tick-in{display:flex;width:max-content;white-space:nowrap;animation:tick 32s linear infinite;padding:9px 0}
+.tick:hover .tick-in{animation-play-state:paused}
+.tick-in span{font-family:var(--sans);font-weight:700;font-style:italic;font-size:11px;
+  letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.72);padding:0 18px}
+.tick-in b{font-family:var(--display);font-style:normal;color:var(--crimson-hi);font-weight:400;padding:0 4px}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* ================= CHAPTERS ================= */
+.ch{padding-block:clamp(40px,7vh,80px);border-bottom:1px solid var(--line-soft);scroll-margin-top:70px}
+.ch:nth-of-type(even){background:var(--paper2)}
+.ch-head{display:flex;align-items:baseline;gap:16px;margin:0 0 clamp(22px,4vh,36px)}
+.ch-head .n{font-family:var(--display);font-size:clamp(34px,5vw,64px);color:transparent;
+  -webkit-text-stroke:1.5px var(--crimson);transform:skewX(-8deg);line-height:1}
+.ch-head h2{margin:0;font-family:var(--display);font-weight:400;
+  font-size:clamp(30px,4.6vw,56px);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--ink);transform:skewX(-8deg);line-height:1}
+.ch-head .sub{margin-left:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink3);text-align:right}
+@media(max-width:700px){.ch-head{flex-wrap:wrap}.ch-head .sub{margin-left:0;width:100%;text-align:left}}
+.sub-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(240px,1fr);
+  gap:clamp(24px,3.4vw,48px);align-items:start}
+@media(max-width:900px){.sub-grid{grid-template-columns:1fr}}
+.side{position:sticky;top:80px;display:grid;gap:10px}
+.side figure{margin:0;overflow:hidden;position:relative;
+  clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px)}
+.side img{width:100%;max-height:520px;object-fit:cover;object-position:top}
+.side figcaption{position:absolute;inset:auto 0 0 0;padding:30px 16px 12px;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));font-family:var(--mono);
+  font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#fff}
+.sec{display:flex;align-items:center;gap:12px;margin:34px 0 14px;scroll-margin-top:80px}
+.sec:first-child{margin-top:0}
+.sec .l{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.14em;
+  color:var(--crimson);border:1px solid var(--crimson);padding:3px 7px;clip-path:var(--cut);
+  min-width:34px;text-align:center}
+.sec h3{margin:0;font-family:var(--display);font-weight:400;font-size:19px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink);transform:skewX(-8deg)}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.bio p{margin:0 0 15px;color:var(--ink2);font-size:15px;max-width:64ch;line-height:1.75}
+.bio p b{color:var(--ink);font-weight:600}
+.lead{font-family:var(--sans);font-weight:700;font-style:italic;
+  font-size:clamp(17px,2.1vw,22px);color:var(--ink);line-height:1.5;letter-spacing:.01em;
+  max-width:56ch;margin:0 0 20px;border-left:3px solid var(--crimson);padding-left:16px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:0 0 6px}
+.fact{background:var(--paper);border:1px solid var(--line-soft);padding:13px 15px;clip-path:var(--cut)}
+.ch:nth-of-type(odd) .fact,.ch:nth-of-type(odd) .tile,.ch:nth-of-type(odd) .pa,.ch:nth-of-type(odd) .hon li,
+.ch:nth-of-type(odd) .path,.ch:nth-of-type(odd) .readout,.ch:nth-of-type(odd) .chart,.ch:nth-of-type(odd) .ref,
+.ch:nth-of-type(odd) .lk{background:var(--paper2)}
+.fact .k{font-family:var(--sans);font-weight:700;font-style:italic;font-size:9px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--crimson);margin-bottom:5px}
+.fact .v{font-family:var(--display);font-size:15px;letter-spacing:.04em;color:var(--ink);text-transform:uppercase}
+.fact .s{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.5}
+.path{display:grid;grid-template-columns:repeat(4,1fr);margin:0 0 6px;
+  border:1px solid var(--line-soft);background:var(--paper);clip-path:var(--cut)}
+@media(max-width:640px){.path{grid-template-columns:repeat(2,1fr)}}
+.pt{padding:14px 16px;border-right:1px solid var(--line-soft)}
+.path .pt:last-child{border-right:0}
+@media(max-width:640px){.path .pt:nth-child(2n){border-right:0}
+  .path .pt:nth-child(-n+2){border-bottom:1px solid var(--line-soft)}}
+.pt .k{font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.pt .v{font-family:var(--display);font-size:16px;letter-spacing:.04em;color:var(--ink);
+  text-transform:uppercase;line-height:1.15;transform:skewX(-8deg);transform-origin:left}
+.pt .s{font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.5}
+.pt.now{border-top:2px solid var(--crimson)}
+.pt.now .k{color:var(--crimson)}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+@media(max-width:640px){.strip{grid-template-columns:1fr}}
+.strip figure{margin:0;position:relative;overflow:hidden;clip-path:var(--cut)}
+.strip img{width:100%;height:160px;object-fit:cover;object-position:50% 22%;transition:transform .4s var(--ease)}
+.strip figure:hover img{transform:scale(1.06)}
+.strip figcaption{position:absolute;inset:auto 0 0 0;padding:24px 13px 9px;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));font-family:var(--mono);
+  font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#fff}
+
+/* stats */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px}
+@media(max-width:640px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--paper);border:1px solid var(--line-soft);border-top:2px solid var(--crimson);
+  padding:14px 14px 12px;clip-path:var(--cut)}
+.tile .k{font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:7px}
+.tile .v{font-family:var(--display);font-size:clamp(27px,3.6vw,40px);color:var(--ink);
+  line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums;transform:skewX(-8deg);transform-origin:left}
+.tile .u{font-family:var(--mono);font-size:8.5px;color:var(--ink3);margin-top:6px;letter-spacing:.06em}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.chip{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.05em;
+  padding:8px 14px;border:1px solid var(--line);color:var(--ink2);clip-path:var(--cut);
+  display:flex;flex-direction:column;gap:2px;align-items:flex-start;line-height:1.25;
+  background:var(--paper);transition:all .16s var(--ease)}
+.chip .ct{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.chip:hover{border-color:var(--ink);color:var(--ink);transform:translateY(-2px)}
+.chip[aria-pressed="true"]{background:var(--crimson);border-color:var(--crimson);color:#fff}
+.chip[aria-pressed="true"] .ct{color:rgba(255,255,255,.8)}
+.readout{border:1px solid var(--line-soft);background:var(--paper);margin-bottom:18px;clip-path:var(--cut)}
+.ro-h{padding:13px 18px;border-bottom:1px solid var(--line-soft);display:flex;
+  justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.ro-h .t{font-family:var(--display);font-weight:400;font-size:17px;letter-spacing:.04em;text-transform:uppercase}
+.ro-h .l{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.12em;text-transform:uppercase}
+.ro-g{display:grid;grid-template-columns:repeat(4,1fr)}
+@media(max-width:560px){.ro-g{grid-template-columns:repeat(2,1fr)}}
+.ro-c{padding:13px 18px;border-right:1px solid var(--line-soft)}
+.ro-g .ro-c:last-child{border-right:0}
+@media(max-width:560px){.ro-g .ro-c:nth-child(2n){border-right:0}
+  .ro-g .ro-c:nth-child(-n+2){border-bottom:1px solid var(--line-soft)}}
+.ro-c .k{font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.ro-c .v{font-family:var(--display);font-size:23px;font-weight:400;color:var(--ink);
+  letter-spacing:.03em;font-variant-numeric:tabular-nums;line-height:1;transform:skewX(-8deg);transform-origin:left}
+.ro-c .v.dim{color:var(--ink3);font-size:18px}
+.ro-n{padding:10px 18px;border-top:1px solid var(--line-soft);font-family:var(--mono);
+  font-size:9.5px;color:var(--ink2);letter-spacing:.03em}
+.ro-n.pend{color:var(--crimson)}
+.chart{border:1px solid var(--line-soft);padding:16px;background:var(--paper);clip-path:var(--cut)}
+.ch-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.ch-h .t{font-family:var(--sans);font-weight:700;font-style:italic;font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.ch-h .n{font-family:var(--mono);font-size:8.5px;color:var(--ink3);letter-spacing:.06em}
+.plot{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end;height:110px;
+  background:repeating-linear-gradient(to top,transparent 0 26px,var(--line-soft) 26px 27px)}
+.pc{display:flex;flex-direction:column;justify-content:flex-end;height:100%;cursor:pointer}
+.pc .pv{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink2);
+  text-align:center;margin-bottom:5px;font-variant-numeric:tabular-nums;transition:color .2s}
+.pb{background:#BDBDBD;transform-origin:bottom;transform:scaleY(0);
+  clip-path:polygon(0 6px,100% 0,100% 100%,0 100%);transition:transform .55s var(--ease),background .2s}
+.loaded .pb{transform:scaleY(1)}
+.pc:nth-child(2) .pb{transition-delay:.05s}.pc:nth-child(3) .pb{transition-delay:.1s}.pc:nth-child(4) .pb{transition-delay:.15s}
+.pc:hover .pb{background:#8A8A8A}
+.pc[data-on="1"] .pb{background:var(--crimson)}
+.pc[data-on="1"] .pv{color:var(--ink)}
+.px{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;border-top:1px solid var(--line);padding-top:8px}
+.px span{display:block;text-align:center;font-family:var(--mono);font-size:8.5px;color:var(--ink3);letter-spacing:.05em;line-height:1.5}
+.px b{display:block;color:var(--ink2);font-weight:600;font-size:9.5px}
+.ch-f{margin:12px 0 0;font-family:var(--mono);font-size:10px;color:var(--ink2);line-height:1.65}
+.ch-f b{color:var(--ink)}
+.src{margin:14px 0 0;font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.06em;line-height:1.7}
+.src a{color:var(--ink2);border-bottom:1px solid var(--line)}
+.src a:hover{color:var(--crimson);border-color:var(--crimson)}
+
+/* honours / passions */
+.hon{display:grid;gap:8px;margin:0 0 6px;padding:0;list-style:none}
+.hon li{display:grid;grid-template-columns:minmax(110px,170px) 1fr;gap:16px;align-items:baseline;
+  padding:12px 16px;border:1px solid var(--line-soft);background:var(--paper);clip-path:var(--cut)}
+@media(max-width:560px){.hon li{grid-template-columns:1fr;gap:4px}}
+.hon .v{font-family:var(--display);font-size:20px;letter-spacing:.03em;color:var(--ink);
+  font-variant-numeric:tabular-nums;line-height:1;transform:skewX(-8deg);transform-origin:left}
+.hon .d{font-size:13px;color:var(--ink2);line-height:1.55}
+.hon .d b{color:var(--ink);font-weight:600}
+.pas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin:0 0 6px}
+.pa{background:var(--paper);border:1px solid var(--line-soft);border-top:2px solid var(--crimson);
+  padding:15px 17px 14px;clip-path:var(--cut)}
+.pa .k{font-family:var(--sans);font-weight:700;font-style:italic;font-size:9px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--crimson);margin-bottom:6px}
+.pa .v{font-family:var(--display);font-size:19px;letter-spacing:.04em;color:var(--ink);
+  text-transform:uppercase;line-height:1.1;transform:skewX(-8deg);transform-origin:left}
+.pa .s{font-size:13px;color:var(--ink2);margin-top:6px;line-height:1.55}
+.pa ul{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:5px}
+.pa li{font-family:var(--mono);font-size:10.5px;color:var(--ink2);letter-spacing:.02em;
+  line-height:1.45;padding-left:14px;position:relative}
+.pa li::before{content:"";position:absolute;left:0;top:.5em;width:6px;height:6px;
+  background:var(--crimson);clip-path:polygon(2px 0,100% 0,calc(100% - 2px) 100%,0 100%)}
+.pend{color:var(--crimson)!important}
+
+/* contact */
+.mailbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin:0 0 14px}
+.lk{background:var(--paper);border:1px solid var(--line-soft);padding:14px 18px;display:flex;
+  align-items:center;gap:14px;clip-path:var(--cut);transition:background .16s,border-color .16s,transform .18s var(--ease)}
+.lk:hover{background:var(--wash);border-color:var(--crimson);transform:translateX(5px)}
+.lk .k{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.lk .v{display:block;font-weight:700;font-size:14px;color:var(--ink);word-break:break-all}
+.lk .a{margin-left:auto;font-family:var(--sans);font-weight:700;font-style:italic;font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);flex:none}
+.refs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.ref{border:1px solid var(--line-soft);padding:15px 17px;background:var(--paper);clip-path:var(--cut)}
+.ref .r{font-family:var(--sans);font-weight:700;font-style:italic;font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--crimson);margin-bottom:6px}
+.ref .n{font-family:var(--display);font-weight:400;font-size:16px;letter-spacing:.04em;color:var(--ink);text-transform:uppercase}
+.ref .d{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.55}
+.ref a{color:var(--ink2);border-bottom:1px solid var(--line)}
+.ref a:hover{color:var(--crimson)}
+
+/* footer */
+.foot{background:var(--ink);color:#fff;padding-block:30px}
+.foot{padding-block:10px;flex:none}
+.foot .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.foot .lc{display:none}
+.credit{margin:0;width:auto;text-align:right}
+.foot .lc{font-family:var(--display);font-size:22px;letter-spacing:.04em;transform:skewX(-8deg);display:inline-block}
+.foot .lc b{color:var(--crimson-hi);font-weight:400}
+.foot p{margin:0;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.credit{margin-top:14px;text-align:right;width:100%}
+.credit p{font-size:8.5px;letter-spacing:.12em;text-transform:none;color:rgba(255,255,255,.38)}
+
+/* ================= v2.1: FIXED STAGE + TABS ================= */
+html{scroll-behavior:auto}
+body{overflow:hidden}
+@media(max-width:760px),(max-height:620px){body{overflow:auto}}
+.site{min-height:100dvh;display:flex;flex-direction:column}
+@media(min-width:761px) and (min-height:621px){.site{height:100dvh}}
+.top{position:relative;flex:none}
+.hero{flex:1;min-height:0;display:flex;flex-direction:column;border-bottom:0}
+.hero>.wrap{width:100%}
+.hero .hero-idx{flex:none;display:block}
+.hero>.hero-main{flex:1;min-height:0;padding-top:clamp(28px,6vh,64px);grid-template-columns:minmax(0,1.15fr) minmax(260px,.85fr);
+  align-items:stretch;padding-block:clamp(16px,3vh,32px) 0}
+.id{display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:clamp(14px,2.5vh,28px)}
+.name .last{font-size:clamp(50px,8vw,112px)}
+.name .first{font-size:clamp(18px,2.4vw,32px)}
+.hero-pic{min-height:0;display:flex}
+.hero-pic figure{flex:1;min-height:0;height:100%}
+.hero-pic img{height:100%;aspect-ratio:auto;min-height:0}
+.index{padding-block:14px 16px;flex:none}
+.ix{transform:none}
+.ix:hover{transform:translateY(-3px)}
+.tick{flex:none}
+@media(max-width:820px){.hero>.hero-main{grid-template-columns:1fr}
+  .hero-pic{order:-1}.hero-pic img{aspect-ratio:16/9;height:auto}}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.ov.on{display:flex;animation:ovin .34s var(--ease)}
+@keyframes ovin{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.ov-head{flex:none;border-bottom:1px solid var(--line-soft);background:var(--paper)}
+.ov-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
+.ov-title{display:flex;align-items:baseline;gap:14px;min-width:0}
+.ov-title .n{font-family:var(--display);font-size:30px;color:transparent;
+  -webkit-text-stroke:1.5px var(--crimson);transform:skewX(-8deg);line-height:1}
+.ov-title h2{margin:0;font-family:var(--display);font-weight:400;
+  font-size:clamp(24px,3vw,34px);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink);transform:skewX(-8deg);line-height:1}
+.ov-title .sub{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink3);margin-left:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:760px){.ov-title .sub{display:none}}
+.x{width:42px;height:42px;flex:none;border:1px solid var(--line);display:grid;place-items:center;
+  font-family:var(--mono);font-size:15px;color:var(--ink2);clip-path:var(--cut);
+  transition:border-color .16s,color .16s,background .16s}
+.x:hover{border-color:var(--crimson);color:var(--crimson);background:var(--wash)}
+.ov-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  padding-block:clamp(22px,4vh,40px) clamp(40px,6vh,64px)}
+.ov .side{top:0}
+.ov .sec{scroll-margin-top:0}
+
+/* ================= v2.2: PHOTO BACKGROUND ================= */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:var(--ink)}
+.bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;
+  animation:bgfade 32s infinite;filter:saturate(1.02) contrast(1.04)}
+.bg img:nth-child(1){animation-delay:0s;object-position:62% 30%}
+.bg img:nth-child(2){animation-delay:8s;object-position:50% 20%}
+.bg img:nth-child(3){animation-delay:16s;object-position:50% 25%}
+.bg img:nth-child(4){animation-delay:24s;object-position:50% 40%}
+@keyframes bgfade{0%{opacity:0;transform:scale(1.06)}6%{opacity:1}25%{opacity:1}
+  33%{opacity:0;transform:scale(1)}100%{opacity:0}}
+.bg::after{content:"";position:absolute;inset:0;
+  background:
+   linear-gradient(100deg,rgba(255,255,255,.96) 0%,rgba(255,255,255,.9) 34%,rgba(255,255,255,.42) 62%,rgba(255,255,255,.18) 100%),
+   linear-gradient(180deg,rgba(255,255,255,.82) 0%,rgba(255,255,255,.1) 30%,rgba(255,255,255,.1) 60%,rgba(255,255,255,.9) 100%)}
+@media(max-width:820px){.bg::after{background:
+   linear-gradient(180deg,rgba(255,255,255,.94) 0%,rgba(255,255,255,.72) 45%,rgba(255,255,255,.4) 70%,rgba(255,255,255,.9) 100%)}}
+.site{position:relative;z-index:1;isolation:isolate;background:transparent}
+.top{background:rgba(255,255,255,.7)}
+.hero{background:transparent}
+.hero>.hero-main{grid-template-columns:1fr}
+.hero-pic{display:none}
+.ghost{-webkit-text-stroke:1px rgba(0,0,0,.09)}
+.id{max-width:860px}
+.ix{background:rgba(255,255,255,.82)}
+.foot{background:rgba(0,0,0,.92)}
+.ov{background:rgba(255,255,255,.94)}
+@media(prefers-reduced-motion:reduce){.bg img{animation:none}.bg img:nth-child(1){opacity:1}}
+
+/* v2.4 hockey block */
+.lead-sm{font-size:clamp(13px,1.3vw,15px);line-height:1.45;max-width:none;margin-bottom:16px}
+.facts-2{grid-template-columns:repeat(2,1fr)}
+.facts-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:760px){.facts-3{grid-template-columns:1fr}}
+.facts-3 .k{line-height:1.5}
+.facts-3 .s{word-break:break-all}
+@media(max-width:480px){.facts-2{grid-template-columns:1fr}}
+.pl{color:var(--ink2);border-bottom:1px solid var(--line);transition:color .16s,border-color .16s}
+.pv-link{color:var(--ink);transition:color .16s}
+.pv-link:hover{color:var(--crimson)}
+.pl:hover{color:var(--crimson);border-color:var(--crimson)}
+.clist{list-style:none;margin:12px 0 4px;padding:0;display:grid;gap:5px}
+.clist li{font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;color:var(--ink2);line-height:1.5}
+.clist b{color:var(--ink);font-weight:600}
+.clist a{color:var(--ink);border-bottom:1px solid var(--line)}
+.clist a:hover{color:var(--crimson);border-color:var(--crimson)}
+
+/* v2.8 contacts */
+.sec-plain{margin-top:26px}
+.contacts{margin:0 0 6px;padding:0;display:grid;gap:2px}
+.contacts dt{font-family:var(--sans);font-weight:700;font-size:13px;color:var(--ink);margin-top:10px}
+.contacts dt:first-child{margin-top:0}
+.contacts dd{margin:2px 0 0 18px;font-size:14px;color:var(--ink2);position:relative;line-height:1.5}
+.contacts dd::before{content:"";position:absolute;left:-14px;top:.55em;width:6px;height:6px;background:var(--crimson);
+  clip-path:polygon(2px 0,100% 0,calc(100% - 2px) 100%,0 100%)}
+.contacts dd a{color:var(--ink);border-bottom:1px solid var(--line);margin-left:4px;word-break:break-all}
+.contacts dd a:hover{color:var(--crimson);border-color:var(--crimson)}
+
+/* v2.11 timeline */
+.tl{position:relative;display:grid;grid-template-columns:repeat(11,1fr);align-items:end;
+  padding:34px 0 0;margin:0}
+.tl-line{position:absolute;left:4.5%;right:4.5%;top:calc(34px + 5px);height:2px;background:var(--line)}
+.tl-line::after{content:"";position:absolute;right:0;top:-3px;width:8px;height:8px;background:var(--crimson);
+  clip-path:polygon(0 0,100% 50%,0 100%)}
+.tl-stop{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:0;
+  cursor:pointer}
+.tl-stop .dot{width:12px;height:12px;border:2px solid var(--ink);background:var(--paper);
+  transform:rotate(45deg);transition:background .16s,border-color .16s,transform .16s var(--ease)}
+.tl-stop .yr{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.08em;color:var(--ink2);
+  transition:color .16s}
+.tl-stop.now .dot{background:var(--crimson);border-color:var(--crimson)}
+.tl-stop.now .yr{color:var(--crimson)}
+.tl-stop .tip{position:absolute;bottom:calc(100% + 2px);left:50%;transform:translate(-50%,4px);
+  font-family:var(--sans);font-weight:700;font-style:italic;font-size:10.5px;letter-spacing:.04em;
+  white-space:nowrap;color:#fff;background:var(--ink);padding:5px 9px;clip-path:var(--cut);
+  opacity:0;pointer-events:none;transition:opacity .16s,transform .16s var(--ease)}
+.tl-stop .tip::after{content:"";position:absolute;left:50%;top:100%;margin-left:-4px;
+  border:4px solid transparent;border-top-color:var(--ink)}
+.tl-stop:hover .dot,.tl-stop:focus-visible .dot,.tl-stop[data-on="1"] .dot{background:var(--crimson);border-color:var(--crimson);transform:rotate(45deg) scale(1.25)}
+.tl-stop:hover .yr,.tl-stop:focus-visible .yr,.tl-stop[data-on="1"] .yr{color:var(--ink)}
+.tl-stop:hover .tip,.tl-stop:focus-visible .tip,.tl-stop[data-on="1"] .tip{opacity:1;transform:translate(-50%,0)}
+.tl-stop:first-child .tip{left:0;transform:translate(0,4px)}
+.tl-stop:first-child:hover .tip,.tl-stop:first-child[data-on="1"] .tip{transform:translate(0,0)}
+.tl-stop:first-child .tip::after{left:12px}
+.tl-stop:last-child .tip{left:auto;right:0;transform:translate(0,4px)}
+.tl-stop:last-child:hover .tip,.tl-stop:last-child[data-on="1"] .tip{transform:translate(0,0)}
+.tl-stop:last-child .tip::after{left:auto;right:8px}
+.tl-out{margin:10px 0 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--ink2)}
+.tl-out b{color:var(--crimson);font-weight:600;margin-right:6px}
+@media(max-width:640px){.tl{grid-template-columns:repeat(6,1fr);row-gap:22px;padding-top:30px}
+  .tl-line{display:none}.tl-stop .tip{display:none}}
+
+/* v2.16 athletics breathing room */
+#ov-athletics .sec{margin-top:64px;margin-bottom:22px}
+#ov-athletics .sec:first-child{margin-top:0}
+#ov-athletics .sec-plain{margin-top:56px}
+#ov-athletics .lead-sm{margin-bottom:28px}
+#ov-athletics .facts{gap:12px}
+#ov-athletics .contacts dt{margin-top:16px}
+#ov-athletics .contacts dt:first-child{margin-top:0}
+#ov-athletics .tl{padding-top:40px}
+#ov-athletics .tl-out{margin-top:18px}
+#ov-athletics .strip{margin-top:28px}
+
+/* v2.19 academics breathing room */
+#ov-academics .sec{margin-top:64px;margin-bottom:22px}
+#ov-academics .sec:first-child{margin-top:0}
+#ov-academics .facts{gap:12px}
+#ov-academics .hon{gap:10px}
+#ov-academics .hon .v{font-size:18px;white-space:nowrap}
+#ov-academics .hon li{grid-template-columns:minmax(110px,150px) 1fr}
+
+/* v2.20 passions breathing room */
+#ov-passions .sec{margin-top:64px;margin-bottom:22px}
+#ov-passions .sec:first-child{margin-top:0}
+#ov-passions .pas{gap:12px}
+#ov-passions .pa.wide{grid-column:1/-1}
+#ov-passions .pa .s+.s{margin-top:8px}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+  .rise{opacity:1;transform:none}.pb{transform:scaleY(1)}.tick-in{animation:none}.ov.on{animation:none}
+}
+</style>
+
+<div class="site" id="site">
+  <div class="bg" aria-hidden="true">
+    <img src="assets/hero.jpg" alt="">
+    <img src="assets/studio2.jpg" alt="">
+    <img src="assets/viola.jpg" alt="">
+    <img src="assets/crew.jpg" alt="">
+  </div>
+
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="ghost" aria-hidden="true">2028</div>
+    <div class="wrap hero-main">
+      <div class="id">
+        <p class="kicker rise d1">Portfolio</p>
+        <h1 class="name rise d2"><span class="first">Leonardo &ldquo;Leo&rdquo;</span><span class="last">Carvalho</span></h1>
+        <dl class="vitals rise d4">
+          <div><dt>Born</dt><dd>AUG 2009</dd></div>
+          <div><dt>Hometown</dt><dd>LAKE WORTH, FL</dd></div>
+          <div><dt>Languages</dt><dd>ENGLISH / MANDARIN / SPANISH</dd></div>
+        </dl>
+      </div>
+      <div class="hero-pic rise d3">
+        <figure><img src="assets/hero.jpg" alt="Leonardo Carvalho in the crease for Groton School, tracking the puck"><figcaption>Groton varsity hockey &middot; NEPSAC Division I</figcaption></figure>
+      </div>
+    </div>
+    <div class="wrap hero-idx">
+      <div class="index rise d4">
+        <button class="ix" data-open="ov-athletics"><span class="n">01</span><span><span class="t">Athletics</span><span class="s">Hockey &middot; Rowing &middot; Soccer</span></span><span class="a">&rarr;</span></button>
+        <button class="ix" data-open="ov-academics"><span class="n">02</span><span><span class="t">Academics</span><span class="s">Groton &middot; Biology &middot; Bioengineering</span></span><span class="a">&rarr;</span></button>
+        <button class="ix" data-open="ov-passions"><span class="n">03</span><span><span class="t">Passions</span><span class="s">Music &middot; OC Apex &middot; Coding</span></span><span class="a">&rarr;</span></button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot"><div class="wrap">
+    <p>Leonardo Carvalho &middot; Groton School &middot; Class of 2028 &middot; <a href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a></p>
+    <div class="credit"><p>Built by Leonardo Carvalho with Claude.AI</p></div>
+  </div></footer>
+</div>
+
+<!-- ===== 1 ATHLETICS ===== -->
+  <section class="ov" id="ov-athletics" role="dialog" aria-modal="true" aria-labelledby="h-athletics">
+  <div class="ov-head"><div class="wrap">
+    <div class="ov-title"><span class="n">1</span><h2 id="h-athletics">Athletics</h2><span class="sub">a &middot; Hockey &middot; b &middot; Rowing / Soccer</span></div>
+    <button class="x" data-close aria-label="Close athletics">&#10005;</button>
+  </div></div>
+  <div class="ov-body"><div class="wrap">
+      <div class="sub-grid">
+        <div class="bio">
+          <div class="sec" id="hockey"><span class="l">1a</span><h3>Hockey</h3></div>
+          <p class="lead lead-sm">A butterfly, positional goalie quick on angles and east-west speed. Going on second season with Groton Boy&rsquo;s Varsity Hockey team.</p>
+          <div class="facts facts-2">
+            <div class="fact"><div class="k">Position</div><div class="v">Goaltender</div><div class="s">Catches left &middot; Butterfly &middot; Positional</div></div>
+            <div class="fact"><div class="k">Team</div><div class="v">Groton Varsity</div><div class="s">NEPSAC - ISL</div></div>
+            <div class="fact"><div class="k">Size</div><div class="v">5&#39;11&quot; &middot; 170 lb</div><div class="s">Elite Prospects listing</div></div>
+            <div class="fact"><div class="k">Profiles</div>
+              <div class="s"><a class="pl" href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" target="_blank" rel="noopener">Elite Prospects (Click Here)</a></div>
+              <div class="s"><a class="pl" href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" target="_blank" rel="noopener">NCSA Profile/Videos (Click Here)</a></div></div>
+          </div>
+          <div class="sec sec-plain"><h3>Contacts</h3></div>
+          <dl class="contacts">
+            <dt>GROTON SCHOOL - Boys Varsity Hockey Head Coach:</dt>
+            <dd>William Riley <a href="mailto:wriley@groton.org">wriley@groton.org</a></dd>
+            <dt>GROTON SCHOOL - Boys Varsity Hockey Assistant Coach:</dt>
+            <dd>Zachary Lubinski <a href="mailto:zlubinski@groton.org">zlubinski@groton.org</a></dd>
+            <dt>GOALTENDING - technical coach:</dt>
+            <dd>Patrick Spano <a href="mailto:pasqualespano33@gmail.com">pasqualespano33@gmail.com</a></dd>
+          </dl>
+          <div class="sec sec-plain"><h3>The Path</h3></div>
+          <div class="tl" id="tl">
+            <div class="tl-line"></div>
+            <button class="tl-stop" type="button" data-team="Heartland Dragons" aria-label="2016: Heartland Dragons"><span class="tip">Heartland Dragons</span><span class="dot"></span><span class="yr">2016</span></button>
+            <button class="tl-stop" type="button" data-team="Brampton 45s AAA" aria-label="2017: Brampton 45s AAA"><span class="tip">Brampton 45s AAA</span><span class="dot"></span><span class="yr">2017</span></button>
+            <button class="tl-stop" type="button" data-team="Brampton 45s AAA" aria-label="2018: Brampton 45s AAA"><span class="tip">Brampton 45s AAA</span><span class="dot"></span><span class="yr">2018</span></button>
+            <button class="tl-stop" type="button" data-team="Florida Alliance AAA" aria-label="2019: Florida Alliance AAA"><span class="tip">Florida Alliance AAA</span><span class="dot"></span><span class="yr">2019</span></button>
+            <button class="tl-stop" type="button" data-team="Florida Alliance AAA" aria-label="2020: Florida Alliance AAA"><span class="tip">Florida Alliance AAA</span><span class="dot"></span><span class="yr">2020</span></button>
+            <button class="tl-stop" type="button" data-team="Florida Alliance AAA" aria-label="2021: Florida Alliance AAA"><span class="tip">Florida Alliance AAA</span><span class="dot"></span><span class="yr">2021</span></button>
+            <button class="tl-stop" type="button" data-team="NJ Rockets AAA" aria-label="2022: NJ Rockets AAA"><span class="tip">NJ Rockets AAA</span><span class="dot"></span><span class="yr">2022</span></button>
+            <button class="tl-stop" type="button" data-team="NJ Rockets AAA" aria-label="2023: NJ Rockets AAA"><span class="tip">NJ Rockets AAA</span><span class="dot"></span><span class="yr">2023</span></button>
+            <button class="tl-stop" type="button" data-team="Palm Beach Breakers U16AA" aria-label="2024: Palm Beach Breakers U16AA"><span class="tip">Palm Beach Breakers U16AA</span><span class="dot"></span><span class="yr">2024</span></button>
+            <button class="tl-stop" type="button" data-team="Groton School - ISL" aria-label="2025: Groton School - ISL"><span class="tip">Groton School - ISL</span><span class="dot"></span><span class="yr">2025</span></button>
+            <button class="tl-stop now" type="button" data-team="Groton School - ISL" aria-label="NOW: Groton School - ISL"><span class="tip">Groton School - ISL</span><span class="dot"></span><span class="yr">NOW</span></button>
+          </div>
+          <p class="tl-out" id="tl-out" aria-live="polite"><b>NOW</b> Groton School - ISL</p>
+
+          <div class="sec" id="rowing"><span class="l">1b</span><h3>Rowing / Soccer</h3></div>
+          <div class="facts">
+            <div class="fact"><div class="k">Spring</div><div class="v">Groton crew</div><div class="s">Varsity Crew Spring 2026 on third boat at NEIRA Regatta.</div></div>
+            <div class="fact"><div class="k">Fall</div><div class="v">Groton Soccer</div><div class="s">JV Soccer on Fall 2026 aspiring to improve footwork and field IQ.</div></div>
+          </div>
+          <div class="strip">
+            <figure><img src="assets/crew.jpg" alt="Racing with the Groton crew"><figcaption>Groton crew</figcaption></figure>
+            <figure><img src="assets/studio1.jpg" alt="Studio portrait in full Groton goaltending equipment"><figcaption>The goaltender</figcaption></figure>
+            <figure><img src="assets/hero.jpg" alt="In the crease for Groton School"><figcaption>Groton varsity hockey</figcaption></figure>
+          </div>
+        </div>
+        <aside class="side">
+          <figure><img src="assets/studio2.jpg" alt="Leonardo Carvalho, studio portrait in Groton goaltending gear"><figcaption>Groton School - NEPSAC - ISL</figcaption></figure>
+        </aside>
+      </div>
+    </div></div>
+</section>
+
+  <!-- ===== 2 ACADEMICS ===== -->
+  <section class="ov" id="ov-academics" role="dialog" aria-modal="true" aria-labelledby="h-academics">
+  <div class="ov-head"><div class="wrap">
+    <div class="ov-title"><span class="n">2</span><h2 id="h-academics">Academics</h2><span class="sub">a &middot; Groton / GPA  b &middot; Interests &middot; c &middot; Dementia  d &middot; Awards  e &middot; Languages</span></div>
+    <button class="x" data-close aria-label="Close academics">&#10005;</button>
+  </div></div>
+  <div class="ov-body"><div class="wrap">
+      <div class="sub-grid">
+        <div class="bio">
+          <div class="sec" id="groton"><span class="l">2a</span><h3>School / GPA</h3></div>
+          <p class="lead">A Groton School Fifth Former, class of 2028, arriving from American Heritage School in Florida and three straight years of honor-society standing. Loving the challenge of boarding school and pushing himself in his academic journey under the incredible academic rigor of Groton School.</p>
+          <div class="facts">
+            <div class="fact"><div class="k">School</div><div class="v">Groton School, MA</div><div class="s">Groton, Massachusetts &middot; Class of 2028</div></div>
+            <div class="fact"><div class="k">Groton record</div><div class="v">Transcript</div><div class="s">Focused on Bioengineering and Biology</div></div>
+            <div class="fact"><div class="k">Prior school</div><div class="v">American Heritage School, FL</div><div class="s">Pre-Engineering Program/Track</div></div>
+          </div>
+
+          <div class="sec" id="interests"><span class="l">2b</span><h3>Interest: Biology / Bioengineering</h3></div>
+          <p>Leonardo is extremely interested in bioengineering and cancer research. Along with Coding and Engineering,
+            he hopes to gain more insights into disease, the structure and function of the cell and where it meets
+            bioengineering.</p>
+
+          <div class="sec" id="dementia"><span class="l">2c</span><h3>Dementia Research</h3></div>
+          <p>Currently working with a Harvard University professor on dementia and
+            <span class="pend">[Leo to fill in what the study is about]</span>.</p>
+
+          <div class="sec" id="awards"><span class="l">2d</span><h3>Academic awards &amp; achievements</h3></div>
+          <ul class="hon">
+            <li><span class="v">4.0</span><span class="d"><b>GPA</b> &middot; Groton School, Massachusetts</span></li>
+            <li><span class="v">5.55</span><span class="d"><b>Unweighted GPA</b> &middot; American Heritage School, Florida</span></li>
+            <li><span class="v">AP</span><span class="d"><b>Completed</b> &middot; Received 5 in all APs: Mandarin, Biology, US History <span class="pend">[more to add]</span></span></li>
+            <li><span class="v">NJHS</span><span class="d"><b>National Junior Honor Society</b> &middot; grades 7, 8 and 9</span></li>
+            <li><span class="v">STEM</span><span class="d"><b>Coding</b> &middot; <b>Pre-Engineering Society</b> &middot; <b>Robotics team</b> &middot; <b>Rocketry</b></span></li>
+            <li><span class="v">Scholarships</span><span class="d">Has received various scholarships for both academics and music. Can discuss and provide information if requested.</span></li>
+          </ul>
+
+          <div class="sec" id="languages"><span class="l">2e</span><h3>Languages / cultures</h3></div>
+          <div class="facts">
+            <div class="fact"><div class="k">English</div><div class="v">Native</div><div class="s">Canadian National, US Green Card Holder</div></div>
+            <div class="fact"><div class="k">Mandarin</div><div class="v">Fluent</div><div class="s">Born in Beijing, AP in Mandarin</div></div>
+            <div class="fact"><div class="k">Spanish</div><div class="v">Fluent</div><div class="s">South Florida</div></div>
+          </div>
+        </div>
+        <aside class="side">
+          <figure><img src="assets/suit.jpg" alt="Leonardo Carvalho, formal portrait"><figcaption>Groton School &middot; Class of 2028</figcaption></figure>
+        </aside>
+      </div>
+    </div></div>
+</section>
+
+  <!-- ===== 3 PASSIONS ===== -->
+  <section class="ov" id="ov-passions" role="dialog" aria-modal="true" aria-labelledby="h-passions">
+  <div class="ov-head"><div class="wrap">
+    <div class="ov-title"><span class="n">3</span><h2 id="h-passions">Passions</h2><span class="sub">a &middot; Music  b &middot; OC Apex  c &middot; Teaching &middot; d &middot; Coding / Claude AI  e &middot; Entrepreneur</span></div>
+    <button class="x" data-close aria-label="Close passions">&#10005;</button>
+  </div></div>
+  <div class="ov-body"><div class="wrap">
+      <div class="sub-grid">
+        <div class="bio">
+          <div class="sec" id="music"><span class="l">3a</span><h3>Music</h3></div>
+          <p class="lead">Leonardo took up the violin at 7 years old and switched to the viola in 8th grade. He&rsquo;s participated in various competitions and shows including a performance (together with his brother) at Carnegie Hall, New York. This summer he ran a show that raised over $8,000 for a children&rsquo;s foundation.</p>
+          <div class="pas">
+            <div class="pa"><div class="k">3a &middot; i</div><div class="v">Viola &amp; violin</div>
+              <div class="s">Enjoys playing the viola and violin when not in class or in the rink. Founder of a non-profit organization (OCApex) bringing classical music and activities to residents of senior living facilities.</div></div>
+            <div class="pa"><div class="k">3a &middot; ii</div><div class="v">Awards &amp; achievements</div>
+              <ul>
+                <li>Florida All-State Orchestra &mdash; 1st stand viola</li>
+                <li>All-County Orchestra &mdash; 3rd seat viola</li>
+                <li>Florida Youth Orchestra, 2020&ndash;2024</li>
+                <li>Fine Arts Scholarship (viola)</li>
+              </ul></div>
+          </div>
+
+          <div class="sec" id="ocapex"><span class="l">3b</span><h3>OC Apex</h3></div>
+          <p><b><a class="pl" href="https://ocapex.com" target="_blank" rel="noopener">OC APEX (ocapex.com)</a></b> was founded in 2022 in South Florida as a nonprofit music organization led by students, devoted to spreading the joy of music. Musicians range from ages 6 to 20, and bring lively performances and music education to elderly care homes, rehabilitation centers, and underprivileged communities. What began in 2022 as a small group of student performers visiting a single senior living community has grown into a program that runs throughout the year, with dozens of active volunteers and more than two dozen community partners across South Florida. Every performance is planned, rehearsed, and led entirely by its student members.</p>
+          <p>Youtube Footage of Events (<a class="pl" href="https://www.youtube.com/@OCApex" target="_blank" rel="noopener">www.youtube.com/@OCApex</a>)</p>
+          <p><b><i>In 2026 alone OCApex has raised more than $8,500 for various children&rsquo;s foundations.</i></b></p>
+
+          <div class="sec" id="teaching"><span class="l">3c</span><h3>Teaching kids coding</h3></div>
+          <p>During the summer we held free classes at NSU (Nova Southeastern University, FL) for kids ages 6-12 on coding to show them the possibilities in it and how to properly work with computers. Number of students varied from 10 to 50 students.</p>
+
+          <div class="sec" id="coding"><span class="l">3d</span><h3>Coding / Claude AI</h3></div>
+          <div class="pas">
+            <div class="pa wide"><div class="k">Build / Coding</div>
+              <div class="s">Leonardo took to coding from robotics competition. That&rsquo;s where the coding passion started. It has now developed into extensive use of Claude AI for work, entrepreneurial, and extended projects.</div>
+              <div class="s">Leonardo has delved deep into the capabilities of Claude AI and continues to pursue potentials of what this somewhat new technology has to offer.</div></div>
+          </div>
+
+          <div class="sec" id="entrepreneur"><span class="l">3e</span><h3>Entrepreneur</h3></div>
+          <div class="pas">
+            <div class="pa wide"><div class="k">Mindset</div>
+              <div class="s">Leonardo is currently working with friends on a venture start-up that has opened interests and spaces he was not aware existed.</div></div>
+          </div>
+          <div class="strip">
+            <figure><img src="assets/viola.jpg" alt="Performing on the viola in concert dress"><figcaption>All-State viola</figcaption></figure>
+            <figure><img src="assets/suit.jpg" alt="Leonardo Carvalho, formal portrait"><figcaption>Leo</figcaption></figure>
+            <figure><img src="assets/studio1.jpg" alt="Studio portrait in Groton goaltending gear"><figcaption>Between the pipes</figcaption></figure>
+          </div>
+        </div>
+        <aside class="side">
+          <figure><img src="assets/viola.jpg" alt="Leonardo Carvalho performing on the viola"><figcaption>Florida All-State Orchestra &middot; 1st stand viola</figcaption></figure>
+        </aside>
+      </div>
+    </div></div>
+</section>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,c){return (c||document).querySelector(s)};
+var $$=function(s,c){return [].slice.call((c||document).querySelectorAll(s))};
+
+/* gate removed in v2.23 — restore from v2.22 before going live */
+
+/* ---- timeline ---- */
+(function(){
+  var tl=$("#tl"),out=$("#tl-out"); if(!tl)return;
+  function show(b){
+    $$(".tl-stop",tl).forEach(function(s){s.dataset.on=s===b?"1":"0"});
+    out.innerHTML="<b>"+$(".yr",b).textContent+"</b>"+b.dataset.team;
+  }
+  $$(".tl-stop",tl).forEach(function(b){
+    b.addEventListener("mouseenter",function(){out.innerHTML="<b>"+$(".yr",b).textContent+"</b>"+b.dataset.team});
+    b.addEventListener("click",function(){show(b)});
+    b.addEventListener("focus",function(){show(b)});
+  });
+  tl.addEventListener("mouseleave",function(){var on=$('.tl-stop[data-on="1"]',tl)||$(".tl-stop.now",tl); if(on)out.innerHTML="<b>"+$(".yr",on).textContent+"</b>"+on.dataset.team});
+})();
+/* ---- overlays ---- */
+var lastFocus=null;
+function openOv(id){
+  var ov=document.getElementById(id); if(!ov)return;
+  lastFocus=document.activeElement;
+  $$(".ov.on").forEach(function(o){o.classList.remove("on")});
+  ov.classList.add("on"); $(".ov-body",ov).scrollTop=0;
+  document.body.style.overflow="hidden";
+  $(".x",ov).focus();
+}
+function closeOv(){
+  $$(".ov.on").forEach(function(o){o.classList.remove("on")});
+  document.body.style.overflow="";
+  if(lastFocus&&lastFocus.focus)lastFocus.focus();
+}
+$$("[data-open]").forEach(function(b){b.addEventListener("click",function(){openOv(b.dataset.open)})});
+$$("[data-close]").forEach(function(b){b.addEventListener("click",closeOv)});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeOv()});
+})();
+</script>
+</body>
+</html>
