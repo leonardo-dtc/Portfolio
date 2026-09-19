@@ -361,7 +361,7 @@ figcaption, .cap { font-family: var(--mono); font-size: var(--meta); color: var(
 .index__link:hover .index__title { color: var(--ac); }
 .index__meta { grid-area: meta; font-family: var(--mono); font-size: var(--meta); color: var(--fg-2); letter-spacing: .03em; display: flex; flex-wrap: wrap; gap: .25em 1em; }
 .index__thumb { grid-area: thumb; width: 96px; aspect-ratio: 3 / 2; margin: 0; }
-.index__thumb .ph { font-size: .5625rem; padding: .25rem; }
+.index__thumb .ph { font-size: var(--meta); letter-spacing: 0; line-height: 1.25; padding: .25rem; }
 .index__thumb .ph::after { inset: 4px; }
 .index__thumb .ph span { max-width: none; }
 @media (min-width: 768px) {
@@ -508,7 +508,7 @@ figcaption, .cap { font-family: var(--mono); font-size: var(--meta); color: var(
 .timeline .team { font-weight: 500; }
 .timeline .where { display: block; font-size: var(--small); color: var(--fg-2); }
 .timeline .slot { width: 72px; aspect-ratio: 1; }
-.timeline .slot .ph { font-size: .5625rem; padding: .2rem; --ar: 1; }
+.timeline .slot .ph { font-size: var(--meta); letter-spacing: 0; padding: .2rem; --ar: 1; }
 .timeline .slot .ph::after { inset: 4px; }
 .timeline .slot .ph span { max-width: none; }
 .strip { display: grid; gap: var(--gutter); }

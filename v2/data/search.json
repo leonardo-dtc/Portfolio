@@ -6,265 +6,309 @@
    "t": "Leonardo Carvalho",
    "k": "Page",
    "s": "Leonardo Carvalho, Groton School Class of 2028. Goaltender, student researcher, founder of OCAPEX, violist. Research, product, hockey and music.",
-   "u": ""
+   "u": "",
+   "x": ""
   },
   {
    "t": "About",
    "k": "Page",
    "s": "How Leonardo Carvalho thinks, and what connects goaltending, research, a music nonprofit and building things with friends.",
-   "u": "about/"
+   "u": "about/",
+   "x": ""
   },
   {
    "t": "Aducanumab’s post-marketing record",
    "k": "Page",
    "s": "A comparative pharmacovigilance analysis of the 486 FDA adverse-event cases filed for aducanumab from 2016 to 2024, set beside lecanemab and donanemab. Independent research by Leonardo Carvalho, advised by Dr. Sujata K. Bhatia of Harvard University.",
-   "u": "work/aducanumab/"
+   "u": "work/aducanumab/",
+   "x": ""
   },
   {
    "t": "Daedalus",
    "k": "Page",
    "s": "Daedalus, a cooperative survival-horror game in development for Roblox, set in a changing labyrinth. Leonardo Carvalho is the main builder on the three-person Gompurkle team.",
-   "u": "work/daedalus/"
+   "u": "work/daedalus/",
+   "x": ""
   },
   {
    "t": "FreeCode Juniors",
    "k": "Page",
    "s": "FreeCode Juniors, free Scratch and Python classes for children ages eight and up at Nova Southeastern University’s Alvin Sherman Library. Leonardo Carvalho is co-founder and instructor.",
-   "u": "work/freecode/"
+   "u": "work/freecode/",
+   "x": ""
   },
   {
    "t": "Genuvalens",
    "k": "Page",
    "s": "Genuvalens: the design and simulation of an assist-as-needed knee exoskeleton for ACL-reconstruction rehabilitation. An individual project by Leonardo Carvalho with guidance from Georgia Tech’s EPIC Lab, summer 2026.",
-   "u": "work/genuvalens/"
+   "u": "work/genuvalens/",
+   "x": ""
   },
   {
    "t": "Hockey",
    "k": "Page",
    "s": "Recruiting profile for Leonardo Carvalho, goaltender, Groton School Class of 2028. Measurables, film, academics, coach contacts and team history.",
-   "u": "hockey/"
+   "u": "hockey/",
+   "x": ""
   },
   {
    "t": "Loquar",
    "k": "Page",
    "s": "Loquar, a language-learning web app in development that teaches Mandarin through conversation in an open world. Leonardo Carvalho is co-founder and CTO.",
-   "u": "work/loquar/"
+   "u": "work/loquar/",
+   "x": ""
   },
   {
    "t": "OCAPEX",
    "k": "Page",
    "s": "OCAPEX, a student-led 501(c)(3) music nonprofit founded by Leonardo Carvalho in 2022 that brings performances to senior living communities, hospitals and community events across South Florida.",
-   "u": "work/ocapex/"
+   "u": "work/ocapex/",
+   "x": ""
   },
   {
    "t": "Résumé",
    "k": "Page",
    "s": "Résumé of Leonardo Carvalho, Groton School Class of 2028: education, research and experience, projects, leadership and service, athletics, music, honors and technical skills.",
-   "u": "resume/"
+   "u": "resume/",
+   "x": ""
   },
   {
    "t": "This site",
    "k": "Page",
    "s": "How this portfolio is built: two editions, static HTML, CSS and vanilla JavaScript, no framework and no build step.",
-   "u": "work/this-site/"
+   "u": "work/this-site/",
+   "x": ""
   },
   {
    "t": "Work",
    "k": "Page",
    "s": "An index of Leonardo Carvalho’s work: research, things built, community work and music, with project pages for the pieces that carry detail.",
-   "u": "work/"
+   "u": "work/",
+   "x": ""
   },
   {
    "t": "Amyloid-related imaging abnormalities dominate aducanumab’s complete post-marketing record",
    "k": "Project",
    "s": "A comparative pharmacovigilance analysis of FDA adverse-event reports",
-   "u": "work/aducanumab/"
+   "u": "work/aducanumab/",
+   "x": "Research · Pharmacovigilance · 2026 Amyloid-related imaging abnormalities dominate aducanumab’s complete post-marketing record A comparative pharmacovigilance analysis of FDA adverse-event reports Type Independent research, sole author Year 2026 Advisor Dr. Sujata K. Bhatia, Harvard University Status Manuscript submitted to the Scholarly Review Journal; publication pending Data FDA Adverse Event Monitoring System (AEMS) Public Dashboard, retrieved August 31, 2026 Tools Python, SciPy What this is. A pharmacovigilance analysis of adverse-event reports submitted to the FDA. It is not an efficacy "
   },
   {
    "t": "Academic",
    "k": "Résumé",
    "s": "Groton School · American Heritage School",
-   "u": "resume/#academic-honors"
+   "u": "resume/#academic-honors",
+   "x": "2023 to 2026 Academic Groton School · American Heritage School Honor Roll, all three terms, Groton School, 2025-26. Nine AP exams, every score a 5, 2024 to 2026. Outstanding Student Award, grade 9, American Heritage School. Best Student in six courses across grades 9 and 10, American Heritage School. National Junior Honor Society, grades 7 to 9; National Honor Society, grade 10. Academic and music merit scholarships, American Heritage School, 2023-24."
   },
   {
    "t": "Aducanumab pharmacovigilance analysis",
    "k": "Résumé",
    "s": "Independent research, sole author · Advised by Dr. Sujata K. Bhatia, Harvard University",
-   "u": "resume/#aducanumab"
+   "u": "resume/#aducanumab",
+   "x": "2026 Aducanumab pharmacovigilance analysis Independent research, sole author · Advised by Dr. Sujata K. Bhatia, Harvard University I analyzed the 486 FDA adverse-event cases filed for aducanumab from 2016 to 2024 and compared the reporting patterns with lecanemab and donanemab: chi-squared tests, two-proportion z-tests and exact binomial tests in Python with SciPy. ARIA appeared in 37.2% of the aducanumab cases, against 25.7% and 34.0% in the comparison sets; these are proportions of submitted reports, not patient risk. Manuscript Amyloid-Related Imaging Abnormalities Dominate Aducanumab’s Com"
   },
   {
    "t": "Advanced Placement exams",
    "k": "Résumé",
    "s": "Nine exams, every score a 5",
-   "u": "resume/#ap-exams"
+   "u": "resume/#ap-exams",
+   "x": "2024 to 2026 Advanced Placement exams Nine exams, every score a 5 2024: Human Geography. 2025: Biology; World History: Modern; Spanish Language and Culture; Precalculus. 2026: Statistics; Computer Science Principles; Calculus BC; Chemistry. SAT 1490, August 2025. PSAT 1480, October 2024."
   },
   {
    "t": "American Heritage School",
    "k": "Résumé",
    "s": "Delray Beach, Florida · Grades 5 to 10 · Pre-Engineering track",
-   "u": "resume/#american-heritage"
+   "u": "resume/#american-heritage",
+   "x": "2019 to 2025 American Heritage School Delray Beach, Florida · Grades 5 to 10 · Pre-Engineering track 4.0 unweighted GPA. Ninth-grade Outstanding Student Award. Best Student in Biology Honors, Algebra II Honors, English I Honors and Architecture I in grade 9, and in AP Biology and AP Precalculus in grade 10. National Junior Honor Society, grades 7 to 9; National Honor Society, grade 10. Introduction to Engineering Design Honors and Principles of Engineering Honors through Project Lead the Way; Pre-Engineering Society. Academic and music merit scholarships, 2023-24."
   },
   {
    "t": "Amora string quartet",
    "k": "Résumé",
    "s": "Viola · Formed through Select Chamber Music",
-   "u": "resume/#amora"
+   "u": "resume/#amora",
+   "x": "2026 to present Amora string quartet Viola · Formed through Select Chamber Music Four classmates who kept playing together beyond the term the group was formed in. Performed the first movement of Dvořák’s “American” Quartet at an assisted living community, Revisit Day Chapel and the spring concerts. Now arranging Vivaldi’s The Four Seasons , one season per player; I am arranging Summer. Plans include Mendelssohn. I also arranged The Phantom of the Opera for string quartet."
   },
   {
    "t": "Carnegie Hall, Weill Recital Hall",
    "k": "Résumé",
    "s": "NY Classical Debut Awards winners’ concert · Violin",
-   "u": "resume/#carnegie-hall"
+   "u": "resume/#carnegie-hall",
+   "x": "November 15, 2025 Carnegie Hall, Weill Recital Hall NY Classical Debut Awards winners’ concert · Violin Bruch’s Violin Concerto No. 1, with my brother Adriano Carvalho accompanying on piano."
   },
   {
    "t": "Class projects",
    "k": "Résumé",
    "s": "Groton School",
-   "u": "resume/#class-projects"
+   "u": "resume/#class-projects",
+   "x": "2025 to 2026 Class projects Groton School A composite index ranking ten sports across five categories (AP Statistics). Snake, Minesweeper and a dinosaur runner rebuilt from scratch in Python and Java (AP Computer Science). A produced cover with its own music video as a Calculus BC final."
   },
   {
    "t": "Clubs at Groton",
    "k": "Résumé",
    "s": "Biology Club · Biomed Club",
-   "u": "resume/#clubs"
+   "u": "resume/#clubs",
+   "x": "2025 to present Clubs at Groton Biology Club · Biomed Club Member of both. Helping establish an OCAPEX chapter at Groton."
   },
   {
    "t": "Congressional Award",
    "k": "Résumé",
    "s": "Bronze application submitted September 2026 · Silver in progress",
-   "u": "resume/#congressional-award"
+   "u": "resume/#congressional-award",
+   "x": "In progress Congressional Award Bronze application submitted September 2026 · Silver in progress Recorded activities: 232 hours of voluntary public service, 163.5 hours of personal development, 251.75 hours of physical fitness and a three-day, two-night expedition in the Florida Keys. The minimum participation period for Silver is expected to be reached in February 2027. Logged hours do not by themselves constitute an awarded medal."
   },
   {
    "t": "Daedalus, main builder",
    "k": "Résumé",
    "s": "Cooperative survival-horror game · Roblox · Three-person team, Gompurkle",
-   "u": "resume/#daedalus"
+   "u": "resume/#daedalus",
+   "x": "In development Daedalus, main builder Cooperative survival-horror game · Roblox · Three-person team, Gompurkle A first-person cooperative game for two to six players set in a changing labyrinth. I contribute design and implementation as the main builder; roles shift as the project develops. Working toward an alpha; no release date. Project page ."
   },
   {
    "t": "Florida Youth Orchestra",
    "k": "Résumé",
    "s": "Symphony Orchestra, first violin (2022) · Principal Orchestra, second violin (2023, 2024)",
-   "u": "resume/#fyo"
+   "u": "resume/#fyo",
+   "x": "2020 to 2024 Florida Youth Orchestra Symphony Orchestra, first violin (2022) · Principal Orchestra, second violin (2023, 2024) Four seasons. Additional recitals for Alberto Zilberstein and for violin teacher Huifang Chen."
   },
   {
    "t": "FreeCode Juniors, co-founder and instructor",
    "k": "Résumé",
    "s": "Nova Southeastern University’s Alvin Sherman Library · Under UStartTeaching",
-   "u": "resume/#freecode"
+   "u": "resume/#freecode",
+   "x": "Since June 2026 FreeCode Juniors, co-founder and instructor Nova Southeastern University’s Alvin Sherman Library · Under UStartTeaching Free Scratch and Python classes for children ages eight and up. Across the first four sessions the program reached more than 40 students; I taught around 10 personally. From Groton I teach remotely and coordinate the program. Project page ."
   },
   {
    "t": "Genuvalens, knee-exoskeleton design and simulation",
    "k": "Résumé",
    "s": "Individual project · Guidance from Dr. Aaron Young and doctoral student Dongho Park, EPIC Lab, Georgia Tech",
-   "u": "resume/#genuvalens"
+   "u": "resume/#genuvalens",
+   "x": "Summer 2026 Genuvalens, knee-exoskeleton design and simulation Individual project · Guidance from Dr. Aaron Young and doctoral student Dongho Park, EPIC Lab, Georgia Tech I designed and simulated an assist-as-needed knee exoskeleton for squat-to-stand movement after ACL reconstruction: an impedance controller with a leg-asymmetry term and a logistic-regression phase classifier. In a simplified five-repetition simulation, adaptive assistance reached 98.0% of target extension at 3.6 N·m peak athlete torque, against 87.2% at 9.6 N·m unassisted and 113.9% at 23.3 N·m with fixed assistance. Model r"
   },
   {
    "t": "Goaltending clinics",
    "k": "Résumé",
    "s": "With goaltending coach Patrick Spano, Florida",
-   "u": "resume/#clinics"
+   "u": "resume/#clinics",
+   "x": "Summers Goaltending clinics With goaltending coach Patrick Spano, Florida I help coach the younger goalies at his clinics."
   },
   {
    "t": "Groton JV Soccer",
    "k": "Résumé",
    "s": "Attacking midfielder · Thirds in 2025",
-   "u": "resume/#soccer"
+   "u": "resume/#soccer",
+   "x": "Fall 2026 Groton JV Soccer Attacking midfielder · Thirds in 2025 A different sport each season; the lateral movement and read-and-react habits from the pitch carry back into the crease."
   },
   {
    "t": "Groton School",
    "k": "Résumé",
    "s": "Groton, Massachusetts · Class of 2028 · Boarding",
-   "u": "resume/#groton"
+   "u": "resume/#groton",
+   "x": "2025 to present Groton School Groton, Massachusetts · Class of 2028 · Boarding 4.0 GPA. Honor Roll in all three terms of 2025-26. 2026-27: English; Multivariable Calculus; Advanced Physics: Mechanics; Organic Chemistry 1 and 2; United States History; Chamber Orchestra; Select Chamber Music; viola and voice lessons. 2025-26: English; AP Calculus BC; AP Statistics; AP Computer Science; AP Chemistry; Chamber Orchestra; Select Chamber Music. Biology Club and Biomed Club. Helping establish an OCAPEX chapter at Groton."
   },
   {
    "t": "Groton School Boys’ Varsity Hockey, goaltender",
    "k": "Résumé",
    "s": "Independent School League · NEPSAC · #1 in 2026-27, #30 in 2025-26",
-   "u": "resume/#hockey"
+   "u": "resume/#hockey",
+   "x": "2025 to present Groton School Boys’ Varsity Hockey, goaltender Independent School League · NEPSAC · #1 in 2026-27, #30 in 2025-26 Butterfly goaltender, catches left. 2025-26 as the second goaltender: two games played, two wins, no losses, one goal allowed, one shutout, 0.50 goals-against average, a two-game sample; team record 14-12-1. Starting in 2026-27. Registered with the NCAA Eligibility Center and USA Hockey. Recruiting profile ."
   },
   {
    "t": "Groton School Chamber Orchestra",
    "k": "Résumé",
    "s": "Principal violist, 2026-27 · Assistant principal, 2025-26",
-   "u": "resume/#chamber-orchestra"
+   "u": "resume/#chamber-orchestra",
+   "x": "2025 to present Groton School Chamber Orchestra Principal violist, 2026-27 · Assistant principal, 2025-26 Studies with Dorcas McCall at Groton and Alberto Zilberstein in Florida. Performed the first movement of Walton’s Viola Concerto at a student recital in spring 2026; repertoire also includes Bartók, the Bach (Casadesus) concerto in C minor and Bach’s first cello suite. Violin since age six, viola since thirteen; I still play both, and I take voice lessons and play open mics at Groton."
   },
   {
    "t": "Groton Varsity Crew",
    "k": "Résumé",
    "s": "Sweep rowing · Starboard, seats two and three",
-   "u": "resume/#crew"
+   "u": "resume/#crew",
+   "x": "Spring 2026 Groton Varsity Crew Sweep rowing · Starboard, seats two and three A first spring on the Nashua River. Began in the fifth boat, joined the third boat the evening before the NEIRA Regatta on Lake Quinsigamond, and the crew reached the grand final."
   },
   {
    "t": "Imagina Children’s Foundation",
    "k": "Résumé",
    "s": "Volunteer · Junior Ambassador since August 2026",
-   "u": "resume/#imagina"
+   "u": "resume/#imagina",
+   "x": "2025 to present Imagina Children’s Foundation Volunteer · Junior Ambassador since August 2026 I help manage an inventory of around 200 handmade items created by children in León, Mexico, for fundraising auctions that support music and education programs, and I supported promotion and fundraising for The Sound of Giving , which was streamed to the children in León."
   },
   {
    "t": "Languages",
    "k": "Résumé",
    "s": "English, Mandarin and Spanish (AP Spanish Language and Culture, 5).",
-   "u": "resume/#languages"
+   "u": "resume/#languages",
+   "x": "Languages English, Mandarin and Spanish (AP Spanish Language and Culture, 5)."
   },
   {
    "t": "Loquar, co-founder and CTO",
    "k": "Résumé",
    "s": "Language-learning web app, beginning with Mandarin",
-   "u": "resume/#loquar"
+   "u": "resume/#loquar",
+   "x": "In development Loquar, co-founder and CTO Language-learning web app, beginning with Mandarin I am responsible for implementing the systems, the interface design and the code of a web app that teaches through conversation in an open world. No release date has been announced. Project page ."
   },
   {
    "t": "Music",
    "k": "Résumé",
    "s": "Competitions and festivals",
-   "u": "resume/#music-honors"
+   "u": "resume/#music-honors",
+   "x": "2019 to 2025 Music Competitions and festivals Florida All-State Orchestra: first and second stand viola across 2023 and 2024. Palm Beach All-County Orchestra: second stand viola, 2023 and 2024. Florida Federation of Music Clubs State Junior Convention, five first places: string quartet, viola concerto and viola solo (2024); viola sight-playing and violin-viola duet (2025). Charleston International Music Competition, winner, 2025: Mozart’s Piano Quartet in G minor, K. 478, and a Passacaglia arranged for violin and viola. NY Classical Debut Awards, Carnegie Hall winners’ concert, 2025. Peel Musi"
   },
   {
    "t": "OCAPEX, founder and president",
    "k": "Résumé",
    "s": "Student-led 501(c)(3) music nonprofit · South Florida",
-   "u": "resume/#ocapex"
+   "u": "resume/#ocapex",
+   "x": "2022 to present OCAPEX, founder and president Student-led 501(c)(3) music nonprofit · South Florida I founded a nonprofit that brings student performances to senior living communities, memory care, rehabilitation centers, hospitals and community events, and I run it: booking facilities, coordinating performers, making programs and promotional material, and working with the student team on outreach. Together, OCAPEX students have given more than 50 performances, reached over 3,000 community members and contributed over 2,000 service hours (organization-wide totals as of September 2026). Two 202"
   },
   {
    "t": "Prep teams, showcases and camps",
    "k": "Résumé",
    "s": "NEFPHL 16U Fall Prep, 2025 · Northern Cyclones Maroon 18U Prep, 2026 · Chowder Cup Jr. A with the Boston Jr. Rangers, 2026",
-   "u": "resume/#prep"
+   "u": "resume/#prep",
+   "x": "2025 to 2026 Prep teams, showcases and camps NEFPHL 16U Fall Prep, 2025 · Northern Cyclones Maroon 18U Prep, 2026 · Chowder Cup Jr. A with the Boston Jr. Rangers, 2026 National Collegiate Development Camp, 2025. Jon Elkin Goaltending Camp, 2026. Summers with goaltending coach Patrick Spano in Florida, remote guidance in season."
   },
   {
    "t": "Programming and methods",
    "k": "Résumé",
    "s": "Most used: Python (NumPy, pandas, Matplotlib, SciPy, scikit-learn) and Java. Also: Lua, JavaScript, TypeScript, HTML, CSS and shell, for games, websites and…",
-   "u": "resume/#skills"
+   "u": "resume/#skills",
+   "x": "Programming and methods Most used: Python (NumPy, pandas, Matplotlib, SciPy, scikit-learn) and Java. Also: Lua, JavaScript, TypeScript, HTML, CSS and shell, for games, websites and smaller projects. Scratch since 2016, Python since 2018, Java since 2023. Methods: statistical tests (chi-squared, z-tests, exact binomial), feedback control, logistic regression, simulation. Manuscripts to IEEE and APA standards."
   },
   {
    "t": "Robotics and rocketry",
    "k": "Résumé",
    "s": "FRC 5472 Wyld Stallyns · FTC 16759 Wyld Stallyns Untamed · American Rocketry Challenge",
-   "u": "resume/#robotics"
+   "u": "resume/#robotics",
+   "x": "2021 to 2025 Robotics and rocketry FRC 5472 Wyld Stallyns · FTC 16759 Wyld Stallyns Untamed · American Rocketry Challenge Programmer in Java on both teams, with basic mechanical work on both and electrical work on the FTC team; the FRC team reached the state championship. Python with VEX Robotics in 2021. Contributed to an American Rocketry Challenge entry; the team did not qualify for nationals."
   },
   {
    "t": "Service",
    "k": "Résumé",
    "s": "Congressional Award",
-   "u": "resume/#service-honors"
+   "u": "resume/#service-honors",
+   "x": "In progress Service Congressional Award Bronze Medal application submitted September 2026; Silver in progress. No medal has been awarded yet."
   },
   {
    "t": "Team history",
    "k": "Résumé",
    "s": "Ontario · Florida · New Jersey",
-   "u": "resume/#team-history"
+   "u": "resume/#team-history",
+   "x": "2016 to 2024 Team history Ontario · Florida · New Jersey Heartland Dragons, Mississauga (2016); Brampton 45s AAA (2017 to 2018); Florida Alliance AAA (2019 to 2021); NJ Rockets AAA (2022 to 2023); Palm Beach Breakers U16 AA (2024). Skating in Ontario and in the crease since 2016; Hockey Canada registered until 2019."
   },
   {
    "t": "This portfolio",
    "k": "Résumé",
    "s": "HTML, CSS and JavaScript · No framework, no build step",
-   "u": "resume/#this-site"
+   "u": "resume/#this-site",
+   "x": "2026 This portfolio HTML, CSS and JavaScript · No framework, no build step Two editions built by hand: a terminal edition with an ASCII field, interactive illustrations and three browser games, and this editorial edition. Project page ."
   },
   {
    "t": "Competitions and festivals",
    "k": "Work",
    "s": "Music · All-State, All-County, FFMC, Charleston, Peel",
-   "u": "resume/#music-honors"
+   "u": "resume/#music-honors",
+   "x": "14 Competitions and festivals Music · All-State, All-County, FFMC, Charleston, Peel 2019 to 2025 No image"
   }
  ]
 }

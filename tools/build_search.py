@@ -45,7 +45,7 @@ class Page(HTMLParser):
         if tag == 'title':
             self._text_target = ('title', None)
         if 'data-search' in a:
-            rec = {'k': a['data-search'] or 'Page', 'id': a.get('id', ''), 't': '', 's': '', 'tag': tag}
+            rec = {'k': a['data-search'] or 'Page', 'id': a.get('id', ''), 't': '', 's': '', 'x': '', 'tag': tag}
             self._open.append([len(self._stack), rec])
         if self._open:
             rec = self._open[-1][1]
@@ -78,7 +78,11 @@ class Page(HTMLParser):
                     break
 
     def handle_data(self, data):
-        if not self._text_target or self._skip:
+        if self._skip:
+            return
+        if self._open:
+            self._open[-1][1]['x'] += data + ' '
+        if not self._text_target:
             return
         kind, rec = self._text_target
         if kind == 'title':
@@ -104,7 +108,8 @@ class Page(HTMLParser):
             u = u.replace('/#', '/#') if '/#' in u else u.replace('#', '/#') if '#' in u and '/#' not in u else u
         else:
             u = self.url + ('#' + rec['id'] if rec['id'] and rec['tag'] not in ('main', 'article') or (rec['tag'] == 'article' and rec['k'] == 'Résumé') else '')
-        self.items.append({'t': t, 'k': rec['k'], 's': s, 'u': u})
+        x = clean(rec['x'])[:600]
+        self.items.append({'t': t, 'k': rec['k'], 's': s, 'u': u, 'x': x})
 
 
 def clean(s):
@@ -123,7 +128,7 @@ def build():
             p = Page(url)
             p.feed(f.read())
         title = clean(p.title).replace(' · Leonardo Carvalho', '')
-        items.append({'t': title, 'k': 'Page', 's': clean(p.desc), 'u': url})
+        items.append({'t': title, 'k': 'Page', 's': clean(p.desc), 'u': url, 'x': ''})
         items.extend(p.items)
     # stable order: pages first (Home first), then by kind then title
     order = {'Page': 0, 'Project': 1, 'Résumé': 2, 'Work': 3}

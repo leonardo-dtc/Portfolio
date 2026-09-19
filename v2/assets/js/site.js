@@ -119,11 +119,11 @@
     }
     function norm(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
     function score(item, q) {
-      var toks = q.split(/\s+/).filter(Boolean), t = norm(item.t), k = norm(item.k), s = norm(item.s), total = 0;
+      var toks = q.split(/\s+/).filter(Boolean), t = norm(item.t), k = norm(item.k), s = norm(item.s), x = norm(item.x), total = 0;
       for (var i = 0; i < toks.length; i++) {
         var tok = toks[i], hit = 0;
         if (t.indexOf(tok) === 0) hit = 6; else if (t.indexOf(tok) >= 0) hit = 4;
-        else if (k.indexOf(tok) >= 0) hit = 3; else if (s.indexOf(tok) >= 0) hit = 1;
+        else if (k.indexOf(tok) >= 0) hit = 3; else if (s.indexOf(tok) >= 0) hit = 2; else if (x.indexOf(tok) >= 0) hit = 1;
         if (!hit) return 0; total += hit;
       }
       return total;
