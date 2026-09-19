@@ -1,0 +1,270 @@
+{
+ "generated_from": "v2/**/index.html",
+ "count": 44,
+ "items": [
+  {
+   "t": "Leonardo Carvalho",
+   "k": "Page",
+   "s": "Leonardo Carvalho, Groton School Class of 2028. Goaltender, student researcher, founder of OCAPEX, violist. Research, product, hockey and music.",
+   "u": ""
+  },
+  {
+   "t": "About",
+   "k": "Page",
+   "s": "How Leonardo Carvalho thinks, and what connects goaltending, research, a music nonprofit and building things with friends.",
+   "u": "about/"
+  },
+  {
+   "t": "Aducanumab’s post-marketing record",
+   "k": "Page",
+   "s": "A comparative pharmacovigilance analysis of the 486 FDA adverse-event cases filed for aducanumab from 2016 to 2024, set beside lecanemab and donanemab. Independent research by Leonardo Carvalho, advised by Dr. Sujata K. Bhatia of Harvard University.",
+   "u": "work/aducanumab/"
+  },
+  {
+   "t": "Daedalus",
+   "k": "Page",
+   "s": "Daedalus, a cooperative survival-horror game in development for Roblox, set in a changing labyrinth. Leonardo Carvalho is the main builder on the three-person Gompurkle team.",
+   "u": "work/daedalus/"
+  },
+  {
+   "t": "FreeCode Juniors",
+   "k": "Page",
+   "s": "FreeCode Juniors, free Scratch and Python classes for children ages eight and up at Nova Southeastern University’s Alvin Sherman Library. Leonardo Carvalho is co-founder and instructor.",
+   "u": "work/freecode/"
+  },
+  {
+   "t": "Genuvalens",
+   "k": "Page",
+   "s": "Genuvalens: the design and simulation of an assist-as-needed knee exoskeleton for ACL-reconstruction rehabilitation. An individual project by Leonardo Carvalho with guidance from Georgia Tech’s EPIC Lab, summer 2026.",
+   "u": "work/genuvalens/"
+  },
+  {
+   "t": "Hockey",
+   "k": "Page",
+   "s": "Recruiting profile for Leonardo Carvalho, goaltender, Groton School Class of 2028. Measurables, film, academics, coach contacts and team history.",
+   "u": "hockey/"
+  },
+  {
+   "t": "Loquar",
+   "k": "Page",
+   "s": "Loquar, a language-learning web app in development that teaches Mandarin through conversation in an open world. Leonardo Carvalho is co-founder and CTO.",
+   "u": "work/loquar/"
+  },
+  {
+   "t": "OCAPEX",
+   "k": "Page",
+   "s": "OCAPEX, a student-led 501(c)(3) music nonprofit founded by Leonardo Carvalho in 2022 that brings performances to senior living communities, hospitals and community events across South Florida.",
+   "u": "work/ocapex/"
+  },
+  {
+   "t": "Résumé",
+   "k": "Page",
+   "s": "Résumé of Leonardo Carvalho, Groton School Class of 2028: education, research and experience, projects, leadership and service, athletics, music, honors and technical skills.",
+   "u": "resume/"
+  },
+  {
+   "t": "This site",
+   "k": "Page",
+   "s": "How this portfolio is built: two editions, static HTML, CSS and vanilla JavaScript, no framework and no build step.",
+   "u": "work/this-site/"
+  },
+  {
+   "t": "Work",
+   "k": "Page",
+   "s": "An index of Leonardo Carvalho’s work: research, things built, community work and music, with project pages for the pieces that carry detail.",
+   "u": "work/"
+  },
+  {
+   "t": "Amyloid-related imaging abnormalities dominate aducanumab’s complete post-marketing record",
+   "k": "Project",
+   "s": "A comparative pharmacovigilance analysis of FDA adverse-event reports",
+   "u": "work/aducanumab/"
+  },
+  {
+   "t": "Academic",
+   "k": "Résumé",
+   "s": "Groton School · American Heritage School",
+   "u": "resume/#academic-honors"
+  },
+  {
+   "t": "Aducanumab pharmacovigilance analysis",
+   "k": "Résumé",
+   "s": "Independent research, sole author · Advised by Dr. Sujata K. Bhatia, Harvard University",
+   "u": "resume/#aducanumab"
+  },
+  {
+   "t": "Advanced Placement exams",
+   "k": "Résumé",
+   "s": "Nine exams, every score a 5",
+   "u": "resume/#ap-exams"
+  },
+  {
+   "t": "American Heritage School",
+   "k": "Résumé",
+   "s": "Delray Beach, Florida · Grades 5 to 10 · Pre-Engineering track",
+   "u": "resume/#american-heritage"
+  },
+  {
+   "t": "Amora string quartet",
+   "k": "Résumé",
+   "s": "Viola · Formed through Select Chamber Music",
+   "u": "resume/#amora"
+  },
+  {
+   "t": "Carnegie Hall, Weill Recital Hall",
+   "k": "Résumé",
+   "s": "NY Classical Debut Awards winners’ concert · Violin",
+   "u": "resume/#carnegie-hall"
+  },
+  {
+   "t": "Class projects",
+   "k": "Résumé",
+   "s": "Groton School",
+   "u": "resume/#class-projects"
+  },
+  {
+   "t": "Clubs at Groton",
+   "k": "Résumé",
+   "s": "Biology Club · Biomed Club",
+   "u": "resume/#clubs"
+  },
+  {
+   "t": "Congressional Award",
+   "k": "Résumé",
+   "s": "Bronze application submitted September 2026 · Silver in progress",
+   "u": "resume/#congressional-award"
+  },
+  {
+   "t": "Daedalus, main builder",
+   "k": "Résumé",
+   "s": "Cooperative survival-horror game · Roblox · Three-person team, Gompurkle",
+   "u": "resume/#daedalus"
+  },
+  {
+   "t": "Florida Youth Orchestra",
+   "k": "Résumé",
+   "s": "Symphony Orchestra, first violin (2022) · Principal Orchestra, second violin (2023, 2024)",
+   "u": "resume/#fyo"
+  },
+  {
+   "t": "FreeCode Juniors, co-founder and instructor",
+   "k": "Résumé",
+   "s": "Nova Southeastern University’s Alvin Sherman Library · Under UStartTeaching",
+   "u": "resume/#freecode"
+  },
+  {
+   "t": "Genuvalens, knee-exoskeleton design and simulation",
+   "k": "Résumé",
+   "s": "Individual project · Guidance from Dr. Aaron Young and doctoral student Dongho Park, EPIC Lab, Georgia Tech",
+   "u": "resume/#genuvalens"
+  },
+  {
+   "t": "Goaltending clinics",
+   "k": "Résumé",
+   "s": "With goaltending coach Patrick Spano, Florida",
+   "u": "resume/#clinics"
+  },
+  {
+   "t": "Groton JV Soccer",
+   "k": "Résumé",
+   "s": "Attacking midfielder · Thirds in 2025",
+   "u": "resume/#soccer"
+  },
+  {
+   "t": "Groton School",
+   "k": "Résumé",
+   "s": "Groton, Massachusetts · Class of 2028 · Boarding",
+   "u": "resume/#groton"
+  },
+  {
+   "t": "Groton School Boys’ Varsity Hockey, goaltender",
+   "k": "Résumé",
+   "s": "Independent School League · NEPSAC · #1 in 2026-27, #30 in 2025-26",
+   "u": "resume/#hockey"
+  },
+  {
+   "t": "Groton School Chamber Orchestra",
+   "k": "Résumé",
+   "s": "Principal violist, 2026-27 · Assistant principal, 2025-26",
+   "u": "resume/#chamber-orchestra"
+  },
+  {
+   "t": "Groton Varsity Crew",
+   "k": "Résumé",
+   "s": "Sweep rowing · Starboard, seats two and three",
+   "u": "resume/#crew"
+  },
+  {
+   "t": "Imagina Children’s Foundation",
+   "k": "Résumé",
+   "s": "Volunteer · Junior Ambassador since August 2026",
+   "u": "resume/#imagina"
+  },
+  {
+   "t": "Languages",
+   "k": "Résumé",
+   "s": "English, Mandarin and Spanish (AP Spanish Language and Culture, 5).",
+   "u": "resume/#languages"
+  },
+  {
+   "t": "Loquar, co-founder and CTO",
+   "k": "Résumé",
+   "s": "Language-learning web app, beginning with Mandarin",
+   "u": "resume/#loquar"
+  },
+  {
+   "t": "Music",
+   "k": "Résumé",
+   "s": "Competitions and festivals",
+   "u": "resume/#music-honors"
+  },
+  {
+   "t": "OCAPEX, founder and president",
+   "k": "Résumé",
+   "s": "Student-led 501(c)(3) music nonprofit · South Florida",
+   "u": "resume/#ocapex"
+  },
+  {
+   "t": "Prep teams, showcases and camps",
+   "k": "Résumé",
+   "s": "NEFPHL 16U Fall Prep, 2025 · Northern Cyclones Maroon 18U Prep, 2026 · Chowder Cup Jr. A with the Boston Jr. Rangers, 2026",
+   "u": "resume/#prep"
+  },
+  {
+   "t": "Programming and methods",
+   "k": "Résumé",
+   "s": "Most used: Python (NumPy, pandas, Matplotlib, SciPy, scikit-learn) and Java. Also: Lua, JavaScript, TypeScript, HTML, CSS and shell, for games, websites and…",
+   "u": "resume/#skills"
+  },
+  {
+   "t": "Robotics and rocketry",
+   "k": "Résumé",
+   "s": "FRC 5472 Wyld Stallyns · FTC 16759 Wyld Stallyns Untamed · American Rocketry Challenge",
+   "u": "resume/#robotics"
+  },
+  {
+   "t": "Service",
+   "k": "Résumé",
+   "s": "Congressional Award",
+   "u": "resume/#service-honors"
+  },
+  {
+   "t": "Team history",
+   "k": "Résumé",
+   "s": "Ontario · Florida · New Jersey",
+   "u": "resume/#team-history"
+  },
+  {
+   "t": "This portfolio",
+   "k": "Résumé",
+   "s": "HTML, CSS and JavaScript · No framework, no build step",
+   "u": "resume/#this-site"
+  },
+  {
+   "t": "Competitions and festivals",
+   "k": "Work",
+   "s": "Music · All-State, All-County, FFMC, Charleston, Peel",
+   "u": "resume/#music-honors"
+  }
+ ]
+}

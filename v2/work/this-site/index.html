@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>This site · Leonardo Carvalho</title>
+<meta name="description" content="How this portfolio is built: two editions, static HTML, CSS and vanilla JavaScript, no framework and no build step.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F5F3EF">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23F5F3EF'/%3E%3Crect y='60' width='64' height='4' fill='%238C1D2C'/%3E%3Ctext x='32' y='44' font-family='Bodoni 72,Didot,Georgia,serif' font-size='34' text-anchor='middle' fill='%23111'%3ELC%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="../../assets/fonts/bodoni-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/inter-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/css/site.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body data-root="../../">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap site-head__in">
+    <a class="wordmark" href="../../" aria-label="Leonardo Carvalho, home"><span class="full">Leonardo Carvalho</span><span class="short">LC</span></a>
+    <nav aria-label="Site">
+      <ul class="nav">
+        <li><a href="../" aria-current="page">Work</a></li>
+        <li><a href="../../hockey/">Hockey</a></li>
+        <li><a href="../../about/">About</a></li>
+        <li><a href="../../resume/">Résumé</a></li>
+        <li><button class="search-btn" type="button" data-search-open aria-label="Search, command K"><span class="lbl">Search</span><kbd aria-hidden="true">⌘K</kbd></button></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="site-head__rule" aria-hidden="true"></div>
+</header>
+
+<main id="main">
+  <article class="wrap paper" data-search="Project" id="this-site">
+
+    <header class="paper__head">
+      <p class="paper__kicker">Product · This site · 2026</p>
+      <h1 class="paper__title display reveal">This site</h1>
+      <p class="paper__sub">Two editions of one portfolio, built by hand</p>
+      <dl class="metaline">
+        <div><dt>Stack</dt><dd>HTML, CSS and vanilla JavaScript. No framework, no build step.</dd></div>
+        <div><dt>Editions</dt><dd><a href="../../../">v1, the terminal edition</a> and v2, this editorial edition</dd></div>
+        <div><dt>Type</dt><dd>Inter, Bodoni Moda and JetBrains Mono, self-hosted</dd></div>
+        <div><dt>Requests</dt><dd>No analytics, no third-party requests, no web fonts from a CDN</dd></div>
+      </dl>
+    </header>
+
+    <div class="paper__body steps">
+      <section class="sec" aria-labelledby="s-problem">
+        <div class="sec__head"><span class="sec__n" aria-hidden="true">01</span><h2 id="s-problem" class="sec__title h3">Problem</h2></div>
+        <div class="prose">
+          <p>Three audiences read this site at three speeds. A hockey coach wants a recruiting profile that loads fast and prints on one page. An admissions reader wants to know what the work is and whether it holds up. A peer wants to see how it was made. So the Home page curates, the Résumé catalogues, and the project pages prove.</p>
+        </div>
+      </section>
+      <section class="sec" aria-labelledby="s-approach">
+        <div class="sec__head"><span class="sec__n" aria-hidden="true">02</span><h2 id="s-approach" class="sec__title h3">Two editions</h2></div>
+        <div class="prose">
+          <p>The first edition is a terminal: an ASCII field on a canvas, a name rasterized from a bitmap font, a portrait and a goaltender’s mask baked into text, a working prompt in the corner and three small games. It is still at the root of this site, as v1, and the games live there.</p>
+          <p>This edition is paper. Light is canonical, one hairline of crimson runs under the chrome, photographs rest in grayscale and resolve to color when you reach for them, and the pages are meant to be quiet at first and more detailed the deeper you go.</p>
+        </div>
+      </section>
+      <section class="sec" aria-labelledby="s-system">
+        <div class="sec__head"><span class="sec__n" aria-hidden="true">03</span><h2 id="s-system" class="sec__title h3">Design system</h2></div>
+        <div class="prose">
+          <p>Every color, type role and duration is a CSS custom property on the root, so a dark theme can be added by re-pointing them. The palette is paper, ink, a secondary gray, a hairline, and oxblood for the accent; the dark stage bands used for film and hero media swap in a lighter ink and a brighter red, because oxblood fails on black.</p>
+          <p>Inter carries the interface and the body text at 16 to 18 pixels on a measure of 60 to 70 characters. Bodoni Moda carries titles and pull lines. JetBrains Mono is reserved for index numbers, metadata and captions, and nothing on the site is set below 12 pixels.</p>
+        </div>
+      </section>
+      <section class="sec" aria-labelledby="s-interaction">
+        <div class="sec__head"><span class="sec__n" aria-hidden="true">04</span><h2 id="s-interaction" class="sec__title h3">Interaction</h2></div>
+        <div class="prose">
+          <p>Motion is limited to 300 milliseconds, never runs before content is readable, and switches off under the reduced-motion preference. Titles clip-reveal once as they enter the viewport; images settle by one to two percent. The image treatment is a single class, so a crimson duotone can replace the grayscale later. Clips play muted on hover and on tap, and never with sound.</p>
+          <p>The search palette opens with ⌘K or a slash and searches projects, résumé entries and pages. The HTML is the source of truth: a small Python script scans the pages and writes the search index, and the site reads fully without JavaScript.</p>
+        </div>
+      </section>
+      <section class="sec" aria-labelledby="s-impl">
+        <div class="sec__head"><span class="sec__n" aria-hidden="true">05</span><h2 id="s-impl" class="sec__title h3">Implementation</h2></div>
+        <div class="prose">
+          <p>Static files in a directory tree, one stylesheet, one small script, latin font subsets served from the same folder, images as WebP and AVIF with width and height set and lazy loading below the fold. Every page carries a print stylesheet; the Hockey page prints to one sheet. The site is marked noindex while it is a comparison build.</p>
+        </div>
+      </section>
+      <section class="sec" aria-labelledby="s-state">
+        <div class="sec__head"><span class="sec__n" aria-hidden="true">06</span><h2 id="s-state" class="sec__title h3">Current state</h2></div>
+        <div class="prose">
+          <p>v2 is a comparison build beside v1. If it wins, the next step is a small generator so the shared chrome is written once.</p>
+        </div>
+      </section>
+    </div>
+
+    <nav class="pager" aria-label="More work">
+      <a href="../loquar/"><span class="k">Previous</span>Loquar</a>
+      <a href="../"><span class="k">Index</span>All work</a>
+    </nav>
+  </article>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="site-foot__grid">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <p style="margin-top:.5rem"><a class="email" href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a></p>
+        <p class="small muted" style="margin-top:.75rem;max-width:44ch">For recruiting, project questions or a conversation. Transcript, hockey film and coach references available on request.</p>
+      </div>
+      <ul class="linkrow">
+        <li><a href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" rel="noopener">Elite Prospects</a></li>
+        <li><a href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" rel="noopener">NCSA</a></li>
+        <li><a href="https://ocapex.com" rel="noopener">OCAPEX</a></li>
+        <li><a href="../../../">Terminal edition, v1</a></li>
+      </ul>
+    </div>
+    <div class="colophon"><span>Leonardo Carvalho · Groton School, Class of 2028</span><span>Updated September 2026</span></div>
+  </div>
+</footer>
+
+<dialog class="palette" id="palette" aria-label="Search">
+  <form class="palette__in" method="dialog">
+    <div class="palette__field">
+      <label class="sr-only" for="q">Search projects, résumé entries and pages</label>
+      <input id="q" type="search" placeholder="Search projects, résumé entries and pages" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list">
+      <kbd>esc</kbd>
+    </div>
+    <ul class="palette__list" id="palette-list" role="listbox" aria-label="Results"></ul>
+    <p class="palette__empty" id="palette-empty" hidden>Nothing matches. Try a project, a school or an instrument.</p>
+    <div class="palette__foot"><span>↑ ↓ move</span><span>↵ open</span><span>/ or ⌘K opens search</span></div>
+  </form>
+</dialog>
+
+<script src="../../assets/js/site.js" defer></script>
+</body>
+</html>
