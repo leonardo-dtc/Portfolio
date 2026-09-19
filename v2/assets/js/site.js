@@ -93,7 +93,7 @@
   /* ---- 5. Résumé rail: mark the section in view ---- */
   var rail = d.querySelector('.cv__rail');
   if (rail && 'IntersectionObserver' in window) {
-    var links = Array.prototype.slice.call(rail.querySelectorAll('a[href^="#"]'));
+    var links = Array.prototype.slice.call(rail.querySelectorAll('a[href^="#"]')).filter(function (a) { return a.getAttribute('href').length > 1; });
     var secs = links.map(function (a) { return d.querySelector(a.getAttribute('href')); }).filter(Boolean);
     var io2 = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
