@@ -8,8 +8,9 @@
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F5F3EF">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23F5F3EF'/%3E%3Crect y='60' width='64' height='4' fill='%238C1D2C'/%3E%3Ctext x='32' y='44' font-family='Bodoni 72,Didot,Georgia,serif' font-size='34' text-anchor='middle' fill='%23111'%3ELC%3C/text%3E%3C/svg%3E">
-<link rel="preload" href="assets/fonts/bodoni-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23F5F3EF'/%3E%3Crect y='60' width='64' height='4' fill='%238C1D2C'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='34' text-anchor='middle' fill='%23111'%3ELC%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/newsreader-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/newsreader-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/inter-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/site.css">
 <script>document.documentElement.classList.add('js')</script>
@@ -36,21 +37,23 @@
 <main id="main">
 
   <section class="wrap hero" aria-labelledby="name">
-    <div class="hero__copy">
-      <h1 id="name" class="hero__name display reveal">Leonardo Carvalho</h1>
-      <p class="hero__line">Goaltender at Groton School, Class of 2028. Outside the rink I do research on drug safety and rehabilitation, run a student music nonprofit and build software with friends.</p>
-      <p class="hero__disc mono"><span>Research</span><span>Product</span><span>Hockey</span><span>Music</span></p>
-      <p class="hero__place">Groton School · Massachusetts</p>
-    </div>
-    <figure class="hero__fig grow">
-      <div class="media tone" style="--ar:4/5">
-        <picture>
-          <source type="image/avif" srcset="assets/img/leonardo-portrait-320.avif 320w, assets/img/leonardo-portrait-480.avif 480w" sizes="(min-width: 768px) 420px, 60vw">
-          <source type="image/webp" srcset="assets/img/leonardo-portrait-320.webp 320w, assets/img/leonardo-portrait-480.webp 480w" sizes="(min-width: 768px) 420px, 60vw">
-          <img src="assets/img/leonardo-portrait-480.webp" width="480" height="600" alt="Leonardo Carvalho, a studio portrait in a dark suit and tie against a plain backdrop" fetchpriority="high" decoding="async">
-        </picture>
+    <h1 id="name" class="hero__name display reveal">Leonardo Carvalho</h1>
+    <div class="hero__grid">
+      <div class="hero__copy">
+        <p class="hero__line">Goaltender at Groton School, Class of 2028. Outside the rink I do research on drug safety and rehabilitation, run a student music nonprofit and build software with friends.</p>
+        <p class="hero__disc mono"><span>Research</span><span>Product</span><span>Hockey</span><span>Music</span></p>
+        <p class="hero__place">Groton School · Massachusetts</p>
       </div>
-    </figure>
+      <figure class="hero__fig grow">
+        <div class="media tone" style="--ar:4/5">
+          <picture>
+            <source type="image/avif" srcset="assets/img/leonardo-portrait-320.avif 320w, assets/img/leonardo-portrait-480.avif 480w" sizes="(min-width: 768px) 440px, 64vw">
+            <source type="image/webp" srcset="assets/img/leonardo-portrait-320.webp 320w, assets/img/leonardo-portrait-480.webp 480w" sizes="(min-width: 768px) 440px, 64vw">
+            <img src="assets/img/leonardo-portrait-480.webp" width="480" height="600" alt="Leonardo Carvalho, a studio portrait in a dark suit and tie against a plain backdrop" fetchpriority="high" decoding="async">
+          </picture>
+        </div>
+      </figure>
+    </div>
   </section>
 
   <section class="wrap section" aria-labelledby="work-title">
