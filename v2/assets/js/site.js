@@ -70,7 +70,8 @@
     });
     var pv = d.querySelector('.preview');
     if (pv && hoverFine) {
-      var img = pv.querySelector('img'), ph = pv.querySelector('.ph'), phText = ph && ph.querySelector('span');
+      var img = d.createElement('img'); img.alt = ''; img.hidden = true; img.decoding = 'async'; pv.insertBefore(img, pv.firstChild);
+      var ph = pv.querySelector('.ph'), phText = ph && ph.querySelector('span');
       var x = 0, y = 0, raf = 0;
       function place() { raf = 0; pv.style.setProperty('--px', (x + 28) + 'px'); pv.style.setProperty('--py', (y - 20) + 'px'); }
       if (!reduce) {
@@ -156,8 +157,10 @@
     function open() {
       if (dlg.open) return;
       dlg.showModal();
-      input.value = ''; render('');
-      load().then(function () { render(input.value); });
+      input.value = '';
+      if (!data) { list.innerHTML = ''; empty.hidden = false; empty.textContent = 'Loading the index'; }
+      else render('');
+      load().then(function () { empty.textContent = 'Nothing matches. Try a project, a school or an instrument.'; render(input.value); });
       setTimeout(function () { input.focus(); }, 0);
     }
     d.querySelectorAll('[data-search-open]').forEach(function (b) { b.addEventListener('click', open); });
