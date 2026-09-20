@@ -394,7 +394,7 @@ figcaption b { font-weight: 500; color: var(--fg); }
 .paper__title.display { font-size: clamp(2rem, 1.4rem + 2.6vw, 4rem); }
 .paper__sub { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: var(--d3); line-height: 1.2; letter-spacing: -.005em; color: var(--fg); max-width: 30ch; text-wrap: balance; }
 .metaline { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .75rem 1.5rem; margin-top: .5rem; }
-.metaline div { display: grid; gap: .15rem; }
+.metaline div { display: grid; gap: .15rem; align-content: start; }
 .metaline dt { font-family: var(--mono); font-size: var(--meta); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-2); }
 .metaline dd { margin: 0; font-size: var(--small); }
 .notice { border-left: 2px solid var(--accent); padding: .1rem 0 .1rem 1rem; font-size: var(--small); color: var(--fg); max-width: var(--measure); text-wrap: pretty; }
