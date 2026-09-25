@@ -112,7 +112,7 @@ spacing:
   section: "44px"
   win-top: "4.5svh"
   w-main: "clamp(720px, 52vw, 1040px)"
-  side-w: "clamp(250px, 18.5vw, 330px)"
+  side-w: "clamp(220px, 17vw, 330px)"
   measure: "44em"
 components:
   window:
@@ -341,11 +341,11 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 One room, and on it a centred main window `clamp(720px, 52vw, 1040px)` wide, 4.5svh from the top, with a height of the viewport less 14svh. Its head carries 30px top and 36px side padding (`{spacing.pad}`); its body scrolls inside the window with 18px above and 110px below, masked to fade over 22px at the top and over the last 78px, so text slides under the toolbar rather than being cut. Wheel and keys anywhere in the room scroll the front window.
 
 Three layout modes, set by script at 1360px and 900px:
-- **Desktop (1360px and wider):** side windows `clamp(250px, 18.5vw, 330px)` wide float 2.6vw from each edge, 8% down the window's height, at most 84% of it tall, turned 24 degrees toward the reader. The room's space has a 120vw perspective; the pointer shifts its origin by up to 10% and moves the space against the pointer by up to 1vw, and the room shifts the other way.
+- **Desktop (1360px and wider):** side windows `clamp(220px, 17vw, 330px)` wide float `clamp(16px, 2vw, 48px)` from each edge, 3% down the window's height, at most 94% of it tall, turned 24 degrees toward the reader. The room's space has a 120vw perspective; the pointer shifts its origin by up to 10% and moves the space against the pointer by up to 1vw, and the room shifts the other way.
 - **Laptop (900 to 1359px):** no side windows; their content becomes sections inside the main window, 44px below the rest, with 22px titles.
-- **Phone and narrow tablet (under 900px):** the window becomes a full-screen sheet 10px from every edge (plus safe areas) with a 40px radius and 22px padding; the tab bar becomes a floating capsule at the bottom, `min(380px, 100vw - 44px)` wide and 66px tall, icons only; the toolbar's actions sit inline in the content; nothing is angled or parallaxed. Under 700px the title is the two-line name and the avatar is dropped; under 600px the facts stack into one column.
+- **Phone and narrow tablet (under 900px):** the window becomes a full-screen sheet 10px from every edge (plus safe areas) with a 40px radius and 22px padding; the tab bar becomes a floating capsule at the bottom, `min(320px, 100vw - 110px)` wide and 66px tall, icons only, with the color style control beside it as a 66px circle (the capsule sits centred alone when there is no room to colour); the toolbar's actions sit inline in the content; nothing is angled or parallaxed. Under 700px the title is the two-line name and the avatar is dropped; under 600px the facts stack into one column.
 
-Rhythm inside a window: 44px above each section, 16px under a section head, 30px between record groups, 12px under a lead, 16px between cards (12px on phones), 34px between prose blocks, 40px above a prose h2, 44px above a pager. Cards run four across (three on the Work page's filtered sets), and as many 150px columns as fit under 900px. Sheets sit 44px inside the main window's sides (capped at 920px wide) and 4svh inside its top and bottom.
+Rhythm inside a window: 44px above each section, 16px under a section head, 30px between record groups, 12px under a lead, 16px between cards (12px on phones), 34px between prose blocks, 40px above a prose h2, 44px above a pager. Cards run four across (three on the Work page's filtered sets), and as many 132px columns as fit under 900px (two on a 360px phone). Sheets sit 44px inside the main window's sides (capped at 920px wide) and 4svh inside its top and bottom.
 
 Scripts off, the room becomes its still, and windows, side windows and tab bar stack in one centred column up to 980px wide.
 
@@ -355,11 +355,11 @@ Depth is the room itself: glass windows at the front, the room behind them, and 
 
 Behind a sheet, the parent steps back 10vw, its glass dims by 55%, its contents lose half their brightness, a fifth of their saturation and blur 1.5px, and fade out; its toolbar and window bar step away with it. The room cannot frost HTML, so the parent's content must fade rather than show through.
 
-Without WebGL2, with scripts off, or under reduced transparency, the same elements draw CSS glass: the tint under `blur(30px) saturate(1.7) brightness(.8)`, a 1px gradient rim (72% white at the top left, 5% through the middle, 42% at the bottom right), and a soft shadow. The phone's bottom tab bar always uses CSS glass (24px blur), because content scrolls under it.
+Without WebGL2, with scripts off, under reduced transparency or in forced colours, the same elements draw CSS glass: the tint under `blur(30px) saturate(1.7) brightness(.8)`, a 1px gradient rim (72% white at the top left, 5% through the middle, 42% at the bottom right), and a soft shadow. The tab bar always uses CSS glass (22px blur), at every size, because it lies over content: the window's text when it opens, and scrolling content on phones.
 
 ### Shadow Vocabulary
 - **Window shadow** (drawn by the room: 22px down, reach 90px, 34%; CSS fallback `0 30px 80px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.12)`): every window and sheet.
-- **Ornament shadow** (drawn: reach 40px, 22%; phone tab bar `0 18px 44px rgba(0,0,0,.32)`): tab bar, toolbar, Enter.
+- **Ornament shadow** (drawn: reach 40px, 22%; the tab bar's CSS glass `0 16px 40px rgba(0,0,0,.28)`): tab bar, toolbar, Enter.
 - **Card lift** (`0 10px 24px rgba(0,0,0,.16)`, hover `0 18px 40px rgba(0,0,0,.24)`): project cards, which sit on the window like objects.
 - **Screenshot shadow** (`0 10px 26px rgba(0,0,0,.26)` on a card, `0 14px 34px rgba(0,0,0,.24)` on a sheet figure): a screenshot resting on its colour.
 - **Hover light** (`radial-gradient(180px circle at pointer, rgba(255,255,255,.16), transparent 62%)`, plus-lighter; pressed 240px at 30%): cards, rows and buttons marked `data-hover`, the visionOS gaze light.
@@ -384,10 +384,10 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **Page change:** the old contents fade to 0 over 180ms while blurring 8px and scaling to .985 (`cubic-bezier(.4, 0, 1, 1)`); the new ones rise 14px and unblur from 6px over 260ms (`cubic-bezier(.2, .8, .2, 1)`). The window itself never leaves.
 
 ### Side windows
-- 28px radius, 24px by 22px padding, a 20px title, then side rows (a 38px round icon well in Fill 2 with a 19px stroked icon, a 15px bold line over 14px Ink 2), a divided list, facts at 14px, a table of contents, or the portrait. They swing in from 52 degrees to 24 and from 22vw back (response .7, damping .86), and fade out over their last 26px.
+- 28px radius, 24px by 22px padding, a 20px title, then side rows (a 38px round icon well in Fill 2, 34px in a floating side window, with a 19px stroked icon, a 15px bold line over 14px Ink 2), a divided list, facts at 14px, a table of contents, or the portrait. They swing in from 52 degrees to 24 and from 22vw back (response .7, damping .86), and fade out over their last 26px.
 
 ### Tab bar (ornament)
-- A 64px glass column hanging 36px off the window's left edge, vertically centred, 8px padding, 48px tabs with 24px stroked icons (1.7 stroke, round caps). Pointing at it for 120ms widens it to 188px and the names slide in (opacity .16s, 6px travel .3s, 60ms delay); it closes 300ms after the pointer leaves. Keyboard focus opens it too.
+- A 64px glass column hanging 36px off the window's left edge, vertically centred, 8px padding, 48px tabs with 24px stroked icons (1.7 stroke, round caps). Pointing at it for 120ms widens it to 188px and the names slide in (opacity .16s, 6px travel .3s, 60ms delay); it closes 300ms after the pointer leaves. Keyboard focus opens it too. Open, it lies over the window's text, so its backdrop deepens from `brightness(.74)` to `(.42)` as it widens, and its names keep 4.5:1 over a light card.
 - **The bubble:** a Fill 3 pill with a 1px inner top highlight at 32% marks the current tab, moved by a spring (response .45, damping .8) that stretches it along its travel by up to 30% while it moves.
 - **Phone:** the floating bottom capsule, icons only, names kept for screen readers, the bubble 60px wide.
 
@@ -416,7 +416,7 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **Links in text:** white, underlined 1px at 45% white, 3px offset; the underline goes white on hover.
 
 ### Motion (one spring model)
-- Every geometric motion is a spring given as a response (seconds) and a damping ratio, stepped at 4ms substeps in the shared frame loop: windows .55 / .86, side windows .7 / .86, the tab bubble .45 / .8, a sheet's parent stepping back .5 / 1, parallax .9 / 1 and the pointer light .6 / 1, the window bar .5 / .7, press light .3 / 1. The hello uses .5 / .8 for the Enter glass, 1.1 / 1 for the room's focus pull, .8 / .92 for the name's flight, and .45 / 1 for the title fading with its page.
+- Every geometric motion is a spring given as a response (seconds) and a damping ratio, stepped at 4ms substeps in the shared frame loop, which runs the springs first, then whatever reads their layout, then the room, so the glass is drawn where its window is in that same frame: windows .55 / .86, side windows .7 / .86, the tab bubble .45 / .8, a sheet's parent stepping back .5 / 1, parallax .9 / 1 and the pointer light .6 / 1, the window bar .5 / .7, press light .3 / 1. The hello uses .5 / .8 for the Enter glass, 1.1 / 1 for the room's focus pull, .8 / .92 for the name's flight, and .45 / 1 for the title fading with its page.
 - **The hello's pace:** "leonardo" writes over 1.45s after .3s, "carvalho" starts .82s in and also takes 1.45s, eased in and out; Enter is ready at about 2.4s. A replay (pressing the title) runs 1.2 / .66 / 1.2. A sheen sweeps the glass name every 6.5s.
 - **Entering:** the main window at .18s, side windows from .34s 60ms apart, then tab bar .55s, toolbar .62s, window bar .7s; ornaments grow from 90% scale.
 - **CSS micro-motion** uses one curve, `cubic-bezier(.16, 1, .3, 1)`: the tab bar's width (.42s), button press (.35s), card hover (.45s), the Enter button (.6s fade, .9s scale).

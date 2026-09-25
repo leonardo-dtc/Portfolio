@@ -18,7 +18,8 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   check(await text(page, '#main h1') === 'Work', 'Work title in the window');
   check(await page.getAttribute('nav.tabs a[data-tab="work"]', 'aria-current') === 'page', 'Work tab is current');
   check(await page.evaluate(() => document.title.startsWith('Work')), 'the document title follows');
-  check(await page.evaluate(() => document.querySelectorAll('aside.side').length === 2 && !!document.getElementById('progress-h')), 'Work’s side windows replaced Home’s');
+  // Home's side windows swing out (a spring of about a second) before they are removed
+  check(await page.waitForFunction(() => document.querySelectorAll('aside.side').length === 2 && !!document.getElementById('progress-h'), null, { timeout: 2500 }).then(() => true, () => false), 'Work’s side windows replaced Home’s');
   check(await page.evaluate(() => new URL(document.querySelector('nav.tabs a[data-tab="home"]').href).pathname === '/v5/'), 'tab links still resolve after the address changed');
 
   await page.click('a[href$="loquar/"]');

@@ -75,8 +75,9 @@ the approved comps beside it in `v5-comps/`, and the build plan is
 ## The glass
 
 - Every glass element carries `data-glass` (`window`, `ornament`, `control` or
-  `prominent`). Each frame `panels.js` reports where they are (the angled side
-  windows through four corner probes that the browser projects), and the room
+  `prominent`). Each frame, once everything that moves has moved, `panels.js`
+  reports where they are (the angled side windows through four corner probes
+  that the browser projects), and the room
   draws their glass under the HTML: frost from the blurred room, lensing within
   about 30 px of a window's rounded edge (20 px on smaller glass), a tint, a bright rim, a highlight near the
   pointer, soft shadows, and a light from within when a control is pressed.
@@ -86,9 +87,10 @@ the approved comps beside it in `v5-comps/`, and the build plan is
 - Glass appears and disappears by ramping its lensing and frost, as Apple
   describes Liquid Glass. Content inside a window never gets a second layer of
   glass.
-- Without WebGL2, with reduced transparency, or in print, the same elements use
-  CSS glass over the still. The phone's bottom tab bar always does, because
-  content scrolls under it and only backdrop glass can frost HTML.
+- Without WebGL2, with reduced transparency or forced colours, or in print, the
+  same elements use CSS glass over the still. The tab bar always does, at every
+  size, because it lies over content (the window's text when it opens, scrolling
+  content on phones) and only backdrop glass can frost HTML.
 
 ## Glass mode: one room, many windows
 
@@ -165,8 +167,13 @@ node tests/v5/e2e/capture.mjs # screenshots of every page at five widths into .i
 ```
 
 The browser checks use the installed Chrome through playwright-core and expect
-the preview server on port 8778. Safari and Firefox have not been checked by
-machine yet.
+the preview server on port 8778. Elsewhere, `PLAYWRIGHT_MODULE`, `PW_CHANNEL`,
+`PW_ARGS` and `V5_SLOW` point them at another Playwright, another browser (empty
+for Playwright's own Chromium), extra launch flags (WebGL through SwiftShader on
+a machine without a GPU) and a slower machine; `V5_CAPTURE_OUT` moves the
+captures. See `tests/v5/e2e/lib.mjs`. Under software rendering the timing and
+frame-rate checks do not mean anything. Safari and Firefox have not been checked
+by machine yet.
 
 ## Conventions
 

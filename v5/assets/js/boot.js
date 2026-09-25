@@ -1,6 +1,5 @@
 // v5 entry point: the room first, then everything that moves in it.
 import { createRoom } from './room.js';
-import { onFrame } from './frame.js';
 import { readPanels, forgetRadii } from './panels.js';
 import { createWindows } from './windows.js';
 import { createHello } from './hello.js';
@@ -11,7 +10,8 @@ const html = document.documentElement;
 html.classList.add('js');
 
 let room = null;
-const lessGlass = matchMedia('(prefers-reduced-transparency: reduce)');
+// reduced transparency and forced colours keep to CSS glass over the still (forced colours hide the canvas)
+const lessGlass = matchMedia('(prefers-reduced-transparency: reduce), (forced-colors: active)');
 try {
   if (!lessGlass.matches) room = createRoom(document.querySelector('canvas.room'));
 } catch (e) {
@@ -23,8 +23,8 @@ html.classList.toggle('no-gl', !room);
 if (room) {
   window.__room = room;
   room.onlost = () => { html.classList.remove('gl'); html.classList.add('no-gl'); };
-  // every frame, tell the room where the glass is
-  onFrame(() => room.setPanels(readPanels(document, room.dpr)));
+  // every frame, once the windows have moved, the room reads where the glass is
+  room.source = () => readPanels(document, room.dpr);
   addEventListener('resize', forgetRadii);
 }
 
@@ -55,6 +55,7 @@ document.addEventListener('click', (e) => {
     document.querySelectorAll('[data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === cat)));
     let shown = 0;
     document.querySelectorAll('[data-cards] .card[data-cat]').forEach(c => { c.hidden = cat !== 'all' && c.dataset.cat !== cat; if (!c.hidden) shown++; });
+    document.querySelectorAll('[data-cards]').forEach(g => g.classList.toggle('cards--3', cat !== 'all'));   // a filtered set runs three across
     const live = document.querySelector('.sr-live');
     if (live) live.textContent = `${shown} ${shown === 1 ? 'project' : 'projects'}`;
     return;

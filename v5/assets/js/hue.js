@@ -64,9 +64,15 @@ export function initHue({ room }) {
     html.dataset.appearance = st.look;
     const to = { hue: st.hue, sat: st.sat, day: isDay() ? 1 : 0 };
     if (!animate || reduced.matches) { hue.snap(to.hue); sat.snap(to.sat); day.snap(to.day); paint(); }
-    else { tween(hue, to.hue, paint); tween(sat, to.sat, paint); tween(day, to.day, paint); }
+    else {
+      // the hue is an angle: turn the short way round (Gold to Emerald is 102°, not a sweep through every colour)
+      hue.value += 360 * Math.round((to.hue - hue.value) / 360);
+      tween(hue, to.hue, paint); tween(sat, to.sat, paint); tween(day, to.day, paint);
+    }
     wrap.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.preset === st.preset)));
     wrap.querySelectorAll('[data-look]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.look === st.look)));
+    // each radio group is one stop for Tab (its checked radio, or its first while a custom colour is set)
+    wrap.querySelectorAll('[role="radiogroup"]').forEach(g => { const rs = [...g.querySelectorAll('[role="radio"]')], on = rs.find(r => r.getAttribute('aria-checked') === 'true') || rs[0]; rs.forEach(r => { r.tabIndex = r === on ? 0 : -1; }); });
     range('hue').value = st.hue; range('sat').value = Math.round(st.sat * 100);
     range('hue').nextElementSibling.textContent = `${st.hue > 0 ? '+' : ''}${Math.round(st.hue)}°`;
     range('sat').nextElementSibling.textContent = `${Math.round(st.sat * 100)}%`;
@@ -103,13 +109,13 @@ export function initHue({ room }) {
   // Escape closes the panel before anything else hears it (an open sheet stays open); a click elsewhere closes it
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) { e.stopPropagation(); e.preventDefault(); close(true); } }, true);
   document.addEventListener('pointerdown', (e) => { if (isOpen() && !wrap.contains(e.target)) close(false); });
-  // arrow keys move between swatches, as in a radio group
-  wrap.querySelector('.hue__swatches').addEventListener('keydown', (e) => {
-    const all = [...wrap.querySelectorAll('[data-preset]')], i = all.indexOf(document.activeElement);
-    const step = { ArrowRight: 1, ArrowDown: 4, ArrowLeft: -1, ArrowUp: -4 }[e.key];
+  // arrow keys move through a radio group and choose as they go (the swatches are a grid of four across)
+  wrap.querySelectorAll('[role="radiogroup"]').forEach(g => g.addEventListener('keydown', (e) => {
+    const all = [...g.querySelectorAll('[role="radio"]')], i = all.indexOf(document.activeElement), across = g.matches('.hue__swatches') ? 4 : 1;
+    const step = { ArrowRight: 1, ArrowDown: across, ArrowLeft: -1, ArrowUp: -across }[e.key];
     if (i < 0 || step === undefined) return;
     e.preventDefault(); const next = all[(i + step + all.length) % all.length]; next.focus(); next.click();
-  });
+  }));
 
   return { get state() { return { ...st }; }, open, close };
 }
