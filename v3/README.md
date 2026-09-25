@@ -51,7 +51,9 @@ first person, no en or em dashes, no superlatives. Detail links point into v2.
 - **Chrome.** Name left, year right, fixed, blended with `difference` so it reads
   on either colour; a dot rail on the right marks the current sheet. Arrow keys
   move one sheet; dots and `#id` links scroll to the sheet's flow position (a
-  plain anchor jump cannot reach a sticky sheet).
+  plain anchor jump cannot reach a sticky sheet). Tabbing into a sheet brings it
+  to rest, so the sheet above it never covers the focused link, and the skip link
+  moves focus to the first sheet after the cover.
 - **The index drawer.** The folder button above the dots (bottom right on phones)
   slides a paper side panel in from the right, after the reference clip in
   Downloads: one hairline folder per sheet with a trapezoid tab, black divider
@@ -65,9 +67,9 @@ first person, no en or em dashes, no superlatives. Detail links point into v2.
   character: the aducanumab analysis with the real counts, the Genuvalens
   controller and its five-repetition simulation with the reported results, a
   Loquar scene function and a Daedalus labyrinth rebuild. Hovering pauses it and
-  frees the panel to scroll; leaving resumes; it waits while the cover is covered
-  or the tab is hidden, and stops when the script ends. Reduced motion shows the
-  whole script at once.
+  frees the panel to scroll; leaving resumes; on touch screens a tap pauses and a
+  second tap resumes. It waits while the cover is covered or the tab is hidden, and
+  stops when the script ends. Reduced motion shows the whole script at once.
 - **Details from the deck's tutorial** (GraphiqVibe, "How to create a Graphic Design
   PORTFOLIO in 2025"): the sliced letter in the title, the torn strip with recoloured
   letters, a tilted editor panel (here Leonardo's own analysis and controller
