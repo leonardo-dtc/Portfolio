@@ -10,6 +10,10 @@ python3 tools/serve.py 8778
 
 Open [the terminal portfolio](http://127.0.0.1:8778) or [low-detail mode](http://127.0.0.1:8778/low-detail.html). The preview server disables caching. Both pages also work from their HTML files.
 
+## Published
+
+Every push to `main` publishes the five editions to GitHub Pages at `https://leonardo-dtc.github.io/Portfolio/` through `.github/workflows/pages.yml`: the terminal edition and low-detail mode at the root, and `v2/` to `v5/` beside them. The workflow ships only those folders; sources, references, tools, tests and notes stay in the repository. Every URL in the editions is relative, so they work under that sub-path. Each page keeps its `noindex`, so search engines leave the comparison build alone.
+
 ## Editions
 
 The terminal build at the root is the first edition. Four later editions sit beside it, each with its own README: [`v2/`](v2/README.md), the editorial edition, [`v3/`](v3/README.md), the poster edition built on the "Portfolio 2025" deck, [`v4/`](v4/README.md), the dim-room edition: a dark ground with one lit window, and [`v5/`](v5/README.md), the glass edition: Liquid Glass windows in a room drawn after Apple's wallpapers, with the name written like Apple's hello. The preview server serves all five.
@@ -51,4 +55,4 @@ Keep completed work, submissions, plans and simulation results distinct. Attribu
 
 ## Verification
 
-Desktop and mobile checks cover 320, 390, 768, 1024 and 1440-pixel widths, plus a 1024×620 laptop window. All 26 terminal entries and all 31 registered illustrations were reviewed. Checks include mode round trips, themes, reduced motion, blocked storage, no-script text, keyboard return, history, games, local references and duplicate IDs. See the content review for the exact scope and remaining factual follow-ups. The site has not been deployed; the existing `noindex` remains.
+Desktop and mobile checks cover 320, 390, 768, 1024 and 1440-pixel widths, plus a 1024×620 laptop window. All 26 terminal entries and all 31 registered illustrations were reviewed. Checks include mode round trips, themes, reduced motion, blocked storage, no-script text, keyboard return, history, games, local references and duplicate IDs. See the content review for the exact scope and remaining factual follow-ups. The site is published to GitHub Pages as a comparison build; the existing `noindex` remains.

@@ -70,6 +70,8 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
    Neiden also saturates each layer by 1.2; stacked on a dark ground that compounds into a glow, so here each
    layer desaturates instead, over a fade to the ground. The script fades the edge out as the page runs out. */
 .edge { position: fixed; left: 0; right: 0; bottom: 0; height: 120px; z-index: 12; pointer-events: none; }
+/* Whatever the keyboard focuses, or the page scrolls to, comes to rest above the edge rather than under it */
+html { scroll-padding-bottom: 120px; }
 /* On a near-black ground a blurred colour tile blooms into a halo. So the fade to the ground starts where the band starts
    (from clear, so text is never cut by a line) and each layer takes a little colour out (saturate .85, compounding to about
    a quarter at the foot): colour sinks into the room instead of glowing. The inverse of Neiden's saturate(1.2) on white. */
@@ -83,7 +85,9 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .edge i:nth-child(6) { -webkit-backdrop-filter: blur(11.3px) saturate(.85); backdrop-filter: blur(11.3px) saturate(.85); -webkit-mask-image: linear-gradient(transparent 43.75%, #000 52.5%); mask-image: linear-gradient(transparent 43.75%, #000 52.5%); }
 .edge i:nth-child(7) { -webkit-backdrop-filter: blur(15.3px) saturate(.85); backdrop-filter: blur(15.3px) saturate(.85); -webkit-mask-image: linear-gradient(transparent 52.5%, #000 61.25%); mask-image: linear-gradient(transparent 52.5%, #000 61.25%); }
 .edge i:nth-child(8) { -webkit-backdrop-filter: blur(20px) saturate(.85); backdrop-filter: blur(20px) saturate(.85); -webkit-mask-image: linear-gradient(transparent 61.25%, #000 70%); mask-image: linear-gradient(transparent 61.25%, #000 70%); }
-@media (max-width: 700px) { .edge { height: 88px; } }
+@media (max-width: 700px) { .edge { height: 88px; } html { scroll-padding-bottom: 88px; } }
+/* Only the script can fade the edge as the page ends; without it the edge would blur the last lines for good */
+html:not(.js) .edge { display: none; }
 
 /* ---------- Menu: name, a frosted pill, two arrows ---------- */
 .menu { position: relative; z-index: 5; max-width: var(--wrap); margin: 0 auto; padding: 32px var(--gutter) 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; font-size: var(--fs-2); view-transition-name: menu; }
@@ -99,6 +103,8 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 /* The current tab's mark is its own element, so a page change slides it from one tab to the next */
 .pill__mark { position: absolute; inset: 0; z-index: -1; border-radius: 999px; background: rgba(242, 242, 242, .08); view-transition-name: pill-mark; }
 .pill__mark::before { content: ''; position: absolute; top: -7px; left: 50%; width: 24px; height: 3px; margin-left: -12px; border-radius: 2px; background: var(--ink); box-shadow: 0 2px 25px 2px #fff; }
+/* A finger gets a taller target on the name and the two links; the padding is taken back by the margin, so nothing moves */
+@media (pointer: coarse) { .menu__name, .menu__right a { padding-block: 12px; margin-block: -12px; } }
 @media (max-width: 700px) { .menu { grid-template-columns: 1fr auto; row-gap: 14px; padding-top: 24px; } .menu__name { grid-row: 1; } .menu__right { grid-row: 1; grid-column: 2; gap: 16px; } .pill { grid-row: 2; grid-column: 1 / -1; justify-self: start; } }
 
 /* ---------- The window: one lit frame that introduces him ---------- */
@@ -203,17 +209,20 @@ a.tile:focus-visible .tile__box { outline: 2px solid var(--ink); outline-offset:
   .exp__list li:hover .exp__d { grid-template-rows: 1fr; }
   .exp__list li:hover .exp__d small { opacity: 1; transform: none; }
   .exp__list li:hover .ix { color: var(--ink); }
-  .exp__list li:hover, .exp__list li:has(+ li:hover) { border-bottom-color: transparent; }
-  .exp__list:has(> li:first-child:hover) { border-top-color: transparent; }
+  .exp__list li:hover, .exp__list li:has(+ li:hover), .exp__list li:has(a:focus-visible), .exp__list li:has(+ li a:focus-visible) { border-bottom-color: transparent; }
+  .exp__list:has(> li:first-child:hover), .exp__list:has(> li:first-child a:focus-visible) { border-top-color: transparent; }
 }
 /* The keyboard gets the same opening, and a ring on the wash instead of on the text */
 .exp__list a:focus-visible { outline: none; }
 .exp__list a:focus-visible::before { opacity: 1; transform: none; box-shadow: 0 0 0 2px var(--ink); }
 .exp__list a:focus-visible .exp__d { grid-template-rows: 1fr; }
 .exp__list a:focus-visible .exp__d small { opacity: 1; transform: none; }
-.exp__list:has(a:focus-visible) li:not(:focus-within) { opacity: .16; filter: blur(3px); }
-/* Touch has no hover to ask with (some tablets report hover with a coarse pointer), so the descriptions are simply there and the wash is never drawn */
-@media (hover: none), (pointer: coarse) { .exp__d { grid-template-rows: 1fr; } .exp__d small { opacity: 1; transform: none; font-size: var(--fs-2); padding: 8px 0 0; } .exp__list a::before { display: none; } }
+.exp__list a:focus-visible .ix { color: var(--ink); }
+/* (while the pointer is over the list, it decides what is open; the focused item does not dim the hovered one) */
+.exp__list:has(a:focus-visible):not(:has(li:hover)) li:not(:focus-within) { opacity: .16; filter: blur(3px); }
+/* Touch has no hover to ask with (some tablets report hover with a coarse pointer), so the descriptions are simply there and the wash is never drawn;
+   a keyboard on such a device gets the site's own ring instead of the wash's */
+@media (hover: none), (pointer: coarse) { .exp__d { grid-template-rows: 1fr; } .exp__d small { opacity: 1; transform: none; font-size: var(--fs-2); padding: 8px 0 0; } .exp__list a::before { display: none; } .exp__list a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; } }
 /* The wash reaches 24px past the text; on a narrow window that must not become sideways scroll */
 #experiments { overflow-x: clip; }
 
@@ -230,13 +239,16 @@ a.tile:focus-visible .tile__box { outline: 2px solid var(--ink); outline-offset:
 .row__m { flex: none; color: var(--ink-2); font-size: var(--fs-2); font-variant-numeric: tabular-nums; white-space: nowrap; transition: color var(--t) ease; }
 @media (hover: hover) and (pointer: fine) {
   .rows:has(a.row:hover) a.row:not(:hover) { opacity: .55; }
-  /* while a row's preview is up, the column it lands on steps back, the way the experiments do */
-  .record:has(a.row[data-peek]:hover) > aside { opacity: .14; filter: blur(4px); }
   a.row:hover .row__t { transform: translateX(6px); }
   a.row:hover .row__m { color: var(--ink); }
 }
+/* while a row's preview is up, the column it lands on steps back, the way the experiments do (previews need the side-by-side record) */
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  .record:has(a.row[data-peek]:hover) > aside, .record:has(a.row[data-peek]:focus-visible) > aside { opacity: .14; filter: blur(4px); }
+}
 a.row:focus-visible .row__t { transform: translateX(6px); }
 a.row:focus-visible .row__m { color: var(--ink); }
+.rows:has(a.row:focus-visible):not(:has(a.row:hover)) a.row:not(:focus-visible) { opacity: .55; }
 a.row:active { transform: scale(.985); }
 @media (min-width: 900px) {
   .record { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: 128px; }
@@ -304,6 +316,9 @@ a.row:active { transform: scale(.985); }
 @keyframes vt-arrive { from { opacity: 0; transform: translateY(12px); } }
 ::view-transition-group(menu) { animation-duration: 520ms; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
 ::view-transition-group(pill-mark) { animation-duration: 560ms; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+/* A page opened at a #section is scrolled away from its menu, so its menu arrives with the page instead of holding
+   (its first frame is taken before the scroll, which would pin a menu over the section; the head script sets the class) */
+.at-hash .menu, .at-hash .pill__mark { view-transition-name: none; }
 /* The static is on the lens, not the page: it cross-fades in place and never scales or blurs */
 /* Elsewhere: a short fade out on the way out, and a rise on the way in */
 html.is-leaving body { opacity: 0; transition: opacity 220ms ease; }
@@ -340,7 +355,7 @@ html.is-leaving body { opacity: 0; transition: opacity 220ms ease; }
 .tbl-wrap { overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter); }
 figure { margin: 32px 0; }
 figcaption { margin-top: 12px; font-size: var(--fs-2); line-height: var(--lh-2); color: var(--ink-2); text-wrap: pretty; }
-.sheet .tile__box { height: auto; padding: clamp(20px, 6%, 56px); }
+.sheet .tile__box { height: auto; aspect-ratio: auto; padding: clamp(20px, 6%, 56px); }
 .sheet .tile--pair .tile__box { grid-template-columns: minmax(0, 1fr) 22%; align-items: end; gap: 20px; }
 .sheet .tile--pair .dev--phone { width: 100%; max-width: none; }
 .sheet .tile--page .tile__box { padding: clamp(16px, 5%, 40px); }
@@ -372,7 +387,7 @@ figcaption { margin-top: 12px; font-size: var(--fs-2); line-height: var(--lh-2);
   .js .rv, .js:not(.js-ready) .rv { translate: none; opacity: 1; transition: none; animation: none; }
   .hero__scroll { animation: none; }
   a.tile .tile__box > :not(.tile__go) { transform: none !important; transition: none; }
-  .tile__go, .tile__go svg, .tile__cap, .row, .row__t, .row__m, .likes li, .exp__list a, .exp__list a::before, .exp__d, .exp__d small { transition: none !important; }
+  .tile__go, .tile__go svg, .tile__cap, .row, .row__t, .row__m, .likes li, .exp__list a, .exp__list a::before, .exp__d, .exp__d small, .menu__right svg { transition: none !important; }
   .likes li:hover { transform: none; }
   .peek, .peek.is-on, .peek.is-out { transform: translateY(-50%) !important; filter: none !important; border-radius: 24px !important; transition: opacity 200ms ease !important; }
   html.is-leaving body { opacity: 1; transition: none; }
@@ -385,9 +400,9 @@ figcaption { margin-top: 12px; font-size: var(--fs-2); line-height: var(--lh-2);
   .grain, .edge { display: none; }
 }
 @media print {
-  :root { --bg: #fff; --ink: #000; --ink-2: #444; --ink-3: #666; --hair: #ccc; --well: #f2f2f2; --fs: 10.5pt; --fs-2: 9pt; --gutter: 0; }
+  :root { --bg: #fff; --ink: #000; --ink-2: #444; --ink-3: #666; --hair: #ccc; --well: #f2f2f2; --fs: 10.5pt; --fs-2: 9pt; --gutter: 0; --shadow: none; }
   html { background: #fff; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .grain, .light, .edge, .menu, .skip, .hero, .peek, .pager, .sheet-foot, .close, .rail, .hero__scroll, .no-print { display: none !important; }
+  .grain, .light, .edge, .menu, .skip, .hero, .peek, .pager, .sheet-foot, .close, .rail, .hero__scroll, .tile__go, .no-print { display: none !important; }
   .js .rv { translate: none !important; opacity: 1 !important; }
   .sheet { padding: 0; max-width: none; }
   .sheet__title, .close__mark, .hero__h { text-shadow: none; }
@@ -398,14 +413,17 @@ figcaption { margin-top: 12px; font-size: var(--fs-2); line-height: var(--lh-2);
   .facts { margin-top: 12pt; padding: 8pt 0; row-gap: 3pt; }
   .list > li, .cv > li { padding: 5pt 0; break-inside: avoid; }
   figure, .tbl, .facts { break-inside: avoid; }
-  .tile__box { border-radius: 0; background: none !important; padding: 0 !important; }
+  .tile__box { border-radius: 0; background: none !important; padding: 0 !important; height: auto; aspect-ratio: auto; }
+  a.tile .tile__box > :not(.tile__go) { transform: none !important; }
+  .exp__d { grid-template-rows: 1fr; } .exp__d small { opacity: 1; transform: none; }
   .print-only { display: block; }
   a { color: inherit; text-decoration: none; }
-  .hockey { --fs: 9pt; --fs-2: 8pt; --lh: 1.28; --lh-2: 1.28; }
+  /* the body copy is set on html, so the sheet's 9pt has to be applied where it is declared */
+  .hockey { --fs: 9pt; --fs-2: 8pt; --lh: 1.28; --lh-2: 1.28; font-size: var(--fs); line-height: var(--lh); }
   .hockey .sheet__title { font-size: 13pt; } .hockey .sheet__dek { margin-top: 4pt; font-size: 9pt; }
   .hockey .avatar { width: 44pt; height: 44pt; margin-bottom: 6pt; float: right; margin-left: 12pt; }
   .hockey .facts { grid-template-columns: 5.5em minmax(0, 1fr) 5.5em minmax(0, 1fr); column-gap: 10pt; row-gap: 1pt; margin-top: 8pt; padding: 4pt 0; clear: both; }
-  .hockey .prose { margin-top: 8pt; } .hockey .prose > h2 { margin: 6pt 0 1pt; } .hockey .prose p { margin-bottom: 4pt; }
+  .hockey .prose { margin-top: 8pt; } .hockey .prose > h2 { margin: 6pt 0 1pt; font-size: 11pt; } .hockey .prose p { margin-bottom: 4pt; }
   .hockey .tbl { margin: 2pt 0 6pt; } .hockey .tbl th, .hockey .tbl td { padding: 2pt 8pt 2pt 0; }
   .hockey .cv > li { padding: 3pt 0; } .hockey .cv p { margin-top: 1pt; } .hockey .cv__sub { margin-top: 0; }
   .hockey #coaches + .cv .cv__head, .hockey #coaches + .cv .cv__head h3 { display: inline; } .hockey #coaches + .cv .cv__when { margin-left: 6pt; }

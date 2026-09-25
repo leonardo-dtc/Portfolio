@@ -50,7 +50,8 @@ export function createWindows({ room }) {
     px.target = e.clientX / innerWidth - .5; py.target = e.clientY / innerHeight - .5;
     lightX = e.clientX; lightY = e.clientY; moving = true;
   }, { passive: true });
-  document.addEventListener('pointerleave', () => { px.target = 0; py.target = 0; });
+  // the pointer leaving the page lets the room settle back (pointerleave does not bubble, so it is heard on <html>)
+  document.documentElement.addEventListener('pointerleave', () => { px.target = 0; py.target = 0; moving = true; });
   const lx = createSpring({ value: lightX, response: .6, damping: 1 }), ly = createSpring({ value: lightY, response: .6, damping: 1 });
   onFrame((dt) => {
     if (!moving && Math.abs(px.value - px.target) < 1e-4 && Math.abs(py.value - py.target) < 1e-4) return;
@@ -130,7 +131,7 @@ export function createWindows({ room }) {
     el.style.opacity = clamp(v * 1.4, 0, 1).toFixed(3);
     if (from !== 'inline') el.style.transform = frameOf(el, v, from);
   }
-  function settle(el) { el.style.opacity = ''; el.style.transform = ''; if (el.glass) el.glass.m = 1; }
+  function settle(el) { el.style.opacity = ''; el.style.transform = ''; if (el.glass) el.glass.m = 1; if (el._spring) el._spring.snap(1); }
   async function animate(el, to, delay, from) {
     from = from || kindOf(el);
     if (reduced.matches) {
@@ -138,10 +139,11 @@ export function createWindows({ room }) {
       if (to === 1) { await wait(.15); settle(el); el.style.transition = ''; }
       return;
     }
-    const s = el._spring || (el._spring = createSpring({ value: el.glass ? el.glass.m : 0, response: from === 'side' ? .7 : .55, damping: .86 }));
+    // an element that has never moved is fully in (it came with the page), so it leaves from 1, not from nothing
+    const s = el._spring || (el._spring = createSpring({ value: el.glass ? el.glass.m : 1, response: from === 'side' ? .7 : .55, damping: .86 }));
     if (delay) await wait(delay);
-    await tween(s, to, v => setIn(el, v, from));
-    if (to === 1) settle(el);
+    const arrived = await tween(s, to, v => setIn(el, v, from));
+    if (to === 1 && arrived) settle(el);                     // not when a newer move took over (it would flash in)
   }
   function materialise(els, { stagger = .08, delay = 0, from } = {}) {
     return Promise.all(els.filter(Boolean).map((el, i) => animate(el, 1, delay + i * stagger, from)));
@@ -200,7 +202,9 @@ export function createWindows({ room }) {
     drag = { x: e.clientX, y: e.clientY }; g.setPointerCapture(e.pointerId);
   });
   document.addEventListener('pointermove', (e) => { if (!drag) return; dx.snap(rubber(e.clientX - drag.x)); dy.snap(rubber(e.clientY - drag.y)); applyDrag(); });
-  document.addEventListener('pointerup', () => { if (!drag) return; drag = null; tween(dx, 0, applyDrag); tween(dy, 0, applyDrag); });
+  const letGo = () => { if (!drag) return; drag = null; tween(dx, 0, applyDrag); tween(dy, 0, applyDrag); };
+  document.addEventListener('pointerup', letGo);
+  document.addEventListener('pointercancel', letGo);
   function applyDrag() { space.style.setProperty('--dx', dx.value.toFixed(2) + 'px'); space.style.setProperty('--dy', dy.value.toFixed(2) + 'px'); }
 
   // ---------- press: a control's glass lights up from under the pointer, then settles ----------

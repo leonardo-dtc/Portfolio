@@ -27,9 +27,10 @@
      Phones: an observer adds the class at 30% and removes it once the sheet is
      fully out. Desktop stacking: a covered sheet still intersects the viewport,
      so update() decides from the scroll geometry instead. */
-  var started = false;
-  if ('IntersectionObserver' in window && !stackMQ.matches) {
-    var io = new IntersectionObserver(function (entries) {
+  var started = false, io = null;
+  if ('IntersectionObserver' in window) {
+    io = new IntersectionObserver(function (entries) {
+      if (stackMQ.matches) return;
       entries.forEach(function (e) {
         if (e.target === cover && !started) return;
         if (e.intersectionRatio >= 0.3) e.target.classList.add('is-in');
@@ -37,7 +38,7 @@
       });
     }, { threshold: [0, 0.3] });
     slides.forEach(function (s) { io.observe(s); });
-  } else if (!('IntersectionObserver' in window)) {
+  } else {
     slides.forEach(function (s) { s.classList.add('is-in'); });
   }
 
@@ -50,13 +51,18 @@
   setTimeout(startCover, 500);
 
   /* ---- 3. geometry: normal-flow tops, and which sheets are too tall to stick ---- */
-  var tops = [], vh = window.innerHeight, current = 0;
+  var tops = [], vh = window.innerHeight, current = 0, stacked = stackMQ.matches;
   function measure() {
     vh = window.innerHeight;
     slides.forEach(function (s, i) {
       s.classList.remove('is-tall'); s.style.transform = '';
       if (dims[i]) dims[i].style.opacity = '';
+      props[i].forEach(function (b) { b.style.translate = ''; });
     });
+    /* leaving the stacked layout (a narrower or shorter window): observe afresh so the
+       sheet in view reveals at once instead of waiting for the next threshold */
+    if (io && stacked && !stackMQ.matches) slides.forEach(function (s) { io.unobserve(s); io.observe(s); });
+    stacked = stackMQ.matches;
     if (stackMQ.matches) {
       /* flow height, not scrollHeight: unrevealed text is still translated
          down and would count as overflow */
@@ -248,9 +254,13 @@
       if (fileEl) fileEl.textContent = 'daedalus/labyrinth.lua';
       codeBox.classList.add('is-done');
     } else {
-      codeBox.addEventListener('pointerenter', function () { paused = true; codeBox.classList.add('is-paused'); });
-      codeBox.addEventListener('pointerleave', function () { paused = false; codeBox.classList.remove('is-paused'); atBottom(); });
-      codeBox.addEventListener('click', function () { if (!hoverFine) { paused = !paused; codeBox.classList.toggle('is-paused', paused); if (!paused) atBottom(); } });
+      /* a mouse pauses by hovering; touch and pen toggle with a tap (their enter and
+         leave fire around every tap, so they must not drive the pause) */
+      var tapped = false;
+      codeBox.addEventListener('pointerdown', function (e) { tapped = e.pointerType !== 'mouse'; });
+      codeBox.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { paused = true; codeBox.classList.add('is-paused'); } });
+      codeBox.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { paused = false; codeBox.classList.remove('is-paused'); atBottom(); } });
+      codeBox.addEventListener('click', function () { if (tapped) { paused = !paused; codeBox.classList.toggle('is-paused', paused); if (!paused) atBottom(); } });
       timer = setTimeout(tick, 1400);
     }
   }
@@ -289,12 +299,13 @@
         if (i >= 0) { go(i); if (history.replaceState) history.replaceState(null, '', i === 0 ? location.pathname : '#' + id); }
       });
     });
-    /* arrow keys walk the folders while the drawer is open */
-    drawer.addEventListener('keydown', function (e) {
-      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-      var btns = Array.prototype.slice.call(drawer.querySelectorAll('.folder__btn')), i = btns.indexOf(d.activeElement);
-      e.preventDefault(); e.stopPropagation();
-      btns[(i + (e.key === 'ArrowDown' ? 1 : -1) + btns.length) % btns.length].focus();
+    /* arrow keys walk the folders while the drawer is open, also after the pointer
+       has taken focus off them (or from the close button) */
+    d.addEventListener('keydown', function (e) {
+      if (!drawer.open || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return;
+      var btns = Array.prototype.slice.call(drawer.querySelectorAll('.folder__btn')), i = btns.indexOf(d.activeElement), down = e.key === 'ArrowDown';
+      e.preventDefault();
+      btns[i < 0 ? (down ? 0 : btns.length - 1) : (i + (down ? 1 : -1) + btns.length) % btns.length].focus();
     });
   }
 
@@ -333,6 +344,17 @@
     e.preventDefault();
     go(i);
     if (history.replaceState) history.replaceState(null, '', i === 0 ? location.pathname : '#' + slides[i].id);
+    /* the skip link also moves keyboard focus, as the native jump would */
+    if (a.classList.contains('skip')) { slides[i].setAttribute('tabindex', '-1'); slides[i].focus({ preventScroll: true }); }
+  });
+  /* keyboard focus landing in a stacked sheet brings that sheet to rest, so the sheet
+     above it in the stack never covers the focused link */
+  d.addEventListener('focusin', function (e) {
+    if (!stackMQ.matches) return;
+    var t = e.target, s = t.closest ? t.closest('.deck > .slide') : null, i = slides.indexOf(s);
+    if (i < 0 || s.classList.contains('is-tall')) return;
+    try { if (!t.matches(':focus-visible')) return; } catch (err) { /* older engines: always correct */ }
+    requestAnimationFrame(function () { if (Math.abs((window.pageYOffset || html.scrollTop) - tops[i]) > 1) go(i); });
   });
   d.addEventListener('keydown', function (e) {
     if (e.altKey || e.metaKey || e.ctrlKey || e.shiftKey) return;

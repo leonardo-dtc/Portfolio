@@ -131,14 +131,19 @@ export function createHello({ room, windows }) {
       draw(L, progress(PACE, t, shape(L.lines).lens));
       if (t >= total(PACE) - .15) ready();
       if (t >= total(PACE)) { finished = true; off(); }
-    });
+    }, 1);
     const onResize = () => { L = hero(); placeEnter(L); if (finished && state === 'ready') draw(L, null); };
 
     // While it writes, a click or a key finishes the name. Once it is written, Return, the button, or a
     // scroll or swipe down enters. These listen first (capture) so the hidden window never scrolls meanwhile.
     const hold = e => { if (state === 'writing' || state === 'ready' || state === 'entering') e.stopPropagation(); };
     const mine = e => e.target.closest && e.target.closest('.hue');     // the color control is not part of the hello
-    const onDown = e => { if (state === 'writing' && !mine(e) && !(e.target.closest && e.target.closest('.enter'))) skip = true; };
+    // A press that finishes the writing must not also press the Enter button that appears under it: a touch's
+    // click is aimed when the finger lifts, by which time the button is there. That one click is let go.
+    let swallow = false;
+    const onDown = e => { swallow = false; if (state === 'writing' && !mine(e) && !(e.target.closest && e.target.closest('.enter'))) { skip = true; swallow = true; } };
+    const onClick = () => { if (swallow) setTimeout(() => { swallow = false; }); };
+    const onEnter = () => { if (!swallow) enter(); };
     const onKey = e => {
       if (mine(e) || e.metaKey || e.ctrlKey || e.altKey || ['Tab', 'Shift', 'Meta', 'Alt', 'Control', 'CapsLock'].includes(e.key)) return;
       hold(e);
@@ -153,11 +158,11 @@ export function createHello({ room, windows }) {
       y0 = null;
       if (state === 'writing') skip = true; else if (state === 'ready') enter();
     };
-    const on = [['pointerdown', onDown, { capture: true }], ['keydown', onKey, { capture: true }], ['wheel', onWheel, { capture: true, passive: true }],
+    const on = [['pointerdown', onDown, { capture: true }], ['click', onClick, { capture: true }], ['pointercancel', () => { swallow = false; }], ['keydown', onKey, { capture: true }], ['wheel', onWheel, { capture: true, passive: true }],
       ['touchstart', onTouchStart, { passive: true }], ['touchmove', onTouchMove, { passive: true }], ['resize', onResize]];
     on.forEach(([type, fn, o]) => addEventListener(type, fn, o));
-    btn.addEventListener('click', enter);
-    cleanup = () => { on.forEach(([type, fn, o]) => removeEventListener(type, fn, o)); btn.removeEventListener('click', enter); };
+    btn.addEventListener('click', onEnter);
+    cleanup = () => { on.forEach(([type, fn, o]) => removeEventListener(type, fn, o)); btn.removeEventListener('click', onEnter); };
   }
 
   const btnGlass = createSpring({ value: 0, response: .5, damping: .8 });
@@ -200,9 +205,12 @@ export function createHello({ room, windows }) {
     windows.materialise([p.grab], { delay: .7, from: 'ornament' });
     const slot = title();
     if (!slot || slot.lines === from.lines) {
-      // the name flies into the title slot, following it as the window arrives
+      // the name flies into the title slot, following it as the window arrives (read after the window has
+      // moved in this frame, so the name and its slot never drift apart)
       const fly = createSpring({ value: 0, response: .8, damping: .92 });
-      await tween(fly, 1, v => { ink.white = Math.min(1, Math.max(0, v)); const to = title(); if (to && to.lines === from.lines) place(between(from, to, Math.min(1, v))); });
+      const follow = onFrame(() => { const to = title(); if (to && to.lines === from.lines) place(between(from, to, Math.min(1, fly.value))); }, 1);
+      await tween(fly, 1, v => { ink.white = Math.min(1, Math.max(0, v)); });
+      follow();
       done(true);
     } else {
       // the hello and the title only differ in shape between 700px windows and phone titles: fade across
@@ -236,7 +244,7 @@ export function createHello({ room, windows }) {
       ink.dim = main && main.glass ? main.glass.dim || 0 : 0;
       if (!drawn || T2.lines !== drawn.lines || Math.abs(T2.s - drawn.s) / drawn.s > .04) draw(T2, null);
       else place(T2);
-    });
+    }, 1);
   }
 
   // pressing the name writes it again, in place
@@ -251,7 +259,7 @@ export function createHello({ room, windows }) {
       const t = reduced.matches ? 99 : now() - t0;
       draw(T, progress(REPLAY, t, lens));
       if (t >= total(REPLAY)) { off(); state = 'glass'; }
-    });
+    }, 1);
   }
   document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#main h1.name')) replay(); });
 

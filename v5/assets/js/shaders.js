@@ -116,12 +116,45 @@ vec3 roomAt(vec2 uv, float lod) {
   c += textureLod(uScene, uv - vec2(0.0, t.y), lod).rgb * 0.16;
   return c;
 }
+// One pane of glass (panel i, at its own pixel lp, sd from its rounded edge) laid over what is behind it.
+vec3 glassOver(int i, vec2 lp, float sd, vec2 px, vec3 col) {
+  vec2 hb = uBox[i].xy * 0.5; float r = uBox[i].z, kind = uBox[i].w;
+  float m = uState[i].x, dim = uState[i].y;
+  float e = 1.0;
+  vec2 n = normalize(vec2(sdRound(lp + vec2(e, 0.0) - hb, hb, r) - sdRound(lp - vec2(e, 0.0) - hb, hb, r),
+                          sdRound(lp + vec2(0.0, e) - hb, hb, r) - sdRound(lp - vec2(0.0, e) - hb, hb, r)) + 1e-6);
+  float lensW = kind < 0.5 ? 30.0 : 20.0;
+  float edge = clamp(1.0 + sd / lensW, 0.0, 1.0);
+  float bend = edge * edge * (kind < 0.5 ? 26.0 : 16.0) * m;
+  vec2 suv = (px - n * bend) / uRes; suv.y = 1.0 - suv.y;
+  float frost = mix(uLod, max(uLod, kind > 1.5 ? uFrostLod - 1.0 : uFrostLod), m);
+  vec3 g = roomAt(suv, frost);
+  bool prominent = kind > 2.5;
+  // night glass is luminous cobalt, as in the comps; day glass is a deeper blue that the cap below holds down
+  vec3 tint = hueShift(prominent ? mix(vec3(0.16, 0.34, 1.0), vec3(0.24, 0.46, 1.0), uDay) : mix(vec3(0.15, 0.20, 0.90), vec3(0.10, 0.16, 0.40), uDay), uColor.x, uColor.y);
+  g = mix(g, tint, (prominent ? 0.46 : kind > 1.5 ? 0.22 : 0.48) * m) * (prominent ? 1.0 + 0.16 * m : 1.0);
+  // legibility: whatever the room behind it (the day sky is bright), the glass stays a dark enough ground for white
+  // text; the rims and highlights come after this, so the edges keep their light
+  if (!prominent) { float gy = dot(g, vec3(0.2126, 0.7152, 0.0722)); g *= mix(1.0, min(1.0, 0.22 / max(gy, 1e-3)), m); }
+  vec2 L = normalize(uLight - px + 1e-3);
+  float rim = exp(-pow((sd + 1.1) / 1.1, 2.0));
+  g += vec3(1.0) * rim * (0.30 + 0.55 * max(dot(n, -L), 0.0)) * 0.8 * m;
+  g += vec3(1.0) * edge * edge * 0.06 * m;
+  g += vec3(1.0) * exp(-dot(px - uLight, px - uLight) / (2.0 * 300.0 * 300.0)) * 0.06 * m;
+  // a press lights the glass from within, under the pointer
+  float press = uState[i].z;
+  if (press > 0.001) { vec2 dp = px - uPointer; float pr = 0.07 * uRes.y; g += vec3(0.92, 0.96, 1.0) * press * 0.24 * exp(-dot(dp, dp) / (2.0 * pr * pr)); }
+  g *= 1.0 - 0.55 * dim;
+  return mix(col, g, smoothstep(1.5, -0.5, sd) * min(1.0, m * 1.6));
+}
+
 void main() {
   vec2 px = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
   vec2 uv = gl_FragCoord.xy / uRes;
   vec3 col = uLod > 0.05 ? roomAt(uv, uLod) : textureLod(uScene, uv, 0.0).rgb;
   float shadow = 0.0;
-  int hit = -1; vec2 lp = vec2(0.0); float sd = 1e5;
+  // the front pane over this pixel, and the one behind it
+  int hit = -1, under = -1; vec2 lp = vec2(0.0), lp2 = vec2(0.0); float sd = 1e5, sd2 = 1e5;
   for (int i = 0; i < 16; i++) {
     if (i >= uCount) break;
     vec2 hb = uBox[i].xy * 0.5;
@@ -132,38 +165,14 @@ void main() {
     float ds = sdRound(hs.xy / hs.z - hb, hb, uBox[i].z);
     float reach = uBox[i].w < 0.5 ? 90.0 : 40.0;
     shadow = max(shadow, (1.0 - smoothstep(-24.0, reach, ds)) * (uBox[i].w < 0.5 ? 0.34 : 0.22) * uState[i].x);
-    if (d < 1.5) { hit = i; lp = p; sd = d; }
+    if (d < 1.5) { under = hit; lp2 = lp; sd2 = sd; hit = i; lp = p; sd = d; }
   }
   col *= 1.0 - shadow * (hit >= 0 ? 0.0 : 1.0);
   if (hit >= 0) {
-    vec2 hb = uBox[hit].xy * 0.5; float r = uBox[hit].z, kind = uBox[hit].w;
-    float m = uState[hit].x, dim = uState[hit].y;
-    float e = 1.0;
-    vec2 n = normalize(vec2(sdRound(lp + vec2(e, 0.0) - hb, hb, r) - sdRound(lp - vec2(e, 0.0) - hb, hb, r),
-                            sdRound(lp + vec2(0.0, e) - hb, hb, r) - sdRound(lp - vec2(0.0, e) - hb, hb, r)) + 1e-6);
-    float lensW = kind < 0.5 ? 30.0 : 20.0;
-    float edge = clamp(1.0 + sd / lensW, 0.0, 1.0);
-    float bend = edge * edge * (kind < 0.5 ? 26.0 : 16.0) * m;
-    vec2 suv = (px - n * bend) / uRes; suv.y = 1.0 - suv.y;
-    float frost = mix(uLod, max(uLod, kind > 1.5 ? uFrostLod - 1.0 : uFrostLod), m);
-    vec3 g = roomAt(suv, frost);
-    bool prominent = kind > 2.5;
-    // night glass is luminous cobalt, as in the comps; day glass is a deeper blue that the cap below holds down
-    vec3 tint = hueShift(prominent ? mix(vec3(0.16, 0.34, 1.0), vec3(0.24, 0.46, 1.0), uDay) : mix(vec3(0.15, 0.20, 0.90), vec3(0.10, 0.16, 0.40), uDay), uColor.x, uColor.y);
-    g = mix(g, tint, (prominent ? 0.46 : kind > 1.5 ? 0.22 : 0.48) * m) * (prominent ? 1.0 + 0.16 * m : 1.0);
-    // legibility: whatever the room behind it (the day sky is bright), the glass stays a dark enough ground for white
-    // text; the rims and highlights come after this, so the edges keep their light
-    if (!prominent) { float gy = dot(g, vec3(0.2126, 0.7152, 0.0722)); g *= mix(1.0, min(1.0, 0.22 / max(gy, 1e-3)), m); }
-    vec2 L = normalize(uLight - px + 1e-3);
-    float rim = exp(-pow((sd + 1.1) / 1.1, 2.0));
-    g += vec3(1.0) * rim * (0.30 + 0.55 * max(dot(n, -L), 0.0)) * 0.8 * m;
-    g += vec3(1.0) * edge * edge * 0.06 * m;
-    g += vec3(1.0) * exp(-dot(px - uLight, px - uLight) / (2.0 * 300.0 * 300.0)) * 0.06 * m;
-    // a press lights the glass from within, under the pointer
-    float press = uState[hit].z;
-    if (press > 0.001) { vec2 dp = px - uPointer; float pr = 0.07 * uRes.y; g += vec3(0.92, 0.96, 1.0) * press * 0.24 * exp(-dot(dp, dp) / (2.0 * pr * pr)); }
-    g *= 1.0 - 0.55 * dim;
-    col = mix(col, g, smoothstep(1.5, -0.5, sd) * min(1.0, m * 1.6));
+    // a front pane that is only partly there (arriving, leaving, or at its antialiased rim) shows the pane behind
+    // it through the gap, not the bare room
+    if (under >= 0 && smoothstep(1.5, -0.5, sd) * min(1.0, uState[hit].x * 1.6) < 0.999) col = glassOver(under, lp2, sd2, px, col);
+    col = glassOver(hit, lp, sd, px, col);
   }
   // the written name: glass tubes over the room, lit by a light that drifts and follows the pointer
   if (uInk0.x > 0.001) {

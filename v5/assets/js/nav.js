@@ -17,7 +17,12 @@ export function initNav({ windows }) {
   let under = html.dataset.kind === 'sheet' ? null : location.pathname;  // the page in the main window
   let seq = 0, opener = null;
 
-  absolutize(document.body, location.href);
+  // Links now. Image addresses only matter once the address changes (a srcset or <picture> can choose again after
+  // that), and rewriting one reloads it, so they are fixed on the first move, when the page has long loaded.
+  const here = location.href;
+  let pinned = false;
+  const pin = () => { if (!pinned) { pinned = true; absolutize(document.body, here, { links: false }); } };
+  absolutize(document.body, here, { media: false });
   history.replaceState({ ...(history.state || {}), v5: true }, '');
 
   // ---------- fetching ----------
@@ -144,6 +149,7 @@ export function initNav({ windows }) {
   async function go(href, { push = true } = {}) {
     const url = new URL(href, location.href);
     const token = ++seq;
+    pin();
     try {
       if (url.pathname === shown) {                                   // same page: a #target, or back to the top
         if (push) history.replaceState(history.state, '', url.href);
@@ -226,7 +232,7 @@ export function initNav({ windows }) {
   document.addEventListener('pointerover', warm, { passive: true });
   document.addEventListener('focusin', warm);
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && $sheet() && !e.defaultPrevented) { e.preventDefault(); close(); } });
-  addEventListener('popstate', () => go(location.href, { push: false }));
+  addEventListener('popstate', () => { pin(); go(location.href, { push: false }); });
 
   // ---------- a project loaded directly: show it as a sheet in front of its parent ----------
   async function bootSheet() {
@@ -263,12 +269,13 @@ export function initNav({ windows }) {
 }
 
 // Rewrites relative links and image sources as root-relative ones, so they survive the address changing under them.
-function absolutize(root, base) {
+function absolutize(root, base, { links = true, media = true } = {}) {
   const fix = (v) => {
     if (!v || v.startsWith('#') || /^(mailto:|tel:|data:|javascript:)/i.test(v)) return v;
     try { const u = new URL(v, base); return u.origin === location.origin ? u.pathname + u.search + u.hash : u.href; } catch (e) { return v; }
   };
-  root.querySelectorAll('[href]').forEach(el => el.setAttribute('href', fix(el.getAttribute('href'))));
+  if (links) root.querySelectorAll('[href]').forEach(el => el.setAttribute('href', fix(el.getAttribute('href'))));
+  if (!media) return;
   root.querySelectorAll('[src]').forEach(el => { const v = el.getAttribute('src'), f = fix(v); if (f !== v) el.setAttribute('src', f); });
   root.querySelectorAll('[srcset]').forEach(el => {
     const v = el.getAttribute('srcset');

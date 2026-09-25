@@ -57,6 +57,7 @@ export function createRoom(canvas) {
   window.__roomFrames = 0;
   const off = onFrame((dt) => {
     if (document.hidden || lost) return;
+    if (api.source) api.setPanels(api.source());          // where the glass is now, after this frame's motion
     frames++;
     const idle = st.fast <= 0;
     st.fast -= dt;
@@ -102,7 +103,7 @@ export function createRoom(canvas) {
 
     // budget: over the first 90 frames, a machine averaging over 22 ms drops to 1x and stops the room's own motion
     if (counted < 90) { counted++; acc += dt; if (counted === 90 && acc / 90 > .022) { slow = true; if (dpr > 1) { dpr = 1; w = h = 0; } } }
-  });
+  }, 2);                                                   // last in the frame: everything that moves has moved
 
   canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); lost = true; api.onlost && api.onlost(); });
 
@@ -110,6 +111,7 @@ export function createRoom(canvas) {
     get dpr() { return dpr; },
     get lod() { return maxLod; },
     set(o) { Object.assign(st, o); st.fast = Math.max(st.fast, .5); },
+    source: null,                                        // () => panels, read each frame just before drawing
     // panels arrive every frame; only a change in them wakes the room to full rate
     setPanels(p) { let sum = p.count; for (let i = 0; i < p.count * 9; i++) sum += p.inv[i] * (i % 7 + 1); for (let i = 0; i < p.count * 4; i++) sum += p.state[i] * 13.7; if (Math.abs(sum - panelSum) > 1e-7) st.fast = Math.max(st.fast, .4); panelSum = sum; st.panels = p; },
     get state() { return st; },

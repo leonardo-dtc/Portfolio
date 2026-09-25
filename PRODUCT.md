@@ -31,7 +31,7 @@ The record is specific work with named collaborators, a stated stage and its cav
 
 - Preview: `python3 tools/serve.py 8778`, often already running; editions at `/`, `/v2/`, `/v3/`, `/v4/`, `/v5/`.
 - Copy conventions (from `v2/README.md`): first person, always "Leonardo", no en or em dashes, no superlatives; facts come from the v2 pages and `CONTENT-REVIEW.md`; caveats travel with their facts.
-- Every page carries `<meta name="robots" content="noindex">` while the site is a comparison build; it has not been deployed.
+- Every page carries `<meta name="robots" content="noindex">` while the site is a comparison build. It is published to GitHub Pages (`https://leonardo-dtc.github.io/Portfolio/`) from `main` as an outlet for review, not as the chosen site.
 - Updated dates on the record: September 2026.
 
 ## Capabilities and Constraints
@@ -41,7 +41,7 @@ The record is specific work with named collaborators, a stated stage and its cav
 - Hidden-until-ready content stays hidden with an HTML comment saying what fills it: 2026-27 stat tiles, the season schedule, the résumé PDF button, the film link.
 - Placeholders exist for photographs not yet supplied (OCAPEX performance, viola, crease, FreeCode session, Carnegie Hall, team-history photos). They are labeled, never faked.
 - Keep completed work, submissions, plans and simulation results distinct. Organization-wide impact is attributed to the team.
-- Undecided: which edition becomes the default (*open*; Leonardo called v5 "the final version of the portfolio before we make a choice between the options"), a deployment target (*open*).
+- Undecided: which edition becomes the default (*open*; Leonardo called v5 "the final version of the portfolio before we make a choice between the options"). GitHub Pages is the current outlet (Leonardo, 2026-09-25); a final domain is *open*.
 
 ## Brand Commitments
 

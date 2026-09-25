@@ -43,7 +43,7 @@
     const blocks = [...target.querySelectorAll('.chapter-name,.chapter-lede,.entry,.sub__title,.sub__lede,.about__copy > .lede')];
     motion = blocks.map((node, i) => node.animate([
       { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }
-    ], { duration: 260, delay: Math.min(i * 24, 130), easing: 'cubic-bezier(.16,1,.3,1)' }));
+    ], { duration: 260, delay: Math.min(i * 24, 130), easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
   }
   function clearDetail(panel) {
     const sub = panel.querySelector('.subpage');
@@ -84,7 +84,7 @@
       if (location.hash !== hash) window.history.pushState(null, '', hash);
     }
     panel.scrollTop = 0;
-    if (!wide.matches) (panel.querySelector('.subpage') || panel.querySelector('.chapter-name') || panel).scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (!wide.matches) (panel.querySelector('.subpage') || panel.querySelector('.chapter__side') || panel).scrollIntoView({ behavior: 'instant', block: 'start' });
     command(slug ? 'cat ' + slug + '.txt' : (index ? 'cd ' + panel.id : './portfolio'));
     if (animate) print(panel.querySelector('.subpage') || panel);
     if (focus) {
@@ -104,7 +104,7 @@
     stopMotion(); body.classList.toggle('mode-panels', wide.matches); body.classList.toggle('mode-flow', !wide.matches);
     panels.forEach((p,i) => { p.hidden = wide.matches && i !== current; });
     if (wide.matches) window.scrollTo(0, 0);
-    else if (body.classList.contains('is-ready')) { const panel = panels[current]; requestAnimationFrame(() => (panel.querySelector('.subpage') || panel.querySelector('.chapter-name') || panel).scrollIntoView({ behavior: 'instant', block: 'start' })); }
+    else if (body.classList.contains('is-ready')) { const panel = panels[current]; requestAnimationFrame(() => (panel.querySelector('.subpage') || panel.querySelector('.chapter__side') || panel).scrollIntoView({ behavior: 'instant', block: 'start' })); }
   }
   links.forEach(a => a.addEventListener('click', event => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -159,7 +159,7 @@
       if (document.querySelector('.has-game')) return;
       const line = $('#nav').getBoundingClientRect().bottom + 80;
       let index = 0;
-      panels.forEach((p,i) => { if ((p.querySelector('.subpage') || p.querySelector('.chapter-name') || p).getBoundingClientRect().top <= line) index = i; });
+      panels.forEach((p,i) => { if ((p.querySelector('.subpage') || p.querySelector('.chapter__side') || p).getBoundingClientRect().top <= line) index = i; });
       if (index !== current) chrome(index, panels[index].dataset.openSlug || '');
     });
   }, { passive: true });

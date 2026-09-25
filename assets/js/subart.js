@@ -33,7 +33,7 @@
     'academics/american-heritage': 'American Heritage School\'s crest.',
     'academics/groton': 'The Schoolhouse, from a photograph of the campus.',
     'athletics/road-to-groton': 'The Florida Alliance crest.',
-    'leadership/freecode': 'Python\'s mark.',
+    'leadership/freecode': 'Python’s mark.',
     'music/carnegie-hall': 'A grand piano with its lid up, from a photograph: the keys, the strings inside, the lyre below.',
   };
 

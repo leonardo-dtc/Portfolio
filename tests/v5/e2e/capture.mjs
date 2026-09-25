@@ -1,8 +1,9 @@
 // Screenshots of every page at five sizes, plus the hello, for review. Usage: node tests/v5/e2e/capture.mjs [page,…]
+// (into .impeccable/review/v5/, or the folder named by V5_CAPTURE_OUT)
 import { open, BASE, PAGES, check } from './lib.mjs';
 import { mkdirSync } from 'node:fs';
 
-const OUT = new URL('../../../.impeccable/review/v5/', import.meta.url).pathname;
+const OUT = process.env.V5_CAPTURE_OUT ? process.env.V5_CAPTURE_OUT.replace(/\/?$/, '/') : new URL('../../../.impeccable/review/v5/', import.meta.url).pathname;
 mkdirSync(OUT, { recursive: true });
 const want = process.argv[2] ? process.argv[2].split(',') : PAGES.map(p => p || 'home');
 for (const [w, h] of [[1440, 900], [1280, 800], [1024, 768], [768, 1024], [390, 844]]) {

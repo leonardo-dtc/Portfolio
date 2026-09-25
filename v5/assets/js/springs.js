@@ -16,17 +16,17 @@ export function createSpring({ value = 0, target = value, response = .5, damping
   return s;
 }
 
-// Drive a spring to a target, calling onUpdate every frame; resolves when it settles.
-// A newer tween on the same spring takes over the old one.
+// Drive a spring to a target, calling onUpdate every frame; resolves true when it settles.
+// A newer tween on the same spring takes over the old one, which resolves false.
 export function tween(spring, target, onUpdate) {
   spring.target = target;
   const token = spring._token = {};
   return new Promise(resolve => {
     const off = onFrame(dt => {
-      if (spring._token !== token) { off(); resolve(); return; }
+      if (spring._token !== token) { off(); resolve(false); return; }
       const done = spring.step(dt);
       onUpdate(spring.value);
-      if (done) { spring.snap(target); onUpdate(target); off(); resolve(); }
+      if (done) { spring.snap(target); onUpdate(target); off(); resolve(true); }
     });
   });
 }
