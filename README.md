@@ -10,6 +10,10 @@ python3 tools/serve.py 8778
 
 Open [the terminal portfolio](http://127.0.0.1:8778) or [low-detail mode](http://127.0.0.1:8778/low-detail.html). The preview server disables caching. Both pages also work from their HTML files.
 
+## Editions
+
+The terminal build at the root is the first edition. Four later editions sit beside it, each with its own README: [`v2/`](v2/README.md), the editorial edition, [`v3/`](v3/README.md), the poster edition built on the "Portfolio 2025" deck, [`v4/`](v4/README.md), the dim-room edition: a dark ground with one lit window, and [`v5/`](v5/README.md), the glass edition: Liquid Glass windows in a room drawn after Apple's wallpapers, with the name written like Apple's hello. The preview server serves all five.
+
 ## Two reading modes
 
 **Terminal is the default.** The original ASCII name, palette shuffle, reactive field, Roman chapter numbers, letter-flip navigation, typed commands, interactive illustrations, timeline and three games remain. Text has more space, stronger contrast and consistent sizing. Artwork has a dedicated canvas, a permanent caption and an enlargement viewer.

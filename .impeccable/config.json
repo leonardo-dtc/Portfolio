@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-09-08T03:03:53.503Z",
         "reason": "Throwaway comparison fixture: the scanline bloom is the CRT effect under evaluation, not decoration. Claude's call; delete this file once the transition is chosen."
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "v5/assets/css/site.css"
+        ],
+        "createdAt": "2026-09-24T20:10:27.027Z",
+        "reason": "v5's only width transition is the visionOS tab ornament widening 64 to 188px on hover. The room's WebGL glass is drawn from the element's real box, so a transform or clip would draw the glass at the wrong size; the element is absolutely positioned with layout containment and measured 60fps. This rule has no extractable value, so the exception is file-scoped; review any new width, height, padding or margin transition in this file by hand."
       }
     ]
   }
