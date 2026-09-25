@@ -1,0 +1,750 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-24T00:00:00Z",
+  "title": "Design System: Leonardo Carvalho, fifth edition",
+  "extensions": {
+    "colorMeta": {
+      "glass-night": {
+        "role": "primary",
+        "displayName": "Night Glass Cobalt",
+        "canonical": "oklch(46.4% 0.259 268)",
+        "tonalRamp": [
+          "oklch(15% 0.259 268)",
+          "oklch(25% 0.259 268)",
+          "oklch(35% 0.259 268)",
+          "oklch(45% 0.259 268)",
+          "oklch(55% 0.259 268)",
+          "oklch(65% 0.259 268)",
+          "oklch(80% 0.259 268)",
+          "oklch(95% 0.259 268)"
+        ],
+        "note": "Shader tint vec3(.15,.20,.90) mixed at 48% into windows and ornaments at night. Light in a surface, never a CSS fill."
+      },
+      "glass-prominent": {
+        "role": "primary",
+        "displayName": "Prominent Cobalt",
+        "canonical": "oklch(54.3% 0.252 266)",
+        "tonalRamp": [
+          "oklch(15% 0.252 266)",
+          "oklch(25% 0.252 266)",
+          "oklch(35% 0.252 266)",
+          "oklch(45% 0.252 266)",
+          "oklch(55% 0.252 266)",
+          "oklch(65% 0.252 266)",
+          "oklch(80% 0.252 266)",
+          "oklch(95% 0.252 266)"
+        ],
+        "note": "The Enter button only: vec3(.16,.34,1.0) at 46%, brightened 16%; by day vec3(.24,.46,1.0) (#3d75ff). Exempt from the brightness cap."
+      },
+      "glass-day": {
+        "role": "primary",
+        "displayName": "Day Glass Blue",
+        "canonical": "oklch(30.9% 0.109 269)",
+        "tonalRamp": [
+          "oklch(15% 0.109 269)",
+          "oklch(25% 0.109 269)",
+          "oklch(35% 0.109 269)",
+          "oklch(45% 0.109 269)",
+          "oklch(55% 0.109 269)",
+          "oklch(65% 0.109 269)",
+          "oklch(80% 0.109 269)",
+          "oklch(95% 0.109 269)"
+        ],
+        "note": "Shader tint vec3(.10,.16,.40) by day, under the 0.22 luminance cap."
+      },
+      "room-night-sky": {
+        "role": "secondary",
+        "displayName": "Night Sky",
+        "canonical": "oklch(17.6% 0.081 272)",
+        "tonalRamp": [
+          "oklch(15% 0.081 272)",
+          "oklch(25% 0.081 272)",
+          "oklch(35% 0.081 272)",
+          "oklch(45% 0.081 272)",
+          "oklch(55% 0.081 272)",
+          "oklch(65% 0.081 272)",
+          "oklch(80% 0.081 272)",
+          "oklch(95% 0.081 272)"
+        ],
+        "note": "Shader top colour vec3(.028,.036,.20)."
+      },
+      "room-night-mid": {
+        "role": "secondary",
+        "displayName": "Night Mid",
+        "canonical": "oklch(28.6% 0.151 270)",
+        "tonalRamp": [
+          "oklch(15% 0.151 270)",
+          "oklch(25% 0.151 270)",
+          "oklch(35% 0.151 270)",
+          "oklch(45% 0.151 270)",
+          "oklch(55% 0.151 270)",
+          "oklch(65% 0.151 270)",
+          "oklch(80% 0.151 270)",
+          "oklch(95% 0.151 270)"
+        ]
+      },
+      "room-night-horizon": {
+        "role": "secondary",
+        "displayName": "Night Horizon",
+        "canonical": "oklch(51.3% 0.208 285)",
+        "tonalRamp": [
+          "oklch(15% 0.208 285)",
+          "oklch(25% 0.208 285)",
+          "oklch(35% 0.208 285)",
+          "oklch(45% 0.208 285)",
+          "oklch(55% 0.208 285)",
+          "oklch(65% 0.208 285)",
+          "oklch(80% 0.208 285)",
+          "oklch(95% 0.208 285)"
+        ],
+        "note": "The violet horizon; the night deep base is #040a47."
+      },
+      "room-day-sky": {
+        "role": "secondary",
+        "displayName": "Day Sky",
+        "canonical": "oklch(50.4% 0.170 256)",
+        "tonalRamp": [
+          "oklch(15% 0.17 256)",
+          "oklch(25% 0.17 256)",
+          "oklch(35% 0.17 256)",
+          "oklch(45% 0.17 256)",
+          "oklch(55% 0.17 256)",
+          "oklch(65% 0.17 256)",
+          "oklch(80% 0.17 256)",
+          "oklch(95% 0.17 256)"
+        ]
+      },
+      "room-day-mid": {
+        "role": "secondary",
+        "displayName": "Day Mid",
+        "canonical": "oklch(67.1% 0.121 253)",
+        "tonalRamp": [
+          "oklch(15% 0.121 253)",
+          "oklch(25% 0.121 253)",
+          "oklch(35% 0.121 253)",
+          "oklch(45% 0.121 253)",
+          "oklch(55% 0.121 253)",
+          "oklch(65% 0.121 253)",
+          "oklch(80% 0.121 253)",
+          "oklch(95% 0.121 253)"
+        ]
+      },
+      "room-day-horizon": {
+        "role": "secondary",
+        "displayName": "Day Horizon",
+        "canonical": "oklch(90.3% 0.046 89)",
+        "tonalRamp": [
+          "oklch(15% 0.046 89)",
+          "oklch(25% 0.046 89)",
+          "oklch(35% 0.046 89)",
+          "oklch(45% 0.046 89)",
+          "oklch(55% 0.046 89)",
+          "oklch(65% 0.046 89)",
+          "oklch(80% 0.046 89)",
+          "oklch(95% 0.046 89)"
+        ],
+        "note": "The warm pale day horizon; the day deep base is #082994."
+      },
+      "ground-night": {
+        "role": "secondary",
+        "displayName": "Night Ground",
+        "canonical": "oklch(20.2% 0.076 271)",
+        "tonalRamp": [
+          "oklch(15% 0.076 271)",
+          "oklch(25% 0.076 271)",
+          "oklch(35% 0.076 271)",
+          "oklch(45% 0.076 271)",
+          "oklch(55% 0.076 271)",
+          "oklch(65% 0.076 271)",
+          "oklch(80% 0.076 271)",
+          "oklch(95% 0.076 271)"
+        ],
+        "note": "html background under room-night.webp, theme colour, text on white controls."
+      },
+      "ground-day": {
+        "role": "secondary",
+        "displayName": "Day Ground",
+        "canonical": "oklch(52.0% 0.158 261)",
+        "tonalRamp": [
+          "oklch(15% 0.158 261)",
+          "oklch(25% 0.158 261)",
+          "oklch(35% 0.158 261)",
+          "oklch(45% 0.158 261)",
+          "oklch(55% 0.158 261)",
+          "oklch(65% 0.158 261)",
+          "oklch(80% 0.158 261)",
+          "oklch(95% 0.158 261)"
+        ],
+        "note": "html background under room-day.webp."
+      },
+      "paper": {
+        "role": "tertiary",
+        "displayName": "Paper",
+        "canonical": "oklch(95.3% 0.010 87)",
+        "tonalRamp": [
+          "oklch(15% 0.01 87)",
+          "oklch(25% 0.01 87)",
+          "oklch(35% 0.01 87)",
+          "oklch(45% 0.01 87)",
+          "oklch(55% 0.01 87)",
+          "oklch(65% 0.01 87)",
+          "oklch(80% 0.01 87)",
+          "oklch(95% 0.01 87)"
+        ],
+        "note": "The manuscript card and figure grounds."
+      },
+      "gold": {
+        "role": "tertiary",
+        "displayName": "Gold",
+        "canonical": "oklch(75.6% 0.089 81)",
+        "tonalRamp": [
+          "oklch(15% 0.089 81)",
+          "oklch(25% 0.089 81)",
+          "oklch(35% 0.089 81)",
+          "oklch(45% 0.089 81)",
+          "oklch(55% 0.089 81)",
+          "oklch(65% 0.089 81)",
+          "oklch(80% 0.089 81)",
+          "oklch(95% 0.089 81)"
+        ],
+        "note": "Loquar."
+      },
+      "blue": {
+        "role": "tertiary",
+        "displayName": "Blue",
+        "canonical": "oklch(49.4% 0.129 252)",
+        "tonalRamp": [
+          "oklch(15% 0.129 252)",
+          "oklch(25% 0.129 252)",
+          "oklch(35% 0.129 252)",
+          "oklch(45% 0.129 252)",
+          "oklch(55% 0.129 252)",
+          "oklch(65% 0.129 252)",
+          "oklch(80% 0.129 252)",
+          "oklch(95% 0.129 252)"
+        ],
+        "note": "Genuvalens; white text."
+      },
+      "sand": {
+        "role": "tertiary",
+        "displayName": "Sand",
+        "canonical": "oklch(83.9% 0.058 69)",
+        "tonalRamp": [
+          "oklch(15% 0.058 69)",
+          "oklch(25% 0.058 69)",
+          "oklch(35% 0.058 69)",
+          "oklch(45% 0.058 69)",
+          "oklch(55% 0.058 69)",
+          "oklch(65% 0.058 69)",
+          "oklch(80% 0.058 69)",
+          "oklch(95% 0.058 69)"
+        ],
+        "note": "OCAPEX."
+      },
+      "card-ink": {
+        "role": "tertiary",
+        "displayName": "Card Ink",
+        "canonical": "oklch(22.4% 0.008 286)",
+        "tonalRamp": [
+          "oklch(15% 0.008 286)",
+          "oklch(25% 0.008 286)",
+          "oklch(35% 0.008 286)",
+          "oklch(45% 0.008 286)",
+          "oklch(55% 0.008 286)",
+          "oklch(65% 0.008 286)",
+          "oklch(80% 0.008 286)",
+          "oklch(95% 0.008 286)"
+        ],
+        "note": "Text on Paper, Gold and Sand cards; written as a literal (#1b1b1f) in four rules."
+      },
+      "drawn-ink": {
+        "role": "tertiary",
+        "displayName": "Drawn Ink",
+        "canonical": "oklch(23.4% 0.065 274)",
+        "tonalRamp": [
+          "oklch(15% 0.065 274)",
+          "oklch(25% 0.065 274)",
+          "oklch(35% 0.065 274)",
+          "oklch(45% 0.065 274)",
+          "oklch(55% 0.065 274)",
+          "oklch(65% 0.065 274)",
+          "oklch(80% 0.065 274)",
+          "oklch(95% 0.065 274)"
+        ],
+        "note": "A drawn Work card; literal in CSS."
+      },
+      "drawn-violet": {
+        "role": "tertiary",
+        "displayName": "Drawn Violet",
+        "canonical": "oklch(45.0% 0.172 282)",
+        "tonalRamp": [
+          "oklch(15% 0.172 282)",
+          "oklch(25% 0.172 282)",
+          "oklch(35% 0.172 282)",
+          "oklch(45% 0.172 282)",
+          "oklch(55% 0.172 282)",
+          "oklch(65% 0.172 282)",
+          "oklch(80% 0.172 282)",
+          "oklch(95% 0.172 282)"
+        ],
+        "note": "A drawn Work card; literal in CSS."
+      },
+      "drawn-green": {
+        "role": "tertiary",
+        "displayName": "Drawn Green",
+        "canonical": "oklch(48.8% 0.083 160)",
+        "tonalRamp": [
+          "oklch(15% 0.083 160)",
+          "oklch(25% 0.083 160)",
+          "oklch(35% 0.083 160)",
+          "oklch(45% 0.083 160)",
+          "oklch(55% 0.083 160)",
+          "oklch(65% 0.083 160)",
+          "oklch(80% 0.083 160)",
+          "oklch(95% 0.083 160)"
+        ],
+        "note": "A drawn Work card; literal in CSS."
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#ffffff",
+        "note": "All primary text. Defined as --ink but used through the token only twice; #fff is written as a literal about 36 times."
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2 (78%)",
+        "canonical": "rgba(255, 255, 255, .78)",
+        "note": "The second text voice."
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink 3 (71%)",
+        "canonical": "rgba(255, 255, 255, .71)",
+        "note": "The third text voice."
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line (14%)",
+        "canonical": "rgba(255, 255, 255, .14)",
+        "note": "Dividers inside list groups and tables. Same value as Fill 2."
+      },
+      "fill": {
+        "role": "neutral",
+        "displayName": "Fill (6%)",
+        "canonical": "rgba(255, 255, 255, .06)",
+        "note": "Surfaces inside a window."
+      },
+      "fill-2": {
+        "role": "neutral",
+        "displayName": "Fill 2 (14%)",
+        "canonical": "rgba(255, 255, 255, .14)",
+        "note": "Hover and icon wells. The toolbar writes .15 as a literal instead."
+      },
+      "fill-3": {
+        "role": "neutral",
+        "displayName": "Fill 3 (22%)",
+        "canonical": "rgba(255, 255, 255, .22)",
+        "note": "The tab bubble and hovered close button."
+      },
+      "tint": {
+        "role": "neutral",
+        "displayName": "CSS Glass Tint",
+        "canonical": "rgba(10, 14, 48, .5)",
+        "note": "CSS glass at night, under blur(30px) saturate(1.7) brightness(.8)."
+      },
+      "tint-day": {
+        "role": "neutral",
+        "displayName": "CSS Glass Tint, Day",
+        "canonical": "rgba(14, 24, 76, .64)",
+        "note": "Overrides --tint under prefers-color-scheme: light."
+      },
+      "tint-strong": {
+        "role": "neutral",
+        "displayName": "CSS Glass Tint, Strong",
+        "canonical": "rgba(10, 14, 48, .84)",
+        "note": "Under prefers-reduced-transparency."
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Title",
+        "purpose": "Window and sheet titles on every page but home; 30px under 900px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles inside a window; inline side-window titles."
+      },
+      "side-title": {
+        "displayName": "Side title",
+        "purpose": "Floating side-window titles."
+      },
+      "card-title": {
+        "displayName": "Card title",
+        "purpose": "Project names on cards."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Introduction and contact sentence; first sentence bold in Ink. 17px under 900px."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "The first-person sentence heading each record group."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose, rows, facts; 17px medium, +.006em."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Buttons, links as controls; tabs at 16px, Enter at 19px."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Dates, sublines, side-window text, references, captions."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Card sublines, table heads, experiment dates. Nothing under 12px."
+      },
+      "manuscript": {
+        "displayName": "Manuscript",
+        "purpose": "The aducanumab manuscript's own title, on its sheet and (15px) on its card. The only serif."
+      },
+      "written-name": {
+        "displayName": "The written name",
+        "purpose": "The display voice: Sacramento traced to pen strokes (24 name units wide), rendered as glass by the room. Hello: 80% of the width, one line (two under 700px). Title: up to 460px (340px under 700px)."
+      }
+    },
+    "shadows": [
+      {
+        "name": "window-drawn",
+        "value": "room shader: offset 22px down, reach 90px, strength .34",
+        "purpose": "Every window and sheet, cast into the room."
+      },
+      {
+        "name": "ornament-drawn",
+        "value": "room shader: offset 22px down, reach 40px, strength .22",
+        "purpose": "Tab bar, toolbar, Enter."
+      },
+      {
+        "name": "css-glass",
+        "value": "0 30px 80px rgba(0, 0, 0, .28), 0 2px 6px rgba(0, 0, 0, .12)",
+        "purpose": "CSS glass fallback."
+      },
+      {
+        "name": "phone-tab-bar",
+        "value": "0 18px 44px rgba(0, 0, 0, .32)",
+        "purpose": "The phone bottom tab bar, always CSS glass."
+      },
+      {
+        "name": "card",
+        "value": "0 10px 24px rgba(0, 0, 0, .16); hover 0 18px 40px rgba(0, 0, 0, .24)",
+        "purpose": "Project cards."
+      },
+      {
+        "name": "screenshot",
+        "value": "0 10px 26px rgba(0, 0, 0, .26) on cards; 0 14px 34px rgba(0, 0, 0, .24) on figures",
+        "purpose": "A screenshot resting on its colour."
+      },
+      {
+        "name": "hover-light",
+        "value": "radial-gradient(180px circle at var(--hx) var(--hy), rgba(255,255,255,.16), transparent 62%), plus-lighter; pressed 240px at .30",
+        "purpose": "The visionOS gaze light on [data-hover] elements."
+      },
+      {
+        "name": "focus",
+        "value": "outline 2px solid #fff, offset 3px; box-shadow 0 0 0 6px rgba(255, 255, 255, .18)",
+        "purpose": "Every focusable element."
+      },
+      {
+        "name": "tab-bubble",
+        "value": "inset 0 1px 0 rgba(255, 255, 255, .32)",
+        "purpose": "The top edge of the current-tab bubble."
+      }
+    ],
+    "glass": [
+      {
+        "name": "frost",
+        "value": "mip level log2(max(4, 26 * dpr)); controls one level less",
+        "purpose": "Blur read from the room texture."
+      },
+      {
+        "name": "lensing",
+        "value": "edge band 30px (windows) or 20px (others); bend = edge^2 * 26px (windows) or 16px",
+        "purpose": "The room bends inward near the rounded edge."
+      },
+      {
+        "name": "tint",
+        "value": "night vec3(.15,.20,.90), day vec3(.10,.16,.40), mixed 48% (windows, ornaments), 22% (controls), prominent 46% of vec3(.16,.34,1.0)/(.24,.46,1.0) and x1.16",
+        "purpose": "Cobalt glass."
+      },
+      {
+        "name": "brightness-cap",
+        "value": "non-prominent glass scaled so luminance <= 0.22 before rim and light are added",
+        "purpose": "White text keeps 4.5:1."
+      },
+      {
+        "name": "rim",
+        "value": "gaussian 1.1px at the edge, 0.8 * (0.30 + 0.55 * facing the light); edge glow 0.06 * edge^2",
+        "purpose": "The bright edge of Liquid Glass."
+      },
+      {
+        "name": "pointer-highlight",
+        "value": "gaussian sigma 300px around the light position, +0.06",
+        "purpose": "A pool of light that follows the pointer (spring .6 / 1)."
+      },
+      {
+        "name": "press-light",
+        "value": "0.24 * press of vec3(.92,.96,1.0), sigma 7% of viewport height, at the pointer",
+        "purpose": "A pressed control lights from within."
+      },
+      {
+        "name": "dim",
+        "value": "glass * (1 - 0.55 * dim)",
+        "purpose": "A sheet's parent stepping back."
+      },
+      {
+        "name": "written-name-ink",
+        "value": "mask canvas (stroke, height, shadow) turned to glass tubes: refraction by the normals, rims 0.85 lit / 0.38 far, specular 0.7, a sheen sweeping every 6.5s, a flowing surface; mixed 93% toward white as the title; shadow 34% (lighter on glass)",
+        "purpose": "The name in the hello and as the home title."
+      }
+    ],
+    "motion": [
+      {
+        "name": "spring-model",
+        "value": "response (s) and damping ratio; 4ms substeps; settles within 1e-3",
+        "purpose": "Every geometric motion (springs.js)."
+      },
+      {
+        "name": "window-materialise",
+        "value": "response .55, damping .86; from translateZ(-14vw) scale(.96); opacity at 1.4x the spring",
+        "purpose": "Windows and sheets arriving."
+      },
+      {
+        "name": "side-materialise",
+        "value": "response .7, damping .86; from 52deg and translateZ(-22vw) to 24deg",
+        "purpose": "Side windows swinging in."
+      },
+      {
+        "name": "ornament-materialise",
+        "value": "scale .9 to 1 on the window spring",
+        "purpose": "Tab bar, toolbar, window bar."
+      },
+      {
+        "name": "tab-bubble",
+        "value": "response .45, damping .8; stretch up to 30% along travel at |v|/3000",
+        "purpose": "The current-tab bubble."
+      },
+      {
+        "name": "sheet-back",
+        "value": "response .5, damping 1; parent translateZ(-10vw), contents brightness .5, saturate .8, blur 1.5px, opacity to 0 at 40% of the travel",
+        "purpose": "A sheet opening over its parent."
+      },
+      {
+        "name": "parallax",
+        "value": "response .9, damping 1; perspective origin +/-10% x, +/-8% y; space translate up to 1vw; room shift x*.012, -y*.008",
+        "purpose": "Desktop only."
+      },
+      {
+        "name": "pointer-light",
+        "value": "response .6, damping 1",
+        "purpose": "The glass light following the pointer."
+      },
+      {
+        "name": "window-bar-drag",
+        "value": "rubber d*40/(40+|d|); home on response .5, damping .7",
+        "purpose": "The window bar."
+      },
+      {
+        "name": "press",
+        "value": "response .3, damping 1",
+        "purpose": "Press light on controls."
+      },
+      {
+        "name": "hello-pace",
+        "value": "delay .3s; leonardo 1.45s; carvalho from .82s over 1.45s; ease in-out quad; Enter ready at about 2.4s; replay 1.2 / .66 / 1.2",
+        "purpose": "The written name."
+      },
+      {
+        "name": "hello-enter",
+        "value": "focus pull response 1.1 damping 1; name flight .8 / .92; Enter glass .5 / .8; main .18s, sides .34s + 60ms, tabs .55s, toolbar .62s, window bar .7s",
+        "purpose": "Entering glass mode."
+      },
+      {
+        "name": "page-swap",
+        "value": "out 180ms cubic-bezier(.4,0,1,1): opacity 0, blur 8px, scale .985; in 260ms cubic-bezier(.2,.8,.2,1): from 14px down, blur 6px",
+        "purpose": "Changing a window's contents."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "CSS micro-motion: tab bar width .42s, labels .3s, button press .35s, card hover .45s, Enter .6s / .9s."
+      },
+      {
+        "name": "breathe",
+        "value": "2.6s ease-in-out infinite; ring opacity .5 to 1, scale .985 to 1",
+        "purpose": "The Enter button's ring."
+      },
+      {
+        "name": "room-drift",
+        "value": "crest undulation and form drift over tens of seconds; 60fps while anything moves, 30fps while only the room drifts",
+        "purpose": "The room."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "no writing, focus pull, parallax, drift or springs; transitions .15s; no animations; room still",
+        "purpose": "prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "desktop",
+        "value": "1360px (min-width, script)"
+      },
+      {
+        "name": "phone",
+        "value": "900px (max-width 899px)"
+      },
+      {
+        "name": "two-line-name",
+        "value": "700px (max-width 699px)"
+      },
+      {
+        "name": "facts",
+        "value": "600px (max-width 599px)"
+      }
+    ],
+    "drift": [
+      "--ink is defined but used through the token twice; #fff is written as a literal about 36 times (text, focus, button fills).",
+      "The glass kind 'control' is defined in panels.js and handled by the shader (22% tint, one frost level less) but no element carries data-glass=\"control\"; only window, ornament and prominent are used.",
+      "#0b1138 (Night Ground, text on white controls) and #1b1b1f (Card Ink) are repeated as literals, not tokens; the three drawn card colours are literals too.",
+      "--r-win (32px) is used once; the tab bar writes 32px, side windows 28px, side rows 16px (= --r-row), the portrait 20px (= --r-card) and toc links 12px as literals.",
+      "--line and --fill-2 share one value (.14).",
+      ":focus-visible sets border-radius 10px globally, which changes the corner of any element without its own radius while focused."
+    ]
+  },
+  "components": [
+    {
+      "name": "Main window with a list group",
+      "kind": "card",
+      "refersTo": "window",
+      "description": "A 32px glass window: a bold title, a lede, then a visionOS list group on a 6% fill.",
+      "html": "<div class=\"ds-room\"><section class=\"ds-win\"><h1 class=\"ds-win__t\">Hockey</h1><p class=\"ds-lede\"><b>Goaltender at Groton School.</b> Catches left.</p><ul class=\"ds-rows\"><li><a class=\"ds-row\" href=\"#\"><span>Groton School Boys’ Varsity</span><span class=\"ds-row__m\">2025 to now</span></a></li><li><a class=\"ds-row\" href=\"#\"><span>Prep teams and showcases</span><span class=\"ds-row__m\">2025 to 2026</span></a></li></ul></section></div>",
+      "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-win{background:rgba(10,14,48,.5);-webkit-backdrop-filter:blur(30px) saturate(1.7) brightness(.8);backdrop-filter:blur(30px) saturate(1.7) brightness(.8);box-shadow:0 30px 80px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.12);position:relative;border-radius:32px;padding:30px 36px 36px;color:#fff;font:500 17px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;letter-spacing:.006em;max-width:620px}.ds-win::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(160deg,rgba(255,255,255,.72),rgba(255,255,255,.14) 22%,rgba(255,255,255,.05) 55%,rgba(255,255,255,.2) 88%,rgba(255,255,255,.42));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}.ds-win__t{margin:0;font:700 34px/1.08 -apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,system-ui,sans-serif;letter-spacing:-.012em}.ds-lede{margin:18px 0 24px;font-size:19px;line-height:1.45;color:rgba(255,255,255,.78)}.ds-lede b{color:#fff;font-weight:650}.ds-rows{margin:0;padding:0;list-style:none;border-radius:16px;background:rgba(255,255,255,.06);overflow:hidden}.ds-rows li+li{border-top:1px solid rgba(255,255,255,.14)}.ds-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:baseline;padding:13px 16px;color:#fff;text-decoration:none}.ds-row:hover{background:rgba(255,255,255,.06)}.ds-row__m{color:rgba(255,255,255,.71);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}.ds-row:focus-visible{outline:2px solid #fff;outline-offset:3px;box-shadow:0 0 0 6px rgba(255,255,255,.18)}"
+    },
+    {
+      "name": "Toolbar and buttons",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "A glass capsule holding fill buttons; at most one white primary.",
+      "html": "<div class=\"ds-room\"><div class=\"ds-bar\" role=\"toolbar\"><a class=\"ds-btn ds-btn--p\" href=\"#\">Write to me</a><a class=\"ds-btn\" href=\"#\">Elite Prospects</a><a class=\"ds-btn\" href=\"#\">NCSA</a></div></div>",
+      "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-bar{background:rgba(10,14,48,.5);-webkit-backdrop-filter:blur(30px) saturate(1.7) brightness(.8);backdrop-filter:blur(30px) saturate(1.7) brightness(.8);box-shadow:0 30px 80px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.12);position:relative;display:inline-flex;gap:6px;padding:7px;border-radius:999px}.ds-bar::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(160deg,rgba(255,255,255,.72),rgba(255,255,255,.14) 22%,rgba(255,255,255,.05) 55%,rgba(255,255,255,.2) 88%,rgba(255,255,255,.42));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}.ds-btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:999px;background:rgba(255,255,255,.15);color:#fff;font:650 15px/1 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;text-decoration:none;white-space:nowrap;transition:background .2s,scale .35s cubic-bezier(.16,1,.3,1)}.ds-btn:hover{background:rgba(255,255,255,.22)}.ds-btn:active{scale:.97}.ds-btn--p,.ds-btn--p:hover{background:#fff;color:#0b1138}.ds-btn:focus-visible{outline:2px solid #fff;outline-offset:3px;box-shadow:0 0 0 6px rgba(255,255,255,.18)}"
+    },
+    {
+      "name": "Tab bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "A glass column off the window’s left edge; icons at rest, names when open; a Fill 3 bubble marks the current tab.",
+      "html": "<div class=\"ds-room\"><nav class=\"ds-tabs is-open\"><a href=\"#\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z\"/></svg><span>Home</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z\"/></svg><span>Work</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M8.4 8.5a3.6 3.6 0 1 0 7.2 0 3.6 3.6 0 1 0-7.2 0M5 20c.9-3.6 3.6-5.5 7-5.5s6.1 1.9 7 5.5\"/></svg><span>About</span></a></nav></div>",
+      "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-tabs{background:rgba(10,14,48,.5);-webkit-backdrop-filter:blur(30px) saturate(1.7) brightness(.8);backdrop-filter:blur(30px) saturate(1.7) brightness(.8);box-shadow:0 30px 80px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.12);position:relative;display:grid;gap:4px;width:188px;padding:8px;border-radius:32px}.ds-tabs::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(160deg,rgba(255,255,255,.72),rgba(255,255,255,.14) 22%,rgba(255,255,255,.05) 55%,rgba(255,255,255,.2) 88%,rgba(255,255,255,.42));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}.ds-tabs a{display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:999px;color:rgba(255,255,255,.78);font:650 16px/1 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;text-decoration:none;transition:color .2s}.ds-tabs a:hover,.ds-tabs a[aria-current]{color:#fff}.ds-tabs a[aria-current]{background:rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.32)}.ds-tabs svg{flex:none;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}"
+    },
+    {
+      "name": "Project card",
+      "kind": "card",
+      "refersTo": "card-gold",
+      "description": "A 20px card on its project’s colour, a screenshot resting on it, the name and a two-line subline at the foot.",
+      "html": "<div class=\"ds-room\"><a class=\"ds-card\" href=\"#\" style=\"--c:#cdaa6d;--ct:#1b1b1f\"><span class=\"ds-card__shot\"></span><p class=\"ds-card__t\"><b>Loquar</b><span>Co-founder and CTO</span></p></a></div>",
+      "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-card{position:relative;display:block;width:200px;aspect-ratio:4/5.1;border-radius:20px;overflow:hidden;background:var(--c);color:var(--ct);text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.16);transition:scale .45s cubic-bezier(.16,1,.3,1),box-shadow .45s cubic-bezier(.16,1,.3,1)}.ds-card:hover{scale:1.02;box-shadow:0 18px 40px rgba(0,0,0,.24)}.ds-card:active{scale:.98}.ds-card__shot{position:absolute;left:8%;right:8%;top:10%;aspect-ratio:16/10;border-radius:9px;background:linear-gradient(135deg,#f4efe4,#d9cdb3);box-shadow:0 10px 26px rgba(0,0,0,.26)}.ds-card__t{position:absolute;left:14px;right:14px;bottom:12px;margin:0;font:500 13px/1.3 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif}.ds-card__t b{display:block;font:700 18px/1.15 -apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,system-ui,sans-serif}.ds-card__t span{display:block;min-height:2.6em;margin-top:3px;opacity:.82}"
+    },
+    {
+      "name": "Facts box",
+      "kind": "custom",
+      "refersTo": "facts-box",
+      "description": "A definition grid on a 6% fill at 16px radius; labels in Ink 2, values in Ink.",
+      "html": "<div class=\"ds-room\"><dl class=\"ds-facts\"><dt>Type</dt><dd>Independent research, sole author</dd><dt>Year</dt><dd>2026</dd><dt>Tools</dt><dd>Python, SciPy</dd></dl></div>",
+      "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:10px 24px;margin:0;padding:18px 20px;border-radius:16px;background:rgba(255,255,255,.06);font:500 16px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;max-width:520px}.ds-facts dt{color:rgba(255,255,255,.78)}.ds-facts dd{margin:0;color:#fff}"
+    },
+    {
+      "name": "Enter (prominent glass)",
+      "kind": "button",
+      "refersTo": "enter",
+      "description": "The one prominent glass: a cobalt capsule with a breathing ring, shown when the name is written.",
+      "html": "<div class=\"ds-room\" style=\"padding:48px;text-align:center\"><button class=\"ds-enter\" type=\"button\">Enter<svg viewBox=\"0 0 24 24\"><path d=\"M5 12h13M13 6l6 6-6 6\"/></svg></button></div>",
+      "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-enter{position:relative;display:inline-flex;align-items:center;gap:10px;min-height:56px;padding:0 30px 0 32px;border:0;border-radius:999px;background:#2957ff;color:#fff;font:650 19px/1 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45),0 18px 44px rgba(0,0,0,.3)}.ds-enter::before{content:'';position:absolute;inset:-7px;border-radius:inherit;box-shadow:0 0 0 1.5px rgba(255,255,255,.34);animation:ds-breathe 2.6s ease-in-out infinite}.ds-enter svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.ds-enter:active{scale:.95}@keyframes ds-breathe{0%,100%{opacity:.5;scale:.985}50%{opacity:1;scale:1}}@media (prefers-reduced-motion:reduce){.ds-enter::before{animation:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "One Room, Many Windows",
+    "overview": "**Creative North Star: \"One Room, Many Windows\"**\n\nA cobalt room drawn the way Apple draws its Liquid Glass wallpapers: a navy sky falling to a violet horizon, soft out-of-focus cobalt and periwinkle forms, and a flat glass wave with one bright crest, all moving slowly. The room is one WebGL2 canvas behind everything, in two palettes that follow the system: Night (navy and violet) and Day (sky blue over a warm pale horizon). Into that room the site floats glass windows as visionOS does: one main window centred, a tab bar hanging off its left edge, a toolbar crossing its bottom edge, a small window bar under it that drags and springs home, and at 1360px and wider two side windows turned 24 degrees toward the reader. Projects open as sheets in front of the window you came from, which steps back and dims.\n\nThe front door is the hello. On the first home view of a session the room is out of focus and \"leonardo carvalho\" writes itself in lowercase script, traced from Sacramento into pen strokes and rendered as glass tubes that bend the room behind them. An Enter button in prominent cobalt glass waits beneath. Entering pulls the room into focus, flies the name into the main window's title slot where it turns to white glass, and materialises the windows in order. After that the written name is the home window's title and the only display type on the site; everything else is the system UI face, set the way visionOS sets it.\n\nThe material is glass drawn by the room itself: frost read from the blurred room, lensing at the rounded edge, a cobalt tint, a brightness cap that keeps white text legible, a bright rim, a light that follows the pointer, and a light from within when a control is pressed. Inside a window nothing is glass again: lists, cards, tables and buttons are white fills at 6, 14 and 22 percent. Motion is springs everywhere, described as Apple describes them (a response and a damping ratio) and stepped in the same frame as the glass.",
+    "keyCharacteristics": [
+      "A drawn cobalt room (Night and Day) behind every page; a still of each is the CSS background without WebGL or scripts.",
+      "Glass windows, ornaments and one prominent control, drawn by the room under the HTML; CSS glass as the fallback.",
+      "The name, written in glass, is the only display voice; the system face sets everything else in white at three levels.",
+      "Concentric radii: phone sheet 40, window 32, side window 28, card 20, list group 16, pill for every control.",
+      "One spring model (response, damping) for materialising, the tab bubble, sheets, parallax, drag and press.",
+      "Every page reads without JavaScript, calms under reduced motion and transparency, and prints on white Letter."
+    ],
+    "rules": [
+      {
+        "name": "The White on Glass Rule",
+        "body": "Text is white at 100, 78 or 71 percent and nothing else, on glass that caps its own brightness (relative luminance at most 0.22 before the rim and highlights are added), so every level keeps 4.5:1 over the night glass and the bright day room alike.",
+        "section": "colors"
+      },
+      {
+        "name": "The Room Is the Colour Rule",
+        "body": "The site's own saturated colour lives in the room and in the glass tint drawn from it. The only other colour is a project's own, on its card and its figures.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fills Not Glass Rule",
+        "body": "Inside a window, surfaces are white fills (6, 14, 22 percent), never a second layer of glass or a coloured panel.",
+        "section": "colors"
+      },
+      {
+        "name": "The Written Name Rule",
+        "body": "The only display type is the name written in glass. Headings never borrow a script, and the system face never goes above the 34px title.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Face Rule",
+        "body": "Everything that is read is the system UI face. The serif appears only as the manuscript's own title, on its card and its sheet; the experiments' titles lean in italic at 550 in the same face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Bold Is Ink Rule",
+        "body": "Inside Ink 2 text, a bold phrase is lifted to white at 650. Weight and ink rise together.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Glass Layer Rule",
+        "body": "Glass is for windows and the controls that float over them. Nothing inside a window is glass: buttons, lists and cards are fills.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Legibility Cap Rule",
+        "body": "The glass holds its own brightness down before light is added to its edges, so white text reads whatever the room is doing behind it.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do let the written name be the display voice: in glass in the hello, in white glass as the home title, and as its SVG with scripts off and in print (The Written Name Rule).",
+      "Do keep text white at 100, 78 or 71 percent on glass, and let the glass cap its own brightness (The White on Glass Rule).",
+      "Do put surfaces inside a window on the three fills (6, 14, 22 percent) and keep glass for windows and the controls that float over them (The One Glass Layer Rule).",
+      "Do keep corners concentric: 40, 32, 28, 20, 16, 12 and the capsule for controls.",
+      "Do move geometry with springs given as response and damping, in the same frame as the glass, and give reduced motion 150ms crossfades.",
+      "Do give a project card its own screen's colour, with its screenshot resting on it.",
+      "Do turn side windows toward the reader as a resting position, and swing them in from further round as they arrive.",
+      "Do keep every page readable with scripts off, under reduced transparency (CSS glass at 84% tint), in forced colours, and in print."
+    ],
+    "donts": [
+      "Don't put glass inside glass: no frosted panel, card or button inside a window.",
+      "Don't tint text or headings; colour belongs to the room, the glass and a project's card.",
+      "Don't set a heading in a script or a display face, or set the system face larger than the 34px title.",
+      "Don't tilt anything in response to hover; the side windows' angle is their place in the room, and hover answers with light and scale.",
+      "Don't fade a sheet's parent through its glass without fading its contents; the room cannot frost HTML.",
+      "Don't put a small label above a title or section heading; the title carries itself.",
+      "Don't use tween durations for window, bubble or sheet motion; those are springs."
+    ]
+  }
+}
