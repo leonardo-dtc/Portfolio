@@ -5,7 +5,7 @@
    2. The window's light follows the pointer, slowly.
    3. One reveal grammar for everything that arrives; things that arrive together cascade.
    4. A live clock for Groton, Massachusetts.
-   5. Row previews spring in at one fixed place on the right (fine pointers only).
+   5. Row previews spring in at one fixed place on the right (fine pointers and keyboard focus, two-column record only).
    6. The bottom edge's blur fades out as the page runs out, so the last lines are never blurred.
    7. The record's right column sticks by its top when it fits the screen and by its bottom when it does not.
    8. Page changes: cross-document view transitions where the browser has them, a short fade elsewhere.
@@ -28,7 +28,13 @@
       return g.createPattern(c, 'repeat');
     };
     for (var k = 0; k < 4; k++) pats.push(makeTile());
-    var size = function () { gw = grain.width = Math.max(1, innerWidth); gh = grain.height = Math.max(1, innerHeight); };
+    // the canvas's own box, not innerWidth: a classic scrollbar would otherwise squeeze the field and blur the grain.
+    // Resizing clears and reallocates the canvas, so it happens only when the box really changed.
+    var size = function () {
+      var w = Math.max(1, grain.clientWidth), h = Math.max(1, grain.clientHeight);
+      if (w !== gw) gw = grain.width = w;
+      if (h !== gh) gh = grain.height = h;
+    };
     var draw = function () {
       var ox = (Math.random() * T) | 0, oy = (Math.random() * T) | 0;
       g.setTransform(1, 0, 0, 1, -ox, -oy);
@@ -37,7 +43,9 @@
     };
     size(); draw();
     addEventListener('resize', function () { size(); draw(); }, { passive: true });
-    if (!still) (function loop() { draw(); requestAnimationFrame(loop); })();
+    // the stylesheet hides the static under reduced transparency and increased contrast; then there is nothing to redraw
+    var unseen = matchMedia('(prefers-reduced-transparency: reduce), (prefers-contrast: more)');
+    if (!still) (function loop() { if (!unseen.matches) draw(); requestAnimationFrame(loop); })();
   }
 
   // 2. the light in the window
@@ -51,6 +59,7 @@
     };
     addEventListener('pointermove', function (e) {
       var r = win.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return; // scrolled away: nothing to light
       tx = Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100));
       ty = Math.max(-20, Math.min(60, (e.clientY - r.top) / r.height * 100 - 20));
       if (!raf) raf = requestAnimationFrame(paint);
@@ -89,14 +98,17 @@
         clock.textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', weekday: 'short', day: 'numeric', month: 'short' }).format(new Date()).replace(',', ' ·');
       } catch (e) { clock.textContent = new Date().toLocaleTimeString(); }
     };
-    tick(); setInterval(tick, 20000);
+    // turn over with the minute rather than up to twenty seconds after it
+    (function next() { tick(); setTimeout(next, 60050 - Date.now() % 60000); })();
   }
 
-  // 5. row previews: one fixed place on the right
+  // 5. row previews: one fixed place on the right, beside the record, so only where the record has two columns.
+  //    The keyboard summons them too (same state for the same row); leaving the page puts them away.
   var prows = [].slice.call(document.querySelectorAll('a.row[data-peek]'));
   if (prows.length && fine) {
     var peek = document.createElement('div'); peek.className = 'peek'; peek.setAttribute('aria-hidden', 'true');
     document.body.appendChild(peek);
+    var wide = matchMedia('(min-width: 900px)');
     var shown = null, outT = 0;
     var fill = function (row) {
       var kind = row.getAttribute('data-peek'), src = row.getAttribute('data-peek-src'), tile = row.getAttribute('data-peek-tile') || '';
@@ -105,20 +117,27 @@
         '<div class="dev__screen"><img src="' + src + '" alt=""></div></div></div></div>';
       shown = src;
     };
+    var peekIn = function (row) {
+      if (!wide.matches) return;
+      clearTimeout(outT);
+      if (shown !== row.getAttribute('data-peek-src')) fill(row);
+      if (peek.classList.contains('is-on')) return;
+      peek.classList.remove('is-out');
+      void peek.offsetWidth; // start the spring from the small, blurred state
+      peek.classList.add('is-on');
+    };
+    var peekOut = function () {
+      if (!peek.classList.contains('is-on')) return;
+      peek.classList.remove('is-on'); peek.classList.add('is-out');
+      outT = setTimeout(function () { peek.classList.remove('is-out'); }, 320);
+    };
     prows.forEach(function (row) {
-      row.addEventListener('pointerenter', function () {
-        clearTimeout(outT);
-        if (shown !== row.getAttribute('data-peek-src')) fill(row);
-        if (peek.classList.contains('is-on')) return;
-        peek.classList.remove('is-out');
-        void peek.offsetWidth; // start the spring from the small, blurred state
-        peek.classList.add('is-on');
-      });
-      row.addEventListener('pointerleave', function () {
-        peek.classList.remove('is-on'); peek.classList.add('is-out');
-        outT = setTimeout(function () { peek.classList.remove('is-out'); }, 320);
-      });
+      row.addEventListener('pointerenter', function () { peekIn(row); });
+      row.addEventListener('pointerleave', function () { if (!row.matches(':focus-visible')) peekOut(); });
+      row.addEventListener('focus', function () { if (row.matches(':focus-visible')) peekIn(row); });
+      row.addEventListener('blur', function () { if (!row.matches(':hover')) peekOut(); });
     });
+    addEventListener('pagehide', function () { clearTimeout(outT); peek.classList.remove('is-on', 'is-out'); });
     // fetch the three screens while the page is idle, so the first preview is never empty
     setTimeout(function () { prows.forEach(function (row) { var im = new Image(); im.src = row.getAttribute('data-peek-src'); }); }, 1500);
   }
@@ -134,10 +153,11 @@
     edgeFade();
   }
 
-  // 7. the record's right column: by its top when it fits, by its bottom when it does not
+  // 7. the record's right column: by its top when it fits, by its bottom when it does not.
+  //    Its foot rests on the bottom edge, not under it, or the last lines of This fall would stay blurred.
   var aside = document.querySelector('.record > aside');
   if (aside) {
-    var stick = function () { aside.style.top = Math.min(48, innerHeight - aside.offsetHeight - 48) + 'px'; };
+    var stick = function () { aside.style.top = Math.min(48, innerHeight - aside.offsetHeight - Math.max(48, edge ? edge.offsetHeight : 0)) + 'px'; };
     stick();
     addEventListener('resize', stick, { passive: true });
     addEventListener('load', stick);
@@ -147,13 +167,23 @@
   var menu = document.querySelector('.menu');
   var mark = menu && menu.querySelector('.pill__mark');
   if ('onpagereveal' in window) {
-    // The menu holds its place across the change only when it is on screen; otherwise it travels with the page
+    // The menu holds its place across the change only when it is on screen on both sides; otherwise it travels with its page.
+    // The next page's script usually runs after its first frame has been taken, so the page being left judges both sides:
+    // its own scroll, and where the next page opens (a #section opens scrolled; Back returns to where that page was left,
+    // remembered per history entry). A page restored from the back-forward cache judges its own arrival as well.
+    // (A page opened at a #section drops the names in CSS for its arrival; the names are set here explicitly to leave it.)
+    var keep = function (on) { if (menu) menu.style.viewTransitionName = on ? 'menu' : 'none'; if (mark) mark.style.viewTransitionName = on ? 'pill-mark' : 'none'; };
+    var left = function (key, y) { try { if (y === undefined) return +sessionStorage.getItem('v4-y:' + key) || 0; sessionStorage.setItem('v4-y:' + key, y); } catch (err) {} return 0; };
     addEventListener('pageswap', function (e) {
+      var here = window.navigation && navigation.currentEntry, act = e.activation, there = 0;
+      if (here) left(here.key, Math.round(scrollY));
       if (!e.viewTransition || !menu) return;
+      if (act && act.entry && act.entry.url && new URL(act.entry.url).hash) there = Infinity;
+      else if (act && act.entry && act.navigationType === 'traverse') there = left(act.entry.key);
       var r = menu.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > innerHeight) { menu.style.viewTransitionName = 'none'; if (mark) mark.style.viewTransitionName = 'none'; }
+      keep(r.bottom > 0 && r.top < innerHeight && there < r.bottom + scrollY);
     });
-    addEventListener('pageshow', function () { if (menu) menu.style.viewTransitionName = ''; if (mark) mark.style.viewTransitionName = ''; });
+    addEventListener('pagereveal', function (e) { if (e.viewTransition && menu) keep(menu.getBoundingClientRect().bottom > 0); });
   } else if (!still) {
     document.addEventListener('click', function (e) {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
