@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>This site · Leonardo Carvalho</title>
+<meta name="description" content="How this site is made: a dark room with one lit window, built by hand in HTML, CSS and JavaScript with no framework and no build step.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0d0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d0d0f'/%3E%3Cpath d='M22 18h-6v28h6M42 18h6v28h-6' fill='none' stroke='%23e03a52' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preload" href="../../assets/fonts/switzer-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/css/site.css">
+<script>document.documentElement.classList.add('js', 'onpagereveal' in window ? 'vt' : 'no-vt')</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<canvas class="grain" aria-hidden="true"></canvas>
+<div class="light" aria-hidden="true"></div>
+<div class="edge" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<header class="menu">
+  <a class="menu__name" href="../../">Leonardo Carvalho</a>
+  <nav class="pill" aria-label="Pages"><a href="../../#work" aria-current="page"><span class="pill__mark" aria-hidden="true"></span>Work</a><a href="../../hockey/">Hockey</a><a href="../../about/">About</a></nav>
+  <div class="menu__right"><a href="../../resume/">Résumé<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a href="mailto:leonardo.dtc2009@gmail.com">Email<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>
+</header>
+<main id="main" class="sheet">
+  <h1 class="sheet__title">This site</h1>
+  <p class="sheet__dek">A dim room with <em>one lit window,</em> built by hand.</p>
+
+  <dl class="facts">
+    <dt>Type</dt><dd>Product. Personal website</dd>
+    <dt>Stack</dt><dd>HTML, CSS and vanilla JavaScript. No framework, no build step</dd>
+    <dt>Faces</dt><dd>Switzer for everything that reads; Instrument Serif italic for one word per headline and the experiments; JetBrains Mono for data labels and the clock. All self-hosted</dd>
+    <dt>Requests</dt><dd>No analytics, no third-party requests, no fonts from a CDN</dd>
+    <dt>Weight</dt><dd>One stylesheet of about 27 kilobytes, one script of about 6, three font files</dd>
+  </dl>
+
+  <div class="prose">
+    <h2 id="problem">Problem</h2>
+    <p>Three audiences read this site at three speeds. A hockey coach wants a recruiting profile that loads fast and prints on one page. An admissions reader wants to know what the work is and whether it holds up. A peer wants to see how it was made. So the home page curates, the résumé catalogues, and the project pages prove.</p>
+
+    <h2 id="room">The room</h2>
+    <p>The page is a dark room lit by one screen. A window with a glass title bar introduces me by name, with a glow that is cool below and warm above; the light in the frame follows the pointer. Static runs over everything the way film grain does, one grain to a pixel, and at the bottom of the screen the page softens into the dark instead of stopping at an edge. The work sits on tiles in the colours of its own screens: Loquar on gold, Genuvalens on blue with the hand-drawn layout lit like a page, OCAPEX on sand, and the aducanumab study on paper as the first page of the manuscript, because it has no screen. Then an index of the smaller things, the record under five sentences from the About page, and what the free time goes to. The numbers stay on the pages that explain them.</p>
+
+    <h2 id="system">Design system</h2>
+    <p>Every colour, size and duration is a custom property on the root. The ground is near black; the ink is one white at three strengths; hairlines are white at a tenth; one red marks the email. Type is set at a handful of sizes with weight doing the rest, and the figures in tables are tabular. Radii are 44 for tiles, 24 for windows and 12 for buttons, and one long soft shadow does for every object. Light comes from above on every frame, and the space between sections is generous on purpose.</p>
+
+    <h2 id="motion">Motion</h2>
+    <p>Everything that arrives does so the same way once: it rises and fades in over 850 milliseconds on one curve, and things that arrive together follow one another in reading order. On a tile, the screen settles to its size and an arrow turns toward you. An experiment opens when you reach for it: its description unfolds, a wash of its own colour comes up behind it, and the rest of the list dims and blurs. A row leans in while the rest of its group steps back. Between pages, the old one steps back and softens while the new one rises, and the menu stays where it is. Nothing tilts, and none of it moves under the reduced-motion preference.</p>
+
+    <h2 id="implementation">Implementation</h2>
+    <p>Static files in a directory tree. Images are WebP derivatives with width and height set and lazy loading below the fold; the iPhone and Mac window are drawn in CSS and the screens inside them are screenshots of the real pages. Every page reads without JavaScript, carries print styles, and is marked noindex while it is a comparison build.</p>
+
+    <h2 id="state">Current state</h2>
+    <p>September 2026. Photographs of the rink, the viola and an OCAPEX performance will join when they exist.</p>
+  </div>
+
+  <nav class="pager" aria-label="More work">
+    <ul class="rows">
+      <li><a class="row" href="../freecode/"><span class="row__t">FreeCode Juniors, free coding classes</span><span class="row__m">Previous</span></a></li>
+      <li><a class="row" href="../../"><span class="row__t">Everything else</span><span class="row__m">Home</span></a></li>
+    </ul>
+  </nav>
+</main>
+<footer class="sheet-foot"><div>
+  <p><a href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a>. Transcript, hockey film and coach references are available on request.</p>
+  <p>Leonardo Carvalho, Groton School, Class of 2028. Updated September 2026.</p>
+</div></footer>
+<script src="../../assets/js/site.js" defer></script>
+</body>
+</html>

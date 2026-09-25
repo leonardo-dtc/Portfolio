@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Genuvalens · Leonardo Carvalho</title>
+<meta name="description" content="Genuvalens: an assist-as-needed knee exoskeleton for ACL-reconstruction rehabilitation, designed and simulated by Leonardo Carvalho with guidance from Georgia Tech’s EPIC Lab. Model results, not patient outcomes.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0d0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d0d0f'/%3E%3Cpath d='M22 18h-6v28h6M42 18h6v28h-6' fill='none' stroke='%23e03a52' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preload" href="../../assets/fonts/switzer-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/css/site.css">
+<script>document.documentElement.classList.add('js', 'onpagereveal' in window ? 'vt' : 'no-vt')</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<canvas class="grain" aria-hidden="true"></canvas>
+<div class="light" aria-hidden="true"></div>
+<div class="edge" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<header class="menu">
+  <a class="menu__name" href="../../">Leonardo Carvalho</a>
+  <nav class="pill" aria-label="Pages"><a href="../../#work" aria-current="page"><span class="pill__mark" aria-hidden="true"></span>Work</a><a href="../../hockey/">Hockey</a><a href="../../about/">About</a></nav>
+  <div class="menu__right"><a href="../../resume/">Résumé<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a><a href="mailto:leonardo.dtc2009@gmail.com">Email<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>
+</header>
+<main id="main" class="sheet">
+  <h1 class="sheet__title">Genuvalens</h1>
+  <p class="sheet__dek">An assist-as-needed knee exoskeleton for ACL-reconstruction rehabilitation, designed and <em>simulated.</em></p>
+
+  <dl class="facts">
+    <dt>Type</dt><dd>Individual design and simulation project</dd>
+    <dt>When</dt><dd>Summer 2026; presented August 23, 2026</dd>
+    <dt>Guidance</dt><dd>Dr. Aaron Young and doctoral student Dongho Park, EPIC Lab, Georgia Tech</dd>
+    <dt>Deliverables</dt><dd>Seven-page IEEE-format report, five figures and two tables; a Colab simulation; a hand-drawn hardware layout</dd>
+    <dt>Tools</dt><dd>Python, NumPy, SciPy, scikit-learn, Google Colab</dd>
+  </dl>
+  <p class="note">What this is. A design study and a simplified simulation with a prescribed recovery curve. The numbers are model results, not patient outcomes. No hardware was built or tested, and clinical validation remains future work.</p>
+
+  <div class="prose">
+    <h2 id="abstract">Abstract</h2>
+    <p>Quadriceps weakness is the longest-lasting deficit after anterior cruciate ligament (ACL) reconstruction and the one most correlated with re-injury on return to sport. Genuvalens is a simulated single-joint knee exoskeleton that provides extension assistance in proportion to continuously measured loading asymmetry between the two legs, so that the help tapers as the reconstructed leg recovers.</p>
+    <p>The design is an electric quasi-direct-drive actuator with a series elastic element that doubles as a torque sensor, an absolute knee-angle encoder and pressure-sensing insoles under both feet. The controller is impedance control about a time-dependent equilibrium, with an assistance term proportional to the measured asymmetry and three independent safety layers. A logistic-regression classifier reads knee angle and angular velocity and predicts the probability that the athlete is in the rise phase of a squat; a confidence gate turns that probability into the gain set used at each time step. I simulated a two-leg squat-to-stand movement over five repetitions under three conditions. Adaptive assistance reached 98.0% of the target extension at a peak of 3.6 N·m of athlete torque, against 87.2% and 9.6 N·m with no support and 113.9% and 23.3 N·m with fixed support, and its assistance fell 11.8% across the repetitions with no scheduled decline in the code.</p>
+
+    <h2 id="question">Question</h2>
+    <p>Reconstruction repairs the ligament. It does not repair the quadriceps inhibition around it, a protective neurological response that suppresses the muscle through rehabilitation and beyond. A passive brace limits movement without adding any torque. A fixed-assistance device can fill the torque gap, but the amount that is right at three months is over-assistance at six, and an athlete who is helped too much does not rebuild the strength that protects the knee.</p>
+    <p>So the design question is how much to help, and when to take the help away. I play three sports that all load the legs, ACL tears are common in every one of them, and rehabilitation is the part I wanted to work on. The name comes from genu, the knee.</p>
+
+    <h2 id="method">Method</h2>
+    <p><strong>Plant.</strong> A one-degree-of-freedom knee integrated with forward Euler at 0.01 s, with a range of motion from 0 to 80 degrees of extension. Only the reconstructed leg’s torque deficit is a scripted input, a capacity ramp from 50% to 70% across the five repetitions anchored to published quadriceps symmetry after ACL reconstruction. Knee angle, velocity, loading state and assistance are all computed by the simulation each time step.</p>
+    <p><strong>Sensing.</strong> An absolute encoder on the hinge axis gives the knee angle, modeled with Gaussian noise of 0.015 rad. There is no velocity sensor: angular velocity is differentiated from the angle after a 14-point moving-average filter, to avoid derivative kick. Pressure-sensing insoles give left and right ground reaction forces, from which an asymmetry estimator computes the reconstructed leg’s effective capacity.</p>
+    <p><strong>Control.</strong> The torque command is an impedance law, proportional and derivative gains on the angle and velocity error to a target trajectory, plus an assistance term equal to a gain times the measured asymmetry. A logistic-regression classifier trained offline on the simulator’s own output (three conditions, five repetitions, 200 steps, 3,000 samples, a 75/25 stratified split) outputs the probability of rising; an 85% confidence gate selects one of two gain sets, a softer set for a confident rise and a stiffer set otherwise, because stiffer is safer. Three safety layers act independently: the command is clipped to a maximum torque, the device is extension-only, and a mechanical hard stop bounds the range. The actuator rating, 15 N·m continuous and 40 N·m peak, was set from the simulation’s own torque history.</p>
+    <p><strong>Experiments.</strong> Three assistance conditions, none, fixed and adaptive, ran through the same plant with the same random seed. A separate sensor study ran the adaptive controller with ideal, unfiltered and filtered angle sensing to measure what the filter is worth rather than assert it.</p>
+
+    <h2 id="figures">Figures</h2>
+    <figure>
+      <div class="tile tile--page" style="--tile:#1E63A8"><div class="tile__box"><div class="page page--photo"><img src="../../assets/img/genuvalens-hardware-1000.webp" srcset="../../assets/img/genuvalens-hardware-1000.webp 1000w, ../../assets/img/genuvalens-hardware-1600.webp 1600w" sizes="(min-width: 700px) 600px, 100vw" width="1000" height="496" loading="lazy" alt="Hand-drawn sketch of a leg wearing the exoskeleton, with ten numbered callouts: thigh cuff, shank cuff, sagittal knee hinge, electric quasi-direct-drive motor with a gearbox of ten to one or less, spring deflection, absolute encoder, mechanical hard stop, quick-release disengage, battery and pressure-sensing insoles"></div></div></div>
+      <figcaption>Figure 1. Sketched component layout in a neutral standing pose, drawn by hand. Ten callouts: thigh cuff, shank cuff, sagittal knee hinge, quasi-direct-drive motor with gearbox, spring deflection, absolute encoder, mechanical hard stop, quick-release disengage, battery, pressure-sensing insoles.</figcaption>
+    </figure>
+    <figure>
+      <div class="tile tile--page" style="--tile:#1E63A8"><div class="tile__box"><div class="page"><img src="../../assets/img/genuvalens-control-1000.webp" srcset="../../assets/img/genuvalens-control-1000.webp 1000w, ../../assets/img/genuvalens-control-1800.webp 1800w" sizes="(min-width: 700px) 560px, 100vw" width="1000" height="518" loading="lazy" alt="Block diagram of the Genuvalens control architecture: sensing feeds signal processing, then a logistic-regression classifier and an 85 percent confidence gate choose a gain set for the impedance control law, which passes through a safety layer to the actuator and the one-degree-of-freedom plant; an asymmetry estimator and a trajectory generator feed the control law, and a dashed offline-training block produces the classifier"></div></div></div>
+      <figcaption>Figure 2. Control architecture. Filtered angle and velocity enter the control law and the classifier; the classifier’s probability passes an 85% confidence gate that selects the gain set for that time step. The hard stop, the torque ceiling and the stiff default are three independent safety layers. Two feedback paths close the loop: the joint state each time step, and the previous step’s delivered torque into the asymmetry estimator. The dashed block is the offline training.</figcaption>
+    </figure>
+    <figure>
+      <div class="tile tile--page" style="--tile:#1E63A8"><div class="tile__box"><div class="page"><img src="../../assets/img/genuvalens-capacity-800.webp" srcset="../../assets/img/genuvalens-capacity-800.webp 800w, ../../assets/img/genuvalens-capacity-1200.webp 1200w" sizes="(min-width: 700px) 560px, 100vw" width="800" height="426" loading="lazy" alt="Line chart of quadriceps limb symmetry index from three to six months after ACL reconstruction: the simulated capacity input rises from 50 to 70 percent in five steps, between a published closed-kinetic-chain curve from 47 to 62 percent and an early open-kinetic-chain curve from 76 to 91 percent, with the 90 percent return-to-sport threshold marked"></div></div></div>
+      <figcaption>Figure 3. The single scripted input against published quadriceps symmetry after reconstruction. The simulated 50% to 70% ramp sits inside the closed-kinetic-chain band; five repetitions compressed into three months is not a clinically plausible rate.</figcaption>
+    </figure>
+    <figure>
+      <div class="tile tile--page" style="--tile:#1E63A8"><div class="tile__box"><div class="page"><img src="../../assets/img/genuvalens-deficit-800.webp" srcset="../../assets/img/genuvalens-deficit-800.webp 800w, ../../assets/img/genuvalens-deficit-1200.webp 1200w" sizes="(min-width: 700px) 560px, 100vw" width="800" height="440" loading="lazy" alt="Line chart of quadriceps deficit remaining from three to six months under conventional and accelerated rehabilitation, with a flat band marking what a fixed-assist device keeps delivering, labeled under-assisted above it and over-assisted below"></div></div></div>
+      <figcaption>Figure 4. Why fixed assistance is the wrong shape: the deficit falls over months while a fixed device keeps delivering the same torque, under-assisting early and over-assisting late.</figcaption>
+    </figure>
+    <figure>
+      <div class="tile tile--page" style="--tile:#1E63A8"><div class="tile__box"><div class="page page--tall"><img src="../../assets/img/genuvalens-results-800.webp" srcset="../../assets/img/genuvalens-results-800.webp 800w, ../../assets/img/genuvalens-results-1200.webp 1200w" sizes="(min-width: 700px) 464px, 100vw" width="800" height="1104" loading="lazy" alt="Four stacked plots over a two-second repetition: knee angle for no support, fixed support, adaptive and the target; assistive torque, with the fixed schedule as a smooth arc and the adaptive trace wandering around ten newton metres; the stiffness gain switching between 60 and 90; and classifier confidence against the 0.85 and 0.15 gate lines"></div></div></div>
+      <figcaption>Figure 5. First repetition, all three conditions. (a) Knee angle against target. (b) Assistive torque: the fixed schedule against the adaptive trace, whose wander is the residual velocity noise. (c) Stiffness gain selected by the gate. (d) Classifier confidence with the 0.85 and 0.15 boundaries.</figcaption>
+    </figure>
+
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <caption>Table 1. Main comparison, averaged over five repetitions per condition.</caption>
+      <thead><tr><th>Condition</th><th class="n">Extension completed</th><th class="n">Time to complete</th><th class="n">Loading symmetry</th><th class="n">Peak athlete torque</th><th class="n">Assist taper</th></tr></thead>
+      <tbody>
+        <tr><th>No support</th><td class="n">87.2%</td><td class="n">2.00 s</td><td class="n">74.8%</td><td class="n">9.6 N·m</td><td class="n">0.0%</td></tr>
+        <tr><th>Fixed support</th><td class="n">113.9%</td><td class="n">0.81 s</td><td class="n">85.8%</td><td class="n">23.3 N·m</td><td class="n">0.0%</td></tr>
+        <tr><th>Adaptive (Genuvalens)</th><td class="n">98.0%</td><td class="n">1.30 s</td><td class="n">78.6%</td><td class="n">3.6 N·m</td><td class="n">11.8%</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="tbl-wrap">
+<table class="tbl">
+      <caption>Table 2. Standalone sensor study, adaptive controller. Values above 100% are overshoot of the model’s target.</caption>
+      <thead><tr><th>Sensor condition</th><th class="n">Extension completed</th><th class="n">Loading symmetry</th></tr></thead>
+      <tbody>
+        <tr><th>Ideal, noise-free</th><td class="n">97.3%</td><td class="n">77.7%</td></tr>
+        <tr><th>Unfiltered, σ = 0.015 rad</th><td class="n">104.5%</td><td class="n">79.6%</td></tr>
+        <tr><th>Filtered, N = 14</th><td class="n">97.6%</td><td class="n">78.6%</td></tr>
+      </tbody>
+    </table>
+</div>
+
+    <h2 id="findings">Findings</h2>
+    <ul class="list">
+      <li><strong>Without support the limb plateaus at 87.2%.</strong> That is steady-state error: a proportional-derivative controller under a constant disturbance, gravity, settles where the proportional action balances the load.</li>
+      <li><strong>Fixed support overshoots to 113.9% at the highest athlete torque.</strong> A schedule sized for a limb doing 50% of the work keeps applying the same effort when the limb can do 70%, and the athlete works against it.</li>
+      <li><strong>The taper emerges; it is not programmed.</strong> Delivered assistance raises the effective capacity, higher capacity lowers the measured asymmetry, and lower asymmetry lowers the assistance term. Across five repetitions that loop reduced the delivered torque by 11.8%.</li>
+      <li><strong>Loading symmetry alone is the wrong target.</strong> The fixed scheme scores higher on symmetry, 85.8% against 78.6%, because it overdoses: a limb doing less work looks more symmetric with the healthy one. The purpose of the exercise is for the reconstructed limb to take more of the load as it recovers.</li>
+      <li><strong>Quieting the controller costs the adaptivity.</strong> Filtering the angle brings overshoot from 104.5% to 97.6%, but velocity noise still leaks through. Sweeping the filter window and derivative gain cuts torque jitter to 27% to 42% of baseline while extension drifts to 100.6% and the taper collapses from 11.8% to 7.2%. Undertuning buys silence at the expense of the behavior the device exists for.</li>
+      <li><strong>The gate is a rise detector in practice.</strong> Confident hold fires on fewer than 0.2% of time steps, because late rise and the top of the squat are not linearly separable in angle and velocity. It does no harm, since the uncertain state selects the same gains as a confident hold would, but it is a place to improve.</li>
+    </ul>
+
+    <h2 id="limitations">Limitations</h2>
+    <p>The plant is a unit-inertia pendulum, so every torque above is in model units and does not correspond to the body-scaled moments of a real knee in a squat, which would be an order of magnitude larger. The 15 and 40 N·m rating has no clinical meaning until the model is re-derived on a normalized biomechanical plant. The model has a single sagittal joint and does not capture the frontal-plane motion that dominates real ACL injury mechanics. The athlete’s capacity is a preset input rather than something the device measures.</p>
+    <p>The classifier was trained on the same simulator’s output, with labels defined by time within the rise, in a space where rise and hold are already nearly separable, so its 86.6% deployed accuracy is an easier result than it appears. Less athlete torque is not automatically a better rehabilitation outcome; the objective has to be stated explicitly, for example completing the repetition at the highest effort the athlete can safely sustain, and lower modeled effort alone does not establish better rehabilitation. Hardware testing and clinical validation remain future work.</p>
+
+    <h2 id="references">References</h2>
+    <p>Report. Genuvalens: An Assist-as-Needed Knee Exoskeleton for ACL-Reconstruction Rehabilitation. Leonardo Carvalho, IEEE format, August 2026. Presented August 23, 2026.</p>
+    <ol class="refs">
+      <li>Herzog MM, et al. Trends in incidence of ACL reconstruction and concomitant procedures among commercially insured individuals in the United States, 2002-2014. Sports Health, 2018;10(6):523-531. <a class="link" href="https://doi.org/10.1177/1941738118803616" rel="noopener">doi:10.1177/1941738118803616</a></li>
+      <li>Barfod KW, et al. Knee extensor strength and hop test performance following anterior cruciate ligament reconstruction. The Knee, 2019;26(1):149-154. <a class="link" href="https://doi.org/10.1016/j.knee.2018.11.004" rel="noopener">doi:10.1016/j.knee.2018.11.004</a></li>
+      <li>Schilaty ND, et al. Arthrogenic muscle inhibition manifests in thigh musculature motor unit characteristics after anterior cruciate ligament injury. European Journal of Sport Science, 2023;23(5):840-850. <a class="link" href="https://doi.org/10.1080/17461391.2022.2056520" rel="noopener">doi:10.1080/17461391.2022.2056520</a></li>
+      <li>Grindem H, et al. Simple decision rules can reduce reinjury risk by 84% after ACL reconstruction: the Delaware-Oslo ACL cohort study. British Journal of Sports Medicine, 2016;50(13):804-808. <a class="link" href="https://doi.org/10.1136/bjsports-2016-096031" rel="noopener">doi:10.1136/bjsports-2016-096031</a></li>
+      <li>Forelli F, et al. Evaluation of muscle strength and graft laxity with early open kinetic chain exercise after ACL reconstruction: a cohort study. Orthopaedic Journal of Sports Medicine, 2023;11(6). <a class="link" href="https://doi.org/10.1177/23259671231177594" rel="noopener">doi:10.1177/23259671231177594</a></li>
+      <li>Maggioni S, et al. Assessing walking ability using a robotic gait trainer: opportunities and limitations of assist-as-needed control in spinal cord injury. Journal of NeuroEngineering and Rehabilitation, 2023;20:121. <a class="link" href="https://doi.org/10.1186/s12984-023-01226-4" rel="noopener">doi:10.1186/s12984-023-01226-4</a></li>
+      <li>Young AJ, Ferris DP. State of the art and future directions for lower limb robotic exoskeletons. IEEE Transactions on Neural Systems and Rehabilitation Engineering, 2017;25(2):171-182. <a class="link" href="https://doi.org/10.1109/TNSRE.2016.2521160" rel="noopener">doi:10.1109/TNSRE.2016.2521160</a></li>
+      <li>Brunst C, et al. Return-to-sport quadriceps strength symmetry impacts 5-year cartilage integrity after anterior cruciate ligament reconstruction. Journal of Orthopaedic Research, 2022;40(1):285-294. <a class="link" href="https://doi.org/10.1002/jor.25029" rel="noopener">doi:10.1002/jor.25029</a></li>
+    </ol>
+  </div>
+
+  <nav class="pager" aria-label="More work">
+    <ul class="rows">
+      <li><a class="row" href="../aducanumab/"><span class="row__t">Aducanumab’s post-marketing record</span><span class="row__m">Previous</span></a></li>
+      <li><a class="row" href="../loquar/"><span class="row__t">Loquar, a language-learning web app</span><span class="row__m">Next</span></a></li>
+      <li><a class="row" href="../../"><span class="row__t">Everything else</span><span class="row__m">Home</span></a></li>
+    </ul>
+  </nav>
+</main>
+<footer class="sheet-foot"><div>
+  <p><a href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a>. Transcript, hockey film and coach references are available on request.</p>
+  <p>Leonardo Carvalho, Groton School, Class of 2028. Updated September 2026.</p>
+</div></footer>
+<script src="../../assets/js/site.js" defer></script>
+</body>
+</html>

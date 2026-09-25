@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leonardo Carvalho</title>
+<meta name="description" content="Leonardo Carvalho, goaltender at Groton School, Class of 2028. Research on drug safety and rehabilitation, a student music nonprofit, and software built with friends.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0d0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d0d0f'/%3E%3Cpath d='M22 18h-6v28h6M42 18h6v28h-6' fill='none' stroke='%23e03a52' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/switzer-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/site.css">
+<script>document.documentElement.classList.add('js', 'onpagereveal' in window ? 'vt' : 'no-vt')</script>
+</head>
+<body class="home">
+<!--
+THESIS: One person in a dim room, lit by one screen. The hero is a lit window that introduces him by name, with one plain line about what he does and his portrait; the record follows as four colour tiles, an index of experiments that open when you reach for them, five sentences over dated rows, and interests with verdicts. It refuses the hero slogan, the stat wall on the landing, the buttons and the card grid, and it borrows nothing from any other edition of this site.
+OWN-WORLD: Ground #0d0d0f under animated static at 10%, one grain per pixel; a progressive blur along the bottom edge of the screen; ink #f2f2f2 with two alphas as the second and third voice; hairlines at 10% white; one red #e03a52 for micro-marks; the paper tile #f2efe8 and the screen colours (Loquar gold, OCAPEX sand, Genuvalens blue). Switzer for everything that reads, Instrument Serif italic for one word in a page title, the paper's title and the experiments, JetBrains Mono for the clock. Radii 44 / 24 / 16 / 12 / pill. One long soft shadow, plus the window's own. Light from above on every frame.
+STORY: A coach, an admissions reader or a friend meets him by name first, sees the work on its own colours, opens the small things he makes for fun, and clicks through to the profile, the report or the résumé entry. Numbers wait on the pages that explain them.
+FIRST VIEWPORT: 1440x900. Menu: name left, frosted pill (Work · Hockey · About) centre with a glowing mark over the active tab, Résumé and Email right. The window, 1088 wide, glass bar with three glowing dots: "Leonardo Carvalho" at 96px with the three-layer glow; under it one line of introduction at 20px, its first sentence in full ink; under that his portrait beside the status block (Now, From) and the live Groton clock. No numbers.
+FORM: The terminal grown up, candidate 5 of 7, seed 03ba0b98; re-directed 2026-09-21 on the user's brief for emotion and authenticity, with his rule that editions stay separate; refined 2026-09-22 (name hero, no stats on the landing, Alta's settle on the tiles, experiments that open on hover, Neiden's bottom edge, page transitions, more air).
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+-->
+<a class="skip" href="#main">Skip to content</a>
+<canvas class="grain" aria-hidden="true"></canvas>
+<div class="light" aria-hidden="true"></div>
+<div class="edge" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<header class="menu">
+  <a class="menu__name" href="./">Leonardo Carvalho</a>
+  <nav class="pill" aria-label="Pages">
+    <a href="#work" aria-current="page"><span class="pill__mark" aria-hidden="true"></span>Work</a>
+    <a href="hockey/">Hockey</a>
+    <a href="about/">About</a>
+  </nav>
+  <div class="menu__right">
+    <a href="resume/">Résumé<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+    <a href="mailto:leonardo.dtc2009@gmail.com">Email<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero" aria-label="Introduction">
+    <div class="win">
+      <div class="win__main">
+        <div class="win__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="win__body">
+          <a class="hero__scroll" href="#work" aria-label="Scroll to the work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M6 14l6 6 6-6"/></svg></a>
+          <h1 class="hero__h rv">Leonardo Carvalho</h1>
+          <p class="hero__intro rv"><span>Goaltender at Groton School, Class of 2028.</span> Outside the rink I do research on drug safety and rehabilitation, run a student music nonprofit and build software with friends.</p>
+          <div class="hero__status">
+            <picture class="rv"><source srcset="assets/img/leonardo-square-320.avif" type="image/avif"><img class="hero__face" src="assets/img/leonardo-square-320.webp" width="72" height="72" alt="Leonardo, in a suit for the school photo"></picture>
+            <div class="stat rv"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><b>Now</b><span>Fifth Form at Groton, wearing #1</span></div>
+            <div class="stat rv"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><b>From</b><span>Beijing, Ontario, South Florida</span></div>
+          </div>
+          <p class="hero__clock mono" data-clock>Groton, Massachusetts<b>Eastern time</b></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="work" aria-labelledby="work-h">
+    <h2 class="sec__h rv" id="work-h">Work<small>Four things, on the colours of their own screens.</small></h2>
+    <div class="tiles">
+      <a class="tile tile--paper rv" href="work/aducanumab/">
+        <div class="tile__box">
+          <div class="paper" aria-hidden="true">
+            <p class="paper__title">Amyloid-related imaging abnormalities dominate aducanumab’s complete post-marketing record</p>
+            <p class="paper__sub">A comparative pharmacovigilance analysis of FDA adverse-event reports</p>
+            <p class="paper__by">Leonardo Carvalho<span> · Submitted, 2026</span></p>
+            <p class="paper__abs"><b>Abstract.</b> Aducanumab (Aduhelm) was the first Alzheimer’s therapy approved for the disease’s pathology rather than its symptoms. It received accelerated approval in 2021 over the advice of the FDA’s own advisory committee, and Biogen withdrew it in 2024. I analyzed every adverse-event case filed for it in the FDA’s public dashboard,</p>
+          </div>
+          <span class="tile__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+        </div>
+        <p class="tile__cap"><b>Aducanumab</b>A pharmacovigilance analysis of every FDA report filed for the drug, against lecanemab and donanemab. Manuscript submitted.</p>
+      </a>
+      <a class="tile rv" style="--tile:#CDAA6D" href="work/loquar/">
+        <div class="tile__box"><div class="dev dev--mac" style="max-width:620px"><div class="dev__body"><div class="dev__bar" aria-hidden="true"><i></i><i></i><i></i></div><div class="dev__screen"><img src="assets/img/loquar-openworld-960.webp" srcset="assets/img/loquar-openworld-640.webp 640w, assets/img/loquar-openworld-960.webp 960w, assets/img/loquar-openworld-1440.webp 1440w" sizes="(min-width: 900px) 40vw, 90vw" width="960" height="600" alt="Loquar’s landing page in a Mac window: photographed city scenes fanned into a spiral beside the headline “A world of experiences. You choose which ones.”" loading="lazy"></div></div></div><span class="tile__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
+        <p class="tile__cap"><b>Loquar</b>A language-learning web app that teaches through conversation in an open world. Co-founder and CTO. In development.</p>
+      </a>
+      <a class="tile rv" style="--tile:#1E63A8" href="work/genuvalens/">
+        <div class="tile__box"><div class="page page--photo" style="max-width:640px"><img src="assets/img/genuvalens-hardware-crop-960.webp" srcset="assets/img/genuvalens-hardware-crop-640.webp 640w, assets/img/genuvalens-hardware-crop-960.webp 960w" sizes="(min-width: 900px) 40vw, 90vw" width="960" height="640" alt="Leonardo’s hand-drawn layout of the knee exoskeleton on lined paper, with ten numbered callouts" loading="lazy"></div><span class="tile__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
+        <p class="tile__cap"><b>Genuvalens</b>An assist-as-needed knee exoskeleton for ACL rehabilitation, designed and simulated with guidance from Georgia Tech’s EPIC Lab.</p>
+      </a>
+      <a class="tile rv" style="--tile:#E4C4A2" href="work/ocapex/">
+        <div class="tile__box"><div class="dev dev--phone"><div class="dev__body"><div class="dev__screen"><img src="assets/img/ocapex-phone-780.webp" srcset="assets/img/ocapex-phone-390.webp 390w, assets/img/ocapex-phone-780.webp 780w" sizes="240px" width="780" height="1688" alt="ocapex.com on an iPhone: a violinist’s hands under the words The Sound of Giving" loading="lazy"></div></div></div><span class="tile__go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
+        <p class="tile__cap"><b>OCAPEX</b>A student-led music nonprofit I founded in 2022 and run: more than seventy musicians playing where the audience cannot come to the hall.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="sec" id="experiments" aria-labelledby="exp-h">
+    <h2 class="sec__h rv" id="exp-h">Experiments<small>The smaller things, made for a class, a quartet or the fun of it.</small></h2>
+    <ol class="exp__list rv" reversed>
+      <li style="--c:#4FB477"><a href="resume/#class-projects"><span class="exp__t"><em>snake, minesweeper and a dinosaur runner</em><span class="exp__d"><span><small>Rebuilt from scratch in Python and Java, AP Computer Science, 2026</small></span></span></span><span class="ix">08</span></a></li>
+      <li style="--c:#8B6CF0"><a href="resume/#class-projects"><span class="exp__t"><em>a cover with its own music video</em><span class="exp__d"><span><small>A Calculus BC final, 2026</small></span></span></span><span class="ix">07</span></a></li>
+      <li style="--c:#1E63A8"><a href="resume/#class-projects"><span class="exp__t"><em>ten sports, one composite index</em><span class="exp__d"><span><small>Five categories, AP Statistics, 2026</small></span></span></span><span class="ix">06</span></a></li>
+      <li style="--c:#CDAA6D"><a href="resume/#amora"><span class="exp__t"><em>vivaldi’s summer, arranged for amora</em><span class="exp__d"><span><small>One season per player; mine is Summer, 2026</small></span></span></span><span class="ix">05</span></a></li>
+      <li style="--c:#F2EFE8"><a href="resume/#amora"><span class="exp__t"><em>the phantom of the opera, for string quartet</em><span class="exp__d"><span><small>An arrangement for four classmates, 2026</small></span></span></span><span class="ix">04</span></a></li>
+      <li style="--c:#E4C4A2"><a href="work/daedalus/"><span class="exp__t"><em>a labyrinth that changes while you are in it</em><span class="exp__d"><span><small>Daedalus, a design document with two endings, in development</small></span></span></span><span class="ix">03</span></a></li>
+      <li style="--c:#1E63A8"><a href="resume/#robotics"><span class="exp__t"><em>frc and ftc robots, in java</em><span class="exp__d"><span><small>Programmer on both teams; the FRC team reached the state championship, 2021 to 2025</small></span></span></span><span class="ix">02</span></a></li>
+      <li style="--c:#CDAA6D"><a href="resume/#robotics"><span class="exp__t"><em>an american rocketry challenge entry</em><span class="exp__d"><span><small>The team did not qualify for nationals, 2025</small></span></span></span><span class="ix">01</span></a></li>
+    </ol>
+  </section>
+
+  <section class="record" aria-label="The record">
+    <div class="record__col">
+      <section class="group" aria-labelledby="g-hockey">
+        <h2 class="group__lead rv" id="g-hockey">In goal I rely on reading the play early, and on positioning, reflexes and skating rather than size.</h2>
+        <ul class="rows" data-stagger="40">
+          <li class="rv"><a class="row" href="hockey/"><span class="row__t">Groton School Boys’ Varsity, goaltender</span><span class="row__m">2025 to now</span></a></li>
+          <li class="rv"><a class="row" href="resume/#prep"><span class="row__t">Prep teams, showcases and camps</span><span class="row__m">2025 to 2026</span></a></li>
+          <li class="rv"><a class="row" href="resume/#teams"><span class="row__t">Team history, Ontario to Florida</span><span class="row__m">2016 to 2024</span></a></li>
+          <li class="rv"><a class="row" href="resume/#crew"><span class="row__t">Groton Varsity Crew and JV Soccer</span><span class="row__m">2026</span></a></li>
+        </ul>
+      </section>
+      <section class="group" aria-labelledby="g-music">
+        <h2 class="group__lead rv" id="g-music">On the viola, the part I like is being inside a story and telling it from my own perspective.</h2>
+        <ul class="rows" data-stagger="40">
+          <li class="rv"><a class="row" href="resume/#orchestra"><span class="row__t">Groton School Chamber Orchestra, principal violist</span><span class="row__m">2025 to now</span></a></li>
+          <li class="rv"><a class="row" href="resume/#carnegie"><span class="row__t">Carnegie Hall, Weill Recital Hall, violin</span><span class="row__m">November 2025</span></a></li>
+          <li class="rv"><a class="row" href="resume/#amora"><span class="row__t">Amora string quartet, viola</span><span class="row__m">2026 to now</span></a></li>
+          <li class="rv"><a class="row" href="resume/#competitions"><span class="row__t">Competitions and festivals</span><span class="row__m">2019 to 2025</span></a></li>
+          <li class="rv"><a class="row" href="resume/#fyo"><span class="row__t">Florida Youth Orchestra</span><span class="row__m">2020 to 2024</span></a></li>
+        </ul>
+      </section>
+      <section class="group" aria-labelledby="g-research">
+        <h2 class="group__lead rv" id="g-research">In research, the question I keep coming back to is how the body fails and how it recovers.</h2>
+        <ul class="rows" data-stagger="40">
+          <li class="rv"><a class="row" href="work/aducanumab/"><span class="row__t">Aducanumab’s post-marketing record</span><span class="row__m">2026</span></a></li>
+          <li class="rv"><a class="row" href="work/genuvalens/" data-peek="tablet" data-peek-src="assets/img/genuvalens-control-1000.webp" data-peek-tile="#1E63A8"><span class="row__t">Genuvalens, a simulated knee exoskeleton</span><span class="row__m">Summer 2026</span></a></li>
+        </ul>
+      </section>
+      <section class="group" aria-labelledby="g-community">
+        <h2 class="group__lead rv" id="g-community">Most of what I make outside class is shared.</h2>
+        <ul class="rows" data-stagger="40">
+          <li class="rv"><a class="row" href="work/ocapex/" data-peek="phone" data-peek-src="assets/img/ocapex-phone-390.webp" data-peek-tile="#E4C4A2"><span class="row__t">OCAPEX, a student-led music nonprofit</span><span class="row__m">2022 to now</span></a></li>
+          <li class="rv"><a class="row" href="work/freecode/"><span class="row__t">FreeCode Juniors, free coding classes</span><span class="row__m">Since June 2026</span></a></li>
+          <li class="rv"><a class="row" href="resume/#imagina"><span class="row__t">Imagina Children’s Foundation, volunteer</span><span class="row__m">2025 to now</span></a></li>
+          <li class="rv"><a class="row" href="resume/#congressional"><span class="row__t">Congressional Award, Bronze submitted</span><span class="row__m">In progress</span></a></li>
+        </ul>
+      </section>
+      <section class="group" aria-labelledby="g-build">
+        <h2 class="group__lead rv" id="g-build">Loquar and Daedalus are the projects with friends, a language app and a game, and both are still being built. This site I build alone.</h2>
+        <ul class="rows" data-stagger="40">
+          <li class="rv"><a class="row" href="work/loquar/" data-peek="mac" data-peek-src="assets/img/loquar-openworld-640.webp" data-peek-tile="#CDAA6D"><span class="row__t">Loquar, a language-learning web app</span><span class="row__m">In development</span></a></li>
+          <li class="rv"><a class="row" href="work/daedalus/"><span class="row__t">Daedalus, a cooperative survival-horror game</span><span class="row__m">In development</span></a></li>
+          <li class="rv"><a class="row" href="work/this-site/"><span class="row__t">This site</span><span class="row__m">2026</span></a></li>
+          <li class="rv"><a class="row" href="resume/#robotics"><span class="row__t">Robotics and rocketry</span><span class="row__m">2021 to 2025</span></a></li>
+          <li class="rv"><a class="row" href="resume/#class-projects"><span class="row__t">Class projects</span><span class="row__m">2025 to 2026</span></a></li>
+        </ul>
+      </section>
+    </div>
+    <aside class="record__col" aria-labelledby="likes-h">
+      <h2 class="sec__h rv" id="likes-h">Interests<small>What the free time goes to.</small></h2>
+      <ul class="likes" data-stagger="60">
+        <li class="rv"><b>Mandarin</b><span>at home, in Loquar, and with friends as a secret language</span></li>
+        <li class="rv"><b>Games</b><span>with friends, online or in person</span></li>
+        <li class="rv"><b>A movie</b><span>or a show, while I eat</span></li>
+        <li class="rv"><b>Arranging</b><span>Vivaldi’s Summer for the quartet; Phantom before it</span></li>
+        <li class="rv"><b>Open mics</b><span>at Groton, with voice lessons on the side</span></li>
+        <li class="rv"><b>Three sports</b><span>hockey, crew and soccer; all of them load the legs</span></li>
+      </ul>
+      <h2 class="sec__h now__h rv" id="now-h">This fall</h2>
+      <ul class="now" aria-labelledby="now-h">
+        <li><b>School</b>Multivariable Calculus, Organic Chemistry and Advanced Physics: Mechanics.</li>
+        <li><b>Rink</b>Goaltender for the 2026-27 varsity season. JV soccer this fall.</li>
+        <li><b>Music</b>Principal violist in the Chamber Orchestra. Arranging Summer from The Four Seasons for Amora.</li>
+        <li><b>Build</b>Loquar in development, no release date. Congressional Award Silver in progress; the participation minimum is reached in February 2027.</li>
+      </ul>
+    </aside>
+  </section>
+
+  <section class="sec contact" id="contact" aria-labelledby="contact-h">
+    <h2 class="group__lead rv" id="contact-h">For recruiting, project questions or a conversation, write to me at <a class="email" href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a>.</h2>
+    <p class="muted rv">Correspondence goes via a parent. Transcript, hockey film and coach references are available on request.</p>
+    <ul class="rows" data-stagger="40" style="max-width: 640px">
+      <li class="rv"><a class="row" href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" rel="noopener"><span class="row__t">Elite Prospects</span><span class="row__m">eliteprospects.com</span></a></li>
+      <li class="rv"><a class="row" href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" rel="noopener"><span class="row__t">NCSA recruiting profile</span><span class="row__m">ncsasports.org</span></a></li>
+      <li class="rv"><a class="row" href="https://ocapex.com" rel="noopener"><span class="row__t">OCAPEX</span><span class="row__m">ocapex.com</span></a></li>
+    </ul>
+  </section>
+
+  <footer class="close">
+    <div class="close__mark" aria-hidden="true">Leonardo</div>
+    <div class="close__line"><span>Leonardo Carvalho, Groton School, Class of 2028.</span><span>Updated September 2026, between the rink and rehearsal.</span></div>
+  </footer>
+
+</main>
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

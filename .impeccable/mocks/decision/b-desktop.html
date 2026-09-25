@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Comp B</title><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@500,600,700,800&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap"><style>@font-face{font-family:"JetBrains Mono";src:url(/v2/assets/fonts/jbmono-normal-latin.woff2) format("woff2");font-weight:100 800}</style>
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:#090909;color:#fff;font-family:Switzer,system-ui,sans-serif;position:relative;-webkit-font-smoothing:antialiased}
+.wall{position:absolute;inset:0;background:url(/v4/assets/img/edition-v1-1440.webp) center/cover;filter:blur(2px) brightness(.55) saturate(1.3)}
+.wall::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.35),rgba(120,20,30,.18))}
+.menubar{position:absolute;top:0;left:0;right:0;height:40px;background:rgba(0,0,0,.35);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:14px}
+.menubar b{font-weight:600} .menubar .m span{margin-left:22px;color:rgba(255,255,255,.9)} .menubar .r span{margin-left:18px}
+.icon{position:absolute;width:96px;text-align:center;font-size:14px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.icon .g{width:76px;height:76px;margin:0 auto 8px;border-radius:17px;box-shadow:0 4px 4px rgba(0,0,0,.12),0 1px 6px rgba(0,0,0,.08),0 10px 24px rgba(0,0,0,.25);background:#ddd;overflow:hidden;display:grid;place-items:center;font-weight:700;font-size:30px;letter-spacing:-.04em}
+.icon img{width:100%;height:100%;object-fit:cover}
+.folder{background:linear-gradient(#5aa7ff,#2b7be5)!important}
+.win{position:absolute;left:300px;top:150px;width:840px;height:560px;border-radius:24px;background:#151517;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 40px 80px rgba(0,0,0,.6);overflow:hidden}
+.win .t{height:48px;background:#242426;display:flex;align-items:center;gap:8px;padding:0 16px;font-size:13px;color:rgba(255,255,255,.6)} .win .t .dots{display:flex;gap:8px;margin-right:12px} .win .t i{width:12px;height:12px;border-radius:50%;display:block}
+.win iframe{width:1680px;height:1024px;transform:scale(.5);transform-origin:0 0;border:0}
+.dock{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:14px;padding:12px 14px;border-radius:24px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(30px);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.dock div{width:60px;height:60px;border-radius:15px;display:grid;place-items:center;font-size:12px;font-weight:600;color:#111;box-shadow:0 1px 4px rgba(0,0,0,.16)}
+.switch{position:absolute;left:24px;bottom:30px;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(10px);font-size:14px;box-shadow:0 10px 24px rgba(0,0,0,.12)}
+.switch i{width:38px;height:22px;border-radius:11px;background:rgba(255,255,255,.25);position:relative} .switch i::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+.puck{position:absolute;left:1120px;top:560px;width:34px;height:14px;border-radius:50%;background:#111;box-shadow:0 6px 10px rgba(0,0,0,.5),inset 0 -3px 0 rgba(255,255,255,.08)}
+</style></head><body>
+<div class="wall"></div>
+<div class="menubar"><div class="m"><b>Leonardo Carvalho</b><span>Hockey</span><span>Research</span><span>Music</span><span>Build</span></div><div class="r"><span>Résumé</span><span>Email</span><span>Mon 21 Sep&nbsp; 10:07 PM</span></div></div>
+<div class="icon" style="left:40px;top:70px"><div class="g"><img src="/v4/assets/img/loquar-ipad-800.webp" alt=""></div>Loquar</div>
+<div class="icon" style="left:170px;top:190px"><div class="g"><img src="/v4/assets/img/genuvalens-hardware-1000.webp" alt="" style="object-position:left"></div>Genuvalens</div>
+<div class="icon" style="left:60px;top:330px"><div class="g" style="background:#1d1d1f;color:#e6303f;font-family:'JetBrains Mono',monospace;font-size:26px">&gt;_</div>Terminal</div>
+<div class="icon" style="left:190px;top:470px"><div class="g folder"></div>Games</div>
+<div class="icon" style="left:50px;top:600px"><div class="g" style="background:#fff;color:#1d1d1f;font-size:13px;line-height:1.1;padding:10px;text-align:left;font-weight:500">Amyloid-related imaging…</div>Aducanumab</div>
+<div class="icon" style="left:1200px;top:80px"><div class="g"><img src="/v4/assets/img/ocapex-site-720.webp" alt=""></div>OCAPEX</div>
+<div class="icon" style="left:1310px;top:210px"><div class="g folder"></div>Hockey</div>
+<div class="icon" style="left:1190px;top:350px"><div class="g"><img src="/v4/assets/img/leonardo-square-320.webp" alt=""></div>About me</div>
+<div class="icon" style="left:1320px;top:480px"><div class="g" style="background:#f5f5f7;color:#1d1d1f;font-size:13px;line-height:1.15;padding:10px;font-weight:500">Now: Fifth Form, #1</div>Now</div>
+<div class="icon" style="left:1210px;top:620px"><div class="g folder"></div>Music</div>
+<div class="win"><div class="t"><span class="dots"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>Terminal — leonardo@carvalho — ./portfolio</div><iframe src="/" title="v1 live"></iframe></div>
+<div class="puck"></div>
+<div class="switch">Release the puck?<i></i></div>
+<div class="dock"><div style="background:#a4133b;color:#fff">Hockey</div><div style="background:#1e63a8;color:#fff">Research</div><div style="background:#d9a441">Music</div><div style="background:#cdaa6d">Build</div><div style="background:#e4c4a2">Mail</div></div>
+</body></html>

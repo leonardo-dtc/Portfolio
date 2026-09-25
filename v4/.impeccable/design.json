@@ -1,0 +1,544 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-22T00:00:00Z",
+  "title": "Design System: Leonardo Carvalho, fourth edition",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "oklch(16.0% 0.004 286)",
+        "tonalRamp": [
+          "oklch(15% 0.004 286)",
+          "oklch(25% 0.004 286)",
+          "oklch(35% 0.004 286)",
+          "oklch(45% 0.004 286)",
+          "oklch(55% 0.004 286)",
+          "oklch(65% 0.004 286)",
+          "oklch(80% 0.004 286)",
+          "oklch(95% 0.004 286)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(96.1% 0.0 90)",
+        "tonalRamp": [
+          "oklch(15% 0.0 90)",
+          "oklch(25% 0.0 90)",
+          "oklch(35% 0.0 90)",
+          "oklch(45% 0.0 90)",
+          "oklch(55% 0.0 90)",
+          "oklch(65% 0.0 90)",
+          "oklch(80% 0.0 90)",
+          "oklch(95% 0.0 90)"
+        ]
+      },
+      "red": {
+        "role": "primary",
+        "displayName": "Signal Red",
+        "canonical": "oklch(60.5% 0.201 18)",
+        "tonalRamp": [
+          "oklch(15% 0.201 18)",
+          "oklch(25% 0.201 18)",
+          "oklch(35% 0.201 18)",
+          "oklch(45% 0.201 18)",
+          "oklch(55% 0.201 18)",
+          "oklch(65% 0.201 18)",
+          "oklch(80% 0.201 18)",
+          "oklch(95% 0.201 18)"
+        ]
+      },
+      "paper": {
+        "role": "secondary",
+        "displayName": "Paper",
+        "canonical": "oklch(95.3% 0.01 87)",
+        "tonalRamp": [
+          "oklch(15% 0.01 87)",
+          "oklch(25% 0.01 87)",
+          "oklch(35% 0.01 87)",
+          "oklch(45% 0.01 87)",
+          "oklch(55% 0.01 87)",
+          "oklch(65% 0.01 87)",
+          "oklch(80% 0.01 87)",
+          "oklch(95% 0.01 87)"
+        ]
+      },
+      "loquar-gold": {
+        "role": "secondary",
+        "displayName": "Loquar Gold",
+        "canonical": "oklch(75.6% 0.089 81)",
+        "tonalRamp": [
+          "oklch(15% 0.089 81)",
+          "oklch(25% 0.089 81)",
+          "oklch(35% 0.089 81)",
+          "oklch(45% 0.089 81)",
+          "oklch(55% 0.089 81)",
+          "oklch(65% 0.089 81)",
+          "oklch(80% 0.089 81)",
+          "oklch(95% 0.089 81)"
+        ]
+      },
+      "genuvalens-blue": {
+        "role": "secondary",
+        "displayName": "Genuvalens Blue",
+        "canonical": "oklch(49.4% 0.129 252)",
+        "tonalRamp": [
+          "oklch(15% 0.129 252)",
+          "oklch(25% 0.129 252)",
+          "oklch(35% 0.129 252)",
+          "oklch(45% 0.129 252)",
+          "oklch(55% 0.129 252)",
+          "oklch(65% 0.129 252)",
+          "oklch(80% 0.129 252)",
+          "oklch(95% 0.129 252)"
+        ]
+      },
+      "ocapex-sand": {
+        "role": "secondary",
+        "displayName": "OCAPEX Sand",
+        "canonical": "oklch(83.9% 0.058 69)",
+        "tonalRamp": [
+          "oklch(15% 0.058 69)",
+          "oklch(25% 0.058 69)",
+          "oklch(35% 0.058 69)",
+          "oklch(45% 0.058 69)",
+          "oklch(55% 0.058 69)",
+          "oklch(65% 0.058 69)",
+          "oklch(80% 0.058 69)",
+          "oklch(95% 0.058 69)"
+        ]
+      },
+      "paper-ink": {
+        "role": "secondary",
+        "displayName": "Paper Ink",
+        "canonical": "oklch(23.2% 0.004 286)",
+        "tonalRamp": [
+          "oklch(15% 0.004 286)",
+          "oklch(25% 0.004 286)",
+          "oklch(35% 0.004 286)",
+          "oklch(45% 0.004 286)",
+          "oklch(55% 0.004 286)",
+          "oklch(65% 0.004 286)",
+          "oklch(80% 0.004 286)",
+          "oklch(95% 0.004 286)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2 (64%)",
+        "canonical": "rgba(242, 242, 242, .64)",
+        "note": "Alpha of ink over the ground; the second text voice."
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink 3 (56%)",
+        "canonical": "rgba(242, 242, 242, .56)",
+        "note": "Alpha of ink over the ground; the third text voice: the clock place name, the scroll arrow, footers, index numerals at rest."
+      },
+      "hair": {
+        "role": "neutral",
+        "displayName": "Hairline (10%)",
+        "canonical": "rgba(242, 242, 242, .1)",
+        "note": "Every divider. Rises to 25% under prefers-contrast: more."
+      },
+      "well": {
+        "role": "neutral",
+        "displayName": "Well (6%)",
+        "canonical": "rgba(242, 242, 242, .06)",
+        "note": "Row hover wash, interest wells, default tile ground."
+      },
+      "glass": {
+        "role": "neutral",
+        "displayName": "Glass",
+        "canonical": "rgba(16, 16, 16, .72)",
+        "note": "The window frame fill under a 20px backdrop blur; #141416 when transparency is reduced."
+      },
+      "frame-line": {
+        "role": "neutral",
+        "displayName": "Frame Line (28%)",
+        "canonical": "rgba(242, 242, 242, .28)"
+      },
+      "dot-red": {
+        "role": "neutral",
+        "displayName": "Window Dot Red",
+        "canonical": "#f46b5d"
+      },
+      "dot-amber": {
+        "role": "neutral",
+        "displayName": "Window Dot Amber",
+        "canonical": "#f9bd4e"
+      },
+      "dot-green": {
+        "role": "neutral",
+        "displayName": "Window Dot Green",
+        "canonical": "#57c353"
+      },
+      "device-body": {
+        "role": "neutral",
+        "displayName": "Device Body",
+        "canonical": "#1d1d1f",
+        "note": "Drawn Mac body. The Mac bar dots use Apple values #ff5f57 / #febc2e / #28c840, a second set distinct from the window dots; recorded as built."
+      },
+      "device-bar": {
+        "role": "neutral",
+        "displayName": "Device Bar",
+        "canonical": "#2b2b2e"
+      },
+      "screen-black": {
+        "role": "neutral",
+        "displayName": "Screen Black",
+        "canonical": "#000000"
+      },
+      "wash-green": {
+        "role": "secondary",
+        "displayName": "Wash Green",
+        "canonical": "#4FB477",
+        "note": "Light only: mixed at 36% and 14% into the wash behind an opened experiment. Never a fill."
+      },
+      "wash-violet": {
+        "role": "secondary",
+        "displayName": "Wash Violet",
+        "canonical": "#8B6CF0",
+        "note": "Light only: mixed at 36% and 14% into the wash behind an opened experiment. Never a fill."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "His name in the window, with the three-layer glow. Home only."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "\"Leonardo\" at the close. Home only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Every sheet title, with one italic word."
+      },
+      "accent-italic": {
+        "displayName": "Accent Italic",
+        "purpose": "The one Instrument Serif word inside a Switzer title or dek."
+      },
+      "index-italic": {
+        "displayName": "Index Italic",
+        "purpose": "The experiments' titles, lowercase."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Home section titles; sheet prose h2 at 20px."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "The five first-person sentences heading record groups and the contact sentence."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose, rows, captions. 640px measure on sheets."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Dates, facts, tables, references, footers, menu."
+      },
+      "clock": {
+        "displayName": "Clock",
+        "purpose": "The live Groton time; the only use of the mono."
+      },
+      "intro": {
+        "displayName": "Intro",
+        "purpose": "The line under the name: 20px (17px on small screens) in Ink 2 with its first sentence in Ink. Home only."
+      },
+      "paper-title": {
+        "displayName": "Paper title",
+        "purpose": "The manuscript title on the paper tile, serif italic in paper ink."
+      }
+    },
+    "shadows": [
+      {
+        "name": "object",
+        "value": "0 54px 60px rgba(0, 0, 0, .35)",
+        "purpose": "The one shadow of the system (--shadow): under drawn devices, the white page, row previews."
+      },
+      {
+        "name": "window-ring",
+        "value": "inset 0 0 8px rgba(0, 0, 0, .4), 0 0 60px rgba(0, 0, 0, .2), 0 30px 120px rgba(0, 0, 0, .8)",
+        "purpose": "The window's outer ring. Not reused."
+      },
+      {
+        "name": "window-frame",
+        "value": "inset 0 0 10px rgba(0, 0, 0, .1), 0 0 12px rgba(0, 0, 0, .4)",
+        "purpose": "The window's inner glass frame. Not reused."
+      },
+      {
+        "name": "text-glow",
+        "value": "text-shadow: 0 5px 10px rgba(0, 87, 255, .15), 0 -5px 10px rgba(255, 90, 0, .10), 0 -5px 25px rgba(255, 255, 255, .30)",
+        "purpose": "The display name only (--glow)."
+      },
+      {
+        "name": "title-halo",
+        "value": "text-shadow: 0 -2px 10px rgba(255, 255, 255, .12)",
+        "purpose": "Sheet titles and the wordmark."
+      },
+      {
+        "name": "dot-glow",
+        "value": "0 0 20px 2px <dot colour>; active tab bar 0 2px 25px 2px #fff",
+        "purpose": "The window's three dots and the current tab's bar."
+      },
+      {
+        "name": "lift",
+        "value": "0 16px 32px rgba(0, 0, 0, .35)",
+        "purpose": "An interest well while lifted under the pointer, and only then."
+      },
+      {
+        "name": "small-lifts",
+        "value": "tile arrow 0 8px 20px rgba(0, 0, 0, .25); pill 0 10px 25px rgba(0, 0, 0, .15)",
+        "purpose": "Small objects over a surface; recorded as built, not a scale to extend."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.22, 1, .36, 1)",
+        "purpose": "Site ease for geometry: reveals, settles, leans, openings, page changes."
+      },
+      {
+        "name": "t",
+        "value": "300ms",
+        "purpose": "Nudges, colour and underline changes."
+      },
+      {
+        "name": "reveal",
+        "value": "translate 0 28px (rows 12px, wells 16px) to none over 850ms var(--ease); opacity 0 to 1 over 600ms; items entering together cascade in reading order by data-stagger (100ms default, rows 40ms, wells 60ms, capped 600ms); once at threshold .18; transitions released after arrival (.rv-done); if the script never runs, everything shows after 2.5s",
+        "purpose": "One grammar for everything that arrives on the home page."
+      },
+      {
+        "name": "tile-settle",
+        "value": "screen scale(1.05) to 1 over 800ms var(--ease); arrow button opacity 0 to 1, scale(.8) to 1, arrow rotate(45deg) to 0, 450ms",
+        "purpose": "Tile hover and focus on fine pointers (altastudio.framer.website's image settle)."
+      },
+      {
+        "name": "experiment-open",
+        "value": "description grid-template-rows 0fr to 1fr, 500ms var(--ease); text opacity 350ms and translateY(-6px) to 0; wash opacity 0 to 1 and scale(.985) to 1, 500ms; siblings opacity .16 and blur(3px), 300ms",
+        "purpose": "Experiments open on hover and keyboard focus; the row grows downward only."
+      },
+      {
+        "name": "row-lean",
+        "value": "title translateX(6px) 450ms var(--ease); date to Ink 300ms; group siblings opacity .55 400ms; press scale(.985)",
+        "purpose": "Record rows, pagers and profile rows."
+      },
+      {
+        "name": "preview-spring",
+        "value": "from translateY(-100%) scale(.2) blur(15px) radius 99px to translateY(-50%) scale(1) blur(0) radius 24px over 750ms cubic-bezier(.22, .61, .36, 1); leaves with opacity 0 and blur(5px) over 300ms; the record aside steps back to .14 and blur(4px)",
+        "purpose": "Row previews at one fixed place (hasque.com's spring-in)."
+      },
+      {
+        "name": "well-lift",
+        "value": "translateY(-2px) with the lift shadow, 450ms var(--ease)",
+        "purpose": "Interest well hover."
+      },
+      {
+        "name": "window-light",
+        "value": "--mx/--my eased toward pointer at 6% per frame; --my clamped -20% to 60%; returns to 50%/0% on leave",
+        "purpose": "The light in the window follows the pointer."
+      },
+      {
+        "name": "static",
+        "value": "canvas at one grain per CSS pixel, redrawn every frame from four 512px noise tiles at random offsets; opacity .1; normal blend",
+        "purpose": "The grain over every page (hasque.com's measure)."
+      },
+      {
+        "name": "bottom-edge",
+        "value": "eight backdrop layers blur .3/1.3/2.8/5/7.8/11.3/15.3/20px with saturate(.85) each, masks starting 8.75% lower each, over a fade to the ground (clear at the top, 55% at 45%, 92% at the foot); opacity = remaining scroll / 160px",
+        "purpose": "The progressive blur at the foot of the screen (neiden.framer.media's measure, desaturating instead of saturating so colour sinks into the dark)."
+      },
+      {
+        "name": "page-change",
+        "value": "old root: opacity 1 to 0 and scale(.985) blur(6px), 340ms; new root: opacity 0 to 1, 340ms, and translateY(12px) to 0, 520ms; menu group 520ms; pill-mark group 560ms; fallback: body opacity 0 over 220ms before leaving, main rises in over 480ms",
+        "purpose": "Cross-document view transitions with a fade fallback."
+      },
+      {
+        "name": "bob",
+        "value": "2.4s ease-in-out infinite; translateY 0 to 8px; opacity .5 to 1",
+        "purpose": "The scroll arrow in the window."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "reveal, static refresh, bob, pointer light, settle, unfold and lean transitions, preview spring, smooth scrolling and page changes all off",
+        "purpose": "prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "structural",
+        "value": "900px"
+      },
+      {
+        "name": "menu",
+        "value": "700px"
+      },
+      {
+        "name": "interests",
+        "value": "520px"
+      },
+      {
+        "name": "facts",
+        "value": "480px"
+      }
+    ],
+    "drift": [
+      "Two small lifts (the tile arrow 0 8px 20px .25 and the pill 0 10px 25px .15) sit outside the declared object-shadow-plus-window scale.",
+      "Radii 12px, 16px and 24px are written as literals in several rules rather than through --r-btn / --r-win; the active tab bar uses a one-off 2px radius.",
+      "Two traffic-light palettes: the window dots (#f46b5d #f9bd4e #57c353) and the drawn Mac bar (#ff5f57 #febc2e #28c840).",
+      "Inline pixel overrides in markup: max-width 620px / 640px on tile devices, margin-top 8px on the hockey facts, max-width 640px on the contact rows."
+    ]
+  },
+  "components": [
+    {
+      "name": "Menu pill",
+      "kind": "nav",
+      "refersTo": "pill-nav",
+      "description": "The frosted capsule at the top of every page; the current tab carries its own mark element, which a page change slides to the new tab.",
+      "html": "<nav class=\"ds-pill\" aria-label=\"Pages\"><a href=\"#\">Work</a><a href=\"#\" aria-current=\"page\"><span class=\"ds-pill__mark\" aria-hidden=\"true\"></span>Hockey</a><a href=\"#\">About</a></nav>",
+      "css": ".ds-pill{position:relative;display:inline-flex;gap:2px;padding:4px;border-radius:999px;background:rgba(242,242,242,.05);border:1px solid rgba(242,242,242,.1);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);box-shadow:0 10px 25px rgba(0,0,0,.15);font:500 14px/1.45 Switzer,system-ui,sans-serif;letter-spacing:-.01em}.ds-pill a{position:relative;padding:9px 18px;border-radius:999px;color:rgba(242,242,242,.64);text-decoration:none;transition:color 300ms ease,background-color 300ms ease}.ds-pill a:hover{color:#f2f2f2}.ds-pill a:focus-visible{outline:2px solid #f2f2f2;outline-offset:3px}.ds-pill a{isolation:isolate}.ds-pill a[aria-current]{color:#f2f2f2}.ds-pill__mark{position:absolute;inset:0;z-index:-1;border-radius:999px;background:rgba(242,242,242,.08);view-transition-name:pill-mark}.ds-pill__mark::before{content:\"\";position:absolute;top:-7px;left:50%;width:24px;height:3px;margin-left:-12px;border-radius:2px;background:#f2f2f2;box-shadow:0 2px 25px 2px #fff}"
+    },
+    {
+      "name": "The window",
+      "kind": "custom",
+      "refersTo": "window",
+      "description": "The glass-barred hero frame that introduces him: his name with the three-layer glow, then one plain line about what he does.",
+      "html": "<div class=\"ds-win\"><div class=\"ds-win__main\"><div class=\"ds-win__bar\" aria-hidden=\"true\"><i></i><i></i><i></i></div><div class=\"ds-win__body\"><h1 class=\"ds-win__h\">Leonardo Carvalho</h1><p class=\"ds-win__intro\"><span>Goaltender at Groton School, Class of 2028.</span> Outside the rink I do research on drug safety and rehabilitation, run a student music nonprofit and build software with friends.</p></div></div></div>",
+      "css": ".ds-win{--mx:50%;--my:0%;position:relative;border-radius:24px;padding:8px;background:radial-gradient(circle farthest-side at var(--mx) var(--my),rgba(242,242,242,.18),transparent 62%);box-shadow:inset 0 0 8px rgba(0,0,0,.4),0 0 60px rgba(0,0,0,.2),0 30px 120px rgba(0,0,0,.8)}.ds-win__main{border-radius:16px;border:1px solid rgba(242,242,242,.28);background:rgba(16,16,16,.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:inset 0 0 10px rgba(0,0,0,.1),0 0 12px rgba(0,0,0,.4);overflow:hidden}.ds-win__bar{position:relative;height:40px;display:flex;align-items:center;gap:8px;padding-left:16px;background:linear-gradient(to right,rgba(242,242,242,.1),rgba(242,242,242,.5) 50%,rgba(242,242,242,.1))}.ds-win__bar::after{content:\"\";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(to right,transparent 5%,rgba(255,255,255,.8) 35%,#fff 50%,rgba(255,255,255,.8) 65%,transparent 95%);opacity:.55}.ds-win__bar i{width:12px;height:12px;border-radius:50%;background:#f46b5d;box-shadow:0 0 20px 2px #f46b5d}.ds-win__bar i:nth-child(2){background:#f9bd4e;box-shadow:0 0 20px 2px #f9bd4e}.ds-win__bar i:nth-child(3){background:#57c353;box-shadow:0 0 20px 2px #57c353}.ds-win__body{padding:64px 48px 48px}.ds-win__h{margin:0;font:600 clamp(44px,6.6vw,96px)/.94 Switzer,system-ui,sans-serif;letter-spacing:-.035em;color:#f2f2f2;max-width:12em;text-wrap:balance;text-shadow:0 5px 10px rgba(0,87,255,.15),0 -5px 10px rgba(255,90,0,.10),0 -5px 25px rgba(255,255,255,.30)}.ds-win__h em{font:400 1.04em \"Instrument Serif\",\"Iowan Old Style\",Georgia,serif;font-style:italic;letter-spacing:-.005em;background:linear-gradient(to bottom,#f2f2f2 55%,rgba(242,242,242,.28) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 22px rgba(255,255,255,.28))}.ds-win__intro{margin:28px 0 0;max-width:32em;font:400 clamp(17px,1.45vw,20px)/1.5 Switzer,system-ui,sans-serif;letter-spacing:-.012em;color:rgba(242,242,242,.64);text-wrap:pretty}.ds-win__intro span{color:#f2f2f2}"
+    },
+    {
+      "name": "Work tile (Mac)",
+      "kind": "card",
+      "refersTo": "tile-loquar",
+      "description": "A 44px-radius tile in the product colour holding a drawn Mac window; on hover the screen settles from 1.05 to 1 and a corner arrow grows in and turns.",
+      "html": "<a class=\"ds-tile\" href=\"#\" style=\"--tile:#CDAA6D\"><div class=\"ds-tile__box\"><div class=\"ds-dev\"><div class=\"ds-dev__bar\" aria-hidden=\"true\"><i></i><i></i><i></i></div><div class=\"ds-dev__screen\"></div></div><span class=\"ds-go\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\"><path d=\"M7 17 17 7M8 7h9v9\"/></svg></span></div><p class=\"ds-tile__cap\"><b>Loquar</b>A language-learning web app that teaches through conversation in an open world.</p></a>",
+      "css": ".ds-tile{--tile:rgba(242,242,242,.06);display:block;text-decoration:none;color:inherit;max-width:520px}.ds-tile__box{position:relative;aspect-ratio:4/5;border-radius:44px;background:var(--tile);overflow:hidden;display:grid;place-items:center;padding:48px;}.ds-tile__box>:not(.ds-go){transform:scale(1.05);transition:transform 800ms cubic-bezier(.22,1,.36,1)}.ds-tile:hover .ds-tile__box>:not(.ds-go),.ds-tile:focus-visible .ds-tile__box>:not(.ds-go){transform:scale(1)}.ds-go{position:absolute;right:20px;bottom:20px;width:32px;height:32px;display:grid;place-items:center;border-radius:12px;background:#0d0d0f;color:#f2f2f2;box-shadow:0 8px 20px rgba(0,0,0,.25);opacity:0;transform:scale(.8);transition:opacity 450ms cubic-bezier(.22,1,.36,1),transform 450ms cubic-bezier(.22,1,.36,1)}.ds-go svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(45deg);transition:transform 450ms cubic-bezier(.22,1,.36,1)}.ds-tile:hover .ds-go,.ds-tile:focus-visible .ds-go{opacity:1;transform:none}.ds-tile:hover .ds-go svg,.ds-tile:focus-visible .ds-go svg{transform:none}.ds-tile:focus-visible{outline:none}.ds-tile:focus-visible .ds-tile__box{outline:2px solid #f2f2f2;outline-offset:4px}.ds-dev{width:100%;border-radius:12px;overflow:hidden;background:#1d1d1f;box-shadow:0 54px 60px rgba(0,0,0,.35)}.ds-dev__bar{height:32px;display:flex;align-items:center;gap:8px;padding-left:14px;background:#2b2b2e}.ds-dev__bar i{width:11px;height:11px;border-radius:50%;background:#ff5f57}.ds-dev__bar i:nth-child(2){background:#febc2e}.ds-dev__bar i:nth-child(3){background:#28c840}.ds-dev__screen{aspect-ratio:16/10;background:#0a0a0a}.ds-tile__cap{margin:20px 0 0;font:400 16px/1.5 Switzer,system-ui,sans-serif;letter-spacing:-.01em;color:rgba(242,242,242,.64)}.ds-tile__cap b{color:#f2f2f2;font-weight:600;margin-right:10px}"
+    },
+    {
+      "name": "Paper tile",
+      "kind": "card",
+      "refersTo": "tile-paper",
+      "description": "The tile for work with no screen: the manuscript's first page on paper, no label above it; serif title, subtitle, byline with its status, and an abstract that fades out at the foot.",
+      "html": "<a class=\"ds-paper\" href=\"#\"><div class=\"ds-paper__box\"><div class=\"ds-paper__page\" aria-hidden=\"true\"><p class=\"ds-paper__t\">Amyloid-related imaging abnormalities dominate aducanumab’s complete post-marketing record</p><p class=\"ds-paper__sub\">A comparative pharmacovigilance analysis of FDA adverse-event reports</p><p class=\"ds-paper__by\">Leonardo Carvalho<span> · Submitted, 2026</span></p><p class=\"ds-paper__abs\"><b>Abstract.</b> Aducanumab (Aduhelm) was the first Alzheimer’s therapy approved for the disease’s pathology rather than its symptoms.</p></div></div></a>",
+      "css": ".ds-paper{display:block;text-decoration:none;max-width:480px}.ds-paper__box{position:relative;aspect-ratio:4/5;border-radius:44px;background:#f2efe8;color:#1d1d1f;padding:40px;overflow:hidden}.ds-paper:focus-visible{outline:none}.ds-paper:focus-visible .ds-paper__box{outline:2px solid #f2f2f2;outline-offset:4px}.ds-paper__page{display:flex;flex-direction:column;height:100%;font-family:Switzer,system-ui,sans-serif}.ds-paper__t{margin:0;font:400 clamp(24px,2.1vw,30px)/1.1 \"Instrument Serif\",\"Iowan Old Style\",Georgia,serif;font-style:italic;letter-spacing:-.01em;text-wrap:balance}.ds-paper__sub{margin:14px 0 0;font-size:14px;line-height:1.4;color:rgba(29,29,31,.66)}.ds-paper__by{margin:18px 0 0;font-size:13px;font-weight:600}.ds-paper__by span{font-weight:500;color:rgba(29,29,31,.66)}.ds-paper__abs{margin:auto 0 0;padding-top:24px;max-height:9.6em;overflow:hidden;font-size:13px;line-height:1.55;color:rgba(29,29,31,.72);-webkit-mask-image:linear-gradient(#000 40%,transparent);mask-image:linear-gradient(#000 40%,transparent)}"
+    },
+    {
+      "name": "Experiments index",
+      "kind": "custom",
+      "refersTo": "index-italic",
+      "description": "A hairline list of serif italic titles with right-hand numerals. Hovering or focusing one opens it: the description unfolds, a wash of its own colour comes up, and the rest dim and blur.",
+      "html": "<ol class=\"ds-exp\" reversed><li style=\"--c:#8B6CF0\"><a href=\"#\"><span class=\"ds-exp__t\"><em>a cover with its own music video</em><span class=\"ds-exp__d\"><span><small>A Calculus BC final, 2026</small></span></span></span><span class=\"ds-exp__ix\">02</span></a></li><li style=\"--c:#1E63A8\"><a href=\"#\"><span class=\"ds-exp__t\"><em>ten sports, one composite index</em><span class=\"ds-exp__d\"><span><small>Five categories, AP Statistics, 2026</small></span></span></span><span class=\"ds-exp__ix\">01</span></a></li></ol>",
+      "css": ".ds-exp{margin:0;padding:0 24px;list-style:none;border-top:1px solid rgba(242,242,242,.1);color:#f2f2f2}.ds-exp li{border-bottom:1px solid rgba(242,242,242,.1);transition:opacity 300ms ease,filter 300ms ease,border-color 300ms ease}.ds-exp:has(li:hover) li:not(:hover){opacity:.16;filter:blur(3px)}.ds-exp li:hover{border-bottom-color:transparent}.ds-exp a{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:24px;padding:26px 0;color:inherit;text-decoration:none}.ds-exp a::before{content:\"\";position:absolute;inset:0 -24px;z-index:-1;border-radius:24px;background:radial-gradient(120% 160% at 0% 0%,color-mix(in srgb,var(--c,#f2f2f2) 36%,transparent),transparent 62%),radial-gradient(80% 120% at 100% 100%,color-mix(in srgb,var(--c,#f2f2f2) 14%,transparent),transparent 70%),rgba(242,242,242,.035);opacity:0;transform:scale(.985);transition:opacity 500ms cubic-bezier(.22,1,.36,1),transform 500ms cubic-bezier(.22,1,.36,1)}.ds-exp li:hover a::before,.ds-exp a:focus-visible::before{opacity:1;transform:none}.ds-exp a:focus-visible{outline:none}.ds-exp a:focus-visible::before{box-shadow:0 0 0 2px #f2f2f2}.ds-exp em{display:block;font:400 clamp(28px,3.4vw,48px)/1.05 \"Instrument Serif\",\"Iowan Old Style\",Georgia,serif;font-style:italic;letter-spacing:-.02em}.ds-exp__d{display:grid;grid-template-rows:0fr;transition:grid-template-rows 500ms cubic-bezier(.22,1,.36,1)}.ds-exp__d>span{min-height:0;overflow:hidden}.ds-exp small{display:block;padding:12px 0 8px;font:400 16px/1.5 Switzer,system-ui,sans-serif;color:rgba(242,242,242,.64);letter-spacing:-.01em;opacity:0;transform:translateY(-6px);transition:opacity 350ms ease,transform 500ms cubic-bezier(.22,1,.36,1)}.ds-exp li:hover .ds-exp__d,.ds-exp a:focus-visible .ds-exp__d{grid-template-rows:1fr}.ds-exp li:hover small,.ds-exp a:focus-visible small{opacity:1;transform:none}.ds-exp__ix{font:400 20px/1 \"Instrument Serif\",Georgia,serif;font-style:italic;color:rgba(242,242,242,.56);font-variant-numeric:tabular-nums;transition:color 300ms ease}.ds-exp li:hover .ds-exp__ix{color:#f2f2f2}"
+    },
+    {
+      "name": "Record row",
+      "kind": "custom",
+      "refersTo": "row",
+      "description": "A dated row link; the title leans in 6px, the date comes up to Ink, and the other rows of its group step back to 55%. Pressed, it scales to .985.",
+      "html": "<ul class=\"ds-rows\"><li><a class=\"ds-row\" href=\"#\"><span class=\"ds-row__t\">Groton School Boys’ Varsity, goaltender</span><span class=\"ds-row__m\">2025 to now</span></a></li><li><a class=\"ds-row\" href=\"#\"><span class=\"ds-row__t\">Carnegie Hall, Weill Recital Hall, violin</span><span class=\"ds-row__m\">November 2025</span></a></li></ul>",
+      "css": ".ds-rows{margin:0 -12px;padding:0;list-style:none;color:#f2f2f2;font:400 16px/1.5 Switzer,system-ui,sans-serif;letter-spacing:-.01em}.ds-row{display:flex;align-items:baseline;justify-content:space-between;gap:24px;padding:11px 12px;border-radius:12px;color:inherit;text-decoration:none;transition:opacity 400ms cubic-bezier(.22,1,.36,1),transform 200ms cubic-bezier(.22,1,.36,1)}.ds-rows:has(.ds-row:hover) .ds-row:not(:hover){opacity:.55}.ds-row:active{transform:scale(.985)}.ds-row:focus-visible{outline:2px solid #f2f2f2;outline-offset:3px}.ds-row__t{min-width:0;transition:transform 450ms cubic-bezier(.22,1,.36,1)}.ds-row:hover .ds-row__t,.ds-row:focus-visible .ds-row__t{transform:translateX(6px)}.ds-row__m{flex:none;color:rgba(242,242,242,.64);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;transition:color 300ms ease}.ds-row:hover .ds-row__m,.ds-row:focus-visible .ds-row__m{color:#f2f2f2}"
+    },
+    {
+      "name": "Interest well",
+      "kind": "chip",
+      "refersTo": "interest-well",
+      "description": "A 24px-radius well with a name and a one-line verdict; lifts 2px with a soft shadow on hover.",
+      "html": "<ul class=\"ds-likes\"><li><b>Mandarin</b><span>at home, in Loquar, and with friends as a secret language</span></li><li><b>Games</b><span>with friends, online or in person</span></li></ul>",
+      "css": ".ds-likes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0;padding:0;list-style:none;color:#f2f2f2;font:400 16px/1.5 Switzer,system-ui,sans-serif;letter-spacing:-.01em}.ds-likes li{padding:22px 24px;border-radius:24px;background:rgba(242,242,242,.06);transition:transform 450ms cubic-bezier(.22,1,.36,1),box-shadow 450ms cubic-bezier(.22,1,.36,1)}.ds-likes li:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(0,0,0,.35)}.ds-likes b{display:block;font-weight:600;margin-bottom:4px}.ds-likes span{color:rgba(242,242,242,.64);font-size:14px}"
+    },
+    {
+      "name": "Facts list",
+      "kind": "custom",
+      "refersTo": "meta",
+      "description": "The sheet definition grid bounded by hairlines: 8em terms in Ink 2, values in Ink.",
+      "html": "<dl class=\"ds-facts\"><dt>Position</dt><dd>Goaltender, catches left</dd><dt>Height</dt><dd class=\"ds-num\">5′11″</dd><dt>School</dt><dd>Groton School, Class of 2028</dd></dl>",
+      "css": ".ds-facts{display:grid;grid-template-columns:8em minmax(0,1fr);column-gap:24px;row-gap:8px;margin:0;padding:16px 0;border-top:1px solid rgba(242,242,242,.1);border-bottom:1px solid rgba(242,242,242,.1);font:400 14px/1.45 Switzer,system-ui,sans-serif;letter-spacing:-.01em;color:#f2f2f2}.ds-facts dt{color:rgba(242,242,242,.64)}.ds-facts dd{margin:0}.ds-num{font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Contact sentence with email",
+      "kind": "custom",
+      "refersTo": "email-link",
+      "description": "The red email inside a lead sentence; the only red text link.",
+      "html": "<p class=\"ds-contact\">For recruiting, project questions or a conversation, write to me at <a class=\"ds-email\" href=\"#\">leonardo.dtc2009@gmail.com</a>.</p>",
+      "css": ".ds-contact{margin:0;max-width:34em;font:600 18px/1.4 Switzer,system-ui,sans-serif;letter-spacing:-.015em;color:#f2f2f2;text-wrap:pretty}.ds-email{color:#e03a52;font-weight:500;text-decoration:underline;text-decoration-color:rgba(224,58,82,.4);text-underline-offset:.22em;text-decoration-thickness:1px;transition:text-decoration-color 300ms ease}.ds-email:hover{text-decoration-color:currentColor}.ds-email:focus-visible{outline:2px solid #f2f2f2;outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "One Lit Window",
+    "overview": "**Creative North Star: \"One Lit Window\"**\n\nOne person in a dim room, lit by one screen. The ground is near-black under a film of fine animated static, with a single soft light falling from the top of every page and a progressive blur where the room meets the bottom of the screen. Into that room the home page sets one glass-barred window that introduces him by name, with one plain line about what he does, his portrait and a live clock; everything after it is the record: four colour tiles in the colours of the screens they hold, an italic index of small experiments that open when you reach for them, five sentences over dated rows beside interests and This fall, and a giant wordmark to close. The other ten pages are sheets: one 640px column in the same room. Pages change by cross-fading in place: the old page steps back and softens, the new one rises, the menu holds still and the current tab's mark slides.\n\nThe material is glass, grain and light rather than paper and card. Depth comes from blur, alpha and light, not from borders or drop shadows on content. Colour is rationed: one white at three strengths does all the reading, hairlines sit at 10% white, one red marks the email, and saturated colour appears only where a real screen supplies it or as a soft wash behind an experiment. Hover settles, leans and steps back; nothing tilts.\n\nDensity is generous everywhere: 176px between sections, 80px between record groups. No numbers stand on the landing; they wait on the pages that explain them. The build refuses the hero slogan, a stat wall, buttons, and the card grid.",
+    "keyCharacteristics": [
+      "Ground #0d0d0f under 10% static, one grain per CSS pixel, a new field every frame; a top radial light; an eight-layer progressive blur on the bottom edge that fades out as the page ends.",
+      "The hero is his name in Switzer 600 with the three-layer glow, then a 20px introduction whose first sentence is in full ink.",
+      "Colour from real screens (paper, gold, blue, sand) and, as light only, two wash colours for experiments; one red for the email.",
+      "Radii 44 / 24 / 16 / 12 / pill; one long soft object shadow, plus the window's own and two small lifts.",
+      "One reveal grammar on the translate property (rise and fade, 850ms), cascading in reading order; hover settles, leans and dims; nothing tilts.",
+      "Cross-document view transitions between pages with a fade fallback; every page reads without JavaScript, rests under reduced motion, and prints white."
+    ],
+    "rules": [
+      {
+        "name": "The Borrowed Colour Rule",
+        "body": "Saturated colour enters the room only as the colour of a real screen or object being shown (a product's colour on its tile, a photograph inside a device), or as a soft wash of light behind an opened experiment. The site's own palette is ground, ink at three strengths, hairline, well and one red.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Voices Rule",
+        "body": "Text is set in Ink, Ink 2 or Ink 3 and nothing else. Hierarchy is carried by alpha and size, never by a fourth grey or a coloured heading.",
+        "section": "colors"
+      },
+      {
+        "name": "The Red Is a Mark Rule",
+        "body": "Red appears on words and strokes, at most a few per screen: an address, a selection. It never fills a button, a tile, or a background.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Word Rule",
+        "body": "Each sheet's title or dek carries exactly one phrase in Instrument Serif italic, set slightly larger than the surrounding Switzer. The serif never sets body copy or a label; its other homes are the paper tile's title and the experiments' titles. The hero, being his name, carries none.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono Is Data Rule",
+        "body": "JetBrains Mono appears only where the content is a reading: the clock. Never for prose, headings, labels or navigation.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tighter As It Grows Rule",
+        "body": "Tracking tightens with size: -.01em at 14 to 20px, -.02em at 20 to 22px, -.035em at 44 to 96px, -.06em on the wordmark; the 12px running head opens to +.08em.",
+        "section": "typography"
+      },
+      {
+        "name": "The Light Not Shadow Rule",
+        "body": "Depth on content is made with alpha washes, hairlines and blur. Drop shadows belong to objects (devices, pages, previews, the window) and to a well only while it is lifted; never to rows, tiles or text blocks at rest.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Glow Is the Name Rule",
+        "body": "The three-layer glow exists for the display name. Other large type gets at most the faint title halo.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do introduce him by name on the landing, in plain Switzer with the glow, and let one factual line say what he does.",
+      "Do set every sheet title with exactly one phrase in Instrument Serif italic, about 6% larger than the Switzer around it.",
+      "Do take colour from the screen being shown: set --tile to the product's own colour and put the screenshot inside a drawn device or a white page with the object shadow.",
+      "Do keep numbers on the pages that explain them, each with its caveat beside it; the landing carries none.",
+      "Do use the five radii as nested scales: 44px tile, 24px ring, wells, previews and washes, 16px inner frame, 12px rows and small objects, full pill for controls.",
+      "Do keep hover as settle, lean and step back, and give the keyboard the same state.",
+      "Do put the reveal class on the object that arrives and let things that arrive together cascade.",
+      "Do keep the whole page legible with JavaScript off and at rest under prefers-reduced-motion; provide a white print sheet for anything a reader would print."
+    ],
+    "donts": [
+      "Don't put a slogan or a statistic in the hero; the halo of the first screen belongs to the person.",
+      "Don't rotate anything on hover.",
+      "Don't introduce a fourth text colour or a coloured heading.",
+      "Don't fill any surface with red, or use it for more than a handful of words on a screen.",
+      "Don't set the three-layer glow on anything other than the display name.",
+      "Don't put drop shadows on rows, tiles or text; shadows belong to devices, pages, previews, the window, and a well only while lifted.",
+      "Don't use JetBrains Mono for anything but the clock.",
+      "Don't animate padding, margin or height for an opening; the one layout property the site animates is grid-template-rows (0fr to 1fr) for the row being opened; everything else moves with transform, translate and opacity.",
+      "Don't put a small uppercase label (an eyebrow) above a heading or a title."
+    ]
+  }
+}
