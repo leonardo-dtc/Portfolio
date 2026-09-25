@@ -84,8 +84,8 @@ th:last-child,td:last-child{padding-right:0}
 .artwork__open{display:block;width:100%;padding:0;border:0;background:none;color:var(--art);container-type:inline-size}
 .artwork__image{font-family:Consolas,"Courier New",monospace;font-size:calc(100cqi / 48.1);font-weight:400;line-height:1;letter-spacing:0;white-space:pre;user-select:none;text-align:left}
 .artwork__open:hover{color:var(--accent)}
-figcaption{color:var(--muted);font-size:11px;line-height:1.7;margin-top:16px;max-width:42ch}
-.artwork__hint{visibility:hidden;display:block;margin-top:4px;font-size:10px}
+figcaption{color:var(--muted);font-size:12px;line-height:1.7;margin-top:16px;max-width:42ch}
+.artwork__hint{visibility:hidden;display:block;margin-top:4px;font-size:12px}
 .hero .artwork{max-width:430px;margin:0;padding:18px 0 0}
 .hero figcaption{margin-top:26px;max-width:none}
 .hero .artwork__hint{display:block;margin-left:0}
@@ -99,7 +99,7 @@ footer{border-top:1px solid var(--line);padding-block:64px 24px;scroll-margin-to
 .email{display:inline-block;color:var(--ink);font-size:clamp(15px,1.6vw,20px);margin-top:24px;overflow-wrap:anywhere}
 .contact-profiles{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;flex-shrink:0}
 .contact-profiles a{font-size:13px;padding-block:8px}
-.footer-meta{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:11px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.footer-meta{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:24px}
 .footer-meta>div{display:flex;gap:22px;flex-wrap:wrap}
 .footer-meta button{background:none;border:none;padding:12px 0;font-size:inherit}
 .footer-meta a{padding-block:12px;text-decoration:none}
@@ -114,18 +114,18 @@ dialog::backdrop{background:rgba(0,0,0,.8)}
 #art-dialog-content figcaption{font-size:13px}
 body.dialog-open{overflow:hidden}
 @media(min-width:1100px) and (min-height:780px){.chapter__side{position:sticky;top:120px}}
-@media(max-width:1050px){.header-inner{gap:24px}.header-inner nav{gap:17px}.header-inner nav a,.contact-link{font-size:11px}.hero,.about{gap:40px}.chapter{gap:48px;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr)}}
+@media(max-width:1050px){.header-inner{gap:24px}.header-inner nav{gap:17px}.header-inner nav a,.contact-link{font-size:12px}.hero,.about{gap:40px}.chapter{gap:48px;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr)}}
 @media(max-width:780px){
- html{scroll-padding-top:150px}.header-inner{padding-block:12px;flex-wrap:wrap;justify-content:space-between;gap:0}.header-inner nav{order:3;flex-basis:100%;justify-content:flex-start;flex-wrap:wrap;gap:0 22px;padding-top:7px}.header-inner nav a{font-size:11px;padding:9px 0}.contact-link{font-size:12px}
+ html{scroll-padding-top:150px}.header-inner{padding-block:12px;flex-wrap:wrap;justify-content:space-between;gap:0}.header-inner nav{order:3;flex-basis:100%;justify-content:flex-start;flex-wrap:wrap;gap:0 22px;padding-top:7px}.header-inner nav a{font-size:12px;padding:9px 0}.contact-link{font-size:12px}
  .hero{gap:24px;padding-block:56px;grid-template-columns:1.2fr 1fr}h1{font-size:clamp(52px,8vw,70px)}.hero__intro{font-size:14px}.hero__school{font-size:12px}.hero .artwork{align-self:start;margin-top:22px}.hero .artwork__hint{visibility:hidden;display:block;margin-left:0}
  .about{gap:32px;grid-template-columns:1.3fr 1fr}.about-facts{padding-left:0;font-size:13px}
- .chapter{display:block;padding-block:48px 56px}.chapter__side{display:grid;grid-template-columns:1fr 145px;gap:0 32px;align-items:start;margin-bottom:36px}.chapter__side h2,.chapter-lede,.athlete-facts{grid-column:1}.chapter-lede{max-width:none;margin-top:18px}.chapter__side .artwork{grid-column:2;grid-row:1 / span 3;margin:0}.chapter__side figcaption{font-size:10px;margin-top:12px}
+ .chapter{display:block;padding-block:48px 56px}.chapter__side{display:grid;grid-template-columns:1fr 145px;gap:0 32px;align-items:start;margin-bottom:36px}.chapter__side h2,.chapter-lede,.athlete-facts{grid-column:1}.chapter-lede{max-width:none;margin-top:18px}.chapter__side .artwork{grid-column:2;grid-row:1 / span 3;margin:0}.chapter__side figcaption{font-size:12px;margin-top:12px}
  .entry{padding-block:28px}.entry__body{font-size:14px}.entry,.chapter,details{scroll-margin-top:16px}.footer-meta{align-items:flex-start;flex-direction:column;gap:8px}footer{scroll-margin-top:16px}
 }
 @media(max-width:520px){
  .hero{grid-template-columns:1fr;padding-block:44px 40px;gap:36px}h1{font-size:clamp(56px,13.8vw,72px)}.hero__intro{font-size:15px;max-width:38ch}.hero .artwork{width:78%;max-width:280px;margin:0 auto;padding:0}.hero figcaption{margin-top:16px}.hero .artwork__hint{display:block;margin-left:0}
  .about{grid-template-columns:1fr;padding-block:36px 44px;gap:24px}.about p{font-size:14px}.about-facts{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}.about-facts div{padding:0}
- .chapter__side{display:block;margin-bottom:32px}.chapter__side .artwork{max-width:240px;margin:26px auto 0}.chapter__side figcaption{font-size:11px}.chapter-lede{font-size:14px}.entry__meta{font-size:11px}.timeline li{grid-template-columns:100px 1fr;gap:12px}.timeline span{font-size:11px}.table-wrap{margin-right:0}table{font-size:11px}
+ .chapter__side{display:block;margin-bottom:32px}.chapter__side .artwork{max-width:240px;margin:26px auto 0}.chapter__side figcaption{font-size:12px}.chapter-lede{font-size:14px}.timeline li{grid-template-columns:100px 1fr;gap:12px}.timeline span{font-size:12px}.table-wrap{margin-right:0}table{font-size:12px}
  .contact-main{display:block}.contact-main p{font-size:13px}.contact-profiles{flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:12px 24px;margin-top:28px}.footer-meta{margin-top:40px}.footer-meta>div{gap:16px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}

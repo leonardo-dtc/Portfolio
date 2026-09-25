@@ -146,7 +146,7 @@
   function themed(pal) {
     if (!isLight()) return { ac: pal.ac, acHi: pal.lit, hi: pal.hi, deep: pal.deep, lit: pal.lit, grey: '#4A4A4A', mul: 1, g: pal.g };
     var k = 0.74, ac = shadeHex(pal.ac, k);
-    while (lum(ac) > 0.16 && k > 0.35) { k -= 0.04; ac = shadeHex(pal.ac, k); }
+    while (lum(ac) > 0.155 && k > 0.35) { k -= 0.04; ac = shadeHex(pal.ac, k); }   // 0.155 keeps ≥4.5:1 on PAPER
     var hi = shadeHex(pal.hi, Math.min(0.92, k + 0.12));
     return {
       ac: ac, acHi: shadeHex(ac, 0.72), hi: hi, deep: mixHex(hi, PAPER, 0.5), lit: pal.ac, grey: '#A8A6AE', mul: 0.55,
@@ -191,11 +191,25 @@
   var busy = false, shown = false, waveTok = 0;
   var GL = '░▒▓█▞▚';
 
+  /* The paged hero cannot scroll, so there the name also yields to the height:
+     the lines under it (role, note, way in, hint) keep clear of the status bar.
+     `room` is the height left for the two <pre>s; flowing layouts scroll and
+     keep the width-only fit. */
+  var paged = matchMedia('(min-width: 900px) and (min-height: 620px)');
+  function room() {
+    var bar = $('#sbar'), last = $('.name-hint');
+    if (!paged.matches || !bar || !last || !nb.offsetParent) return Infinity;
+    var r = nb.getBoundingClientRect(), under = last.getBoundingClientRect().bottom - r.bottom;
+    return bar.getBoundingClientRect().top - 24 - under - r.top - 28;   // 28: the name block's own padding
+  }
   function fit() {
-    var avail = Math.max(120, nb.clientWidth);
-    var wide = true, len = Math.max(widthOf(NAME[0], true), widthOf(NAME[1], true));
-    var fs = avail / (len * 0.62);
-    if (fs < 9) { wide = false; len = Math.max(widthOf(NAME[0], false), widthOf(NAME[1], false)); fs = avail / (len * 0.62); }
+    var avail = Math.max(120, nb.clientWidth), tall = room();
+    var size = function (wide) {                          // two names of 7 bitmap rows, 2 text rows each when wide, .45em apart
+      var len = Math.max(widthOf(NAME[0], wide), widthOf(NAME[1], wide));
+      return Math.min(avail / (len * 0.62), tall / (14 * (wide ? 2 : 1) + 0.45));
+    };
+    var wide = true, fs = size(true);
+    if (fs < 9) { wide = false; fs = size(false); }
     return { wide: wide, fs: Math.max(6, Math.min(24, fs)) };
   }
   function strings() {

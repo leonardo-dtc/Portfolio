@@ -372,7 +372,8 @@
     var width = term.root.clientWidth;
     // Reserve the actual height of the controls and instructions, including wraps.
     var controlsHeight = term.root.offsetHeight - term.screen.offsetHeight;
-    var availableHeight = innerWidth < 900 ? Math.max(100, innerHeight - document.getElementById('nav').offsetHeight - document.getElementById('sbar').offsetHeight - controlsHeight - 48) : 500;
+    // Every layout fits the screen between the fixed bars, so the controls never sit under the status bar.
+    var availableHeight = Math.max(100, innerHeight - document.getElementById('nav').offsetHeight - document.getElementById('sbar').offsetHeight - controlsHeight - 48);
     if (columns !== term.columns || rows.length !== term.rows || width !== term.width || availableHeight !== term.availableHeight) {
       term.screen.style.fontSize = Math.min(12, Math.floor(width / (columns * 0.62) * 100) / 100, availableHeight / (rows.length * 1.22)) + 'px';
       term.columns = columns; term.rows = rows.length; term.width = width; term.availableHeight = availableHeight;
@@ -387,10 +388,14 @@
     rows[9] = '  scores are kept on this device';
     paint(rows, 'games   ' + PROGRAMS.length + ' programs', '↑ ↓ choose  ·  enter run  ·  1 2 3  ·  q back');
   }
+  // Phones always bring the terminal to the top; wider layouts scroll only when it would run under the status bar.
+  function reveal() {
+    if (innerWidth < 900 || term.root.getBoundingClientRect().bottom > document.getElementById('sbar').getBoundingClientRect().top) term.root.scrollIntoView({block:'start',behavior:'instant'});
+  }
   function run(i) {
     pick = i; game = PROGRAMS[i]; game.reset();
     paint(game.draw(), game.status(), game.hint);
-    if (innerWidth < 900) term.root.scrollIntoView({block:'start',behavior:'instant'});
+    reveal();
   }
   function frame(now) {
     raf = requestAnimationFrame(frame);
@@ -468,7 +473,7 @@
     root.addEventListener('pointerup', release); root.addEventListener('pointercancel', release);
     menu();
     root.focus({ preventScroll: true });
-    if (innerWidth < 900) requestAnimationFrame(function () { root.scrollIntoView({block:'start',behavior:'instant'}); });
+    requestAnimationFrame(function () { if (term && term.root === root) reveal(); });
     raf = requestAnimationFrame(frame);
   }
   function close(restore) {

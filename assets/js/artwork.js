@@ -38,7 +38,7 @@
   function caption(piece) {
     const a = piece.a, address = a.panel + (a.sub ? '/' + a.sub : '');
     let text = captions[address] || a.caption || 'ASCII illustration.';
-    if (reduced.matches) text = text.replace(' Move the pointer to change the tempo.','').replace(/;? (?:they scissor|turning|the cursor[^.]*).*?\./g,'.');
+    if (reduced.matches) text = text.replace(' Move the pointer to change the tempo.','').replace(/[;,]? (?:they scissor|turning|the cursor[^.]*).*?\./g,'.');
     return text;
   }
   const dialog = document.createElement('dialog'); dialog.id = 'art-dialog'; dialog.className = 'terminal-dialog art-dialog';
