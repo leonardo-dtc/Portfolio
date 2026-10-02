@@ -2,7 +2,7 @@
 import { createRoom } from './room.js';
 import { readPanels, forgetRadii } from './panels.js';
 import { createWindows } from './windows.js';
-import { createHello } from './hello.js';
+import { createHero } from './hero.js';
 import { initNav } from './nav.js';
 import { initHue } from './hue.js';
 
@@ -34,18 +34,12 @@ window.__windows = windows;
 // the color style control (it also sets Night and Day: Auto follows the system)
 window.__hue = initHue({ room });
 
-// the hello needs the room to write in; without it the page opens straight into the windows
-let hello = null;
-if (room) {
-  hello = createHello({ room, windows });
-  window.__hello = hello;
-  if (html.classList.contains('is-hello')) hello.start();
-  else hello.showTitle(true);
-  const lost = room.onlost;
-  room.onlost = () => { lost(); hello.abort(); };
-} else {
-  html.classList.remove('is-hello');
-}
+// the hero: on the first home view of a session (html.is-hello, set in the page's head). With the room it is drawn
+// in Liquid Glass; without it (no WebGL2, reduced transparency, forced colours) it is the same name in CSS glass.
+const hero = createHero({ room, windows });
+window.__hero = hero;
+if (html.classList.contains('is-hello')) hero.start();
+if (room) { const lost = room.onlost; room.onlost = () => { lost(); hero.abort(); }; }
 
 // Work's filters and the print buttons are delegated from the document, so they keep working after a page swap
 document.addEventListener('click', (e) => {
@@ -64,11 +58,15 @@ document.addEventListener('click', (e) => {
   if (p) { e.preventDefault(); print(); }
 });
 
-// the Now window's clock: the time in Groton, refreshed each minute and whenever a page arrives
+// Groton's clock (Home's side window): the time there, refreshed each minute and whenever a page arrives.
+// data-clock="in Groton" reads "9:41 AM in Groton"; an empty data-clock reads "9:41 AM, Eastern time".
 const clock = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
 function tick() {
-  const t = `${clock.format(new Date())}, Eastern time`;
-  document.querySelectorAll('[data-clock]').forEach(el => { if (el.textContent !== t) el.textContent = t; });
+  const now = clock.format(new Date());
+  document.querySelectorAll('[data-clock]').forEach(el => {
+    const t = el.dataset.clock ? `${now} ${el.dataset.clock}` : `${now}, Eastern time`;
+    if (el.textContent !== t) el.textContent = t;
+  });
 }
 tick();
 setInterval(tick, 15000);
@@ -77,4 +75,4 @@ document.addEventListener('v5:navigate', tick);
 const nav = initNav({ windows });
 window.__nav = nav;
 
-export { room, windows, hello, nav };
+export { room, windows, hero, nav };

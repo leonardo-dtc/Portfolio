@@ -26,7 +26,7 @@ export function createRoom(canvas) {
   gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   const uniforms = (p, names) => Object.fromEntries(names.map(n => [n, gl.getUniformLocation(p, n)]));
   const us = uniforms(sceneP, ['uRes', 'uTime', 'uDay', 'uAspect', 'uShift', 'uColor']);
-  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uColor']);
+  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uColor', 'uInk1', 'uInkL']);
 
   const tex = gl.createTexture(), fbo = gl.createFramebuffer(), inkTex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, inkTex);
@@ -48,7 +48,7 @@ export function createRoom(canvas) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    maxLod = Math.log2(Math.max(8, .045 * w));          // the hello's defocus: about 4.5% of the width
+    maxLod = Math.log2(Math.max(8, .045 * w));          // the hero's defocus: about 4.5% of the width
     st.fast = Math.max(st.fast, .3);
   }
 
@@ -99,6 +99,9 @@ export function createRoom(canvas) {
     gl.uniform4f(uc.uInk0, ink ? ink.on : 0, ink ? (ink.dim || 0) : 0, ink ? (ink.white || 0) : 0, ink ? (ink.px || 24) : 24);
     const x = ink && ink.xform ? ink.xform : [1, 0, 0];
     gl.uniform3f(uc.uInkX, x[0], x[1], x[2]);
+    const lean = ink && ink.lean ? ink.lean : [0, 0], hl = ink && ink.light ? ink.light : [0, 0, 1, 0];
+    gl.uniform4f(uc.uInk1, ink ? (ink.glow || 0) : 0, lean[0], lean[1], 0);
+    gl.uniform4f(uc.uInkL, hl[0], hl[1], hl[2], hl[3]);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     // budget: over the first 90 frames, a machine averaging over 22 ms drops to 1x and stops the room's own motion

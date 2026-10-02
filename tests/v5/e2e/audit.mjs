@@ -38,8 +38,12 @@ function inspect(opts) {
   }
   // B. pieces that must not touch (the tab bar and toolbar may overlap the window's edge by design)
   const byName = Object.fromEntries(pieces.map(el => [name(el), el]));
-  const pairs = [['tabs', 'side:left'], ['tabs', 'side:right'], ['toolbar', 'side:left'], ['toolbar', 'side:right'], ['window-bar', 'side:left'], ['window-bar', 'side:right'],
-    ['window', 'side:left'], ['window', 'side:right'], ['toolbar', 'window-bar'], ['color-control', 'side:right'], ['color-control', 'toolbar'], ['color-control', 'window-bar'], ['color-control', 'tabs'], ['color-control', 'window'], ['color-control', 'sheet'], ['color-control', 'sheet-toolbar']];
+  const pairs = [['tabs', 'side:right'], ['toolbar', 'side:right'], ['window-bar', 'side:right'], ['window', 'side:right'], ['toolbar', 'window-bar'],
+    ['color-control', 'side:right'], ['color-control', 'toolbar'], ['color-control', 'window-bar'], ['color-control', 'tabs'], ['color-control', 'window'], ['color-control', 'sheet'], ['color-control', 'sheet-toolbar']];
+  // the tab bar sits just off the window's left edge: at rest, and opened wherever the screen has room for it
+  // (from about 1150px; on narrower laptops the opened bar leans over the window's edge, frosted), it never covers it
+  const tb = byName.tabs, win = byName.window;
+  if (tb && win && W >= 900 && (!(opts && opts.open) || W >= 1150)) { const a = box(tb), b = box(win); if (a.right > b.left - 13) out.push(`the tab bar covers the window's edge (${Math.round(a.right - b.left)}px)`); }
   for (const [a, b] of pairs) {
     if (!byName[a] || !byName[b]) continue;
     if (W < 900 && a === 'color-control' && (b === 'window' || b === 'sheet')) continue;   // on phones it docks over the window, frosted
@@ -82,16 +86,16 @@ function inspect(opts) {
       if (tag && tag.getBoundingClientRect().right > card.getBoundingClientRect().right - 4) out.push(`card tag too wide: ${card.querySelector('b').textContent}`);
     }
     // the home title and the avatar
-    const name2 = front.querySelector('h1.name .name__svg'), av = front.querySelector('.win__head .avatar');
-    if (name2 && vis(av) && over(name2.getBoundingClientRect(), av.getBoundingClientRect()) > 4) out.push('the written title overlaps the avatar');
+    const name2 = front.querySelector('h1.name'), av = front.querySelector('.win__head .avatar');
+    if (name2 && vis(av)) { const r = document.createRange(); r.selectNodeContents(name2); if (over(r.getBoundingClientRect(), av.getBoundingClientRect()) > 4) out.push('the title overlaps the avatar'); }
     // head text into the close button
     const close = front.querySelector('.close'), h1 = front.querySelector('.win__head h1');
     if (close && h1 && over(close.getBoundingClientRect(), h1.getBoundingClientRect()) > 4) out.push('the close button overlaps the title');
   }
   // F. toolbars that clip their buttons
   for (const tb of document.querySelectorAll('.space > .toolbar')) if (vis(tb) && tb.scrollWidth > tb.clientWidth + 2) out.push(`${name(tb)} clips its buttons (${tb.scrollWidth - tb.clientWidth}px)`);
-  // I. side windows that hide content
-  for (const s of document.querySelectorAll('aside.side:not(.side--inline)')) if (vis(s) && s.scrollHeight > s.clientHeight + 4) out.push(`side:${s.dataset.side} hides ${s.scrollHeight - s.clientHeight}px of its content`);
+  // I. a side window taller than its room must scroll (it may: one side window holds what two did)
+  for (const s of document.querySelectorAll('aside.side:not(.side--inline)')) if (vis(s) && s.scrollHeight > s.clientHeight + 4 && !/auto|scroll/.test(getComputedStyle(s).overflowY)) out.push(`side:${s.dataset.side} hides ${s.scrollHeight - s.clientHeight}px of its content`);
   // J/K. images and page overflow
   for (const img of document.querySelectorAll('img')) if (vis(img) && img.complete && img.naturalWidth === 0) out.push(`image failed: ${img.getAttribute('src')}`);
   if (document.documentElement.scrollWidth > W + 1) out.push(`page scrolls sideways (${document.documentElement.scrollWidth - W}px)`);
@@ -114,7 +118,7 @@ for (const key of want) {
         const bb = await t.boundingBox();
         await page.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2);
         await page.waitForTimeout(700);
-        open = (await page.evaluate(inspect)).map(s => 'tab bar open: ' + s).filter(s => !found.includes(s.replace('tab bar open: ', '')));
+        open = (await page.evaluate(inspect, { open: true })).map(s => 'tab bar open: ' + s).filter(s => !found.includes(s.replace('tab bar open: ', '')));
         await page.mouse.move(w - 5, h / 2);
         await page.waitForTimeout(400);
       }

@@ -1,5 +1,5 @@
 // Keyboard and pointer: Tab reaches every part of the room, the wheel over the room scrolls the window,
-// a press lights a control's glass, and the Now window keeps Groton's time.
+// a press lights a control's glass, and This fall keeps Groton's time.
 import { open, BASE, check } from './lib.mjs';
 
 const { browser, page, errors } = await open();
@@ -45,7 +45,7 @@ await page.waitForTimeout(700);
 const out = await page.evaluate(() => document.querySelector('.toolbar').glass.press);
 check(lit > .6 && out < .05, `a press lights the glass and lets it go (${lit.toFixed(2)}, then ${out.toFixed(2)})`);
 
-check(/^\d{1,2}:\d{2}\s?(AM|PM), Eastern time$/.test((await page.textContent('[data-clock]')).trim()), 'the Now window keeps Groton’s time');
+check(/^\d{1,2}:\d{2}\s?(AM|PM) in Groton$/.test((await page.textContent('aside.side [data-clock]')).trim()), 'This fall keeps Groton’s time');
 check(errors.length === 0, 'no console errors ' + errors.join(' | '));
 await browser.close();
 {

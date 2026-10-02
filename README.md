@@ -16,7 +16,9 @@ Every push to `main` publishes the five editions to GitHub Pages at `https://leo
 
 ## Editions
 
-The terminal build at the root is the first edition. Four later editions sit beside it, each with its own README: [`v2/`](v2/README.md), the editorial edition, [`v3/`](v3/README.md), the poster edition built on the "Portfolio 2025" deck, [`v4/`](v4/README.md), the dim-room edition: a dark ground with one lit window, and [`v5/`](v5/README.md), the glass edition: Liquid Glass windows in a room drawn after Apple's wallpapers, with the name written like Apple's hello. The preview server serves all five.
+The terminal build at the root is the first edition. Four later editions sit beside it, each with its own README: [`v2/`](v2/README.md), the editorial edition, [`v3/`](v3/README.md), the poster edition built on the "Portfolio 2025" deck, [`v4/`](v4/README.md), the dim-room edition: a dark ground with one lit window, and [`v5/`](v5/README.md), the glass edition: Liquid Glass windows in a room drawn after Apple's wallpapers, with the name set in heavy glass type that you click to enter. The preview server serves all five.
+
+The [decision matrix](docs/editions/decision-matrix.md) scores the five editions against each other, and the [foundation](docs/editions/foundation.md) records what each one does well, as the base for the final portfolio. The family's favourites, v3 and v5, are the finalists.
 
 ## Two reading modes
 

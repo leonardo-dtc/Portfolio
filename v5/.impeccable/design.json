@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-24T00:00:00Z",
+  "generatedAt": "2026-10-02T00:00:00Z",
   "title": "Design System: Leonardo Carvalho, fifth edition",
   "extensions": {
     "colorMeta": {
@@ -34,7 +34,7 @@
           "oklch(80% 0.252 266)",
           "oklch(95% 0.252 266)"
         ],
-        "note": "The Enter button only: vec3(.16,.34,1.0) at 46%, brightened 16%; by day vec3(.24,.46,1.0) (#3d75ff). Exempt from the brightness cap."
+        "note": "The prominent glass kind: vec3(.16,.34,1.0) at 46%, brightened 16%; by day vec3(.24,.46,1.0) (#3d75ff). Exempt from the brightness cap. It was the hello's Enter button; since the hero made the title the control no element carries it."
       },
       "glass-day": {
         "role": "primary",
@@ -397,7 +397,7 @@
       },
       "control": {
         "displayName": "Control",
-        "purpose": "Buttons, links as controls; tabs at 16px, Enter at 19px."
+        "purpose": "Buttons, links as controls; tabs at 16px."
       },
       "meta": {
         "displayName": "Meta",
@@ -411,9 +411,17 @@
         "displayName": "Manuscript",
         "purpose": "The aducanumab manuscript's own title, on its sheet and (15px) on its card. The only serif."
       },
-      "written-name": {
-        "displayName": "The written name",
-        "purpose": "The display voice: Sacramento traced to pen strokes (24 name units wide), rendered as glass by the room. Hello: 80% of the width, one line (two under 700px). Title: up to 460px (340px under 700px)."
+      "name-hero": {
+        "displayName": "The name (hero)",
+        "purpose": "Switzer 780, min(8.2vw, 24svh, 160px), -.03em: one line from 700px wide, two lines below at min(18vw, 15svh, 120px). Solid glass drawn by the room; CSS glass without it."
+      },
+      "name-title": {
+        "displayName": "The name (home title)",
+        "purpose": "Switzer 700, 46px (42px under 900px, 44px on two lines under 700px, 30px on short landscape phones), -.03em, white text: the glyphs the hero lands on."
+      },
+      "hint": {
+        "displayName": "The hint",
+        "purpose": "500 14px Ink 2, centred 32px above the foot of the screen: \"Click the title to proceed\" (\"Tap\" on coarse pointers)."
       }
     },
     "shadows": [
@@ -425,7 +433,7 @@
       {
         "name": "ornament-drawn",
         "value": "room shader: offset 22px down, reach 40px, strength .22",
-        "purpose": "Tab bar, toolbar, Enter."
+        "purpose": "Tab bar, toolbar."
       },
       {
         "name": "css-glass",
@@ -455,12 +463,17 @@
       {
         "name": "focus",
         "value": "outline 2px solid #fff, offset 3px; box-shadow 0 0 0 6px rgba(255, 255, 255, .18)",
-        "purpose": "Every focusable element."
+        "purpose": "Every focusable element; the hero's name takes the same ring 12px out, rounded at .2em."
       },
       {
         "name": "tab-bubble",
         "value": "inset 0 1px 0 rgba(255, 255, 255, .32)",
         "purpose": "The top edge of the current-tab bubble."
+      },
+      {
+        "name": "hero-light",
+        "value": "Gaussian blur of the letters, 30% of the font size; added to the room at .5 by night, .26 by day; a tighter leak at the edges (mip 3 of the letters); leans up to 5% of the font size toward the pointer; hover x1.22, a press flares it",
+        "purpose": "The light behind the hero's name, in the color style's hue."
       }
     ],
     "glass": [
@@ -505,9 +518,9 @@
         "purpose": "A sheet's parent stepping back."
       },
       {
-        "name": "written-name-ink",
-        "value": "mask canvas (stroke, height, shadow) turned to glass tubes: refraction by the normals, rims 0.85 lit / 0.38 far, specular 0.7, a sheen sweeping every 6.5s, a flowing surface; mixed 93% toward white as the title; shadow 34% (lighter on glass)",
-        "purpose": "The name in the hello and as the home title."
+        "name": "hero-ink",
+        "value": "mask canvas (letters, a height blurred 3.5% of the font size, the light behind blurred 30%) turned to solid glass: frosted faces (the room at the frost level x1.12, lit from behind), a rim 0.95 facing the light and 0.38 behind, the far bevel shaded 38%, a highlight drawn toward the pointer, a faint moving surface and a sheen every 9s; by day the faces a deeper cobalt; mixed fully to white as it becomes the title",
+        "purpose": "The hero's name, until it hands off to the HTML title."
       }
     ],
     "motion": [
@@ -517,18 +530,23 @@
         "purpose": "Every geometric motion (springs.js)."
       },
       {
+        "name": "motion-rules",
+        "value": "no blur on text in motion; nothing moves on its own; 150 to 300ms and at most about 8px of travel for UI; critically damped for anything with text; staggers of 40 to 80ms",
+        "purpose": "Every transition."
+      },
+      {
         "name": "window-materialise",
-        "value": "response .55, damping .86; from translateZ(-14vw) scale(.96); opacity at 1.4x the spring",
+        "value": "response .5, damping 1; from scale(.985) (8px at most at the corners); opacity at 1.4x the spring",
         "purpose": "Windows and sheets arriving."
       },
       {
         "name": "side-materialise",
-        "value": "response .7, damping .86; from 52deg and translateZ(-22vw) to 24deg",
-        "purpose": "Side windows swinging in."
+        "value": "response .55, damping 1; from 32deg to 24deg, with the fade",
+        "purpose": "The side window arriving (it stays in place across page changes)."
       },
       {
         "name": "ornament-materialise",
-        "value": "scale .9 to 1 on the window spring",
+        "value": "response .45, damping 1; scale .96 to 1",
         "purpose": "Tab bar, toolbar, window bar."
       },
       {
@@ -538,13 +556,13 @@
       },
       {
         "name": "sheet-back",
-        "value": "response .5, damping 1; parent translateZ(-10vw), contents brightness .5, saturate .8, blur 1.5px, opacity to 0 at 40% of the travel",
+        "value": "response .5, damping 1; parent translateZ(-4vw), contents brightness .5, saturate .8 (no blur), the window's contents gone by 25% of the travel (its toolbar and window bar by 40%)",
         "purpose": "A sheet opening over its parent."
       },
       {
-        "name": "parallax",
-        "value": "response .9, damping 1; perspective origin +/-10% x, +/-8% y; space translate up to 1vw; room shift x*.012, -y*.008",
-        "purpose": "Desktop only."
+        "name": "room-lean",
+        "value": "response .9, damping 1; room shift x*.012, -y*.008; the windows never move with the pointer",
+        "purpose": "Desktop only, not under reduced motion."
       },
       {
         "name": "pointer-light",
@@ -562,29 +580,24 @@
         "purpose": "Press light on controls."
       },
       {
-        "name": "hello-pace",
-        "value": "delay .3s; leonardo 1.45s; carvalho from .82s over 1.45s; ease in-out quad; Enter ready at about 2.4s; replay 1.2 / .66 / 1.2",
-        "purpose": "The written name."
+        "name": "hero-arrival",
+        "value": "glass and light up on response .8, damping 1 (about 0.9s); the hint from .75s over .5s",
+        "purpose": "The hero's name arriving."
       },
       {
-        "name": "hello-enter",
-        "value": "focus pull response 1.1 damping 1; name flight .8 / .92; Enter glass .5 / .8; main .18s, sides .34s + 60ms, tabs .55s, toolbar .62s, window bar .7s",
+        "name": "hero-enter",
+        "value": "hint out 120ms; focus pull response 1 damping 1; the glide response .65 damping 1 (about 0.7s), size in log space, weight 780 to 700, to white; the window's glass at once; its contents (240ms) once the name is within .6 of the title's size of its slot, then side window +60ms, tab bar +120ms, toolbar and window bar +180ms; hand-off: the HTML title fades in 150ms over the ink, then the ink out 100ms",
         "purpose": "Entering glass mode."
       },
       {
         "name": "page-swap",
-        "value": "out 180ms cubic-bezier(.4,0,1,1): opacity 0, blur 8px, scale .985; in 260ms cubic-bezier(.2,.8,.2,1): from 14px down, blur 6px",
+        "value": "out 140ms cubic-bezier(.4,0,1,1): opacity only; in 220ms cubic-bezier(.2,.8,.2,1): opacity from 6px down; no blur, no scale; the side window's contents crossfade with the window's",
         "purpose": "Changing a window's contents."
       },
       {
         "name": "ease-out",
         "value": "cubic-bezier(.16, 1, .3, 1)",
-        "purpose": "CSS micro-motion: tab bar width .42s, labels .3s, button press .35s, card hover .45s, Enter .6s / .9s."
-      },
-      {
-        "name": "breathe",
-        "value": "2.6s ease-in-out infinite; ring opacity .5 to 1, scale .985 to 1",
-        "purpose": "The Enter button's ring."
+        "purpose": "CSS micro-motion: tab bar width .42s, labels .3s, button press .35s, card hover .45s, the hero's hint .5s."
       },
       {
         "name": "room-drift",
@@ -593,7 +606,7 @@
       },
       {
         "name": "reduced-motion",
-        "value": "no writing, focus pull, parallax, drift or springs; transitions .15s; no animations; room still",
+        "value": "no glide, focus pull, lean, drift or springs; the hero shown at once; transitions .15s; no animations; room still",
         "purpose": "prefers-reduced-motion: reduce."
       }
     ],
@@ -645,7 +658,7 @@
       "name": "Tab bar",
       "kind": "nav",
       "refersTo": "tab-bar",
-      "description": "A glass column off the window’s left edge; icons at rest, names when open; a Fill 3 bubble marks the current tab.",
+      "description": "A glass column 14px off the window's left edge; icons at rest, names when open (it opens to the left, icons fixed); a Fill 3 bubble marks the current tab.",
       "html": "<div class=\"ds-room\"><nav class=\"ds-tabs is-open\"><a href=\"#\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z\"/></svg><span>Home</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z\"/></svg><span>Work</span></a><a href=\"#\"><svg viewBox=\"0 0 24 24\"><path d=\"M8.4 8.5a3.6 3.6 0 1 0 7.2 0 3.6 3.6 0 1 0-7.2 0M5 20c.9-3.6 3.6-5.5 7-5.5s6.1 1.9 7 5.5\"/></svg><span>About</span></a></nav></div>",
       "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-tabs{background:rgba(10,14,48,.5);-webkit-backdrop-filter:blur(30px) saturate(1.7) brightness(.8);backdrop-filter:blur(30px) saturate(1.7) brightness(.8);box-shadow:0 30px 80px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.12);position:relative;display:grid;gap:4px;width:188px;padding:8px;border-radius:32px}.ds-tabs::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(160deg,rgba(255,255,255,.72),rgba(255,255,255,.14) 22%,rgba(255,255,255,.05) 55%,rgba(255,255,255,.2) 88%,rgba(255,255,255,.42));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}.ds-tabs a{display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:999px;color:rgba(255,255,255,.78);font:650 16px/1 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;text-decoration:none;transition:color .2s}.ds-tabs a:hover,.ds-tabs a[aria-current]{color:#fff}.ds-tabs a[aria-current]{background:rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.32)}.ds-tabs svg{flex:none;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}"
     },
@@ -666,23 +679,22 @@
       "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:10px 24px;margin:0;padding:18px 20px;border-radius:16px;background:rgba(255,255,255,.06);font:500 16px/1.47 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;max-width:520px}.ds-facts dt{color:rgba(255,255,255,.78)}.ds-facts dd{margin:0;color:#fff}"
     },
     {
-      "name": "Enter (prominent glass)",
-      "kind": "button",
-      "refersTo": "enter",
-      "description": "The one prominent glass: a cobalt capsule with a breathing ring, shown when the name is written.",
-      "html": "<div class=\"ds-room\" style=\"padding:48px;text-align:center\"><button class=\"ds-enter\" type=\"button\">Enter<svg viewBox=\"0 0 24 24\"><path d=\"M5 12h13M13 6l6 6-6 6\"/></svg></button></div>",
-      "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-enter{position:relative;display:inline-flex;align-items:center;gap:10px;min-height:56px;padding:0 30px 0 32px;border:0;border-radius:999px;background:#2957ff;color:#fff;font:650 19px/1 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45),0 18px 44px rgba(0,0,0,.3)}.ds-enter::before{content:'';position:absolute;inset:-7px;border-radius:inherit;box-shadow:0 0 0 1.5px rgba(255,255,255,.34);animation:ds-breathe 2.6s ease-in-out infinite}.ds-enter svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.ds-enter:active{scale:.95}@keyframes ds-breathe{0%,100%{opacity:.5;scale:.985}50%{opacity:1;scale:1}}@media (prefers-reduced-motion:reduce){.ds-enter::before{animation:none}}"
+      "name": "The hero's name (CSS glass)",
+      "refersTo": "hero-name",
+      "description": "The name in Switzer 780 as CSS glass with the light behind it (the fallback; with WebGL the room draws it), and the hint beneath.",
+      "html": "<div class=\"ds-room\" style=\"padding:56px 32px 28px;text-align:center\"><button class=\"ds-hero\" type=\"button\" aria-label=\"Leonardo Carvalho. Enter the portfolio\"><span>Leonardo Carvalho</span></button><p class=\"ds-hint\">Click the title to proceed</p></div>",
+      "css": ".ds-room{background:linear-gradient(to bottom,#070933,#141773 40%,#6147d6 75%,#040a47);padding:32px}.ds-hero{margin:0;padding:.05em .12em;border:0;border-radius:.2em;background:none;cursor:pointer;font:780 64px/1 Switzer,-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,system-ui,sans-serif;letter-spacing:-.03em}.ds-hero span{color:transparent;-webkit-text-fill-color:transparent;background:linear-gradient(172deg,rgba(255,255,255,.97) 18%,rgba(206,220,255,.72) 52%,rgba(255,255,255,.9) 88%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 .05em rgba(255,255,255,.5)) drop-shadow(0 0 .3em rgba(112,148,255,.7)) drop-shadow(0 0 .3em rgba(112,148,255,.7))}.ds-hero:focus-visible{outline:2px solid #fff;outline-offset:12px;box-shadow:0 0 0 14px rgba(255,255,255,.08)}.ds-hint{margin:40px 0 0;color:rgba(255,255,255,.78);font:500 14px/1.3 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif}"
     }
   ],
   "narrative": {
     "northStar": "One Room, Many Windows",
-    "overview": "**Creative North Star: \"One Room, Many Windows\"**\n\nA cobalt room drawn the way Apple draws its Liquid Glass wallpapers: a navy sky falling to a violet horizon, soft out-of-focus cobalt and periwinkle forms, and a flat glass wave with one bright crest, all moving slowly. The room is one WebGL2 canvas behind everything, in two palettes that follow the system: Night (navy and violet) and Day (sky blue over a warm pale horizon). Into that room the site floats glass windows as visionOS does: one main window centred, a tab bar hanging off its left edge, a toolbar crossing its bottom edge, a small window bar under it that drags and springs home, and at 1360px and wider two side windows turned 24 degrees toward the reader. Projects open as sheets in front of the window you came from, which steps back and dims.\n\nThe front door is the hello. On the first home view of a session the room is out of focus and \"leonardo carvalho\" writes itself in lowercase script, traced from Sacramento into pen strokes and rendered as glass tubes that bend the room behind them. An Enter button in prominent cobalt glass waits beneath. Entering pulls the room into focus, flies the name into the main window's title slot where it turns to white glass, and materialises the windows in order. After that the written name is the home window's title and the only display type on the site; everything else is the system UI face, set the way visionOS sets it.\n\nThe material is glass drawn by the room itself: frost read from the blurred room, lensing at the rounded edge, a cobalt tint, a brightness cap that keeps white text legible, a bright rim, a light that follows the pointer, and a light from within when a control is pressed. Inside a window nothing is glass again: lists, cards, tables and buttons are white fills at 6, 14 and 22 percent. Motion is springs everywhere, described as Apple describes them (a response and a damping ratio) and stepped in the same frame as the glass.",
+    "overview": "**Creative North Star: \"One Room, Many Windows\"**\n\nA cobalt room drawn the way Apple draws its Liquid Glass wallpapers: a navy sky falling to a violet horizon, soft out-of-focus cobalt and periwinkle forms, and a flat glass wave with one bright crest, all moving slowly. The room is one WebGL2 canvas behind everything, in two palettes that follow the system: Night (navy and violet) and Day (sky blue over a warm pale horizon). Into that room the site floats glass windows as visionOS does: one main window, a tab bar just off its left edge, a toolbar crossing its bottom edge, a small window bar under it that drags and springs home, and at 1360px and wider one side window turned 24 degrees toward the reader; tab bar, main window and side window are set as one group, centred on the screen. Projects open as sheets in front of the window you came from, which steps back a little and dims.\n\nThe front door is the hero. On the first home view of a session the room is out of focus and \"Leonardo Carvalho\" stands in the middle of it in Switzer at 780, heavy and blocky, drawn by the room as solid glass: frosted faces, bright rims, and a light behind the letters that spills round them in the colour style's hue. The specular light and that glow lean gently toward the pointer, hovering lifts the light and a press flares it. At the foot of the screen one quiet line says \"Click the title to proceed\" (\"Tap\" on touch screens). The title is the control: clicking it (or Return) pulls the room into focus while the name glides into the main window's title slot, turning white, and the window's glass forms around it; the window's contents, the side window and the tab bar follow, and the name hands off to the HTML title, which is plain text from then on. Liquid Glass stays out of the content layer, as Apple asks. Everything else is the system UI face, set the way visionOS sets it.\n\nThe material is glass drawn by the room itself: frost read from the blurred room, lensing at the rounded edge, a cobalt tint, a brightness cap that keeps white text legible, a bright rim, a light that follows the pointer, and a light from within when a control is pressed. Inside a window nothing is glass again: lists, cards, tables and buttons are white fills at 6, 14 and 22 percent. Motion is springs everywhere, described as Apple describes them (a response and a damping ratio) and stepped in the same frame as the glass. Nothing that carries text blurs or moves on its own: page changes crossfade, windows stay where they are when the pointer moves (only the light follows it, and the room behind leans), and anything with text settles without overshoot.",
     "keyCharacteristics": [
       "A drawn cobalt room (Night and Day) behind every page; a still of each is the CSS background without WebGL or scripts.",
-      "Glass windows, ornaments and one prominent control, drawn by the room under the HTML; CSS glass as the fallback.",
-      "The name, written in glass, is the only display voice; the system face sets everything else in white at three levels.",
+      "Glass windows and ornaments, and the hero's name, drawn by the room under the HTML; CSS glass as the fallback.",
+      "The name in Switzer is the only display voice: solid glass in the hero, white text as the home title; the system face sets everything else in white at three levels.",
       "Concentric radii: phone sheet 40, window 32, side window 28, card 20, list group 16, pill for every control.",
-      "One spring model (response, damping) for materialising, the tab bubble, sheets, parallax, drag and press.",
+      "One spring model (response, damping) for materialising, the hero's glide, the tab bubble, sheets, drag and press; no blur on text in motion.",
       "Every page reads without JavaScript, calms under reduced motion and transparency, and prints on white Letter."
     ],
     "rules": [
@@ -702,13 +714,13 @@
         "section": "colors"
       },
       {
-        "name": "The Written Name Rule",
-        "body": "The only display type is the name written in glass. Headings never borrow a script, and the system face never goes above the 34px title.",
+        "name": "The Name Rule",
+        "body": "The only display type is the name in Switzer: solid glass in the hero, white text as the home title. Headings never borrow it, and the system face never goes above the 34px title.",
         "section": "typography"
       },
       {
         "name": "The One Face Rule",
-        "body": "Everything that is read is the system UI face. The serif appears only as the manuscript's own title, on its card and its sheet; the experiments' titles lean in italic at 550 in the same face.",
+        "body": "Everything that is read is the system UI face, the name apart. The serif appears only as the manuscript's own title, on its card and its sheet; the experiments' titles lean in italic at 550 in the same face.",
         "section": "typography"
       },
       {
@@ -728,20 +740,21 @@
       }
     ],
     "dos": [
-      "Do let the written name be the display voice: in glass in the hello, in white glass as the home title, and as its SVG with scripts off and in print (The Written Name Rule).",
+      "Do let the name be the display voice: Switzer in solid glass in the hero, white text as the home title, with scripts off and in print (The Name Rule).",
       "Do keep text white at 100, 78 or 71 percent on glass, and let the glass cap its own brightness (The White on Glass Rule).",
       "Do put surfaces inside a window on the three fills (6, 14, 22 percent) and keep glass for windows and the controls that float over them (The One Glass Layer Rule).",
       "Do keep corners concentric: 40, 32, 28, 20, 16, 12 and the capsule for controls.",
       "Do move geometry with springs given as response and damping, in the same frame as the glass, and give reduced motion 150ms crossfades.",
       "Do give a project card its own screen's colour, with its screenshot resting on it.",
-      "Do turn side windows toward the reader as a resting position, and swing them in from further round as they arrive.",
+      "Do turn the side window toward the reader as a resting position, keep it in place across page changes, and turn it in from a little further round (32 degrees) when it first arrives.",
       "Do keep every page readable with scripts off, under reduced transparency (CSS glass at 84% tint), in forced colours, and in print."
     ],
     "donts": [
       "Don't put glass inside glass: no frosted panel, card or button inside a window.",
       "Don't tint text or headings; colour belongs to the room, the glass and a project's card.",
       "Don't set a heading in a script or a display face, or set the system face larger than the 34px title.",
-      "Don't tilt anything in response to hover; the side windows' angle is their place in the room, and hover answers with light and scale.",
+      "Don't tilt anything in response to hover; the side window's angle is its place in the room, and hover answers with light and scale.",
+      "Don't blur text or a window's contents while they move, and don't move windows with the pointer: blur and lean belong to the room behind.",
       "Don't fade a sheet's parent through its glass without fading its contents; the room cannot frost HTML.",
       "Don't put a small label above a title or section heading; the title carries itself.",
       "Don't use tween durations for window, bubble or sheet motion; those are springs."

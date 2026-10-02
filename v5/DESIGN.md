@@ -1,6 +1,6 @@
 ---
 name: Leonardo Carvalho, fifth edition
-description: A cobalt room drawn after Apple's Liquid Glass wallpapers, with glass windows floating in it and his name written in glass the way Apple writes hello.
+description: A cobalt room drawn after Apple's Liquid Glass wallpapers, with glass windows floating in it and his name in heavy Switzer, drawn as solid glass with a light behind it.
 colors:
   ground-night: "#0b1138"
   ground-day: "#2f64c2"
@@ -92,6 +92,23 @@ typography:
     fontSize: "clamp(20px, 2.1vw, 24px)"
     fontWeight: 600
     lineHeight: 1.3
+  name-hero:
+    fontFamily: "Switzer, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', Roboto, system-ui, sans-serif"
+    fontSize: "min(8.2vw, 24svh, 160px)"
+    fontWeight: 780
+    lineHeight: 1
+    letterSpacing: "-0.03em"
+  name-title:
+    fontFamily: "Switzer, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', Roboto, system-ui, sans-serif"
+    fontSize: "46px"
+    fontWeight: 700
+    lineHeight: 1.04
+    letterSpacing: "-0.03em"
+  hint:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', Roboto, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 500
+    lineHeight: 1.3
 rounded:
   sheet-phone: "40px"
   win: "32px"
@@ -112,7 +129,9 @@ spacing:
   section: "44px"
   win-top: "4.5svh"
   w-main: "clamp(720px, 52vw, 1040px)"
-  side-w: "clamp(220px, 17vw, 330px)"
+  side-w: "clamp(240px, 20vw, 350px)"
+  gap-side: "clamp(40px, 3.4vw, 64px)"
+  gap-tabs: "14px"
   measure: "44em"
 components:
   window:
@@ -173,12 +192,17 @@ components:
     rounded: "{rounded.pill}"
     padding: "8px 14px"
     typography: "{typography.control}"
-  enter:
-    backgroundColor: "{colors.glass-prominent}"
+  hero-name:
     textColor: "{colors.ink}"
-    rounded: "{rounded.pill}"
-    padding: "0 30px 0 32px"
-    height: "56px"
+    rounded: "0.2em"
+    padding: "0.05em 0.12em"
+    typography: "{typography.name-hero}"
+  hero-hint:
+    textColor: "{colors.ink-2}"
+    typography: "{typography.hint}"
+  name-title:
+    textColor: "{colors.ink}"
+    typography: "{typography.name-title}"
   close:
     backgroundColor: "{colors.fill-2}"
     textColor: "{colors.ink}"
@@ -259,18 +283,18 @@ components:
 
 **Creative North Star: "One Room, Many Windows"**
 
-A cobalt room drawn the way Apple draws its Liquid Glass wallpapers: a navy sky falling to a violet horizon, soft out-of-focus cobalt and periwinkle forms, and a flat glass wave with one bright crest, all moving slowly. The room is one WebGL2 canvas behind everything, in two palettes that follow the system: Night (navy and violet) and Day (sky blue over a warm pale horizon). Into that room the site floats glass windows as visionOS does: one main window centred, a tab bar hanging off its left edge, a toolbar crossing its bottom edge, a small window bar under it that drags and springs home, and at 1360px and wider two side windows turned 24 degrees toward the reader. Projects open as sheets in front of the window you came from, which steps back and dims.
+A cobalt room drawn the way Apple draws its Liquid Glass wallpapers: a navy sky falling to a violet horizon, soft out-of-focus cobalt and periwinkle forms, and a flat glass wave with one bright crest, all moving slowly. The room is one WebGL2 canvas behind everything, in two palettes that follow the system: Night (navy and violet) and Day (sky blue over a warm pale horizon). Into that room the site floats glass windows as visionOS does: one main window, a tab bar just off its left edge, a toolbar crossing its bottom edge, a small window bar under it that drags and springs home, and at 1360px and wider one side window turned 24 degrees toward the reader; tab bar, main window and side window are set as one group, centred on the screen. Projects open as sheets in front of the window you came from, which steps back a little and dims.
 
-The front door is the hello. On the first home view of a session the room is out of focus and "leonardo carvalho" writes itself in lowercase script, traced from Sacramento into pen strokes and rendered as glass tubes that bend the room behind them. An Enter button in prominent cobalt glass waits beneath. Entering pulls the room into focus, flies the name into the main window's title slot where it turns to white glass, and materialises the windows in order. After that the written name is the home window's title and the only display type on the site; everything else is the system UI face, set the way visionOS sets it.
+The front door is the hero. On the first home view of a session the room is out of focus and "Leonardo Carvalho" stands in the middle of it in Switzer at 780, heavy and blocky, drawn by the room as solid glass: frosted faces, bright rims, and a light behind the letters that spills round them in the colour style's hue. The specular light and that glow lean gently toward the pointer, hovering lifts the light and a press flares it. At the foot of the screen one quiet line says "Click the title to proceed" ("Tap" on touch screens). The title is the control: clicking it (or Return) pulls the room into focus while the name glides into the main window's title slot, turning white, and the window's glass forms around it; the window's contents, the side window and the tab bar follow, and the name hands off to the HTML title, which is plain text from then on. Liquid Glass stays out of the content layer, as Apple asks. Everything else is the system UI face, set the way visionOS sets it.
 
-The material is glass drawn by the room itself: frost read from the blurred room, lensing at the rounded edge, a cobalt tint, a brightness cap that keeps white text legible, a bright rim, a light that follows the pointer, and a light from within when a control is pressed. Inside a window nothing is glass again: lists, cards, tables and buttons are white fills at 6, 14 and 22 percent. Motion is springs everywhere, described as Apple describes them (a response and a damping ratio) and stepped in the same frame as the glass.
+The material is glass drawn by the room itself: frost read from the blurred room, lensing at the rounded edge, a cobalt tint, a brightness cap that keeps white text legible, a bright rim, a light that follows the pointer, and a light from within when a control is pressed. Inside a window nothing is glass again: lists, cards, tables and buttons are white fills at 6, 14 and 22 percent. Motion is springs everywhere, described as Apple describes them (a response and a damping ratio) and stepped in the same frame as the glass. Nothing that carries text blurs or moves on its own: page changes crossfade, windows stay where they are when the pointer moves (only the light follows it, and the room behind leans), and anything with text settles without overshoot.
 
 **Key Characteristics:**
 - A drawn cobalt room (Night and Day) behind every page; a still of each is the CSS background without WebGL or scripts.
-- Glass windows, ornaments and one prominent control, drawn by the room under the HTML; CSS glass as the fallback.
-- The name, written in glass, is the only display voice; the system face sets everything else in white at three levels.
+- Glass windows and ornaments, and the hero's name, drawn by the room under the HTML; CSS glass as the fallback.
+- The name in Switzer is the only display voice: solid glass in the hero, white text as the home title; the system face sets everything else in white at three levels.
 - Concentric radii: phone sheet 40, window 32, side window 28, card 20, list group 16, pill for every control.
-- One spring model (response, damping) for materialising, the tab bubble, sheets, parallax, drag and press.
+- One spring model (response, damping) for materialising, the hero's glide, the tab bubble, sheets, drag and press; no blur on text in motion.
 - Every page reads without JavaScript, calms under reduced motion and transparency, and prints on white Letter.
 
 ## Colors
@@ -279,7 +303,8 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 
 ### Primary
 - **Night Glass Cobalt** (`{colors.glass-night}`): the tint mixed into every window and ornament at night (48% for windows and ornaments), so the glass reads as luminous cobalt rather than grey. It is light in a surface, never a flat fill in CSS.
-- **Prominent Cobalt** (`{colors.glass-prominent}`): the one prominent glass, the Enter button in the hello, mixed at 46% and brightened by 16% so it stands above the room. By day it lifts to `#3d75ff`.
+- **Prominent Cobalt** (`{colors.glass-prominent}`): the prominent glass kind (mixed at 46% and brightened by 16%; by day `#3d75ff`). It was the hello's Enter button; since the hero made the title the control, no element carries it, and the shader keeps it for a primary control drawn in glass.
+- **The light behind the name**: periwinkle at night (`vec3(.44, .58, 1.0)`, about `#7094ff`), near white by day (`vec3(.86, .93, 1.0)`), turned by the color style like the room. By day the name's faces are a deeper cobalt glass (`vec3(.13, .27, .80)`) so they read against the bright room. The CSS hero takes the same light from `--glow-css`.
 - **Day Glass Blue** (`{colors.glass-day}`): the day tint, deeper than the day sky, so the brightness cap has less to hold down.
 
 ### Secondary (the room)
@@ -293,8 +318,8 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 - **Drawn Ink** (`{colors.drawn-ink}`), **Drawn Violet** (`{colors.drawn-violet}`) and **Drawn Green** (`{colors.drawn-green}`): the three Work cards for projects without screenshots, each drawn as a small picture on its colour, with white text.
 
 ### Neutral
-- **Ink** (`{colors.ink}`): all primary text, titles, the written name as a title, focus rings, the primary button's fill.
-- **Ink 2** (`{colors.ink-2}`, 78%): the second voice. The lede after its first sentence, prose, fact labels, side-window text, tabs at rest.
+- **Ink** (`{colors.ink}`): all primary text, titles, the name as the home title, focus rings, the primary button's fill.
+- **Ink 2** (`{colors.ink-2}`, 78%): the second voice. The lede after its first sentence, prose, fact labels, side-window text, tabs at rest, the hero's hint.
 - **Ink 3** (`{colors.ink-3}`, 71%): the third voice. Dates, notes, captions, table heads, reference numerals, list bullets.
 - **Line** (`{colors.line}`, 14%): dividers inside a list group, table rows, the side-window list.
 - **Fill** (`{colors.fill}`, 6%), **Fill 2** (`{colors.fill-2}`, 14%) and **Fill 3** (`{colors.fill-3}`, 22%): the three fills on glass. Fill grounds list groups, cards without colour, résumé entries, fact boxes, tables and buttons at rest; Fill 2 is hover and the round icon wells; Fill 3 is the current tab's bubble and a hovered close button.
@@ -309,14 +334,16 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 
 ## Typography
 
-**Display:** the written name, "leonardo carvalho" in lowercase script traced from Sacramento into pen strokes and rendered in glass. The site loads no font file; the name is stroke data (and an SVG for scripts off and print).
+**Display:** the name, "Leonardo Carvalho" in Switzer (Indian Type Foundry, through Fontshare; the variable font self-hosted from `assets/fonts/` under the ITF Free Font License, which allows self-hosting and wordmarks), heavy and blocky with tight tracking. It is the site's one font file.
 **Text and Titles Font:** the system UI face (SF Pro Display and SF Pro Text on Apple devices; Segoe UI Variable, Roboto and system-ui elsewhere).
 **Manuscript Font:** Iowan Old Style (with Palatino, Georgia): the aducanumab manuscript's own title only.
 
-**Character:** Apple's own voice for everything that is read, set at visionOS weights: bold titles, a medium 500 body that holds up on glass, and semibold 650 controls. The single flourish is the written name, which is drawn rather than typeset.
+**Character:** Apple's own voice for everything that is read, set at visionOS weights: bold titles, a medium 500 body that holds up on glass, and semibold 650 controls. The single flourish is the name, set big and heavy in Switzer and drawn as glass in the hero.
 
 ### Hierarchy
-- **The written name** (stroke width 24 name units, round caps and joins): the hello, at 80% of the viewport width on one line, or two lines under 700px; then the home window's title at up to 460px wide (340px under 700px, two lines). White glass as a title; clear glass in the hello.
+- **The name in the hero** (Switzer 780, `min(8.2vw, 24svh, 160px)`, line 1, -.03em): about 70% of the viewport's width on one line from 700px wide; under 700px two lines ("Leonardo" over "Carvalho") at `min(18vw, 15svh, 120px)`, line .98. Solid glass drawn by the room; CSS glass without it.
+- **The name as the home title** (Switzer 700, 46px, 1.04, -.03em; 42px under 900px; 44px on two lines under 700px; 30px on short landscape phones): plain white text, the glyphs the hero lands on.
+- **The hint** (500, 14px, Ink 2): "Click the title to proceed", or "Tap the title to proceed" on coarse pointers, centred 32px above the foot of the screen and its safe area.
 - **Title** (700, 34px, 1.08, -.012em): the window's title on every page other than home, and each sheet's title. 30px under 900px.
 - **Headline** (700, 22px, 1.2, -.008em): section titles inside a window, and side-window titles when they sit inside the main window.
 - **Side title** (700, 20px, 1.15, -.005em): the title of a floating side window.
@@ -324,42 +351,43 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 - **Lede** (500, 19px, 1.45): the introduction and the contact sentence, max 44em, in Ink 2 with its first sentence bold in Ink. 17px under 900px.
 - **Lead** (600, 18px, 1.4): the first-person sentence heading each group of the record, max 34em.
 - **Body** (500, 17px, 1.47, +.006em): prose (max 40em), rows, résumé text (16px inside entries), facts at 16px.
-- **Control** (650, 15px, line 1): buttons, the All work link, table of contents links; tabs and the close label at 16px; the Enter button at 19px.
+- **Control** (650, 15px, line 1): buttons, the All work link, table of contents links; tabs and the close label at 16px.
 - **Meta** (500, 14px): dates, sublines, side-window text, references, figure captions, side facts.
 - **Caption** (500, 13px): card sublines (two lines always reserved), table heads, experiment dates. Nothing on the site is under 12px.
 - **Manuscript** (600, `clamp(20px, 2.1vw, 24px)`, 1.3): the manuscript's title on its sheet, max 30em; 15px/1.22 on its card, clamped to three lines.
 
 ### Named Rules
-**The Written Name Rule.** The only display type is the name written in glass. Headings never borrow a script, and the system face never goes above the 34px title.
+**The Name Rule.** The only display type is the name in Switzer: solid glass in the hero, white text as the home title. Headings never borrow it, and the system face never goes above the 34px title.
 
-**The One Face Rule.** Everything that is read is the system UI face. The serif appears only as the manuscript's own title, on its card and its sheet; the experiments' titles lean in italic at 550 in the same face.
+**The One Face Rule.** Everything that is read is the system UI face, the name apart. The serif appears only as the manuscript's own title, on its card and its sheet; the experiments' titles lean in italic at 550 in the same face.
 
 **The Bold Is Ink Rule.** Inside Ink 2 text, a bold phrase is lifted to white at 650. Weight and ink rise together.
 
 ## Layout
 
-One room, and on it a centred main window `clamp(720px, 52vw, 1040px)` wide, 4.5svh from the top, with a height of the viewport less 14svh. Its head carries 30px top and 36px side padding (`{spacing.pad}`); its body scrolls inside the window with 18px above and 110px below, masked to fade over 22px at the top and over the last 78px, so text slides under the toolbar rather than being cut. Wheel and keys anywhere in the room scroll the front window.
+One room, and on it a main window `clamp(720px, 52vw, 1040px)` wide, 4.5svh from the top, with a height of the viewport less 14svh. Its head carries 30px top and 36px side padding (`{spacing.pad}`); its body scrolls inside the window with 18px above and 110px below, masked to fade over 22px at the top and over the last 78px, so text slides under the toolbar rather than being cut. Wheel and keys anywhere in the room scroll the front window.
 
 Three layout modes, set by script at 1360px and 900px:
-- **Desktop (1360px and wider):** side windows `clamp(220px, 17vw, 330px)` wide float `clamp(16px, 2vw, 48px)` from each edge, 3% down the window's height, at most 94% of it tall, turned 24 degrees toward the reader. The room's space has a 120vw perspective; the pointer shifts its origin by up to 10% and moves the space against the pointer by up to 1vw, and the room shifts the other way.
-- **Laptop (900 to 1359px):** no side windows; their content becomes sections inside the main window, 44px below the rest, with 22px titles.
-- **Phone and narrow tablet (under 900px):** the window becomes a full-screen sheet 10px from every edge (plus safe areas) with a 40px radius and 22px padding; the tab bar becomes a floating capsule at the bottom, `min(320px, 100vw - 110px)` wide and 66px tall, icons only, with the color style control beside it as a 66px circle (the capsule sits centred alone when there is no room to colour); the toolbar's actions sit inline in the content; nothing is angled or parallaxed. Under 700px the title is the two-line name and the avatar is dropped; under 600px the facts stack into one column.
+- **Desktop (1360px and wider):** one side window `clamp(240px, 20vw, 350px)` wide floats `clamp(40px, 3.4vw, 64px)` right of the main window, 3% down the window's height, at most 94% of it tall (it scrolls past that), turned 24 degrees toward the reader about its near edge, so it projects about 4.5% wider than its box. The tab bar sits 14px off the main window's left edge. The three are one group: the main window moves left of centre by half the difference between the side window's reach (its gap plus its projected width) and the tab bar's 78px, which centres the group's outline and, with it, the visual weight of its three pieces. It stops where the opened tab bar (188px, 14px off the window, 12px from the screen's edge) would no longer fit to the window's left, so under about 1460px the group sits up to 21px right of centre. The room's space has a 120vw perspective from 50% 45%. The pointer moves the light and leans the room a little against it (up to 1.2% across, desktop only); the windows never move with it, as visionOS keeps windows fixed in space.
+- **Laptop (900 to 1359px):** the main window centred, the tab bar 14px off its left edge; no side window, its content sections inside the main window, 44px below the rest, with 22px titles. Opened, the tab bar keeps its right edge where the screen has room (from about 1150px); narrower, it keeps 12px from the screen's edge and leans over the window's edge, its backdrop deepened so the window's text stays frosted beneath it.
+- **Phone and narrow tablet (under 900px):** the window becomes a full-screen sheet 10px from every edge (plus safe areas) with a 40px radius and 22px padding; the tab bar becomes a floating capsule at the bottom, `min(320px, 100vw - 110px)` wide and 66px tall, icons only, with the color style control beside it as a 66px circle (the capsule sits centred alone when there is no room to colour); the toolbar's actions sit inline in the content; nothing is angled. During the hero the color style control waits in the corner at its 46px desktop size, clear of the hint. Under 700px the title is the two-line name and the avatar is dropped; under 600px the facts stack into one column.
 
 Rhythm inside a window: 44px above each section, 16px under a section head, 30px between record groups, 12px under a lead, 16px between cards (12px on phones), 34px between prose blocks, 40px above a prose h2, 44px above a pager. Cards run four across (three on the Work page's filtered sets), and as many 132px columns as fit under 900px (two on a 360px phone). Sheets sit 44px inside the main window's sides (capped at 920px wide) and 4svh inside its top and bottom.
 
-Scripts off, the room becomes its still, and windows, side windows and tab bar stack in one centred column up to 980px wide.
+Scripts off, the room becomes its still, and the window, side window and tab bar stack in one centred column up to 980px wide.
 
 ## Elevation & Depth
 
 Depth is the room itself: glass windows at the front, the room behind them, and each window casting a soft shadow into the room. With WebGL2 the room draws every glass surface under its HTML element (marked `data-glass` as window, ornament or prominent) in one composite pass: frost read from the room's mipmaps at about 26 device pixels of blur (one step less for controls), refraction that bends the room inward within 30px of a window's rounded edge (20px for ornaments), a cobalt tint, the brightness cap, a 1px bright rim that is brighter on the side facing the light, a faint glow along the edge, a 300px pool of light near the pointer, and on press a light from within (24%, a spot 7% of the viewport tall, under the pointer). Windows cast a shadow 22px down that reaches 90px at 34%; ornaments one that reaches 40px at 22%. Glass appears and leaves by ramping its lensing and frost, not by fading a box.
 
-Behind a sheet, the parent steps back 10vw, its glass dims by 55%, its contents lose half their brightness, a fifth of their saturation and blur 1.5px, and fade out; its toolbar and window bar step away with it. The room cannot frost HTML, so the parent's content must fade rather than show through.
+Behind a sheet, the parent steps back 4vw (about 3% smaller), its glass dims by 55%, its contents lose half their brightness and a fifth of their saturation and fade out by a quarter of the way back (so the sheet's text and the parent's barely overlap, opening or closing); its toolbar and window bar step away with it. Nothing behind a sheet is blurred: the side window and tab bar stay sharp, only dimmed. The room cannot frost HTML, so the parent's content must fade rather than show through.
 
 Without WebGL2, with scripts off, under reduced transparency or in forced colours, the same elements draw CSS glass: the tint under `blur(30px) saturate(1.7) brightness(.8)`, a 1px gradient rim (72% white at the top left, 5% through the middle, 42% at the bottom right), and a soft shadow. The tab bar always uses CSS glass (22px blur), at every size, because it lies over content: the window's text when it opens, and scrolling content on phones.
 
 ### Shadow Vocabulary
 - **Window shadow** (drawn by the room: 22px down, reach 90px, 34%; CSS fallback `0 30px 80px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.12)`): every window and sheet.
-- **Ornament shadow** (drawn: reach 40px, 22%; the tab bar's CSS glass `0 16px 40px rgba(0,0,0,.28)`): tab bar, toolbar, Enter.
+- **Ornament shadow** (drawn: reach 40px, 22%; the tab bar's CSS glass `0 16px 40px rgba(0,0,0,.28)`): tab bar, toolbar.
+- **The light behind the name** (the hero only): a Gaussian blur of the letters 30% of the font size wide, added to the room at 50% by night (26% by day) and leaning up to 5% of the font size toward the pointer, with a tighter leak at the letters' edges; hover lifts it by 22%, a press flares it and it settles back within about 250ms. The CSS hero draws it with two `drop-shadow` filters.
 - **Card lift** (`0 10px 24px rgba(0,0,0,.16)`, hover `0 18px 40px rgba(0,0,0,.24)`): project cards, which sit on the window like objects.
 - **Screenshot shadow** (`0 10px 26px rgba(0,0,0,.26)` on a card, `0 14px 34px rgba(0,0,0,.24)` on a sheet figure): a screenshot resting on its colour.
 - **Hover light** (`radial-gradient(180px circle at pointer, rgba(255,255,255,.16), transparent 62%)`, plus-lighter; pressed 240px at 30%): cards, rows and buttons marked `data-hover`, the visionOS gaze light.
@@ -372,22 +400,23 @@ Without WebGL2, with scripts off, under reduced transparency or in forced colour
 
 ## Shapes
 
-Corners are concentric, larger outside and smaller within: the phone sheet 40px (`{rounded.sheet-phone}`), the main window and sheets 32px (`{rounded.win}`), side windows 28px (`{rounded.side}`), cards, figure tiles and the portrait 20px (`{rounded.card}`), list groups, résumé entries, fact boxes, tables and side-window rows 16px (`{rounded.row}`), table of contents links 12px (`{rounded.inner}`), and every control a full capsule (`{rounded.pill}`): buttons, tabs and their bubble, the toolbar, the phone tab bar, the Enter button, the skip link. The desktop tab bar is a 64px column with a 32px radius, so its ends are round. Screenshots on cards take 9px (14px when tall, a phone screen); sheet figures 10px. The avatar and icon wells are circles.
+Corners are concentric, larger outside and smaller within: the phone sheet 40px (`{rounded.sheet-phone}`), the main window and sheets 32px (`{rounded.win}`), the side window 28px (`{rounded.side}`), cards, figure tiles and the portrait 20px (`{rounded.card}`), list groups, résumé entries, fact boxes, tables and side-window rows 16px (`{rounded.row}`), table of contents links 12px (`{rounded.inner}`), and every control a full capsule (`{rounded.pill}`): buttons, tabs and their bubble, the toolbar, the phone tab bar, the skip link. The hero's focus ring rounds at .2em, 12px out from the name. The desktop tab bar is a 64px column with a 32px radius, so its ends are round. Screenshots on cards take 9px (14px when tall, a phone screen); sheet figures 10px. The avatar and icon wells are circles.
 
 Borders are almost absent: rows inside a group are divided by the Line, tables by the Line under each row, and the CSS glass rim is a masked gradient, not a border. The window bar is a pill pair of 11px dot and 96px bar at 62% white.
 
 ## Components
 
 ### The main window (signature)
-- A 32px-radius glass window with a head (title and, on home, the written name and a 60px round avatar) and a scrolling body masked at both ends. On sheets a 44px round close button (Fill 2, Fill 3 on hover) sits top left, and the head moves 84px right to clear it.
-- **Materialise:** from 14vw back and 96% scale to rest, opacity ramping 1.4 times faster than the spring, under a spring of response .55 and damping .86.
-- **Page change:** the old contents fade to 0 over 180ms while blurring 8px and scaling to .985 (`cubic-bezier(.4, 0, 1, 1)`); the new ones rise 14px and unblur from 6px over 260ms (`cubic-bezier(.2, .8, .2, 1)`). The window itself never leaves.
+- A 32px-radius glass window with a head (title and, on home, the name and a 60px round avatar) and a scrolling body masked at both ends. On sheets a 44px round close button (Fill 2, Fill 3 on hover) sits top left, and the head moves 84px right to clear it.
+- **Materialise:** from 98.5% scale to rest (8px at most at its corners), opacity ramping 1.4 times faster than the spring, under a critically damped spring (response .5, damping 1).
+- **Page change:** the old contents fade out over 140ms (`cubic-bezier(.4, 0, 1, 1)`); the new ones fade in over 220ms rising 6px (`cubic-bezier(.2, .8, .2, 1)`). No blur and no scale. The window itself never leaves, and neither does the side window: its contents crossfade with the window's.
 
-### Side windows
-- 28px radius, 24px by 22px padding, a 20px title, then side rows (a 38px round icon well in Fill 2, 34px in a floating side window, with a 19px stroked icon, a 15px bold line over 14px Ink 2), a divided list, facts at 14px, a table of contents, or the portrait. They swing in from 52 degrees to 24 and from 22vw back (response .7, damping .86), and fade out over their last 26px.
+### The side window
+- One per page, on the right: Home's This fall (with a line for Groton's live time, "9:41 AM in Groton"), Work's In progress then Experiments, Hockey's Measurables then Coach contacts, About's portrait and From then Interests, the Résumé's Sections then Contact. Two parts sit 30px apart (44px as sections inside the window).
+- 28px radius, 24px by 22px padding, a 20px title, then side rows (a 38px round icon well in Fill 2, 34px in a floating side window, with a 19px stroked icon, a 15px bold line over 14px Ink 2), a divided list, facts at 14px, a table of contents, or the portrait. It arrives turning from 32 degrees to its 24 as it fades in (response .55, damping 1), fades out over its last 26px, and scrolls when what it holds is taller than its room.
 
 ### Tab bar (ornament)
-- A 64px glass column hanging 36px off the window's left edge, vertically centred, 8px padding, 48px tabs with 24px stroked icons (1.7 stroke, round caps). Pointing at it for 120ms widens it to 188px and the names slide in (opacity .16s, 6px travel .3s, 60ms delay); it closes 300ms after the pointer leaves. Keyboard focus opens it too. Open, it lies over the window's text, so its backdrop deepens from `brightness(.74)` to `(.42)` as it widens, and its names keep 4.5:1 over a light card.
+- A 64px glass column whose right edge sits 14px off the window's left edge, vertically centred on it, 8px padding, 48px tabs with 24px stroked icons (1.7 stroke, round caps). Pointing at it for 120ms widens it to 188px toward the left: its right edge and its icons stay put, and each name slides in beside its icon on the open side (opacity .16s, 6px travel .3s, 60ms delay); it closes 300ms after the pointer leaves. Keyboard focus opens it too. It never covers the window where the screen has room; on laptops under about 1150px it leans over the window's edge, its backdrop deepening from `brightness(.74)` to `(.42)` as it widens so its names keep 4.5:1 over a light card. Its glass is always CSS glass (`data-glass-off`), so it stays true to its box at every width.
 - **The bubble:** a Fill 3 pill with a 1px inner top highlight at 32% marks the current tab, moved by a spring (response .45, damping .8) that stretches it along its travel by up to 30% while it moves.
 - **Phone:** the floating bottom capsule, icons only, names kept for screen readers, the bubble 60px wide.
 
@@ -396,8 +425,13 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **Button:** a 44px capsule, 18px sides, 650 at 15px, a Fill at rest and Fill 2 on hover (Fill 2 at rest and Fill 3 on hover inside the toolbar); pressing scales to .97 over a .35s ease.
 - **Primary:** white with Night Ground text; at most one per toolbar. A pressed filter takes the same white.
 - **More link:** a smaller capsule (8px 14px, Fill) beside a section title.
-- **Enter:** the one prominent glass, 56px tall, 650 at 19px with an arrow, and a 1.5px ring at 34% white 7px outside it that breathes over 2.6s. It fades in from 94% scale when the name is written, and leaves by growing to 108% as it fades.
 - **Window bar:** under the window, drags up to about 40px with rubber-band resistance and springs home (response .5, damping .7).
+
+### The hero
+- **The name** is a real `<button>` ("Leonardo Carvalho. Enter the portfolio") holding the name as text, centred at 45% of the screen's height. With the room it is transparent text, the control and the layout the glass is drawn from; Enter, Space or a click activates it, and Return anywhere on the hero does too. Its focus ring is the site's white 2px ring, 12px out, rounded at .2em.
+- **The glass:** the room draws the letters from a mask (the letters, a soft height 3.5% of the font size for the bevel, and a blur 30% of it for the light behind): frosted faces (the blurred room, a little lift and the light shining through), a bright rim on the side facing the light and a fainter one behind it, shade on the far bevel, a soft highlight drawn toward the pointer, a shimmer of moving surface and a sheen every 9s. By day the faces are a deeper cobalt.
+- **The hint** below it (see Typography) proceeds when clicked, without being a tab stop.
+- **Without the room** (no WebGL2, reduced transparency, forced colours) the same text is CSS glass: a white-to-periwinkle gradient clipped to the letters (deep blue by day, plain white under reduced transparency, system colours in forced colours) with a two-layer `drop-shadow` glow, and entering is a fade. Without scripts there is no hero.
 
 ### Cards (projects on their own screens' colours)
 - 20px radius, 4 to 5.1 aspect, the project's colour as the ground, the card lift shadow. A screenshot sits 8% in from the sides and 10% from the top (a phone screen 26% in, 9:17), with the name at 700 18px and a two-line 13px subline at 82% opacity pinned to the foot. The manuscript card is a page: its title in the serif over three grey rule lines.
@@ -416,29 +450,31 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **Links in text:** white, underlined 1px at 45% white, 3px offset; the underline goes white on hover.
 
 ### Motion (one spring model)
-- Every geometric motion is a spring given as a response (seconds) and a damping ratio, stepped at 4ms substeps in the shared frame loop, which runs the springs first, then whatever reads their layout, then the room, so the glass is drawn where its window is in that same frame: windows .55 / .86, side windows .7 / .86, the tab bubble .45 / .8, a sheet's parent stepping back .5 / 1, parallax .9 / 1 and the pointer light .6 / 1, the window bar .5 / .7, press light .3 / 1. The hello uses .5 / .8 for the Enter glass, 1.1 / 1 for the room's focus pull, .8 / .92 for the name's flight, and .45 / 1 for the title fading with its page.
-- **The hello's pace:** "leonardo" writes over 1.45s after .3s, "carvalho" starts .82s in and also takes 1.45s, eased in and out; Enter is ready at about 2.4s. A replay (pressing the title) runs 1.2 / .66 / 1.2. A sheen sweeps the glass name every 6.5s.
-- **Entering:** the main window at .18s, side windows from .34s 60ms apart, then tab bar .55s, toolbar .62s, window bar .7s; ornaments grow from 90% scale.
-- **CSS micro-motion** uses one curve, `cubic-bezier(.16, 1, .3, 1)`: the tab bar's width (.42s), button press (.35s), card hover (.45s), the Enter button (.6s fade, .9s scale).
-- **Reduced motion:** no writing, focus pull, parallax, drift or springs; transitions become 150ms crossfades and the room does not redraw while nothing moves.
+- Every geometric motion is a spring given as a response (seconds) and a damping ratio, stepped at 4ms substeps in the shared frame loop, which runs the springs first, then whatever reads their layout, then the room, so the glass is drawn where its window is in that same frame. Anything carrying text is critically damped: windows .5 / 1, the side window .55 / 1, ornaments .45 / 1, a sheet's parent stepping back .5 / 1, the pointer light .6 / 1 and the room's lean .9 / 1. The tab bubble (.45 / .8) and the window bar (.5 / .7) carry no text and may overshoot a little; press light .3 / 1.
+- **The motion rules:** text never blurs while it moves and content never moves on its own; blur belongs to the room. UI transitions run 150 to 300ms with at most about 8px of travel; bigger motion only answers the reader's own action (the hero's glide). Where several things move they stagger by 40 to 80ms.
+- **The hero's arrival:** the glass and the light behind come up together on a critically damped spring (response .8, about 0.9s); the hint follows from .75s over .5s.
+- **Entering:** on the click the hint fades (120ms) and the room pulls focus (1 / 1); the name glides on one critically damped spring (response .65, about 0.7s, no overshoot), its size in log space, its weight from 780 to 700 and its colour to white, redrawn at screen resolution every frame and read after the window has moved, so it never trails its slot. The main window's glass forms under it at once (from 98.5% scale); its contents fade in (240ms) once the name is within about half a line of its slot, then the side window (+60ms), the tab bar (+120ms) and the toolbar and window bar (+180ms). Landed, the name hands off: the HTML title fades in over the identical glyphs (150ms), then the ink goes from under it (100ms), and the glass is switched off.
+- **CSS micro-motion** uses one curve, `cubic-bezier(.16, 1, .3, 1)`: the tab bar's width (.42s), button press (.35s), card hover (.45s), the hero's hint (.5s).
+- **Reduced motion:** no glide, focus pull, lean, drift or springs; the hero's name is there at once and entering, page changes and sheets are 150ms crossfades (or none); the room does not redraw while nothing moves.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** let the written name be the display voice: in glass in the hello, in white glass as the home title, and as its SVG with scripts off and in print (The Written Name Rule).
+- **Do** let the name be the display voice: Switzer in solid glass in the hero, white text as the home title, with scripts off and in print (The Name Rule).
 - **Do** keep text white at 100, 78 or 71 percent on glass, and let the glass cap its own brightness (The White on Glass Rule).
 - **Do** put surfaces inside a window on the three fills (6, 14, 22 percent) and keep glass for windows and the controls that float over them (The One Glass Layer Rule).
 - **Do** keep corners concentric: 40, 32, 28, 20, 16, 12 and the capsule for controls.
 - **Do** move geometry with springs given as response and damping, in the same frame as the glass, and give reduced motion 150ms crossfades.
 - **Do** give a project card its own screen's colour, with its screenshot resting on it.
-- **Do** turn side windows toward the reader as a resting position, and swing them in from further round as they arrive.
+- **Do** turn the side window toward the reader as a resting position, keep it in place across page changes, and turn it in from a little further round (32 degrees) when it first arrives.
 - **Do** keep every page readable with scripts off, under reduced transparency (CSS glass at 84% tint), in forced colours, and in print.
 
 ### Don't:
 - **Don't** put glass inside glass: no frosted panel, card or button inside a window.
 - **Don't** tint text or headings; colour belongs to the room, the glass and a project's card.
 - **Don't** set a heading in a script or a display face, or set the system face larger than the 34px title.
-- **Don't** tilt anything in response to hover; the side windows' angle is their place in the room, and hover answers with light and scale.
+- **Don't** tilt anything in response to hover; the side window's angle is its place in the room, and hover answers with light and scale.
+- **Don't** blur text or a window's contents while they move, and don't move windows with the pointer: blur and lean belong to the room behind.
 - **Don't** fade a sheet's parent through its glass without fading its contents; the room cannot frost HTML.
 - **Don't** put a small label above a title or section heading; the title carries itself.
 - **Don't** use tween durations for window, bubble or sheet motion; those are springs.
