@@ -1,8 +1,9 @@
 /* v3 poster · one small script. Everything is progressive: the page reads
-   fully without it. It does four things: clip-reveals headlines once per
-   slide, runs the cover's load sequence after the display face arrives,
-   drives the desktop sheet-stacking (the covered sheet recedes as the next
-   one slides over it) and keeps the dot rail and keyboard in step. All
+   fully without it. It clip-reveals headlines once per slide, runs the
+   cover's load sequence after the display face arrives, drives the desktop
+   sheet-stacking (the covered sheet recedes as the next one slides over it),
+   keeps the dot rail, its current-sheet label and the keyboard in step, and
+   runs the cabinet: the index as a small file drawer beside the rail. All
    movement stops under prefers-reduced-motion. */
 (function () {
   'use strict';
@@ -22,6 +23,8 @@
     while (el.firstChild) span.appendChild(el.firstChild);
     el.appendChild(span);
   });
+  /* archive cards reveal one after another, however many Leonardo adds */
+  d.querySelectorAll('.entries > li').forEach(function (li, i) { li.style.setProperty('--i', i); });
 
   /* ---- 2. reveals replay every time a sheet comes back ----
      Phones: an observer adds the class at 30% and removes it once the sheet is
@@ -265,53 +268,242 @@
     }
   }
 
-  /* ---- the index drawer: folders for every sheet; choosing one scrolls there ---- */
-  var drawer = d.getElementById('drawer');
-  if (drawer && typeof drawer.showModal === 'function') {
-    var opener = null;
-    function openDrawer(e) {
-      if (drawer.open) return;
-      opener = e && e.currentTarget ? e.currentTarget : null;
-      drawer.querySelectorAll('.folder[data-current]').forEach(function (f) { f.removeAttribute('aria-current'); f.removeAttribute('data-current'); });
-      var cur = drawer.querySelector('.folder__btn[data-go="' + slides[current].id + '"]');
-      if (cur) { cur.parentNode.setAttribute('aria-current', 'true'); cur.parentNode.setAttribute('data-current', ''); }
-      html.classList.add('drawer-open');
-      drawer.classList.add('is-quiet');
-      drawer.showModal();
-      if (cur) cur.focus(); else { var first = drawer.querySelector('.folder__btn'); if (first) first.focus(); }
-    }
-    function closeDrawer() { if (drawer.open) drawer.close(); }
-    function wake() { drawer.classList.remove('is-quiet'); }
-    /* once the pointer takes over, drop the keyboard focus so only the hovered card shows */
-    drawer.addEventListener('pointermove', function () { wake(); var ae = d.activeElement; if (ae && ae.classList && ae.classList.contains('folder__btn')) ae.blur(); });
-    drawer.addEventListener('keydown', wake);
-    drawer.addEventListener('close', function () {
-      html.classList.remove('drawer-open'); drawer.classList.remove('is-quiet');
-      if (opener && opener.focus) opener.focus();
-    });
-    d.querySelectorAll('[data-drawer-open]').forEach(function (b) { b.addEventListener('click', openDrawer); });
-    d.querySelectorAll('[data-drawer-close]').forEach(function (b) { b.addEventListener('click', closeDrawer); });
-    drawer.addEventListener('click', function (e) { if (e.target === drawer) closeDrawer(); });
-    drawer.querySelectorAll('.folder__btn').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var id = b.getAttribute('data-go'), i = indexOfHash('#' + id);
-        closeDrawer();
-        if (i >= 0) { go(i); if (history.replaceState) history.replaceState(null, '', i === 0 ? location.pathname : '#' + id); }
+  /* ---- the rail and the cabinet ----
+     The rail is always on screen: a dot per sheet, the current sheet's number and name, and the folder
+     button. Hovering or focusing it opens the cabinet beside it after a short intent delay, and it closes
+     after a grace period once the pointer has left both; it stays open while the pointer is over either.
+     A click on the folder button keeps it open (a second click closes it). Hovering a dot or a folder, or
+     focusing a folder, pulls that folder's file up. Below 900px the same cabinet opens from the index
+     button as a bottom panel and a tap on a folder goes straight to the sheet. Non-modal throughout. */
+  var rail = d.querySelector('.rail');
+  var railBtn = d.querySelector('.rail__folder');
+  var railLabel = d.querySelector('[data-rail-label]');
+  var cabinet = d.getElementById('cabinet');
+  var folders = cabinet ? Array.prototype.slice.call(cabinet.querySelectorAll('.folder')) : [];
+  var folderLinks = folders.map(function (f) { return f.querySelector('.folder__btn'); });
+  var openers = Array.prototype.slice.call(d.querySelectorAll('[data-index-open]'));
+  var names = dots.map(function (a) { return a.getAttribute('data-name') || ''; });
+  var phoneMQ = window.matchMedia('(max-width: 899px)');
+  var OPEN_DELAY = 120, CLOSE_GRACE = 300, PULL_DWELL = 50;
+  var isOpen = false, pinned = false, openT = 0, closeT = 0, pullT = 0, pulled = -1;
+  var quiet = false, opener = null, holdFocusOpen = false, pointerIn = false;
+
+  /* with the script, keyboard users take the cabinet (one stop on the rail instead of twelve) */
+  dots.forEach(function (a) { a.setAttribute('tabindex', '-1'); });
+
+  function within(el) { return !!el && el.nodeType === 1 && ((rail && rail.contains(el)) || (cabinet && cabinet.contains(el))); }
+  function isOpener(el) { return openers.indexOf(el) >= 0; }
+  function mouseLike(e) { return e.pointerType === 'mouse' || e.pointerType === 'pen'; }
+  function setExpanded(v) { openers.forEach(function (b) { b.setAttribute('aria-expanded', v ? 'true' : 'false'); }); }
+
+  /* one file out at a time; its dot lights up with it */
+  function pull(k) {
+    clearTimeout(pullT); pullT = 0;
+    if (k === pulled) return;
+    var swap = pulled >= 0 && k >= 0;
+    if (pulled >= 0 && folders[pulled]) folders[pulled].classList.remove('is-out');
+    pulled = k;
+    if (k >= 0 && folders[k]) { folders[k].style.setProperty('--rise-delay', swap ? '60ms' : '0ms'); folders[k].classList.add('is-out'); }
+    dots.forEach(function (a, i) { a.classList.toggle('is-hot', i === k); });
+  }
+  function pullSoon(k, ms) { clearTimeout(pullT); pullT = setTimeout(function () { pull(k); }, ms); }
+
+  /* rows line up with the dots; only when a window is too short for the top folder's file to rise inside
+     it does the cabinet move down (as far as it can while staying on screen) */
+  function place() {
+    if (!cabinet) return;
+    cabinet.style.removeProperty('--cab-shift');
+    cabinet.classList.remove('is-cramped');
+    if (phoneMQ.matches) return;
+    function need() {
+      var n = 0;
+      folders.forEach(function (f) {
+        var file = f.querySelector('.file');
+        if (file) n = Math.max(n, 12 - (f.getBoundingClientRect().top + file.offsetTop)); /* 12: room for the tilt */
       });
-    });
-    /* arrow keys walk the folders while the drawer is open, also after the pointer
-       has taken focus off them (or from the close button) */
-    d.addEventListener('keydown', function (e) {
-      if (!drawer.open || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return;
-      var btns = Array.prototype.slice.call(drawer.querySelectorAll('.folder__btn')), i = btns.indexOf(d.activeElement), down = e.key === 'ArrowDown';
-      e.preventDefault();
-      btns[i < 0 ? (down ? 0 : btns.length - 1) : (i + (down ? 1 : -1) + btns.length) % btns.length].focus();
-    });
+      return n;
+    }
+    var room = window.innerHeight - 8 - cabinet.getBoundingClientRect().bottom, n = need();
+    /* in a very short window the files leave out their summary line rather than leave the screen */
+    if (n > room) { cabinet.classList.add('is-cramped'); n = need(); }
+    var shift = Math.max(0, Math.min(n, room));
+    if (shift > 0) cabinet.style.setProperty('--cab-shift', Math.ceil(shift) + 'px');
   }
 
-  /* ---- magnetic contact buttons: a few pixels toward a fine pointer ---- */
+  function openCabinet(how, focusIn) {
+    clearTimeout(openT); openT = 0; clearTimeout(closeT); closeT = 0;
+    if (!cabinet) return;
+    if (!isOpen) {
+      isOpen = true; place();
+      cabinet.classList.add('is-open'); rail.classList.add('is-indexing'); setExpanded(true);
+    }
+    if (how === 'pin') pinned = true;
+    if (focusIn) {
+      /* keyboard: focus lands on the current sheet's folder, and stays quiet (no file) until the
+         reader moves; a file covering the index the moment it opens would hide the folders */
+      quiet = true;
+      var f = folderLinks[current] || folderLinks[0];
+      if (f) f.focus();
+    }
+  }
+  function closeCabinet(returnFocus) {
+    clearTimeout(openT); openT = 0; clearTimeout(closeT); closeT = 0;
+    if (!isOpen) return;
+    isOpen = false; pinned = false; quiet = false;
+    pull(-1);
+    cabinet.classList.remove('is-open'); rail.classList.remove('is-indexing'); setExpanded(false);
+    var to = opener || railBtn;
+    opener = null;
+    if (returnFocus && to) { if (to === railBtn) holdFocusOpen = true; to.focus(); }
+    else if (within(d.activeElement) && d.activeElement !== railBtn) d.activeElement.blur();
+  }
+  function scheduleClose() {
+    clearTimeout(closeT);
+    closeT = setTimeout(function () {
+      closeT = 0;
+      if (pointerIn) return;
+      if (within(d.activeElement) && d.activeElement !== railBtn) { var i = folderLinks.indexOf(d.activeElement); pull(i); return; }
+      if (pinned) { pull(-1); return; }
+      closeCabinet(false);
+    }, CLOSE_GRACE);
+  }
+
+  if (cabinet && rail && railBtn) {
+    /* hover intent on the rail and the cabinet, as one area */
+    [rail, cabinet].forEach(function (el) {
+      el.addEventListener('pointerenter', function (e) {
+        if (!mouseLike(e) || phoneMQ.matches) return;
+        pointerIn = true; clearTimeout(closeT); closeT = 0;
+        if (!isOpen && !openT) openT = setTimeout(function () { openT = 0; if (pointerIn) openCabinet('hover'); }, OPEN_DELAY);
+      });
+      el.addEventListener('pointerleave', function (e) {
+        if (!mouseLike(e) || phoneMQ.matches) return;
+        if (within(e.relatedTarget)) return; /* from the rail straight into the cabinet, or back */
+        pointerIn = false;
+        clearTimeout(openT); openT = 0;
+        if (isOpen) scheduleClose();
+      });
+    });
+    /* a dot pulls its folder's file; moving left from a dot stays on the same row */
+    dots.forEach(function (a, i) {
+      a.addEventListener('pointerenter', function (e) {
+        if (!mouseLike(e) || phoneMQ.matches) return;
+        quiet = false;
+        pullSoon(i, isOpen ? PULL_DWELL : OPEN_DELAY + 60);
+      });
+    });
+    folderLinks.forEach(function (a, k) {
+      a.addEventListener('pointerenter', function (e) {
+        if (!mouseLike(e) || phoneMQ.matches) return;
+        quiet = false;
+        pullSoon(k, PULL_DWELL);
+      });
+      a.addEventListener('focus', function () { if (!quiet && !phoneMQ.matches) pull(k); });
+    });
+    cabinet.addEventListener('pointermove', function (e) { if (mouseLike(e)) quiet = false; });
+
+    /* focusing the folder button opens the cabinet too (keyboard focus only, after the same delay) */
+    railBtn.addEventListener('focus', function () {
+      if (holdFocusOpen) { holdFocusOpen = false; return; }
+      if (phoneMQ.matches || isOpen) return;
+      var kb = true; try { kb = railBtn.matches(':focus-visible'); } catch (err) { /* older engines */ }
+      if (!kb) return;
+      clearTimeout(openT);
+      openT = setTimeout(function () { openT = 0; if (d.activeElement === railBtn) { opener = railBtn; openCabinet('focus'); } }, OPEN_DELAY);
+    });
+    railBtn.addEventListener('blur', function () { holdFocusOpen = false; });
+
+    /* the folder button and "Open the index" toggle it for click, keyboard and touch */
+    openers.forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        var kb = e.detail === 0;
+        clearTimeout(openT); openT = 0;
+        if (isOpen && (pinned || b !== railBtn)) { closeCabinet(kb); return; }
+        opener = b;
+        openCabinet('pin', kb);
+      });
+    });
+    d.querySelectorAll('[data-index-close]').forEach(function (b) {
+      b.addEventListener('click', function (e) { closeCabinet(e.detail === 0 || within(d.activeElement)); });
+    });
+
+    /* focus leaving both the rail and the cabinet closes it, unless the pointer still holds it */
+    function focusOut(e) {
+      if (!isOpen) { if (!within(e.relatedTarget)) { clearTimeout(openT); openT = 0; } return; }
+      if (within(e.relatedTarget) || isOpener(e.relatedTarget)) return;
+      setTimeout(function () {
+        if (!isOpen || within(d.activeElement)) return;
+        if (pointerIn) { pull(-1); return; }
+        if (pinned && isOpener(d.activeElement)) return;
+        closeCabinet(false);
+      }, 0);
+    }
+    rail.addEventListener('focusout', focusOut);
+    cabinet.addEventListener('focusout', focusOut);
+
+    /* a press anywhere else closes it */
+    d.addEventListener('pointerdown', function (e) {
+      if (!isOpen) return;
+      var t = e.target;
+      if (within(t) || openers.some(function (b) { return b.contains(t); })) return;
+      closeCabinet(false);
+    }, true);
+
+    /* Escape closes and returns focus; arrows walk the folders; Home and End jump */
+    d.addEventListener('keydown', function (e) {
+      if (!isOpen) return;
+      var ae = d.activeElement, i = folderLinks.indexOf(ae);
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeCabinet(within(ae) || isOpener(ae));
+        return;
+      }
+      if (i < 0 && !isOpener(ae) && !within(ae)) return;
+      quiet = false;
+      var n = folderLinks.length, k = -1;
+      if (e.key === 'ArrowDown') k = i < 0 ? current : (i + 1) % n;
+      else if (e.key === 'ArrowUp') k = i < 0 ? current : (i - 1 + n) % n;
+      else if (e.key === 'Home') k = 0;
+      else if (e.key === 'End') k = n - 1;
+      if (k < 0) return;
+      e.preventDefault();
+      folderLinks[k].focus();
+      pull(k);
+    });
+
+    phoneMQ.addEventListener ? phoneMQ.addEventListener('change', function () { closeCabinet(false); }) : phoneMQ.addListener(function () { closeCabinet(false); });
+    window.addEventListener('resize', function () { if (isOpen) place(); });
+  }
+
+  /* the label beside the rail follows the current sheet; it fades through a swap, and while the reader
+     scrolls past several sheets it only shows where they land */
+  var labelT = 0, labelTo = 0;
+  function writeLabel(i) {
+    if (!railLabel) return;
+    var b = d.createElement('b'); b.textContent = (i < 9 ? '0' : '') + (i + 1);
+    railLabel.textContent = '';
+    railLabel.appendChild(b);
+    railLabel.appendChild(d.createTextNode(' ' + (names[i] || '')));
+  }
+  function showLabel(i) {
+    labelTo = i;
+    if (!railLabel) return;
+    if (reduce) { writeLabel(i); return; }
+    if (labelT) return;
+    railLabel.classList.add('is-swapping');
+    labelT = setTimeout(function () { labelT = 0; writeLabel(labelTo); railLabel.classList.remove('is-swapping'); }, 120);
+  }
+
+  /* on phones the floating index button steps aside while the end row, which has its own
+     "Open the index", is on screen (the CSS applies it below 900px only) */
+  var endRow = d.querySelector('.end');
+  if (endRow && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) { html.classList.toggle('at-end', es[0].isIntersecting); }).observe(endRow);
+  }
+
+  /* ---- magnetic buttons on the contact sheet: a few pixels toward a fine pointer ---- */
   if (hoverFine && !reduce) {
-    d.querySelectorAll('.contact__links a').forEach(function (a) {
+    d.querySelectorAll('[data-magnet]').forEach(function (a) {
       a.addEventListener('pointermove', function (e) {
         var r = a.getBoundingClientRect();
         var dx = (e.clientX - (r.left + r.width / 2)) / r.width, dy = (e.clientY - (r.top + r.height / 2)) / r.height;
@@ -323,6 +515,11 @@
   function setCurrent(i) {
     current = i;
     dots.forEach(function (a, k) { if (k === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    folders.forEach(function (f, k) {
+      f.classList.toggle('is-current', k === i);
+      if (k === i) folderLinks[k].setAttribute('aria-current', 'true'); else folderLinks[k].removeAttribute('aria-current');
+    });
+    showLabel(i);
   }
 
   /* ---- 5. navigation: dots, the name in the chrome, arrow keys, the hash ---- */
@@ -342,10 +539,11 @@
     var i = indexOfHash(a.getAttribute('href'));
     if (i < 0) return;
     e.preventDefault();
+    if (within(a)) closeCabinet(false);
     go(i);
     if (history.replaceState) history.replaceState(null, '', i === 0 ? location.pathname : '#' + slides[i].id);
-    /* the skip link also moves keyboard focus, as the native jump would */
-    if (a.classList.contains('skip')) { slides[i].setAttribute('tabindex', '-1'); slides[i].focus({ preventScroll: true }); }
+    /* the skip link, and any in-page link taken from the keyboard, also moves focus, as the native jump would */
+    if (a.classList.contains('skip') || e.detail === 0) { slides[i].setAttribute('tabindex', '-1'); slides[i].focus({ preventScroll: true }); }
   });
   /* keyboard focus landing in a stacked sheet brings that sheet to rest, so the sheet
      above it in the stack never covers the focused link */
@@ -358,7 +556,7 @@
   });
   d.addEventListener('keydown', function (e) {
     if (e.altKey || e.metaKey || e.ctrlKey || e.shiftKey) return;
-    if (d.getElementById('drawer') && d.getElementById('drawer').open) return;
+    if (isOpen && (within(d.activeElement) || isOpener(d.activeElement))) return;
     var tag = (e.target.tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
     if (e.key === 'ArrowRight') { e.preventDefault(); go(current + 1); }

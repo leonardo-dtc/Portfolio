@@ -21,21 +21,163 @@
   <a href="#cover">Leonardo Carvalho</a>
   <span aria-hidden="true">2026</span>
 </header>
-<nav class="rail" aria-label="Slides">
-  <button class="rail__folder" type="button" data-drawer-open aria-haspopup="dialog" aria-controls="drawer" aria-label="Open the index of sheets" title="Index">
+<!-- The rail: one dot per sheet, the current sheet's number and name, and the folder button that opens the
+     cabinet. The dots share their row pitch with the cabinet's folders, so each dot sits level with its folder. -->
+<nav class="rail" aria-label="Sheets">
+  <button class="rail__folder" type="button" data-index-open aria-expanded="false" aria-controls="cabinet" aria-label="Index of the sheets" title="Index">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5h6.2l1.8 2h10v10H3z"/><path d="M3 7.5V5.8h5.4l1.5 1.7"/></svg>
   </button>
-  <a href="#cover" aria-label="Cover" aria-current="true"></a>
-  <a href="#about" aria-label="About me"></a>
-  <a href="#skills" aria-label="Skills, tools and how I work"></a>
-  <a href="#research" aria-label="Drug safety research"></a>
-  <a href="#exoskeleton" aria-label="Knee exoskeleton"></a>
-  <a href="#loquar" aria-label="Loquar"></a>
-  <a href="#ocapex" aria-label="OCAPEX and FreeCode Juniors"></a>
-  <a href="#hockey" aria-label="Goaltender"></a>
-  <a href="#music" aria-label="Viola and violin"></a>
-  <a href="#record" aria-label="The record"></a>
-  <a href="#contact" aria-label="Contact"></a>
+  <p class="rail__label" aria-hidden="true" data-rail-label><b>01</b> Cover</p>
+  <a href="#cover" data-name="Cover" aria-label="Cover" aria-current="true"></a>
+  <a href="#about" data-name="About me" aria-label="About me"></a>
+  <a href="#skills" data-name="Skills" aria-label="Skills, tools and how I work"></a>
+  <a href="#research" data-name="Drug safety" aria-label="Drug safety research"></a>
+  <a href="#exoskeleton" data-name="Knee exoskeleton" aria-label="Knee exoskeleton"></a>
+  <a href="#loquar" data-name="Loquar" aria-label="Loquar"></a>
+  <a href="#ocapex" data-name="OCAPEX" aria-label="OCAPEX and FreeCode Juniors"></a>
+  <a href="#hockey" data-name="Goaltender" aria-label="Goaltender"></a>
+  <a href="#music" data-name="Viola &amp; violin" aria-label="Viola and violin"></a>
+  <a href="#record" data-name="The record" aria-label="The record"></a>
+  <a href="#archive" data-name="Archive" aria-label="Archive"></a>
+  <a href="#contact" data-name="Contact" aria-label="Contact"></a>
+</nav>
+
+<!-- The cabinet: the index as a small paper file drawer beside the rail (a bottom panel on phones).
+     One hairline folder per sheet with a trapezoid tab; black divider tabs mark the disciplines. Hovering or
+     focusing a folder pulls its file up out of it. Hidden without the script; the dots still work as anchors. -->
+<nav class="cabinet" id="cabinet" aria-label="Index of the sheets">
+  <div class="cabinet__stack">
+    <ol class="folders">
+      <li class="folder is-current" style="--k:0;--tx:.36">
+        <a class="folder__btn" href="#cover" aria-current="true" aria-describedby="file-cover"><span class="folder__tab"><span class="folder__n">01</span> Cover</span></a>
+        <div class="file" id="file-cover" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>01 / 12</p>
+          <p class="file__title">Leonardo Carvalho</p>
+          <p class="file__kicker">Portfolio 2026</p>
+          <p class="file__sum">Goaltender, student researcher, founder of OCAPEX, violist. Groton School, Class of 2028.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="divider" style="--k:1" aria-hidden="true"><span class="divider__card"><span class="divider__tab">About</span></span></li>
+      <li class="folder" style="--k:1;--tx:.04">
+        <a class="folder__btn" href="#about" aria-describedby="file-about"><span class="folder__tab"><span class="folder__n">02</span> About me</span></a>
+        <div class="file" id="file-about" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>02 / 12</p>
+          <p class="file__title">About me</p>
+          <p class="file__kicker">Read early, then commit.</p>
+          <p class="file__sum">Born in Beijing, raised in Ontario and South Florida, boarding at Groton since 2025. Planning to study biomedical engineering.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="folder" style="--k:2;--tx:.42">
+        <a class="folder__btn" href="#skills" aria-describedby="file-skills"><span class="folder__tab"><span class="folder__n">03</span> Skills</span></a>
+        <div class="file" id="file-skills" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>03 / 12</p>
+          <p class="file__title">Skills, tools, how I work</p>
+          <p class="file__kicker">Three habits</p>
+          <p class="file__sum">Statistics, feedback control and simulation in Python and Java, and three habits carried between the crease, the lab and the rehearsal room.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="divider" style="--k:3" aria-hidden="true"><span class="divider__card"><span class="divider__tab">Research</span></span></li>
+      <li class="folder" style="--k:3;--tx:.02">
+        <a class="folder__btn" href="#research" aria-describedby="file-research"><span class="folder__tab"><span class="folder__n">04</span> Drug safety</span></a>
+        <div class="file" id="file-research" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>04 / 12</p>
+          <p class="file__title">Drug safety</p>
+          <p class="file__kicker">Aducanumab’s post-marketing record</p>
+          <p class="file__sum">486 FDA adverse-event cases from 2016 to 2024, compared with lecanemab and donanemab. Manuscript submitted; not an efficacy study.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="folder" style="--k:4;--tx:.2">
+        <a class="folder__btn" href="#exoskeleton" aria-describedby="file-exoskeleton"><span class="folder__tab"><span class="folder__n">05</span> Knee exoskeleton</span></a>
+        <div class="file" id="file-exoskeleton" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>05 / 12</p>
+          <p class="file__title">Knee exoskeleton</p>
+          <p class="file__kicker">Genuvalens, summer 2026</p>
+          <p class="file__sum">An assist-as-needed knee exoskeleton for squat-to-stand after ACL reconstruction, designed and simulated with guidance from Georgia Tech’s EPIC Lab.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="divider" style="--k:5" aria-hidden="true"><span class="divider__card"><span class="divider__tab">Product</span></span></li>
+      <li class="folder" style="--k:5;--tx:.04">
+        <a class="folder__btn" href="#loquar" aria-describedby="file-loquar"><span class="folder__tab"><span class="folder__n">06</span> Loquar</span></a>
+        <div class="file" id="file-loquar" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>06 / 12</p>
+          <p class="file__title">Loquar</p>
+          <p class="file__kicker">Mandarin, in an open world</p>
+          <p class="file__sum">A language-learning web app built with friends; I own the systems, the interface and the code. Also Daedalus and this site.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="folder" style="--k:6;--tx:.44">
+        <a class="folder__btn" href="#ocapex" aria-describedby="file-ocapex"><span class="folder__tab"><span class="folder__n">07</span> OCAPEX</span></a>
+        <div class="file" id="file-ocapex" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>07 / 12</p>
+          <p class="file__title">OCAPEX</p>
+          <p class="file__kicker">Since 2022</p>
+          <p class="file__sum">A student-led music nonprofit I founded and run: 50+ performances and 3,000+ community members reached. Plus FreeCode Juniors.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="divider" style="--k:7" aria-hidden="true"><span class="divider__card"><span class="divider__tab">Hockey</span></span></li>
+      <li class="folder" style="--k:7;--tx:.08">
+        <a class="folder__btn" href="#hockey" aria-describedby="file-hockey"><span class="folder__tab"><span class="folder__n">08</span> Goaltender</span></a>
+        <div class="file" id="file-hockey" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>08 / 12</p>
+          <p class="file__title">Goaltender</p>
+          <p class="file__kicker">Groton School Boys’ Varsity</p>
+          <p class="file__sum">Butterfly, catches left, #1 in 2026-27. Measurables, the two-game 2025-26 line, team history and recruiting links.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="divider" style="--k:8" aria-hidden="true"><span class="divider__card"><span class="divider__tab">Music</span></span></li>
+      <li class="folder" style="--k:8;--tx:.03">
+        <a class="folder__btn" href="#music" aria-describedby="file-music"><span class="folder__tab"><span class="folder__n">09</span> Viola &amp; violin</span></a>
+        <div class="file" id="file-music" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>09 / 12</p>
+          <p class="file__title">Viola and violin</p>
+          <p class="file__kicker">Principal violist</p>
+          <p class="file__sum">Chamber Orchestra, the Amora quartet, Carnegie Hall’s Weill Recital Hall in November 2025, and the competition record.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="divider" style="--k:9" aria-hidden="true"><span class="divider__card"><span class="divider__tab">Record</span></span></li>
+      <li class="folder" style="--k:9;--tx:.12">
+        <a class="folder__btn" href="#record" aria-describedby="file-record"><span class="folder__tab"><span class="folder__n">10</span> The record</span></a>
+        <div class="file" id="file-record" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>10 / 12</p>
+          <p class="file__title">The record</p>
+          <p class="file__kicker">Education, honors, service</p>
+          <p class="file__sum">Groton School, nine AP exams at 5, SAT 1490, the Imagina Children’s Foundation and a Congressional Award in progress.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="divider" style="--k:10" aria-hidden="true"><span class="divider__card"><span class="divider__tab">Archive</span></span></li>
+      <li class="folder" style="--k:10;--tx:.05">
+        <a class="folder__btn" href="#archive" aria-describedby="file-archive"><span class="folder__tab"><span class="folder__n">11</span> Archive</span></a>
+        <div class="file" id="file-archive" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>11 / 12</p>
+          <p class="file__title">Archive</p>
+          <p class="file__kicker">Personal archive</p>
+          <p class="file__sum">Class projects, arrangements and team builds kept on file, from games rebuilt in Python and Java to FRC and FTC robots.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+      <li class="folder" style="--k:11;--tx:.4">
+        <a class="folder__btn" href="#contact" aria-describedby="file-contact"><span class="folder__tab"><span class="folder__n">12</span> Contact</span></a>
+        <div class="file" id="file-contact" aria-hidden="true">
+          <p class="file__rec"><span class="file__sheet">Sheet </span>12 / 12</p>
+          <p class="file__title">Let’s talk</p>
+          <p class="file__kicker">Email and profiles</p>
+          <p class="file__sum">Email, Elite Prospects, NCSA and OCAPEX. Transcript, hockey film and coach references available on request.</p>
+          <p class="file__go">Open the sheet</p>
+        </div>
+      </li>
+    </ol>
+    <div class="cabinet__front"><span class="cabinet__label">Portfolio · 12 sheets</span><button class="cabinet__close" type="button" data-index-close>Close <kbd>esc</kbd></button></div>
+  </div>
 </nav>
 
 <main class="deck" id="main">
@@ -394,178 +536,127 @@
     <div class="slide__dim" aria-hidden="true"></div>
   </section>
 
-  <!-- 11 · Contact -->
+  <!-- 11 · Archive -->
+  <section class="slide slide--paper archive" id="archive" aria-labelledby="archive-title">
+    <svg class="tear" aria-hidden="true"><use href="#tear-2"/></svg>
+    <div class="sheet"><div class="sheet__in">
+      <div class="head">
+        <h2 class="title hl" id="archive-title" style="--i:0">Archive</h2>
+        <p class="kicker r" style="--i:1">Personal archive · Class projects, arrangements and team builds · 2021 to now</p>
+      </div>
+      <!-- HOW TO ADD AN ENTRY (for Leonardo)
+           Each index card below is one <li class="entry"> ... </li>. To add your own:
+           1. Copy a whole <li class="entry"> block and paste it where it belongs in the list.
+           2. Change the four parts: the year (a year, "2021 to 2025" or "Now"), the kind (one or two words,
+              such as "Arrangement"), the title (written as you would say it) and the one line under it.
+           3. The link is optional. For a sheet on this page use its id: #cover, #about, #skills, #research,
+              #exoskeleton, #loquar, #ocapex, #hockey, #music, #record, #archive or #contact. For a page on
+              another site use the full https:// address, add rel="noopener", and end the link text with
+              "(leaves the site)". If there is nothing to link, delete the whole <a class="entry__link"> line.
+           4. Never link to another edition of this portfolio.
+           The tilt, the tape, the order of the reveal and the layout come from the stylesheet and the script,
+           so a new card looks like the others without any extra markup. If the cabinet's Archive file should
+           mention the new entry, edit its one line in the index near the top of this file (id "file-archive"). -->
+      <ul class="entries" aria-label="Archive entries">
+        <li class="entry">
+          <p class="entry__meta"><span class="entry__year">2026</span><span class="entry__kind">Games</span></p>
+          <h3 class="entry__title">snake, minesweeper and a dinosaur runner</h3>
+          <p class="entry__line">Rebuilt from scratch in Python and Java, AP Computer Science.</p>
+          <a class="entry__link" href="#record">Sheet 10, The record</a>
+        </li>
+        <li class="entry">
+          <p class="entry__meta"><span class="entry__year">2026</span><span class="entry__kind">Music video</span></p>
+          <h3 class="entry__title">a cover with its own music video</h3>
+          <p class="entry__line">A Calculus BC final.</p>
+          <a class="entry__link" href="#record">Sheet 10, The record</a>
+        </li>
+        <li class="entry">
+          <p class="entry__meta"><span class="entry__year">2026</span><span class="entry__kind">Statistics</span></p>
+          <h3 class="entry__title">ten sports, one composite index</h3>
+          <p class="entry__line">Five categories, AP Statistics.</p>
+          <a class="entry__link" href="#record">Sheet 10, The record</a>
+        </li>
+        <li class="entry">
+          <p class="entry__meta"><span class="entry__year">2026</span><span class="entry__kind">Arrangement</span></p>
+          <h3 class="entry__title">Vivaldi’s Summer, arranged for Amora</h3>
+          <p class="entry__line">One season per player; mine is Summer.</p>
+          <a class="entry__link" href="#music">Sheet 09, Viola and violin</a>
+        </li>
+        <li class="entry">
+          <p class="entry__meta"><span class="entry__year">2026</span><span class="entry__kind">Arrangement</span></p>
+          <h3 class="entry__title">The Phantom of the Opera, for string quartet</h3>
+          <p class="entry__line">An arrangement for four classmates.</p>
+          <a class="entry__link" href="#music">Sheet 09, Viola and violin</a>
+        </li>
+        <li class="entry">
+          <p class="entry__meta"><span class="entry__year">Now</span><span class="entry__kind">Game design</span></p>
+          <h3 class="entry__title">a labyrinth that changes while you are in it</h3>
+          <p class="entry__line">Daedalus, a design document with two endings, in development.</p>
+          <a class="entry__link" href="#loquar">Sheet 06, Loquar</a>
+        </li>
+        <li class="entry">
+          <p class="entry__meta"><span class="entry__year">2021 to 2025</span><span class="entry__kind">Robotics</span></p>
+          <h3 class="entry__title">FRC and FTC robots, in Java</h3>
+          <p class="entry__line">Programmer on both teams; the FRC team reached the state championship.</p>
+          <a class="entry__link" href="#record">Sheet 10, The record</a>
+        </li>
+        <li class="entry">
+          <p class="entry__meta"><span class="entry__year">2025</span><span class="entry__kind">Rocketry</span></p>
+          <h3 class="entry__title">an American Rocketry Challenge entry</h3>
+          <p class="entry__line">The team did not qualify for nationals.</p>
+          <a class="entry__link" href="#record">Sheet 10, The record</a>
+        </li>
+      </ul>
+    </div></div>
+    <div class="slide__dim" aria-hidden="true"></div>
+  </section>
+
+  <!-- 12 · Contact -->
   <section class="slide slide--dark talk" id="contact" aria-labelledby="contact-title">
     <svg class="tear" aria-hidden="true"><use href="#tear-1"/></svg>
     <div class="sheet">
-      <div class="talk__top">
-        <h2 class="sr-only" id="contact-title">Contact</h2>
-        <p class="talk__word" aria-hidden="true">
-          <span class="hl ac" style="--i:0">Let’s</span><span class="hl" style="--i:1">Talk</span>
-          <svg class="talk__frame" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true"><path class="draw" pathLength="1" d="M69.6,28.7 L88.9,34.1 L110.1,30.9 L141.5,27.2 L160.5,33.0 L177.9,31.0 L207.0,32.2 L229.8,29.7 L247.4,29.7 L272.6,38.3 L295.9,37.2 L316.3,37.4 L336.0,33.3 L364.2,38.1 L384.2,32.2 L405.2,33.8 L427.8,40.3 L449.5,41.5 L478.8,33.6 L496.3,38.5 L515.2,38.2 L546.6,35.6 L566.0,36.1 L588.3,44.3 L607.0,35.9 L628.3,41.6 L650.2,37.5 L677.5,46.4 L699.2,41.6 L723.9,39.0 L745.8,40.2 L768.6,48.5 L785.5,45.0 L813.6,41.3 L832.7,50.2 L862.5,42.0 L882.1,50.7 L899.9,47.8 L920.4,45.8 L949.2,48.5 L972.7,43.9 L967.7,59.7 L969.3,63.6 L966.8,77.0 L967.7,75.4 L969.2,86.5 L964.8,93.4 L964.2,102.6 L959.9,113.7 L959.3,123.3 L957.8,131.3 L964.8,136.5 L963.1,142.1 L962.6,151.9 L956.8,165.3 L957.8,167.5 L961.6,175.5 L958.9,181.6 L959.9,190.5 L951.3,205.7 L951.7,213.5 L959.1,218.1 L948.6,220.7 L949.8,232.0 L953.1,245.9 L949.8,245.7 L951.1,253.7 L945.6,265.9 L951.0,269.1 L947.8,283.5 L950.1,288.3 L950.6,294.2 L948.2,308.3 L949.1,313.6 L940.5,317.2 L944.0,326.5 L944.3,333.6 L945.1,343.1 L936.6,350.7 L940.3,362.5 L938.9,366.7 L917.1,373.9 L894.9,373.3 L867.0,373.3 L852.9,368.2 L826.5,367.6 L807.6,362.4 L782.2,366.6 L756.0,367.8 L737.5,361.1 L714.5,364.0 L689.7,365.3 L662.5,364.4 L643.0,366.6 L618.8,365.5 L601.0,363.0 L579.8,356.6 L554.2,361.8 L532.3,359.2 L503.4,356.4 L486.1,355.8 L457.9,357.0 L439.2,358.3 L412.0,360.1 L392.3,359.6 L366.3,360.8 L349.4,360.5 L330.6,358.5 L299.1,353.1 L277.6,356.8 L254.4,350.7 L230.9,349.2 L216.4,357.2 L188.0,354.3 L166.2,351.5 L142.4,352.1 L118.4,347.8 L98.4,346.6 L74.9,353.5 L48.0,344.6 L33.0,343.6 L28.5,343.6 L33.1,329.3 L28.6,321.9 L32.0,319.2 L39.8,311.1 L40.0,304.6 L40.8,296.5 L42.7,280.3 L37.2,273.9 L41.0,268.4 L39.5,263.9 L41.0,249.7 L40.8,244.3 L45.1,237.4 L44.4,225.6 L45.0,219.1 L43.7,213.3 L44.9,207.0 L50.6,193.3 L51.3,187.4 L50.5,182.1 L54.6,176.9 L55.3,162.3 L54.4,155.6 L50.2,149.8 L55.7,145.0 L55.2,136.7 L58.1,121.4 L61.2,115.3 L60.3,105.2 L56.1,105.8 L57.4,90.1 L59.6,81.6 L67.2,82.7 L66.5,68.7 L69.9,61.9 L63.3,55.8 L66.6,43.6 L67.2,36.8 Z"/></svg>
-          <img class="sticker sticker--mask sticker--hover pop" style="--i:4" src="assets/img/goalie-mask-front-640.webp" width="640" height="752" alt="" loading="lazy" decoding="async">
-          <svg class="sticker sticker--crown pop" style="--i:3" viewBox="0 0 120 90"><use href="#crown"/></svg>
-          <svg class="sticker sticker--star pop" style="--i:5" viewBox="0 0 64 64"><use href="#star"/></svg>
-          <span class="tape r" style="--i:6"></span>
-        </p>
+      <div class="talk__main">
+        <div class="talk__top">
+          <h2 class="sr-only" id="contact-title">Contact</h2>
+          <p class="talk__word" aria-hidden="true">
+            <span class="hl ac" style="--i:0">Let’s</span><span class="hl" style="--i:1">Talk</span>
+            <svg class="talk__frame" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true"><path class="draw" pathLength="1" d="M69.6,28.7 L88.9,34.1 L110.1,30.9 L141.5,27.2 L160.5,33.0 L177.9,31.0 L207.0,32.2 L229.8,29.7 L247.4,29.7 L272.6,38.3 L295.9,37.2 L316.3,37.4 L336.0,33.3 L364.2,38.1 L384.2,32.2 L405.2,33.8 L427.8,40.3 L449.5,41.5 L478.8,33.6 L496.3,38.5 L515.2,38.2 L546.6,35.6 L566.0,36.1 L588.3,44.3 L607.0,35.9 L628.3,41.6 L650.2,37.5 L677.5,46.4 L699.2,41.6 L723.9,39.0 L745.8,40.2 L768.6,48.5 L785.5,45.0 L813.6,41.3 L832.7,50.2 L862.5,42.0 L882.1,50.7 L899.9,47.8 L920.4,45.8 L949.2,48.5 L972.7,43.9 L967.7,59.7 L969.3,63.6 L966.8,77.0 L967.7,75.4 L969.2,86.5 L964.8,93.4 L964.2,102.6 L959.9,113.7 L959.3,123.3 L957.8,131.3 L964.8,136.5 L963.1,142.1 L962.6,151.9 L956.8,165.3 L957.8,167.5 L961.6,175.5 L958.9,181.6 L959.9,190.5 L951.3,205.7 L951.7,213.5 L959.1,218.1 L948.6,220.7 L949.8,232.0 L953.1,245.9 L949.8,245.7 L951.1,253.7 L945.6,265.9 L951.0,269.1 L947.8,283.5 L950.1,288.3 L950.6,294.2 L948.2,308.3 L949.1,313.6 L940.5,317.2 L944.0,326.5 L944.3,333.6 L945.1,343.1 L936.6,350.7 L940.3,362.5 L938.9,366.7 L917.1,373.9 L894.9,373.3 L867.0,373.3 L852.9,368.2 L826.5,367.6 L807.6,362.4 L782.2,366.6 L756.0,367.8 L737.5,361.1 L714.5,364.0 L689.7,365.3 L662.5,364.4 L643.0,366.6 L618.8,365.5 L601.0,363.0 L579.8,356.6 L554.2,361.8 L532.3,359.2 L503.4,356.4 L486.1,355.8 L457.9,357.0 L439.2,358.3 L412.0,360.1 L392.3,359.6 L366.3,360.8 L349.4,360.5 L330.6,358.5 L299.1,353.1 L277.6,356.8 L254.4,350.7 L230.9,349.2 L216.4,357.2 L188.0,354.3 L166.2,351.5 L142.4,352.1 L118.4,347.8 L98.4,346.6 L74.9,353.5 L48.0,344.6 L33.0,343.6 L28.5,343.6 L33.1,329.3 L28.6,321.9 L32.0,319.2 L39.8,311.1 L40.0,304.6 L40.8,296.5 L42.7,280.3 L37.2,273.9 L41.0,268.4 L39.5,263.9 L41.0,249.7 L40.8,244.3 L45.1,237.4 L44.4,225.6 L45.0,219.1 L43.7,213.3 L44.9,207.0 L50.6,193.3 L51.3,187.4 L50.5,182.1 L54.6,176.9 L55.3,162.3 L54.4,155.6 L50.2,149.8 L55.7,145.0 L55.2,136.7 L58.1,121.4 L61.2,115.3 L60.3,105.2 L56.1,105.8 L57.4,90.1 L59.6,81.6 L67.2,82.7 L66.5,68.7 L69.9,61.9 L63.3,55.8 L66.6,43.6 L67.2,36.8 Z"/></svg>
+            <img class="sticker sticker--mask sticker--hover pop" style="--i:4" src="assets/img/goalie-mask-front-640.webp" width="640" height="752" alt="" loading="lazy" decoding="async">
+            <svg class="sticker sticker--crown pop" style="--i:3" viewBox="0 0 120 90"><use href="#crown"/></svg>
+            <svg class="sticker sticker--star pop" style="--i:5" viewBox="0 0 64 64"><use href="#star"/></svg>
+            <span class="tape r" style="--i:6"></span>
+          </p>
+        </div>
+        <div class="reply">
+          <div class="reply__mail r" style="--i:2">
+            <p class="reply__k">Write to me</p>
+            <a class="mail" href="mailto:leonardo.dtc2009@gmail.com" data-magnet><span class="mail__addr">leonardo.dtc2009@<wbr>gmail.com</span><svg class="mail__go" viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg></a>
+            <p class="reply__note">For recruiting, project questions or a conversation. Transcript, hockey film and coach references available on request. Correspondence goes via a parent.</p>
+          </div>
+          <div class="reply__out r" style="--i:3">
+            <p class="reply__k">Profiles <span>· each one leaves this site</span></p>
+            <ul class="out">
+              <li><a href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" rel="noopener"><span class="out__t">Elite Prospects</span><span class="out__m">eliteprospects.com<span class="sr-only">, leaves this site</span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg></span></a></li>
+              <li><a href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" rel="noopener"><span class="out__t">NCSA recruiting profile</span><span class="out__m">ncsasports.org<span class="sr-only">, leaves this site</span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg></span></a></li>
+              <li><a href="https://ocapex.com" rel="noopener"><span class="out__t">OCAPEX</span><span class="out__m">ocapex.com<span class="sr-only">, leaves this site</span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg></span></a></li>
+            </ul>
+          </div>
+        </div>
       </div>
       <div class="talk__foot">
         <svg class="tear" aria-hidden="true"><use href="#tear-2"/></svg>
         <div class="sheet__in">
-          <div class="marquee r" style="--i:2" role="img" aria-label="Research, product, hockey, music">
-            <div class="marquee__track" aria-hidden="true">
-              <p class="disc"><span>Research</span><span>Product</span><span>Hockey</span><span>Music</span><span>Research</span><span>Product</span><span>Hockey</span><span>Music</span></p>
-              <p class="disc"><span>Research</span><span>Product</span><span>Hockey</span><span>Music</span><span>Research</span><span>Product</span><span>Hockey</span><span>Music</span></p>
-            </div>
+          <div class="end r" style="--i:4">
+            <a class="end__btn" href="#cover" data-magnet><svg class="end__up" viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg>Back to the top</a>
+            <button class="end__btn end__index" type="button" data-index-open aria-expanded="false" aria-controls="cabinet" data-magnet><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5h6.2l1.8 2h10v10H3z"/><path d="M3 7.5V5.8h5.4l1.5 1.7"/></svg>Open the index</button>
+            <p class="colophon">Leonardo Carvalho · Groton School, Class of 2028 · Updated September 2026</p>
           </div>
-          <div class="contact r" style="--i:3">
-            <p class="contact__title">Contact me</p>
-            <div class="contact__mid">
-              <a href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a>
-              <p>For recruiting, project questions or a conversation. Transcript, hockey film and coach references available on request.</p>
-            </div>
-            <ul class="contact__links">
-              <li><a href="mailto:leonardo.dtc2009@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a></li>
-              <li><a href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" rel="noopener" aria-label="Elite Prospects">EP</a></li>
-              <li><a href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" rel="noopener" aria-label="NCSA recruiting profile">NCSA</a></li>
-              <li><a href="https://ocapex.com" rel="noopener" aria-label="OCAPEX">OC</a></li>
-            </ul>
-          </div>
-          <p class="colophon r" style="--i:4"><span>Leonardo Carvalho · Groton School, Class of 2028 · Updated September 2026</span><span>Editions: <a href="../">v1 terminal</a> · <a href="../v2/">v2 editorial</a> · v3 poster</span></p>
         </div>
       </div>
     </div>
   </section>
 
 </main>
-
-<dialog class="drawer" id="drawer" aria-label="Index of the sheets">
-  <div class="drawer__in">
-    <div class="drawer__head">
-      <p class="drawer__label">Index</p>
-      <button class="drawer__close" type="button" data-drawer-close aria-label="Close the index">Close <kbd>esc</kbd></button>
-    </div>
-    <ol class="folders" style="--n:17">
-      <li class="folder" style="--k:0">
-        <button class="folder__btn" type="button" data-go="cover" aria-describedby="fc-cover"><span class="folder__tab"><span class="folder__n">01</span> Cover</span></button>
-        <div class="folder__card" id="fc-cover" role="note">
-          <p class="folder__rec">Sheet 01 / 11</p>
-          <p class="folder__title">Leonardo Carvalho</p>
-          <p class="folder__kicker">Portfolio 2026</p>
-          <p class="folder__sum">Goaltender, student researcher, founder of OCAPEX, violist. Groton School, Class of 2028.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder folder--divider" style="--k:1" aria-hidden="true"><span class="folder__tab">About</span></li>
-      <li class="folder" style="--k:2">
-        <button class="folder__btn" type="button" data-go="about" aria-describedby="fc-about"><span class="folder__tab"><span class="folder__n">02</span> About me</span></button>
-        <div class="folder__card" id="fc-about" role="note">
-          <p class="folder__rec">Sheet 02 / 11</p>
-          <p class="folder__title">About me</p>
-          <p class="folder__kicker">Read early, then commit.</p>
-          <p class="folder__sum">Born in Beijing, raised in Ontario and South Florida, boarding at Groton since 2025. Planning to study biomedical engineering.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder" style="--k:3">
-        <button class="folder__btn" type="button" data-go="skills" aria-describedby="fc-skills"><span class="folder__tab"><span class="folder__n">03</span> Skills</span></button>
-        <div class="folder__card" id="fc-skills" role="note">
-          <p class="folder__rec">Sheet 03 / 11</p>
-          <p class="folder__title">Skills, tools, how I work</p>
-          <p class="folder__kicker">Three habits</p>
-          <p class="folder__sum">Statistics, feedback control and simulation in Python and Java, and three habits carried between the crease, the lab and the rehearsal room.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder folder--divider" style="--k:4" aria-hidden="true"><span class="folder__tab">Research</span></li>
-      <li class="folder" style="--k:5">
-        <button class="folder__btn" type="button" data-go="research" aria-describedby="fc-research"><span class="folder__tab"><span class="folder__n">04</span> Drug safety</span></button>
-        <div class="folder__card" id="fc-research" role="note">
-          <p class="folder__rec">Sheet 04 / 11</p>
-          <p class="folder__title">Drug safety</p>
-          <p class="folder__kicker">Aducanumab’s post-marketing record</p>
-          <p class="folder__sum">486 FDA adverse-event cases from 2016 to 2024, compared with lecanemab and donanemab. Manuscript submitted; not an efficacy study.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder" style="--k:6">
-        <button class="folder__btn" type="button" data-go="exoskeleton" aria-describedby="fc-exoskeleton"><span class="folder__tab"><span class="folder__n">05</span> Knee exoskeleton</span></button>
-        <div class="folder__card" id="fc-exoskeleton" role="note">
-          <p class="folder__rec">Sheet 05 / 11</p>
-          <p class="folder__title">Knee exoskeleton</p>
-          <p class="folder__kicker">Genuvalens, summer 2026</p>
-          <p class="folder__sum">An assist-as-needed knee exoskeleton for squat-to-stand after ACL reconstruction, designed and simulated with guidance from Georgia Tech’s EPIC Lab.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder folder--divider" style="--k:7" aria-hidden="true"><span class="folder__tab">Product</span></li>
-      <li class="folder" style="--k:8">
-        <button class="folder__btn" type="button" data-go="loquar" aria-describedby="fc-loquar"><span class="folder__tab"><span class="folder__n">06</span> Loquar</span></button>
-        <div class="folder__card" id="fc-loquar" role="note">
-          <p class="folder__rec">Sheet 06 / 11</p>
-          <p class="folder__title">Loquar</p>
-          <p class="folder__kicker">Mandarin, in an open world</p>
-          <p class="folder__sum">A language-learning web app built with friends; I own the systems, the interface and the code. Also Daedalus and this site.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder" style="--k:9">
-        <button class="folder__btn" type="button" data-go="ocapex" aria-describedby="fc-ocapex"><span class="folder__tab"><span class="folder__n">07</span> OCAPEX</span></button>
-        <div class="folder__card" id="fc-ocapex" role="note">
-          <p class="folder__rec">Sheet 07 / 11</p>
-          <p class="folder__title">OCAPEX</p>
-          <p class="folder__kicker">Since 2022</p>
-          <p class="folder__sum">A student-led music nonprofit I founded and run: 50+ performances and 3,000+ community members reached. Plus FreeCode Juniors.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder folder--divider" style="--k:10" aria-hidden="true"><span class="folder__tab">Hockey</span></li>
-      <li class="folder" style="--k:11">
-        <button class="folder__btn" type="button" data-go="hockey" aria-describedby="fc-hockey"><span class="folder__tab"><span class="folder__n">08</span> Goaltender</span></button>
-        <div class="folder__card" id="fc-hockey" role="note">
-          <p class="folder__rec">Sheet 08 / 11</p>
-          <p class="folder__title">Goaltender</p>
-          <p class="folder__kicker">Groton School Boys’ Varsity</p>
-          <p class="folder__sum">Butterfly, catches left, #1 in 2026-27. Measurables, the two-game 2025-26 line, team history and recruiting links.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder folder--divider" style="--k:12" aria-hidden="true"><span class="folder__tab">Music</span></li>
-      <li class="folder" style="--k:13">
-        <button class="folder__btn" type="button" data-go="music" aria-describedby="fc-music"><span class="folder__tab"><span class="folder__n">09</span> Viola & violin</span></button>
-        <div class="folder__card" id="fc-music" role="note">
-          <p class="folder__rec">Sheet 09 / 11</p>
-          <p class="folder__title">Viola and violin</p>
-          <p class="folder__kicker">Principal violist</p>
-          <p class="folder__sum">Chamber Orchestra, the Amora quartet, Carnegie Hall’s Weill Recital Hall in November 2025, and the competition record.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder folder--divider" style="--k:14" aria-hidden="true"><span class="folder__tab">Record</span></li>
-      <li class="folder" style="--k:15">
-        <button class="folder__btn" type="button" data-go="record" aria-describedby="fc-record"><span class="folder__tab"><span class="folder__n">10</span> The record</span></button>
-        <div class="folder__card" id="fc-record" role="note">
-          <p class="folder__rec">Sheet 10 / 11</p>
-          <p class="folder__title">The record</p>
-          <p class="folder__kicker">Education, honors, service</p>
-          <p class="folder__sum">Groton School, nine AP exams at 5, SAT 1490, the Imagina Children’s Foundation and a Congressional Award in progress.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-      <li class="folder" style="--k:16">
-        <button class="folder__btn" type="button" data-go="contact" aria-describedby="fc-contact"><span class="folder__tab"><span class="folder__n">11</span> Contact</span></button>
-        <div class="folder__card" id="fc-contact" role="note">
-          <p class="folder__rec">Sheet 11 / 11</p>
-          <p class="folder__title">Let’s talk</p>
-          <p class="folder__kicker">Email and links</p>
-          <p class="folder__sum">Email, Elite Prospects, NCSA and OCAPEX, and the three editions of this site.</p>
-          <p class="folder__go">Open the sheet</p>
-        </div>
-      </li>
-    </ol>
-    <div class="drawer__front" aria-hidden="true"><span>Portfolio · 11 sheets</span></div>
-  </div>
-</dialog>
 
 <!-- Sprite: torn edges, stickers. The tears are 2800 wide and slice from the middle so they never stretch. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -587,6 +678,8 @@
     <circle cx="32" cy="32" r="29" fill="#fff" stroke="#151515" stroke-width="4"/>
     <path d="M32,12 L37.9,24.6 L51.6,26.2 L41.5,35.7 L44.2,49.3 L32,42.6 L19.8,49.3 L22.5,35.7 L12.4,26.2 L26.1,24.6 Z" fill="#151515"/>
   </symbol>
+  <!-- Arrow, drawn pointing right; turned in CSS for up and out -->
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/></symbol>
   <!-- Number badge -->
   <symbol id="num" viewBox="0 0 84 84">
     <circle cx="42" cy="42" r="38" fill="#fff" stroke="#151515" stroke-width="5"/>

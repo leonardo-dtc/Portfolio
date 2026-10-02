@@ -53,6 +53,9 @@
   --t: 240ms;
   --t-reveal: 560ms;
   --stagger: 60ms;
+  /* the index: the rail's dots and the cabinet's folders share one row pitch */
+  --row: 22px;
+  --tabh: 18px;
   /* the cover's torn red strip, in percent of the title box */
   --strip: polygon(26.0% 66.94%, 29.36% 68.95%, 32.73% 67.2%, 36.09% 66.0%, 39.45% 69.7%, 42.82% 63.71%, 46.18% 64.13%, 49.55% 62.1%, 52.91% 62.68%, 56.27% 62.41%, 59.64% 62.34%, 63.0% 59.28%, 66.36% 62.66%, 69.73% 60.43%, 73.09% 58.85%, 76.45% 57.87%, 79.82% 57.79%, 83.18% 56.32%, 86.55% 56.6%, 89.91% 55.06%, 93.27% 54.93%, 96.64% 53.43%, 100.0% 54.96%, 100.0% 69.46%, 96.64% 70.68%, 93.27% 72.79%, 89.91% 71.07%, 86.55% 71.91%, 83.18% 72.15%, 79.82% 75.35%, 76.45% 73.55%, 73.09% 76.68%, 69.73% 76.85%, 66.36% 77.71%, 63.0% 78.32%, 59.64% 77.46%, 56.27% 79.01%, 52.91% 78.77%, 49.55% 79.81%, 46.18% 79.22%, 42.82% 80.3%, 39.45% 79.55%, 36.09% 82.84%, 32.73% 82.33%, 29.36% 82.38%, 26.0% 82.41%);
 }
@@ -76,12 +79,22 @@ b { font-weight: 700; }
 .chrome { position: fixed; top: 0; left: 0; right: 0; height: var(--chrome); z-index: 100; display: flex; align-items: center; justify-content: space-between; padding-inline: var(--gutter); font-size: var(--small); letter-spacing: .12em; text-transform: uppercase; color: #fff; mix-blend-mode: difference; pointer-events: none; }
 .chrome a { pointer-events: auto; text-decoration: none; }
 .chrome a:focus-visible { outline-color: #fff; }
-.rail { position: fixed; right: calc(var(--gutter) - 2px); top: 50%; transform: translateY(-50%); z-index: 100; display: grid; gap: 9px; mix-blend-mode: difference; }
-.rail a { display: block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.38); transition: background var(--t-fast) ease, transform var(--t) var(--ease-out); }
-.rail a[aria-current="true"] { background: #fff; transform: scale(1.4); }
-.rail a:focus-visible { outline-color: #fff; }
-@media (max-width: 899px) { .rail { display: none; } }
-@media (hover: hover) and (pointer: fine) { .rail a:hover { background: #fff; } }
+/* The rail: a dot per sheet, each on an invisible hit cell one row tall and 20 to 36px wide (the dots
+   themselves are 8px), the current sheet's number and name running down beside them, and the folder
+   button on top. The rows start at 50% - 6 rows + 16px (so the rail, button included, is centred), the
+   same line the cabinet's folders start on, so each dot sits level with its folder. */
+.rail { --ext: clamp(0px, calc(var(--gutter) - 20px), 16px); position: fixed; right: calc(var(--gutter) - 10px - var(--ext)); top: calc(50% - 6 * var(--row) - 24px); z-index: 100; display: grid; grid-template-columns: 13px calc(20px + var(--ext)); grid-template-rows: 34px repeat(12, var(--row)); column-gap: 2px; padding: 6px 0 10px 10px; mix-blend-mode: difference; } /* --ext: the cells run on toward the screen edge as far as the gutter allows */
+.rail a { position: relative; grid-column: 2; display: block; height: var(--row); border-radius: 6px; }
+.rail a:first-of-type { grid-row: 2; } /* row 1 is the folder button's, even when it is hidden (no script) */
+.rail a::before { content: ""; position: absolute; left: 10px; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: rgba(255,255,255,.38); transition: background var(--t-fast) ease, transform var(--t) var(--ease-out); }
+.rail a[aria-current="true"]::before { background: #fff; transform: scale(1.4); }
+.rail a.is-hot::before { background: #fff; }
+.rail a:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.rail__label { grid-column: 1; grid-row: 2 / span 12; justify-self: center; align-self: start; margin: 4px 0 0; writing-mode: vertical-rl; font-size: var(--micro); line-height: 13px; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; color: #fff; transition: opacity 120ms ease; }
+.rail__label b { font-weight: 700; margin-bottom: .55em; }
+.rail__label.is-swapping, .rail.is-indexing .rail__label { opacity: 0; }
+html:not(.js) .rail__label { display: none; } /* without the script it could not follow the reader */
+@media (hover: hover) and (pointer: fine) { .rail a:hover::before { background: #fff; } }
 
 /* ---------- Slides as sheets ---------- */
 .deck { position: relative; }
@@ -99,8 +112,8 @@ b { font-weight: 700; }
 /* Where the sheet above does not stay behind this one (phones, short windows, no script, or a sheet too
    tall to stick), a dark sheet's torn edge tears from that paper instead of from the page's black. */
 .slide--paper + .slide--dark::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: calc(var(--chrome) + var(--tear)); background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .056 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 220px 220px, var(--paper); pointer-events: none; } /* paper with the sheet's grain baked in */
-/* the dot rail sits in the right margin; until the page is wide enough for that, content keeps clear of it */
-@media screen and (min-width: 900px) { .slide:not(.cover):not(.talk) .sheet__in { padding-right: max(var(--gutter), calc(var(--gutter) + 30px - max(0px, (100vw - var(--max)) / 2))); } }
+/* the dot rail and its label sit in the right margin; until the page is wide enough for that, content keeps clear of them */
+@media screen and (min-width: 900px) { .slide:not(.cover):not(.talk) .sheet__in, .talk__foot .sheet__in { padding-right: max(var(--gutter), calc(var(--gutter) + 33px - max(0px, (100vw - var(--max)) / 2))); } }
 
 /* Desktop: sticky stacking. Gated on size so tall content never gets stuck. */
 @media (min-width: 900px) and (min-height: 600px) {
@@ -151,8 +164,7 @@ b { font-weight: 700; }
 @media (hover: hover) and (pointer: fine) {
   .more:hover { color: var(--red); }
   .more:hover::after { animation: redraw 460ms var(--ease-out); }
-  .linkrow a:hover, .colophon a:hover { color: var(--red); background-size: 100% 2px; }
-  .contact__mid a:hover { color: var(--red); }
+  .linkrow a:hover { color: var(--red); background-size: 100% 2px; }
   .chrome a { transition: letter-spacing 200ms var(--ease-out); }
   .chrome a:hover { letter-spacing: .16em; }
 }
@@ -354,40 +366,104 @@ b { font-weight: 700; }
 .cols li > b:first-child { display: block; }
 .cols li .w { color: var(--fg-2); }
 
-/* ---------- 11 Contact ---------- */
+/* ---------- 11 Archive: index cards taped to the sheet ----------
+   Each entry is one <li class="entry">; tilt, tape and the reveal order come from here and the script,
+   so a copied card needs no extra markup. */
+.archive .sheet__in { align-content: start; padding-top: .75rem; }
+.archive .head { display: flex; align-items: end; justify-content: space-between; gap: .25rem 2rem; flex-wrap: wrap; }
+.archive .head .kicker { margin: 0 0 .55rem; max-width: 36ch; }
+.entries { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: clamp(1.25rem, 4.6vh, 3rem) clamp(1rem, 1.8vw, 1.6rem); margin-top: clamp(1.25rem, 5vh, 3.5rem); }
+@media (min-width: 900px) { .entries { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.entry { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 1rem 1.05rem 1rem; background: var(--white); color: var(--black); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 12px 26px rgba(0,0,0,.13); rotate: var(--tilt, 0deg); }
+.entry:nth-child(4n+1) { --tilt: -1deg; }
+.entry:nth-child(4n+2) { --tilt: .7deg; --tape: 5deg; }
+.entry:nth-child(4n+3) { --tilt: -.45deg; --tape: -7deg; }
+.entry:nth-child(4n+4) { --tilt: 1deg; --tape: 3deg; }
+.entry::before { content: ""; position: absolute; top: -13px; left: 50%; width: 78px; height: 24px; translate: -50% 0; rotate: var(--tape, -4deg); pointer-events: none; background: linear-gradient(100deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.85) 32%, rgba(255,255,255,.6) 58%, rgba(255,255,255,.8) 100%); box-shadow: 0 1px 3px rgba(0,0,0,.18), inset 0 0 0 1px rgba(0,0,0,.05); clip-path: polygon(2% 0, 98% 3%, 100% 24%, 97% 48%, 100% 78%, 98% 100%, 3% 97%, 0 70%, 2% 42%, 0 16%); }
+.entry__meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .35rem .75rem; padding-bottom: .5rem; border-bottom: 2px solid var(--red); }
+.entry__year { font: 400 1.5rem/1 var(--display); letter-spacing: .01em; color: var(--red); } /* 24px: large text, 4:1 on white */
+.entry__kind { padding: .32em .6em .26em; background: var(--black); color: var(--white); font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.2; text-transform: uppercase; }
+.entry__title { margin-top: .75rem; font: 400 clamp(1.05rem, .95rem + .35vw, 1.3rem)/1.2 var(--hand); text-wrap: balance; }
+.entry__line { margin-top: .45rem; font-size: var(--small); line-height: 1.45; color: var(--ink-2); text-wrap: pretty; }
+.entry__link { align-self: flex-start; margin-top: auto; padding-top: .8rem; font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.3; text-transform: uppercase; color: var(--black); text-decoration: none; }
+.entry__link::after { content: " →"; }
+.entry__link { background: linear-gradient(var(--red), var(--red)) 0 100% / 100% 2px no-repeat; padding-bottom: .3em; transition: background-size 200ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .entry__link:hover { background-size: 100% 4px; } }
+.js .entry { opacity: 0; translate: 0 8px; transition: opacity 420ms var(--ease-out), translate 420ms var(--ease-out); transition-delay: calc(160ms + var(--i, 0) * 50ms); }
+.js .is-in .entry { opacity: 1; translate: none; }
+
+/* ---------- 12 Contact: the poster and the reply, then a deliberate end ----------
+   Desktop: the framed LET'S TALK keeps its full size in the left column and the reply (one large email
+   action, the three profiles, the note) stands beside it; the torn paper strip below holds only the end.
+   Phones read it top to bottom in the same order. */
 .talk .sheet { display: grid; grid-template-rows: minmax(0, 1fr) auto; }
-.talk__top { position: relative; display: grid; place-items: center; padding: 1.5rem var(--gutter) 5rem; }
+.talk__main { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 2.5rem; width: 100%; max-width: var(--max); margin-inline: auto; padding: 1.5rem var(--gutter) 4.75rem; }
+.talk__top { position: relative; display: grid; place-items: center; min-width: 0; padding-top: 1rem; }
 .talk__word { position: relative; text-align: center; font: 400 clamp(4.5rem, 20vw, 13rem)/.86 var(--display); text-transform: uppercase; color: #fff; }
+@media (min-width: 900px) {
+  .talk__main { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); grid-template-rows: minmax(0, 1fr); gap: clamp(2rem, 4.5vw, 4.5rem); padding-right: max(var(--gutter), calc(var(--gutter) + 33px - max(0px, (100vw - var(--max)) / 2))); }
+  .talk__top { align-self: stretch; justify-items: start; padding-top: 0; }
+  /* the poster group runs from the star (left) to the mask (far right): about 3.4 times the type size */
+  .talk__word { margin-left: .3em; font-size: clamp(3rem, 14vw, 13rem); }
+}
+/* stacked sheets: the poster takes the room its column leaves it */
+@media (min-width: 900px) and (min-height: 600px) {
+  .js .talk__top { container-type: size; }
+  .js .talk__word { font-size: clamp(3rem, min(29cqw, 45cqh), 13rem); }
+}
 .talk__word .ac { color: var(--red); }
 .talk__frame { position: absolute; left: -8%; right: -8%; top: -12%; bottom: -12%; width: 116%; height: 124%; overflow: visible; }
 .talk__frame path { fill: none; stroke: #fff; stroke-width: 6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-.talk .sticker--mask { right: -64%; bottom: -14%; --rot: -8deg; transform: rotate(var(--rot)); width: clamp(110px, 14vw, 210px); height: auto; }
-.talk .sticker--crown { right: -18%; top: -28%; --rot: 16deg; transform: rotate(var(--rot)); }
-.talk .sticker--star { left: -14%; bottom: -8%; }
-.talk .tape { left: 18%; top: -9%; rotate: -28deg; width: 118px; } /* `rotate`, so the reveal's transform does not undo the tilt */
-@media (max-width: 719px) { .talk .sticker--crown, .talk .sticker--star, .talk .tape { display: none; } .talk .sticker--mask { right: -48%; bottom: -18%; width: 76px; } .talk__top { padding-bottom: 3.5rem; } }
+/* the stickers scale with the type (em), so the composition holds at any size */
+.talk .sticker--mask { right: -64%; bottom: -14%; --rot: -8deg; transform: rotate(var(--rot)); width: .97em; height: auto; }
+.talk .sticker--crown { right: -18%; top: -28%; --rot: 16deg; transform: rotate(var(--rot)); width: .62em; }
+.talk .sticker--star { left: -14%; bottom: -8%; width: .33em; }
+.talk .tape { left: 18%; top: -9%; rotate: -28deg; width: .57em; height: .17em; } /* `rotate`, so the reveal's transform does not undo the tilt */
+@media (max-width: 719px) { .talk .sticker--crown, .talk .sticker--star, .talk .tape { display: none; } .talk .sticker--mask { right: -48%; bottom: -18%; width: 76px; } }
+/* the reply, on the dark sheet */
+.reply { display: grid; gap: clamp(1.5rem, 3.6vh, 2.5rem); min-width: 0; align-self: center; }
+.reply__mail { container-type: inline-size; min-width: 0; }
+.reply__out { min-width: 0; }
+.reply__k { font-size: var(--micro); font-weight: 700; letter-spacing: .14em; line-height: 1.3; text-transform: uppercase; color: var(--fg); }
+.reply__k span { font-weight: 400; color: var(--fg-2); }
+/* the one large action: the address on a vermilion slab, taped down like everything else */
+.mail { position: relative; display: flex; align-items: center; justify-content: space-between; gap: .45em; margin-top: .65rem; padding: .52em .55em .46em .6em; background: var(--red); color: var(--black); font: 400 clamp(1.25rem, 2.6vw, 2.6rem)/1.04 var(--display); font-size: clamp(1.25rem, 6.2cqi, 2.6rem); letter-spacing: .01em; text-transform: uppercase; text-decoration: none; rotate: -1deg; box-shadow: 0 14px 30px rgba(0,0,0,.35); transition: background var(--t-fast) ease, color var(--t-fast) ease, translate 160ms var(--ease-out); }
+.mail::before { content: ""; position: absolute; right: 14%; top: -15px; width: 88px; height: 22px; rotate: 4deg; pointer-events: none; background: linear-gradient(100deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.55) 32%, rgba(255,255,255,.26) 58%, rgba(255,255,255,.5) 100%); box-shadow: 0 1px 3px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.08); clip-path: polygon(2% 0, 98% 3%, 100% 24%, 97% 48%, 100% 78%, 98% 100%, 3% 97%, 0 70%, 2% 42%, 0 16%); }
+.mail__addr { min-width: 0; }
+.mail__go { flex: none; width: .82em; height: .82em; transition: rotate 240ms var(--ease-out); }
+.mail:focus-visible { outline: 3px solid var(--white); outline-offset: 4px; }
+.reply__note { margin-top: 1.1rem; max-width: 56ch; font-size: var(--small); line-height: 1.5; color: var(--fg-2); text-wrap: pretty; }
+/* the three profiles: named rows, each marked as leaving the site */
+.out { margin-top: .65rem; border-top: 2px solid var(--fg); }
+.out a { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .2rem 1rem; min-height: 44px; padding: .7rem 0 .6rem; border-bottom: 1px solid var(--rule); color: var(--fg); text-decoration: none; transition: color var(--t-fast) ease; }
+.out__t { font: 400 clamp(1.3rem, 1rem + .9vw, 1.7rem)/1.05 var(--display); letter-spacing: .01em; text-transform: uppercase; }
+.out__m { display: inline-flex; align-items: center; gap: .5em; font-size: var(--micro); letter-spacing: .1em; text-transform: uppercase; color: var(--fg-2); }
+.out__m svg { width: 15px; height: 15px; flex: none; rotate: -45deg; transition: translate 240ms var(--ease-out); }
+.out a:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+/* the end: a torn paper strip with the way back up, the index and the colophon */
 .talk__foot { position: relative; background: var(--paper); color: var(--black); --fg: var(--black); --fg-2: var(--ink-2); --rule: var(--paper-2); }
 .talk__foot .tear { top: calc(1px - var(--tear)); color: var(--paper); }
-.talk__foot .sheet__in { min-height: 0; align-content: start; gap: 1.25rem; padding-top: 1rem; }
+.talk__foot .sheet__in { min-height: 0; padding-block: clamp(.6rem, 1.6vh, 1.1rem) clamp(.9rem, 2.4vh, 1.5rem); }
 @media (max-width: 899px) { .js .talk__foot .sheet__in { padding-bottom: 5rem; } } /* the colophon clears the index button */
-.marquee { overflow: hidden; margin-inline: calc(-1 * var(--gutter)); -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-.marquee__track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
-.marquee:hover .marquee__track { animation-play-state: paused; }
-.disc { display: flex; white-space: nowrap; font: 400 clamp(1rem, 1.9vw, 1.7rem)/1.2 var(--display); text-transform: uppercase; letter-spacing: .02em; }
-.disc span::after { content: "|"; margin-inline: .55em; color: var(--fg-2); }
-@keyframes marquee { to { transform: translateX(-50%); } }
-.contact { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; align-items: center; }
-@media (min-width: 720px) { .contact { grid-template-columns: auto minmax(0, 1fr) auto; gap: 2rem; } .contact__mid { text-align: center; } .contact__links { justify-content: flex-end; } }
-.contact__title { font: 400 clamp(1.75rem, 3vw, 2.75rem)/1 var(--display); text-transform: uppercase; }
-.contact__mid a { font-size: clamp(1rem, .9rem + .6vw, 1.25rem); text-decoration: none; border-bottom: 2px solid var(--red); padding-bottom: .15em; }
-.contact__mid p { margin-top: .5rem; font-size: var(--small); color: var(--fg-2); }
-.contact__links { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
-.contact__links a { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 2px solid var(--black); border-radius: 50%; font-weight: 700; font-size: var(--micro); letter-spacing: .04em; text-decoration: none; transition: background var(--t-fast) ease, color var(--t-fast) ease, translate 160ms var(--ease-out); }
-.contact__links a svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 2; }
-@media (hover: hover) and (pointer: fine) { .contact__links a:hover { background: var(--black); color: #fff; } }
-@media (pointer: coarse) { .drawer__close { min-height: 44px; } } /* a 44px touch target */
-.colophon { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .35rem 1.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: var(--micro); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); }
-.colophon a { text-decoration: none; background-image: linear-gradient(currentColor, currentColor); background-size: 100% 1px; background-position: 0 100%; background-repeat: no-repeat; transition: color var(--t-fast) ease, background-size 200ms var(--ease-out); }
+.end { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.end__btn { display: inline-flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 1.15rem 0 .95rem; border: 2px solid var(--black); border-radius: 999px; background: transparent; color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease, translate 160ms var(--ease-out); }
+.end__btn svg { width: 16px; height: 16px; flex: none; }
+.end__up { rotate: -90deg; transition: translate 240ms var(--ease-out); }
+.end__index svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+.end__btn:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
+.colophon { font-size: var(--micro); letter-spacing: .08em; line-height: 1.5; text-transform: uppercase; color: var(--ink-2); }
+.end .colophon { margin-left: auto; text-align: right; }
+@media (max-width: 1099px) { .end .colophon { margin-left: 0; flex-basis: 100%; text-align: left; } }
+@media (hover: hover) and (pointer: fine) {
+  .mail:hover { background: var(--white); color: var(--black); }
+  .mail:hover .mail__go { rotate: -45deg; }
+  .out:hover a { color: var(--fg-2); } /* the other two step back */
+  .out a:hover { color: var(--fg); }
+  .out a:hover .out__m svg { translate: 3px -3px; }
+  .end__btn:hover { background: var(--black); color: var(--white); }
+  .end__btn:hover .end__up { translate: 0 -2px; }
+}
 
 /* ---------- Small parts shared by the project slides ---------- */
 .hl { display: block; }
@@ -409,7 +485,7 @@ b { font-weight: 700; }
 
 /* ---------- Short windows: everything a notch tighter so the sheets still stack ---------- */
 @media (min-width: 900px) and (max-height: 820px) {
-  :root { --title: clamp(2.6rem, 7vw, 6rem); --text: 0.9rem; --tear: 52px; --chrome: 44px; }
+  :root { --title: clamp(2.6rem, 7vw, 6rem); --text: 0.9rem; --tear: 52px; --chrome: 44px; --row: 20px; --tabh: 17px; }
   .sheet__in { padding-block: .5rem .75rem; }
   .kicker, .split__text .kicker { margin-top: .6rem; font-size: .75rem; }
   .lede { margin-top: .5rem; font-size: 1.2rem; }
@@ -441,9 +517,6 @@ b { font-weight: 700; }
   .body { font-size: .86rem; }
   .cols ul { font-size: .75rem; line-height: 1.32; }
   .cols li { padding: .25rem 0; }
-  .colophon { padding-top: .5rem; }
-  .talk__foot .sheet__in { padding-bottom: .6rem; }
-  .contact__mid p { margin-top: .25rem; }
   .ticket { padding: .8rem 1rem; }
   .ticket .t { font-size: 1.5rem; }
   .ticket p { margin-top: .4rem; }
@@ -453,10 +526,25 @@ b { font-weight: 700; }
   .cover__title { font-size: clamp(3.2rem, 12.6vw, 11.4rem); }
   .cover__hand { font-size: 1.4rem; max-width: calc(113% - clamp(100px, 12vw, 170px) - 20px); }
   .cover .sticker--mask { width: clamp(100px, 12vw, 170px); }
-  .talk__word { font-size: clamp(4rem, 14vw, 10rem); }
-  .talk__top { padding-bottom: 3rem; }
-  .talk__foot .sheet__in { gap: .75rem; }
-  .disc { font-size: 1.1rem; }
+  .talk__main { padding-block: .75rem 4rem; }
+  .reply { gap: 1.1rem; }
+  .reply__note { margin-top: .75rem; font-size: .75rem; }
+  .out a { padding: .5rem 0 .4rem; min-height: 40px; }
+  .out__t { font-size: 1.3rem; }
+  .archive .entries { margin-top: 1rem; gap: 1.1rem 1rem; }
+  .entry { padding: .75rem .85rem .8rem; }
+  .entry__meta { padding-bottom: .4rem; }
+  .entry__title { margin-top: .5rem; font-size: 1.02rem; }
+  .entry__line { margin-top: .3rem; font-size: .75rem; line-height: 1.4; }
+  .entry__link { padding-top: .55rem; }
+}
+
+/* ---------- Touch screens at desktop widths (tablets in landscape): larger targets ---------- */
+@media (min-width: 900px) and (pointer: coarse) {
+  :root { --row: 28px; --tabh: 20px; }
+  .rail__folder { width: 34px; height: 34px; margin-left: -7px; }
+  .out a { min-height: 44px; }
+  .entry__link { display: inline-flex; align-items: flex-end; min-height: 44px; }
 }
 
 /* ---------- Reduced motion: keep the fades, drop the movement ---------- */
@@ -470,10 +558,7 @@ b { font-weight: 700; }
   .js .deck .slide { transform: none !important; }
   .slide__dim { display: none; }
   .cover__hint { animation: none; opacity: .8; }
-  .marquee__track { animation: none; width: 100%; justify-content: center; }
-  .marquee__track .disc + .disc { display: none; }
-  .marquee { mask-image: none; -webkit-mask-image: none; }
-  .tone img, .sticker--hover, .rail a, .more, .linkrow a, .colophon a, .contact__links a, .chrome a { transition: none; }
+  .tone img, .sticker--hover, .more, .linkrow a, .chrome a { transition: none; }
   .more:hover::after { animation: none; }
 }
 
@@ -495,90 +580,126 @@ b { font-weight: 700; }
   a { text-decoration: none; }
 }
 
-/* ---------- The index: a paper file drawer (after the reference clip) ----------
-   Folders fan out of the drawer on open, each one a hairline paper folder with
-   a trapezoid tab; a hovered or focused folder lifts and raises a dark record
-   card; choosing one closes the drawer and scrolls to that sheet. */
-.rail__folder { display: grid; place-items: center; width: 26px; height: 26px; margin: 0 0 6px -9px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #fff; cursor: pointer; transition: background var(--t-fast) ease, transform var(--t) var(--ease-out); }
+/* ---------- The index: the rail's folder button and the cabinet ----------
+   A compact paper file drawer anchored beside the rail (a bottom panel on phones), after the reference
+   clip: one hairline folder per sheet with a trapezoid tab, black divider tabs per discipline and the
+   drawer front. Each folder is one row tall and the whole row is its target; the rows start on the same
+   line as the rail's dots. A hovered or focused folder pulls its file up out of it, from behind its own
+   front, so the file never covers that folder's tab. Non-modal: the page stays visible and usable. */
+.rail__folder { grid-column: 2; grid-row: 1; justify-self: start; align-self: start; margin-left: -3px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #fff; cursor: pointer; transition: background var(--t-fast) ease, transform var(--t) var(--ease-out); }
 .rail__folder svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 .rail__folder:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.rail__folder[aria-expanded="true"] { background: rgba(255,255,255,.18); }
 html:not(.js) .rail__folder { display: none; }
 @media (hover: hover) and (pointer: fine) { .rail__folder:hover { background: rgba(255,255,255,.18); transform: translateY(-1px); } }
 @media (max-width: 899px) {
-  .rail { display: grid; top: auto; bottom: 16px; right: 14px; transform: none; gap: 0; }
-  .rail a { display: none; }
-  .rail__folder { width: 44px; height: 44px; margin: 0; border-radius: 50%; background: rgba(255,255,255,.14); }
+  .rail { top: auto; bottom: 16px; right: 14px; grid-template-columns: 44px; grid-template-rows: 44px; column-gap: 0; padding: 0; }
+  .rail a:first-of-type { grid-row: auto; }
+  .rail a, .rail__label { display: none; }
+  .rail__folder { grid-column: 1; width: 44px; height: 44px; margin-left: 0; border-radius: 50%; background: rgba(255,255,255,.14); }
   .rail__folder svg { width: 20px; height: 20px; }
+  /* the page's own end has "Open the index"; the floating button steps aside while it is on screen */
+  html.at-end .rail__folder { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t-fast) ease, visibility 0s linear var(--t-fast); }
 }
 
-.drawer { position: fixed; top: 0; right: 0; bottom: 0; left: auto; width: min(460px, 94vw); height: 100vh; height: 100svh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; border-left: 1px solid var(--black); background: var(--paper); color: var(--black); overflow: auto; box-shadow: -24px 0 60px rgba(0,0,0,.22); }
-.drawer::backdrop { background: rgba(21,21,21,.28); }
-.drawer[open] { animation: drawer-in 340ms var(--ease-out); }
-@keyframes drawer-in { from { transform: translateX(100%); } }
-html.drawer-open { overflow: hidden; }
-.drawer__in { position: relative; width: auto; margin: 0; padding: 1.1rem 1.4rem 1.6rem; min-height: 100%; display: grid; grid-template-rows: auto 1fr auto; }
-.drawer__head { display: flex; justify-content: space-between; align-items: center; font-size: var(--micro); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 1rem; }
-.drawer__label { font-weight: 700; color: var(--black); }
-.drawer__close { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; background: none; border: 0; padding: .4rem 0; cursor: pointer; display: flex; gap: .5rem; align-items: center; }
-.drawer__close kbd { font: inherit; border: 1px solid var(--paper-2); border-radius: 3px; padding: .05rem .35rem; }
-.drawer__close:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
-
-.folders { --step: 28px; --tabh: 20px; display: grid; justify-items: center; align-content: end; padding-top: 48px; }
-/* right after opening, the focused folder stays quiet until the visitor moves or presses a key */
-.drawer.is-quiet .folder:focus-within .folder__card { opacity: 0; transform: translateY(14px); }
-.drawer.is-quiet .folder:focus-within .folder__btn { transform: none; box-shadow: none; }
-.folder { position: relative; width: calc(58% + (var(--k) / max(var(--n) - 1, 1)) * 42%); height: 46px; margin-top: calc(var(--step) - 46px); }
-.folder:first-child { margin-top: 0; }
-.folder__btn { position: absolute; inset: 0; z-index: calc(var(--k) + 1); width: 100%; height: 100%; padding: 0; border: 1px solid var(--black); border-bottom: 0; border-radius: 3px 3px 0 0; background: var(--paper); color: var(--black); cursor: pointer; font: inherit; text-align: left; transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out); }
-.folder__btn::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: rgba(21,21,21,.08); }
-.folder__tab { position: absolute; top: calc(-1 * var(--tabh) + 1px); left: 12%; height: var(--tabh); padding: 0 14px; display: inline-flex; align-items: center; gap: .45em; font-size: var(--micro); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; color: var(--black); background: var(--black); clip-path: polygon(0 100%, 9px 0, calc(100% - 9px) 0, 100% 100%); }
-.folder__tab::before { content: ""; position: absolute; inset: 1px 1px 0 1px; background: var(--paper); clip-path: polygon(0 100%, 8px 0, calc(100% - 8px) 0, 100% 100%); z-index: -1; }
-.folder:nth-child(3n+2) .folder__tab { left: auto; right: 12%; }
-.folder:nth-child(3n+3) .folder__tab { left: 40%; }
-.folder__n { color: var(--red); font-weight: 700; }
-.folder--divider .folder__tab { position: absolute; top: calc(-1 * var(--tabh) + 1px); left: 22%; z-index: calc(var(--k) + 2); color: #fff; font-weight: 700; padding: 0 12px; pointer-events: none; }
-.folder--divider .folder__tab::before { display: none; }
-.folder--divider:nth-child(3n+2) .folder__tab { left: auto; right: 22%; }
-.folder--divider::after { content: ""; position: absolute; inset: 0; z-index: calc(var(--k) + 1); border: 1px solid var(--black); border-bottom: 0; border-radius: 3px 3px 0 0; background: var(--paper); }
-.folder[aria-current="true"] .folder__tab::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
-.folder__card { position: absolute; left: 2%; right: 2%; bottom: calc(100% - 6px); z-index: 80; background: var(--black); color: var(--paper); padding: 1rem 1.1rem 1.1rem; box-shadow: 0 24px 50px rgba(0,0,0,.35); opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity 180ms var(--ease-out), transform 220ms var(--ease-out); }
-.folder__rec { font-size: var(--micro); letter-spacing: .14em; text-transform: uppercase; color: var(--stage-2); }
-.folder__title { font: 400 clamp(1.5rem, 3vw, 2.1rem)/1 var(--display); text-transform: uppercase; margin-top: .45rem; }
-.folder__kicker { font-size: var(--micro); letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 700; margin-top: .35rem; }
-.folder__sum { font-size: var(--small); line-height: 1.45; margin-top: .6rem; max-width: 52ch; }
-.folder__go { font-size: var(--micro); letter-spacing: .14em; text-transform: uppercase; margin-top: .8rem; color: #fff; }
-.folder__go::after { content: " →"; }
-.folder:hover .folder__btn, .folder:focus-within .folder__btn { transform: translateY(-5px); }
-.folder:hover .folder__card, .folder:focus-within .folder__card { opacity: 1; transform: translateY(-5px); }
-/* the top folders have no room above them, so their cards drop downward */
-.folder:nth-child(-n+5) .folder__card { bottom: auto; top: calc(100% - 4px); transform: translateY(-14px); }
-.folder:nth-child(-n+5):hover .folder__card, .folder:nth-child(-n+5):focus-within .folder__card { transform: translateY(0); }
-.folder__btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
-.drawer__front { position: relative; z-index: 90; width: 100%; height: 76px; border: 1px solid var(--black); border-radius: 2px; background: var(--paper); display: grid; place-items: center; font-size: var(--micro); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2); }
-/* on open, the folders rise out of the drawer one after another */
-.drawer[open] .folder { animation: folder-rise 760ms cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: calc(240ms + var(--k) * 16ms); }
-@keyframes folder-rise { from { opacity: 0; transform: translateY(72px); } 40% { opacity: 1; } }
-@media (max-width: 599px) {
-  .folders { --step: 26px; padding-top: 44px; }
-  .folder { height: 40px; margin-top: calc(var(--step) - 40px); width: calc(70% + (var(--k) / max(var(--n) - 1, 1)) * 30%); }
-  .folder__tab { padding: 0 9px; letter-spacing: .08em; }
-  .folder__card { left: -6%; right: -6%; padding: .8rem .9rem .9rem; }
-  .folder__sum { font-size: .78rem; }
-  .drawer__front { height: 64px; }
+.cabinet { --div-up: min(5px, calc(var(--row) - var(--tabh) - 1px)); position: fixed; z-index: 120; right: calc(var(--gutter) + 10px); top: calc(50% - 6 * var(--row) + 3px + var(--cab-shift, 0px)); width: 324px; padding: 12px 12px 10px; background: var(--paper); color: var(--black); border: 1px solid var(--black); border-radius: 3px; box-shadow: 0 2px 6px rgba(0,0,0,.16), 0 24px 52px rgba(0,0,0,.3); }
+html:not(.js) .cabinet { display: none; }
+.js .cabinet { visibility: hidden; opacity: 0; transform: translateX(8px); transition: opacity 150ms ease, transform 200ms var(--ease-out), visibility 0s linear 200ms; }
+.js .cabinet.is-open { visibility: visible; opacity: 1; transform: none; transition: opacity 200ms ease, transform 240ms var(--ease-out), visibility 0s; }
+/* files may rise out of the top and sides; nothing shows below the drawer front */
+.cabinet__stack { position: relative; z-index: 0; clip-path: inset(-100vh -100vw 0 -100vw); }
+.folder, .divider { position: relative; --w: calc(86% + 14% * var(--k) / 11); }
+.folder { height: var(--row); }
+.divider { height: 0; }
+.folder__btn { position: absolute; inset: 0; z-index: calc(3 * var(--k) + 3); display: block; color: var(--black); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+/* the folder itself: its front edge sits 4px above the row's end, the folder in front covers the rest */
+.folder__btn::before { content: ""; position: absolute; left: calc((100% - var(--w)) / 2); width: var(--w); top: calc(100% - 4px); height: calc(var(--row) + 12px); border: 1px solid var(--black); border-bottom: 0; border-radius: 3px 3px 0 0; background: var(--paper); }
+.folder__tab { position: absolute; bottom: 2px; left: calc((100% - var(--w)) / 2 + var(--w) * var(--tx, .04)); height: var(--tabh); padding: 0 11px; display: inline-flex; align-items: center; gap: .5em; font-size: var(--micro); line-height: 1; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; color: var(--black); background: var(--black); clip-path: polygon(0 100%, 8px 0, calc(100% - 8px) 0, 100% 100%); }
+.folder__tab::before { content: ""; position: absolute; inset: 1px 1px 0; z-index: -1; background: var(--paper); clip-path: polygon(0 100%, 7px 0, calc(100% - 7px) 0, 100% 100%); transition: background var(--t-fast) ease; }
+.folder__n { font-weight: 700; }
+/* you are here: the current sheet's tab is vermilion (black on vermilion, 4.5:1) */
+.folder.is-current .folder__tab::before { background: var(--red); }
+.folder.is-out:not(.is-current) .folder__tab::before { background: var(--white); }
+/* keyboard focus: the tab's outline thickens to 2px, vermilion (black on the current, vermilion, tab) */
+.folder__btn:focus { outline: none; }
+.folder__btn:focus-visible .folder__tab { background: var(--red); }
+.folder.is-current .folder__btn:focus-visible .folder__tab { background: var(--black); }
+.folder__btn:focus-visible .folder__tab::before { inset: 2px 2px 0; }
+.folder__btn:focus-visible::before { border-top-width: 2px; }
+/* dividers are cards standing just behind their first folder, a few px taller, tab on the right */
+.divider__card { position: absolute; z-index: calc(3 * var(--k) + 1); left: calc((100% - var(--w)) / 2); width: var(--w); top: calc(var(--row) - 4px - var(--div-up)); height: calc(var(--row) + 8px); border: 1px solid var(--black); border-bottom: 0; border-radius: 3px 3px 0 0; background: var(--paper); pointer-events: none; }
+.divider__tab { position: absolute; right: 4%; bottom: calc(100% - 1px); height: var(--tabh); padding: 0 11px; display: inline-flex; align-items: center; font-size: var(--micro); font-weight: 700; line-height: 1; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; color: var(--white); background: var(--black); clip-path: polygon(0 100%, 8px 0, calc(100% - 8px) 0, 100% 100%); }
+/* the file: white paper behind its folder's front; pulled, it rises out with a slight tilt and a piece of
+   tape. Its lowest part stays in the folder, below the text, so the folder's tab never covers a word. */
+.file { position: absolute; z-index: calc(3 * var(--k) + 2); left: calc((100% - var(--w)) / 2 + 9px); width: calc(var(--w) - 18px); bottom: -4px; padding: 14px 15px calc(var(--tabh) + 16px); background: var(--white); color: var(--black); box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 14px 32px rgba(0,0,0,.26); transform-origin: 50% 100%; transform: translateY(100%) rotate(var(--tilt, -1.2deg)); visibility: hidden; pointer-events: none; transition: transform 180ms var(--ease-out), visibility 0s linear 180ms; }
+.folder:nth-child(even) .file { --tilt: 1deg; }
+.folder:nth-child(3n) .file { --tilt: -.6deg; }
+/* one file moves at a time: when another is going back in, this one waits 60ms (set by the script) */
+.folder.is-out .file { transform: rotate(var(--tilt, -1.2deg)); visibility: visible; transition: transform 250ms var(--ease-out) var(--rise-delay, 0ms), visibility 0s linear var(--rise-delay, 0ms); }
+.file::before { content: ""; position: absolute; top: -12px; left: 50%; width: 72px; height: 22px; translate: -50% 0; rotate: -3deg; background: linear-gradient(100deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.85) 32%, rgba(255,255,255,.6) 58%, rgba(255,255,255,.8) 100%); box-shadow: 0 1px 3px rgba(0,0,0,.22), inset 0 0 0 1px rgba(0,0,0,.06); clip-path: polygon(2% 0, 98% 3%, 100% 24%, 97% 48%, 100% 78%, 98% 100%, 3% 97%, 0 70%, 2% 42%, 0 16%); }
+.file__rec { font-size: var(--micro); letter-spacing: .14em; line-height: 1.3; text-transform: uppercase; color: var(--ink-2); }
+/* you are here: the current sheet's file says so in its first line (generated, so no other folder's
+   description carries it) */
+.folder.is-current .file__sheet { display: none; }
+.folder.is-current .file__rec::before { content: "You are here · "; font-weight: 700; color: var(--black); }
+.file__title { margin-top: .4rem; font: 400 1.6rem/1 var(--display); letter-spacing: .005em; text-transform: uppercase; text-wrap: balance; }
+.file__kicker { margin-top: .45rem; padding-left: .55rem; border-left: 3px solid var(--red); font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.3; text-transform: uppercase; }
+.file__sum { margin-top: .55rem; font-size: var(--small); line-height: 1.42; text-wrap: pretty; }
+.file__go { display: inline-block; margin-top: .65rem; padding-bottom: .2em; border-bottom: 2px solid var(--red); font-size: var(--micro); font-weight: 700; letter-spacing: .14em; line-height: 1.2; text-transform: uppercase; }
+.file__go::after { content: " →"; }
+/* the drawer front */
+.cabinet__front { position: relative; z-index: 100; display: flex; align-items: center; justify-content: space-between; gap: .5rem; height: 40px; margin-top: 6px; padding: 0 4px 0 12px; border: 1px solid var(--black); border-radius: 2px; background: var(--paper); font-size: var(--micro); letter-spacing: .12em; line-height: 1; text-transform: uppercase; white-space: nowrap; color: var(--ink-2); }
+.cabinet__close { display: inline-flex; align-items: center; gap: .45rem; min-height: 32px; padding: 0 .55rem; border: 0; border-radius: 3px; background: none; color: var(--black); font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.cabinet__close kbd { font: inherit; padding: .2rem .35rem .15rem; border: 1px solid var(--paper-2); border-radius: 3px; }
+.cabinet__close:focus-visible { outline: 2px solid var(--red); outline-offset: 0; }
+@media (hover: hover) and (pointer: fine) { .cabinet__close:hover { background: rgba(21,21,21,.06); } }
+@media (pointer: coarse) { .cabinet__close { min-height: 44px; } .cabinet__close kbd { display: none; } } /* a 44px touch target; no key hint on touch screens */
+/* short windows: tighter files, so even the top folder's file rises inside the window */
+@media (min-width: 900px) and (max-height: 820px) {
+  .file { padding: 11px 13px calc(var(--tabh) + 12px); }
+  .file__title { margin-top: .3rem; font-size: 1.4rem; }
+  .file__kicker { margin-top: .35rem; }
+  .file__sum { margin-top: .4rem; line-height: 1.36; }
+  .file__go { margin-top: .45rem; }
 }
-@media (max-width: 359px) { .folder:nth-child(3n+3) .folder__tab { left: 28%; } } /* the longest tab stays on its folder */
+.cabinet.is-cramped .file__sum { display: none; } /* very short windows only (set by the script) */
+/* phones: the same cabinet as a bottom panel, rows 44px tall, no files (a tap opens the sheet) */
+@media (max-width: 899px) {
+  .cabinet { --row: 44px; --tabh: 22px; top: auto; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); width: min(440px, calc(100vw - 16px)); max-height: min(80svh, calc(100svh - 24px)); overflow-y: auto; overscroll-behavior: contain; padding: 14px 12px 0; }
+  .js .cabinet { transform: translateY(14px); }
+  .js .cabinet.is-open { transform: none; }
+  .cabinet .file { display: none; }
+  .cabinet__stack { clip-path: none; }
+  .cabinet__front { position: sticky; bottom: 0; height: 52px; margin: 8px -12px 0; padding: 0 4px 0 16px; border-width: 1px 0 0; border-radius: 0; }
+  .cabinet__close { min-height: 44px; padding: 0 .9rem; }
+  .cabinet__close kbd { display: none; }
+  .folder__tab, .divider__tab { padding: 0 12px; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .drawer[open], .drawer[open] .folder { animation: none; }
   .code__body code::after { animation: none; }
-  .folder:hover .folder__btn, .folder:focus-within .folder__btn { transform: none; }
-  .folder__card { transition: opacity 150ms ease; transform: none; }
-  .folder:hover .folder__card, .folder:focus-within .folder__card { transform: none; }
-  .folder:nth-child(-n+5) .folder__card { transform: none; }
-  .rail__folder { transition: none; }
+  .rail__folder, .rail a::before, .rail__label, .folder__tab::before { transition: none; }
+  .js .cabinet, .js .cabinet.is-open { transform: none; }
+  .js .cabinet { transition: opacity 150ms ease, visibility 0s linear 150ms; }
+  .js .cabinet.is-open { transition: opacity 150ms ease, visibility 0s; }
+  .file, .folder.is-out .file { transform: rotate(var(--tilt, -1.2deg)); }
+  .file { opacity: 0; transition: opacity 150ms ease, visibility 0s linear 150ms; }
+  .folder.is-out .file { opacity: 1; transition: opacity 150ms ease var(--rise-delay, 0ms), visibility 0s linear var(--rise-delay, 0ms); }
+  .js .entry { translate: none !important; transition: opacity 200ms ease; }
+  .mail, .mail__go, .out a, .out__m svg, .end__btn, .end__up, .entry__link { transition: none; }
 }
 @media print {
-  .drawer, .rail__folder, .cover__code, .sheet::after, .slide::before { display: none !important; }
-  .marquee { margin-inline: 0; -webkit-mask-image: none; mask-image: none; }
-  .marquee__track { animation: none; width: 100%; justify-content: center; }
-  .marquee__track .disc + .disc { display: none; }
+  .cabinet, .rail__folder, .cover__code, .sheet::after, .slide::before { display: none !important; }
+  .archive .head { display: block; }
+  .entries { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; margin-top: .75rem; }
+  .entry { rotate: none; box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+  .js .entry { opacity: 1 !important; translate: none !important; }
+  .entry::before, .mail::before, .mail__go, .end__btn { display: none !important; }
+  .entry__kind { background: none; color: #000; border: 1px solid #000; }
+  .entry__year { color: #000; }
+  .talk__foot { background: #fff; }
+  .talk__main { padding: 0 0 1rem; }
+  .reply { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .mail { rotate: none; box-shadow: none; background: none !important; color: #000 !important; padding: 0; font-size: 16pt; }
+  .end { border: 0; padding: 0; }
+  .end .colophon { margin: 0; text-align: left; }
 }
