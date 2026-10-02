@@ -1,6 +1,7 @@
-// The windows in the room: layout modes, side windows turned toward you, pointer parallax, the tab bar and its
-// bubble, sheets in front of a stepped-back parent, the window bar's spring drag, the hover light, and scroll
-// forwarding. Every motion is a spring stepped in the shared frame loop, so the glass never lags its window.
+// The windows in the room: layout modes, the side window turned toward you, the tab bar and its bubble, sheets in
+// front of a stepped-back parent, the window bar's spring drag, the hover light, and scroll forwarding. Windows stay
+// where they are: the pointer moves the light and leans the room behind them, never the windows themselves.
+// Every motion is a spring stepped in the shared frame loop, so the glass never lags its window.
 import { createSpring, tween } from './springs.js';
 import { onFrame } from './frame.js';
 
@@ -38,11 +39,25 @@ export function createWindows({ room }) {
       asides.forEach(a => { a.classList.add('side--inline'); a.style.transform = ''; if (a.parentElement !== body) body.append(a); });
     }
     placeBubble(true);
+    scrollable();
+  }
+  // A floating side window taller than its room scrolls; it becomes a tab stop then, so the keyboard can scroll it
+  // in every browser (some make scrollers focusable on their own, some do not).
+  function scrollable() {
+    for (const a of document.querySelectorAll('aside.side')) {
+      const over = !a.classList.contains('side--inline') && a.scrollHeight > a.clientHeight + 4;
+      if (over && !a.hasAttribute('tabindex')) a.tabIndex = 0;
+      else if (!over && a.getAttribute('tabindex') === '0') a.removeAttribute('tabindex');
+    }
   }
   qDesk.addEventListener('change', layout); qPhone.addEventListener('change', layout);
-  addEventListener('resize', () => placeBubble(true));
+  let sized = 0;
+  addEventListener('resize', () => { placeBubble(true); cancelAnimationFrame(sized); sized = requestAnimationFrame(scrollable); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(scrollable);
 
-  // ---------- pointer: parallax (desktop) and the light ----------
+  // ---------- pointer: the light, and the room's lean (desktop) ----------
+  // The windows never follow the pointer (visionOS keeps windows fixed in space); the light does, and the room
+  // behind them leans a little against it. Reduced motion keeps the room still too.
   const px = createSpring({ value: 0, response: .9, damping: 1 }), py = createSpring({ value: 0, response: .9, damping: 1 });
   let lightX = innerWidth * .35, lightY = -120, moving = false;
   addEventListener('pointermove', (e) => {
@@ -54,17 +69,12 @@ export function createWindows({ room }) {
   document.documentElement.addEventListener('pointerleave', () => { px.target = 0; py.target = 0; moving = true; });
   const lx = createSpring({ value: lightX, response: .6, damping: 1 }), ly = createSpring({ value: lightY, response: .6, damping: 1 });
   onFrame((dt) => {
-    if (!moving && Math.abs(px.value - px.target) < 1e-4 && Math.abs(py.value - py.target) < 1e-4) return;
+    if (!moving && Math.abs(px.value - px.target) < 1e-4 && Math.abs(py.value - py.target) < 1e-4 && Math.abs(lx.value - lx.target) < .05 && Math.abs(ly.value - ly.target) < .05) return;
     moving = false;
     px.step(dt); py.step(dt);
     lx.target = lightX; ly.target = lightY; lx.step(dt); ly.step(dt);
     const still = reduced.matches || mode !== 'desktop';
     const x = still ? 0 : px.value, y = still ? 0 : py.value;
-    if (still) { space.style.perspectiveOrigin = ''; space.style.translate = ''; }
-    else {
-      space.style.perspectiveOrigin = `${(50 + x * 10).toFixed(2)}% ${(45 + y * 8).toFixed(2)}%`;
-      space.style.translate = `${(-x * 1).toFixed(3)}vw ${(-y * .7).toFixed(3)}vw`;
-    }
     if (room) room.set({ shift: [x * .012, -y * .008], light: [lx.value, ly.value] });
   });
 
@@ -115,14 +125,15 @@ export function createWindows({ room }) {
   }
 
   // ---------- materialise ----------
+  // Short moves that settle without overshoot, since every one of these carries text: a window grows from 98.5%
+  // (8px at most at its corners), the side window turns from 32 degrees to its 24, an ornament grows from 96%.
   function frameOf(el, v, from) {
     if (from === 'side') {
       const sgn = el.dataset.side === 'left' ? 1 : -1;
-      const ang = 24 + (1 - v) * 28, tz = (1 - v) * -22, tx = (1 - v) * -4 * sgn;
-      return `translateX(${tx.toFixed(3)}vw) translateZ(${tz.toFixed(3)}vw) rotateY(${(sgn * ang).toFixed(3)}deg)`;
+      return `rotateY(${(sgn * (24 + (1 - v) * 8)).toFixed(3)}deg)`;
     }
-    if (from === 'ornament') return `translateZ(1px) scale(${(.9 + .1 * v).toFixed(4)})`;
-    return `translateZ(${((1 - v) * -14).toFixed(3)}vw) scale(${(.96 + .04 * v).toFixed(4)})`;
+    if (from === 'ornament') return `translateZ(1px) scale(${(.96 + .04 * v).toFixed(4)})`;
+    return `scale(${(.985 + .015 * v).toFixed(4)})`;
   }
   function kindOf(el) { return el.matches('aside.side') ? (el.classList.contains('side--inline') ? 'inline' : 'side') : el.matches('.tabs, .toolbar, .grab') ? 'ornament' : 'window'; }
   function setIn(el, v, from) {
@@ -140,7 +151,7 @@ export function createWindows({ room }) {
       return;
     }
     // an element that has never moved is fully in (it came with the page), so it leaves from 1, not from nothing
-    const s = el._spring || (el._spring = createSpring({ value: el.glass ? el.glass.m : 1, response: from === 'side' ? .7 : .55, damping: .86 }));
+    const s = el._spring || (el._spring = createSpring({ value: el.glass ? el.glass.m : 1, response: from === 'side' ? .55 : from === 'ornament' ? .45 : .5, damping: 1 }));
     if (delay) await wait(delay);
     const arrived = await tween(s, to, v => setIn(el, v, from));
     if (to === 1 && arrived) settle(el);                     // not when a newer move took over (it would flash in)
@@ -236,12 +247,13 @@ export function createWindows({ room }) {
 
   // ---------- scrolling from anywhere reaches the front window ----------
   const scroller = () => $front() && $front().querySelector('.win__body');
+  const inHero = () => html.classList.contains('is-hello');            // the windows are hidden behind the hero
   addEventListener('wheel', (e) => {
-    if (e.target.closest && e.target.closest('.win, .side, .sheet, .tabs, .toolbar')) return;
+    if (inHero() || (e.target.closest && e.target.closest('.win, .side, .sheet, .tabs, .toolbar'))) return;
     const b = scroller(); if (b) b.scrollBy({ top: e.deltaY, left: 0 });
   }, { passive: true });
   addEventListener('keydown', (e) => {
-    if (document.activeElement !== document.body || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (inHero() || document.activeElement !== document.body || e.altKey || e.ctrlKey || e.metaKey) return;
     const b = scroller(); if (!b) return;
     const page = b.clientHeight * .85;
     const by = { ArrowDown: 60, ArrowUp: -60, PageDown: page, PageUp: -page, ' ': e.shiftKey ? -page : page, Home: -1e6, End: 1e6 }[e.key];

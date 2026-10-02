@@ -1,6 +1,7 @@
 // The color style control (bottom right): palettes, a hue and vibrance to play with, and Night, Day or Auto.
-// It turns the whole room (and so every pane of glass, the written name and the Enter button) in the shader;
-// the few pieces of CSS glass follow through --glass-css. The choice is kept in this browser only.
+// It turns the whole room (and so every pane of glass, and the hero's name and the light behind it) in the shader;
+// the few pieces of CSS glass follow through --glass-css, and the CSS hero's glow through --glow-css. The choice is
+// kept in this browser only.
 import { createSpring, tween } from './springs.js';
 
 const PRESETS = [
@@ -58,6 +59,7 @@ export function initHue({ room }) {
     if (room) room.set({ color: [h * Math.PI / 180, k], day: d });
     const base = d > .5 ? [.10, .16, .52] : [.16, .22, .77];
     html.style.setProperty('--glass-css', rgb(turn(base, h, k), d > .5 ? .5 : .34));
+    html.style.setProperty('--glow-css', rgb(turn(d > .5 ? [.86, .93, 1] : [.44, .58, 1], h, k), .7));
     button.querySelector('i').style.background = swatch(h, k);
   }
   function apply(animate) {

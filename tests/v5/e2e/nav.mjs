@@ -1,4 +1,5 @@
-// Moving around the room: pages swap in place, projects open as sheets, history and direct loads behave.
+// Moving around the room: pages swap in place (the side window too: it stays, and only its contents change),
+// projects open as sheets, history and direct loads behave.
 import { open, BASE, check } from './lib.mjs';
 
 const settle = (page, ms = 800) => page.waitForTimeout(ms);
@@ -9,7 +10,7 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   const { browser, page, errors } = await open();
   await page.goto(BASE + '?nohello', { waitUntil: 'load' });
   await settle(page, 600);
-  await page.evaluate(() => { window.__marker = 1; });
+  await page.evaluate(() => { window.__marker = 1; window.__side = document.querySelector('aside.side'); });
 
   await page.click('nav.tabs a[data-tab="work"]');
   await page.waitForURL('**/v5/work/');
@@ -18,8 +19,9 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   check(await text(page, '#main h1') === 'Work', 'Work title in the window');
   check(await page.getAttribute('nav.tabs a[data-tab="work"]', 'aria-current') === 'page', 'Work tab is current');
   check(await page.evaluate(() => document.title.startsWith('Work')), 'the document title follows');
-  // Home's side windows swing out (a spring of about a second) before they are removed
-  check(await page.waitForFunction(() => document.querySelectorAll('aside.side').length === 2 && !!document.getElementById('progress-h'), null, { timeout: 2500 }).then(() => true, () => false), 'Work’s side windows replaced Home’s');
+  // one side window, the same element as Home's: it stays where it is and its contents change
+  check(await page.waitForFunction(() => document.querySelectorAll('aside.side').length === 1 && document.querySelector('aside.side') === window.__side && !!document.getElementById('progress-h') && !!document.getElementById('exp-h'), null, { timeout: 2500 }).then(() => true, () => false), 'Work’s In progress and Experiments fill the same side window');
+  check(await page.evaluate(() => { const a = document.querySelector('aside.side'); return a.getAttribute('aria-labelledby') === 'progress-h exp-h' && a.querySelectorAll(':scope > .probe').length === 4 && !a.style.transform; }), 'the side window keeps its probes and its place, and takes the new labels');
   check(await page.evaluate(() => new URL(document.querySelector('nav.tabs a[data-tab="home"]').href).pathname === '/v5/'), 'tab links still resolve after the address changed');
 
   await page.click('a[href$="loquar/"]');
@@ -53,7 +55,7 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   await settle(page);
   check(await page.evaluate(() => !!document.querySelector('#main h1.name')), 'Back to Home restores its window');
   await settle(page, 400);
-  check(await page.evaluate(() => !window.__room || window.__room.state.ink.on > .9), 'the written title returns with Home');
+  check(await page.evaluate(() => { const h = document.querySelector('#main h1.name'); return h.textContent.trim() === 'Leonardo Carvalho' && getComputedStyle(h).opacity === '1' && !!document.querySelector('[data-clock]'); }), 'the text title (and Groton’s time) return with Home');
 
   await page.click('a.row[href$="resume/#amora"]');
   await page.waitForURL('**/v5/resume/#amora');
@@ -110,13 +112,14 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   const r = await page.evaluate(() => ({
     bars: document.querySelectorAll('.space > .toolbar').length,
     sides: document.querySelectorAll('aside.side').length,
+    side: !!document.getElementById('measure-h') && !!document.getElementById('coaches-h'),
     title: document.querySelector('#main h1').textContent.trim(),
     tab: document.querySelector('nav.tabs a[aria-current="page"]').dataset.tab,
     path: location.pathname,
   }));
   check(r.bars === 1, `quick tab clicks leave one toolbar (${r.bars})`);
-  check(r.sides === 2, `quick tab clicks leave two side windows (${r.sides})`);
-  check(r.path === '/v5/hockey/' && r.tab === 'hockey' && r.title.startsWith('Leonardo Carvalho, goaltender'), 'the last click wins: Hockey, with its tab and title');
+  check(r.sides === 1, `quick tab clicks leave one side window (${r.sides})`);
+  check(r.path === '/v5/hockey/' && r.tab === 'hockey' && r.title.startsWith('Leonardo Carvalho, goaltender') && r.side, 'the last click wins: Hockey, with its tab, title and side window');
   check(errors.length === 0, 'no console errors ' + errors.join(' | '));
   await browser.close();
 }

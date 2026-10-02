@@ -2,8 +2,10 @@
 // sheets in front of it, while every page stays its own HTML file: Back, Forward, deep links and reading without
 // scripts all keep working. Anything unexpected falls back to an ordinary page load.
 const ROOT = new URL('../../', import.meta.url).pathname;
-const OUT = [{ opacity: 1, filter: 'blur(0px)', transform: 'scale(1)' }, { opacity: 0, filter: 'blur(8px)', transform: 'scale(.985)' }];
-const IN = [{ opacity: 0, filter: 'blur(6px)', transform: 'translateY(14px)' }, { opacity: 1, filter: 'blur(0px)', transform: 'none' }];
+// A page swap is a crossfade with a few pixels of rise: no blur and no scale, so text never smears while it moves.
+const OUT = [{ opacity: 1 }, { opacity: 0 }];
+const IN = [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }];
+const T_OUT = 140, T_IN = 220;
 
 export function initNav({ windows }) {
   const html = document.documentElement;
@@ -12,6 +14,7 @@ export function initNav({ windows }) {
   const $main = () => document.getElementById('main');
   const $sheet = () => document.querySelector('section.sheet:not(.is-closing)');
   const $front = () => $sheet() || $main();
+  const $side = () => document.querySelector('aside.side');
   const cache = new Map(), scrolls = new Map();
   let shown = location.pathname;                                      // what is in front
   let under = html.dataset.kind === 'sheet' ? null : location.pathname;  // the page in the main window
@@ -40,7 +43,7 @@ export function initNav({ windows }) {
     const d = doc.documentElement.dataset;
     return {
       page: d.page, kind: d.kind || 'page', tab: d.tab, parent: d.parent, title: doc.title,
-      main: doc.getElementById('main'), sides: [...doc.querySelectorAll('aside.side')],
+      main: doc.getElementById('main'), side: doc.querySelector('aside.side'),
       bar: doc.querySelector('.toolbar:not(.toolbar--inline):not(.toolbar--sheet)'),
       sheetBar: doc.querySelector('.toolbar--sheet'), grab: doc.querySelector('.grab'),
     };
@@ -55,12 +58,42 @@ export function initNav({ windows }) {
       return a.finished.catch(() => {}).then(() => a);
     }));
   }
-  // outgoing content drops back and blurs, the new content rises in
+  // the outgoing content fades, the new content fades in rising 6px
   async function swapWindow(win, info) {
-    await fade([...win.children], OUT, 180, 'cubic-bezier(.4, 0, 1, 1)');
+    await fade([...win.children], OUT, T_OUT, 'cubic-bezier(.4, 0, 1, 1)');
     const fresh = copy(info.main.children);
     win.replaceChildren(...fresh);
-    fade(fresh, IN, 260, 'cubic-bezier(.2, .8, .2, 1)').then(as => as.forEach(a => a.cancel()));
+    fade(fresh, IN, T_IN, 'cubic-bezier(.2, .8, .2, 1)').then(as => as.forEach(a => a.cancel()));
+  }
+  // A page change keeps every window where it is. The side window stays too (its glass and its corner probes), and
+  // its contents crossfade with the main window's; inside the window (laptops and phones) it goes with the body.
+  async function swapPage(info) {
+    const win = $main(), side = $side();
+    const floating = !!side && !side.classList.contains('side--inline');
+    const inner = el => [...el.children].filter(c => !c.matches('.probe'));
+    await fade([...win.children, ...(floating ? inner(side) : [])], OUT, T_OUT, 'cubic-bezier(.4, 0, 1, 1)');
+    const fresh = copy(info.main.children);
+    if (side && !floating) side.remove();                             // lifted out of the old body before it goes
+    win.replaceChildren(...fresh);
+    let freshSide = [];
+    if (side && info.side) {
+      for (const a of ['aria-labelledby', 'aria-label']) { const v = info.side.getAttribute(a); if (v) side.setAttribute(a, v); else side.removeAttribute(a); }
+      freshSide = copy(inner(info.side));
+      inner(side).forEach(n => n.remove());
+      side.append(...freshSide);
+      side.scrollTop = 0;
+      if (!floating) win.after(side);                                  // the layout puts it back inside the new body
+    } else if (side) {
+      if (floating) windows.dematerialise([side], { from: 'side' }).then(() => side.remove());
+    } else if (info.side) {
+      const added = document.importNode(info.side, true);
+      windows.hideNow([added]);
+      win.after(added);
+      windows.refresh();
+      windows.materialise([added]);
+    }
+    windows.refresh();
+    fade([...fresh, ...(floating ? freshSide : [])], IN, T_IN, 'cubic-bezier(.2, .8, .2, 1)').then(as => as.forEach(a => a.cancel()));
   }
   // Every toolbar still on screen leaves (not only the first one found): one that is still fading out from an
   // earlier change is marked, so a quick second click never mistakes it for the current one and leaves two.
@@ -86,19 +119,9 @@ export function initNav({ windows }) {
     if (token !== seq) return false;                                   // a newer page change took over
     if (under === url.pathname) return false;                          // the page was already underneath
     under = url.pathname;
-    const desk = windows.mode === 'desktop';
-    const oldSides = [...document.querySelectorAll('aside.side')];
-    if (desk) windows.dematerialise(oldSides, { from: 'side' }).then(() => oldSides.forEach(s => s.remove()));
     swapBar(info);
-    await swapWindow($main(), info);
-    if (token !== seq) return true;                                    // overtaken: the newer change adds its own sides
-    if (!desk) oldSides.forEach(s => s.remove());                      // inline, they left with the old body
-    const sides = copy(info.sides);
-    windows.hideNow(sides);
-    $main().after(...sides);
-    windows.refresh();
-    windows.materialise(sides, { stagger: .06, delay: desk ? .06 : 0 });
     windows.setTab(info.tab);
+    await swapPage(info);
     return true;
   }
 
@@ -251,7 +274,7 @@ export function initNav({ windows }) {
     const main = $main();
     const sheet = buildSheet([...main.children]);
     main.replaceChildren(...copy(info.main.children));
-    main.after(...copy(info.sides));
+    if (info.side) main.after(document.importNode(info.side, true));
     if (info.bar) space.insertBefore(document.importNode(info.bar, true), document.querySelector('.space > .toolbar--sheet'));
     if (!document.querySelector('.grab') && info.grab) space.append(document.importNode(info.grab, true));
     under = parentUrl.pathname;

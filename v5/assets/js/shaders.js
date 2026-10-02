@@ -91,13 +91,16 @@ void main() {
 
 // Composite: the room (sharp or defocused), soft shadows under the panels, the glass inside them, the ink.
 // Panels arrive as inverse homographies (screen device px, y down -> panel px), size, radius, kind, and state.
+// The ink is the hero's name: a mask (red the letters, green a soft height for their bevel, blue a wide blur of them
+// for the light behind) placed by uInkX; uInk0 = (shown, dim, white, bevel px), uInk1 = (glow, lean x, lean y, -),
+// uInkL = the highlight on the glass (centre x, y, radius, strength), all in device px.
 export const COMPOSITE = `#version 300 es
 precision highp float;
 uniform sampler2D uScene; uniform sampler2D uInk;
 uniform vec2 uRes; uniform float uLod; uniform float uFrostLod; uniform float uTime; uniform float uDay;
 uniform vec2 uLight; uniform vec2 uPointer; uniform int uCount;
 uniform mat3 uInv[16]; uniform vec4 uBox[16]; uniform vec4 uState[16];
-uniform vec4 uInk0; uniform vec3 uInkX; uniform vec2 uColor;
+uniform vec4 uInk0; uniform vec3 uInkX; uniform vec2 uColor; uniform vec4 uInk1; uniform vec4 uInkL;
 // the color style: a hue rotation (radians) and a saturation scale in YIQ, which keeps each colour's brightness
 vec3 hueShift(vec3 c, float a, float k) {
   vec3 yiq = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312) * c;
@@ -174,39 +177,56 @@ void main() {
     if (under >= 0 && smoothstep(1.5, -0.5, sd) * min(1.0, uState[hit].x * 1.6) < 0.999) col = glassOver(under, lp2, sd2, px, col);
     col = glassOver(hit, lp, sd, px, col);
   }
-  // the written name: glass tubes over the room, lit by a light that drifts and follows the pointer
+  // The name: solid glass letters with a light behind them. The light spills round the letters into the room (blue,
+  // leaning a few pixels toward the pointer) and shines through their frosted faces; the bevel catches a bright rim
+  // on the side facing the light, which leans toward the pointer too. Turning white, they become plain white text.
   if (uInk0.x > 0.001) {
     vec2 isz = vec2(textureSize(uInk, 0));
     vec2 mu = (px * uInkX.x + uInkX.yz) / isz;
     if (mu.x > 0.0 && mu.y > 0.0 && mu.x < 1.0 && mu.y < 1.0) {
       // an explicit mip level: inside this branch the GPU has no derivatives to choose one at the mask's edge
       float lk = max(0.0, log2(max(uInkX.x, 1e-4)));
-      vec4 mk = textureLod(uInk, mu, lk);
-      float cov = mk.r * uInk0.x, sh = mk.b * uInk0.x;
-      col *= 1.0 - 0.34 * sh * (1.0 - cov) * (1.0 - 0.85 * uInk0.z);  // the title's shadow is lighter: it sits on glass
+      float on = uInk0.x, white = uInk0.z, bev = max(uInk0.w, 1.0);
+      float cov = textureLod(uInk, mu, lk).r * on;
+      vec2 lean = uInk1.yz * uInkX.x / isz;
+      float back = textureLod(uInk, mu - lean, lk).b;                  // the wide light behind
+      float leak = textureLod(uInk, mu - lean * 0.4, lk + 3.0).r;      // and a tight leak of it right at the edges
+      vec3 glowC = hueShift(mix(vec3(0.44, 0.58, 1.0), vec3(0.86, 0.93, 1.0), uDay), uColor.x, uColor.y);
+      float glow = uInk1.x * on * (1.0 - white);
+      col += glowC * (back * mix(0.5, 0.26, uDay) + leak * mix(0.22, 0.14, uDay)) * glow;
       if (cov > 0.003) {
-        float spx0 = max(uInk0.w, 1.0);                      // the stroke width on screen, device px
-        vec2 e = vec2(max(1.0, spx0 * 0.063) * uInkX.x) / isz;
+        float hc = textureLod(uInk, mu, lk).g;
+        vec2 e = vec2(max(1.0, bev * 0.5) * uInkX.x) / isz;
         float hx = textureLod(uInk, mu + vec2(e.x, 0.0), lk).g - textureLod(uInk, mu - vec2(e.x, 0.0), lk).g;
         float hy = textureLod(uInk, mu + vec2(0.0, e.y), lk).g - textureLod(uInk, mu - vec2(0.0, e.y), lk).g;
+        // the moving surface, kept to a shimmer
         vec2 q = uv * vec2(uRes.x / uRes.y, 1.0);
         vec2 flow = vec2(sin(q.y * 21.0 + uTime * 0.9 + 1.7 * sin(q.x * 9.0 + uTime * 0.5)), cos(q.x * 17.0 - uTime * 0.7 + 1.9 * sin(q.y * 11.0 - uTime * 0.4)));
-        vec3 n = normalize(vec3(-hx * 5.0 + flow.x * 0.06, -hy * 5.0 + flow.y * 0.06, 1.0));
-        vec2 drift = vec2(0.28 * sin(uTime * 0.45), 0.18 * cos(uTime * 0.36));
-        vec3 L = normalize(vec3((uLight - px) / uRes.y * 1.4 + vec2(-0.45, -0.62) + drift, 0.64));
-        float dif = max(dot(n, L), 0.0);
-        float spec = pow(max(dot(reflect(-L, n), vec3(0.0, 0.0, 1.0)), 0.0), 40.0);
-        float fres = pow(1.0 - n.z, 1.6);
+        vec3 n = normalize(vec3(-vec2(hx, hy) * 3.0 + flow * 0.012, 1.0));
+        // the light: from the upper left, leaning gently toward the pointer
+        vec3 L = normalize(vec3(clamp((uLight - px) / uRes.y, -1.0, 1.0) * 0.5 + vec2(-0.42, -0.58), 0.75));
         vec2 lit = normalize(L.xy + 1e-5), nn = normalize(n.xy + 1e-5);
-        float rimLit = fres * max(dot(nn, lit), 0.0), rimFar = fres * max(dot(nn, -lit), 0.0);
-        float sweep = fract(uTime / 6.5) * 2.6 - 0.8;
-        float sheen = exp(-pow((uv.x * 0.85 + (1.0 - uv.y) * 0.35 - sweep) * 7.0, 2.0));
-        vec2 spx = px - n.xy * (0.62 + 2.05 * fres) * spx0 + flow * 0.085 * spx0;
+        float slope = clamp(1.0 - n.z, 0.0, 1.0);
+        float edge = exp(-pow((hc - 0.56) / 0.13, 2.0));          // the rim, just inside the letter's edge
+        float facing = max(dot(nn, lit), 0.0), away = max(dot(nn, -lit), 0.0);
+        // frosted inside: the room behind, bent a little at the bevel and deeply blurred, lit from behind
+        vec2 spx = px - n.xy * bev * 3.5;
         vec2 suv = spx / uRes; suv.y = 1.0 - suv.y;
-        vec3 g = roomAt(suv, uLod * 0.6) * (1.06 + 0.14 * dif) + 0.07;
-        // as the window's title the glass turns white, so the name reads like the comp's white script
-        g = mix(g, vec3(0.98, 0.99, 1.0) * (0.97 + 0.03 * dif), 0.93 * uInk0.z);
-        g += vec3(0.94, 0.97, 1.0) * (0.85 * rimLit + 0.38 * rimFar + 0.7 * spec + sheen * (0.16 + 0.5 * fres));
+        vec3 frost = roomAt(suv, max(uLod, uFrostLod));
+        vec3 g = frost * 1.12 + glowC * (0.24 + 0.5 * back) * uInk1.x + vec3(0.1);
+        // by day the room behind is bright, so the glass is a deeper blue (as the windows are) and the rims draw on it
+        vec3 deep = hueShift(vec3(0.13, 0.27, 0.80), uColor.x, uColor.y);
+        g = mix(g, mix(frost * 0.55, deep, 0.62) + glowC * 0.12 * back * uInk1.x, uDay);
+        g *= 1.0 - 0.38 * slope * away;                           // the bevel away from the light falls into shade
+        g += vec3(0.96, 0.98, 1.0) * edge * (0.95 * facing + 0.38 * away + 0.12);   // a bright rim, a fainter one behind
+        g += vec3(0.96, 0.98, 1.0) * slope * facing * 0.35;
+        // a soft highlight across the faces, drawn toward the pointer
+        vec2 dl = (px - uInkL.xy) / max(uInkL.z, 1.0);
+        g += vec3(0.95, 0.97, 1.0) * uInkL.w * exp(-dot(dl, dl));
+        float sweep = fract(uTime / 9.0) * 2.6 - 0.8;
+        g += vec3(1.0) * 0.045 * exp(-pow((uv.x * 0.85 + (1.0 - uv.y) * 0.35 - sweep) * 6.0, 2.0));
+        // as the window's title it is plain white, as the HTML title it hands off to
+        g = mix(g, vec3(1.0), white);
         g *= 1.0 - 0.5 * uInk0.y;
         col = mix(col, g, cov);
       }

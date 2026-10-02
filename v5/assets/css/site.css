@@ -3,11 +3,16 @@
    With WebGL2 the canvas draws every glass surface and the elements here carry only their content (html.gl).
    Without it, or with scripts off, or with reduced transparency, the same elements draw CSS glass. */
 
+/* ---------- type ---------- */
+/* Switzer (Indian Type Foundry, via Fontshare; ITF Free Font License, see fonts/FFL-switzer.txt): the name only */
+@font-face { font-family: "Switzer"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("../fonts/switzer-variable.woff2") format("woff2"); }
+
 /* ---------- tokens ---------- */
 :root {
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", Roboto, system-ui, sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, system-ui, sans-serif;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-name: "Switzer", var(--font-display);
 
   --ink: #fff;
   --ink-2: rgba(255, 255, 255, .78);
@@ -28,8 +33,10 @@
   --w-main: clamp(720px, 52vw, 1040px);
   --win-top: 4.5svh;
   --win-h: calc(100svh - var(--win-top) - max(9.5svh, 84px));   /* room below for the toolbar and the window bar */
-  --side-w: clamp(220px, 17vw, 330px);                            /* narrow enough to leave the tab bar its own gap */
-  --side-x: clamp(16px, 2vw, 48px);
+  --side-w: clamp(240px, 20vw, 350px);                            /* one side window now, so a little wider than the two were */
+  --gap-side: clamp(40px, 3.4vw, 64px);                           /* the main window to the side window */
+  --shift: 0px;                                                   /* how far the main window sits left of centre (desktop) */
+  --cx: calc(50% - var(--shift));                                 /* the main window's centre line */
   --glass-css: rgba(40, 56, 196, .34);    /* CSS glass over page content (the tab bar, the color control); follows the color style */
 
   --ease-out: cubic-bezier(.16, 1, .3, 1);
@@ -64,8 +71,8 @@ html:not(.gl) .room { display: none; }
 
 /* ---------- the space and its windows ---------- */
 .space { position: fixed; inset: 0; z-index: 1; perspective: 120vw; perspective-origin: 50% 45%; transform-style: preserve-3d; }
-.win { position: absolute; left: calc(50% - var(--w-main) / 2); top: var(--win-top); width: var(--w-main); height: var(--win-h); border-radius: var(--r-win); display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; z-index: 2; translate: var(--dx, 0px) var(--dy, 0px); }
-.win.is-behind { transform: translateZ(calc(var(--back, 0) * -10vw)); }
+.win { position: absolute; left: calc(var(--cx) - var(--w-main) / 2); top: var(--win-top); width: var(--w-main); height: var(--win-h); border-radius: var(--r-win); display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; z-index: 2; translate: var(--dx, 0px) var(--dy, 0px); }
+.win.is-behind { transform: translateZ(calc(var(--back, 0) * -4vw)); }   /* a small step back (about 3%) */
 .win__head { padding: 30px var(--pad) 10px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
 .win__head h1 { font: 700 34px/1.08 var(--font-display); letter-spacing: -.012em; }
 .win__head .sub { margin-top: 6px; color: var(--ink-2); font-size: 16px; }
@@ -74,18 +81,23 @@ html:not(.gl) .room { display: none; }
   scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .25) transparent; }
 .win__body:focus-visible { box-shadow: none; outline: 2px solid rgba(255, 255, 255, .5); }
 
-.side { position: absolute; top: calc(var(--win-top) + var(--win-h) * .03); width: var(--side-w); max-height: calc(var(--win-h) * .94); border-radius: 28px; padding: 24px 22px; overflow: auto; z-index: 1; scrollbar-width: none; }
+/* one side window, on the right, a set gap from the main window and turned 24 degrees toward you about its near edge */
+.side { position: absolute; top: calc(var(--win-top) + var(--win-h) * .03); left: calc(var(--cx) + var(--w-main) / 2 + var(--gap-side)); width: var(--side-w); max-height: calc(var(--win-h) * .94); border-radius: 28px; padding: 24px 22px; overflow: auto; z-index: 1; scrollbar-width: none; transform-origin: 0% 50%; transform: rotateY(-24deg); }
 .side:not(.side--inline) { will-change: transform; }
-.side[data-side="left"] { left: var(--side-x); transform-origin: 100% 50%; transform: rotateY(24deg); }
-.side[data-side="right"] { right: var(--side-x); transform-origin: 0% 50%; transform: rotateY(-24deg); }
+.side:focus-visible { outline-offset: -3px; box-shadow: none; border-radius: 28px; }   /* when it scrolls it takes focus; the ring keeps its corners */
 .side h2 { font: 700 20px/1.15 var(--font-display); letter-spacing: -.005em; }
+.side__part + .side__part { margin-top: 30px; }
+.side-time { display: flex; align-items: center; gap: 7px; margin-top: 8px; color: var(--ink-3); font-size: 14px; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.side-time svg { flex: none; width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 html.gl .side:not(.side--inline) { -webkit-mask-image: linear-gradient(#000 calc(100% - 26px), transparent); mask-image: linear-gradient(#000 calc(100% - 26px), transparent); }
 .probe { position: absolute; width: 0; height: 0; pointer-events: none; }
 .probe[data-corner="0"] { left: 0; top: 0; } .probe[data-corner="1"] { right: 0; top: 0; }
 .probe[data-corner="2"] { right: 0; bottom: 0; } .probe[data-corner="3"] { left: 0; bottom: 0; }
 
-/* the tab bar: an ornament hanging off the window's left edge */
-.tabs { position: absolute; left: calc(50% - var(--w-main) / 2 - 36px); top: calc(var(--win-top) + var(--win-h) / 2); translate: var(--dx, 0px) calc(-50% + var(--dy, 0px)); transform: translateZ(1px); width: 64px; padding: 8px; border-radius: 32px; display: grid; gap: 4px; z-index: 4; contain: layout; transition: width .42s var(--ease-out), -webkit-backdrop-filter .42s var(--ease-out), backdrop-filter .42s var(--ease-out); }  /* it widens (rather than scales) so its glass keeps its true shape */
+/* the tab bar: an ornament just off the window's left edge (its right edge 14px out). It opens to the left, its right
+   edge and its icons staying put, so it never covers the window; only where the screen has no room for that (laptops
+   under about 1150px) does it lean over the window's edge, frosted. */
+.tabs { position: absolute; --tabs-r: calc(100% - var(--cx) + var(--w-main) / 2 + 14px); right: var(--tabs-r); top: calc(var(--win-top) + var(--win-h) / 2); translate: var(--dx, 0px) calc(-50% + var(--dy, 0px)); transform: translateZ(1px); width: 64px; padding: 8px; border-radius: 32px; display: grid; gap: 4px; z-index: 4; contain: layout; transition: width .42s var(--ease-out), right .42s var(--ease-out), -webkit-backdrop-filter .42s var(--ease-out), backdrop-filter .42s var(--ease-out); }  /* it widens (rather than scales) so its glass keeps its true shape */
 /* opened, the tab bar lies over the window's text, which only backdrop glass can frost; it sits a pixel in front of the window's plane */
 html.gl .tabs.glass { background: var(--glass-css); -webkit-backdrop-filter: blur(22px) saturate(1.7) brightness(.74); backdrop-filter: blur(22px) saturate(1.7) brightness(.74); box-shadow: 0 16px 40px rgba(0, 0, 0, .28); }
 html.gl .tabs.glass::after { display: block; }   /* (more specific than html.gl .glass, which hands every other pane to the room) */
@@ -96,15 +108,21 @@ html.gl .tabs.glass.is-behind { opacity: calc(1 - var(--back, 1) * .4); }   /* i
 .tabs a:hover { color: #fff; }
 .tabs .icon { flex: none; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .tabs__label { opacity: 0; translate: -6px 0; transition: opacity .16s, translate .3s var(--ease-out); }
-.tabs.is-open { width: 188px; }
+.tabs.is-open { width: 188px; right: min(var(--tabs-r), calc(100% - 200px)); }
+@media (min-width: 900px) {
+  /* opening leftward: each icon keeps its place and its name appears beside it, on the open side */
+  html.js .tabs a { flex-direction: row-reverse; }
+  html.js .tabs__label { translate: 6px 0; }
+  html.js .tabs.is-open .tabs__label { translate: 0 0; }
+}
 .tabs.is-open .tabs__label { opacity: 1; translate: 0 0; transition-delay: .06s; }
 .tabs__bubble { position: absolute; left: 8px; right: 8px; top: 8px; height: 48px; border-radius: 999px; background: var(--fill-3); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32); pointer-events: none; }
 html:not(.js) .tabs__bubble { display: none; }
 html:not(.js) .tabs a[aria-current="page"] { background: var(--fill-3); }
 
 /* the toolbar: an ornament across the window's bottom edge (overlapping by 20pt) */
-.toolbar { position: absolute; left: 50%; top: calc(var(--win-top) + var(--win-h) - 28px); translate: calc(-50% + var(--dx, 0px)) var(--dy, 0px); transform: translateZ(1px); display: flex; align-items: center; gap: 6px; padding: 7px; border-radius: 999px; z-index: 4; max-width: calc(var(--w-main) - 48px); overflow-x: auto; scrollbar-width: none; }
-.grab { position: absolute; left: 50%; top: calc(var(--win-top) + var(--win-h) + 42px); translate: calc(-50% + var(--dx, 0px)) var(--dy, 0px); display: flex; align-items: center; gap: 9px; padding: 8px; z-index: 3; cursor: grab; touch-action: none; }
+.toolbar { position: absolute; left: var(--cx); top: calc(var(--win-top) + var(--win-h) - 28px); translate: calc(-50% + var(--dx, 0px)) var(--dy, 0px); transform: translateZ(1px); display: flex; align-items: center; gap: 6px; padding: 7px; border-radius: 999px; z-index: 4; max-width: calc(var(--w-main) - 48px); overflow-x: auto; scrollbar-width: none; }
+.grab { position: absolute; left: var(--cx); top: calc(var(--win-top) + var(--win-h) + 42px); translate: calc(-50% + var(--dx, 0px)) var(--dy, 0px); display: flex; align-items: center; gap: 9px; padding: 8px; z-index: 3; cursor: grab; touch-action: none; }
 .grab:active { cursor: grabbing; }
 .grab i { display: block; height: 11px; border-radius: 999px; background: rgba(255, 255, 255, .62); box-shadow: 0 2px 8px rgba(0, 0, 0, .18); }
 .grab i:first-child { width: 11px; } .grab i:last-child { width: 96px; }
@@ -130,29 +148,53 @@ html:not(.js) .tabs a[aria-current="page"] { background: var(--fill-3); }
 html.gl .glass { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
 html.gl .glass::after { display: none; }
 
-/* ---------- the hello ---------- */
-.hello { position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; }
-html.is-hello .hello, html.is-entering .hello { display: block; }
-.enter { position: absolute; left: 50%; top: 62%; translate: -50% 0;   /* hello.js moves it to 40px under the name */ pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 30px 0 32px; border: 0; border-radius: 999px; color: #fff; font: 650 19px/1 var(--font); cursor: pointer; opacity: 0; scale: .94; transition: opacity .6s var(--ease-out), scale .9s var(--ease-out); }
-.enter[hidden] { display: inline-flex; visibility: hidden; }
-.enter.is-ready { opacity: 1; scale: 1; }
-.enter svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.enter::before { content: ""; position: absolute; inset: -7px; border-radius: inherit; box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .34); animation: breathe 2.6s ease-in-out infinite; }
-@keyframes breathe { 0%, 100% { opacity: .5; scale: .985; } 50% { opacity: 1; scale: 1; } }
-.enter.is-ready:active { scale: .95; transition-duration: .12s; }
-.enter.is-gone { opacity: 0; scale: 1.08; pointer-events: none; transition: opacity .3s var(--ease-out), scale .5s var(--ease-out); }
-.enter.is-gone::before { animation: none; opacity: 0; }
+/* ---------- the hero ---------- */
+/* The name, heavy and blocky, is a real button: with the room it is transparent text (its layout and the control)
+   and the room draws it in Liquid Glass; without the room it is the same text in CSS glass with a CSS glow. */
+.hero { position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; --hero-fs: min(8.2vw, 24svh, 160px); }
+html.is-hello .hero, html.is-entering .hero { display: block; }
+.hero__name { position: absolute; left: 50%; top: 45%; translate: -50% -50%; margin: 0; padding: .05em .12em; border: 0; border-radius: .2em; background: none; color: #fff; font: 780 var(--hero-fs)/1 var(--font-name); letter-spacing: -.03em; white-space: nowrap; text-align: center; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
+.hero__name:focus-visible { outline: 2px solid #fff; outline-offset: 12px; box-shadow: 0 0 0 14px rgba(255, 255, 255, .08); border-radius: .2em; }
+.hero__w { white-space: nowrap; }
+.hero__text { display: inline-block; opacity: 0; }
+html.gl .hero__text { color: transparent; }
+html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s var(--ease-out); }
+html:not(.gl) .hero__text {
+  color: transparent; -webkit-text-fill-color: transparent;
+  background: linear-gradient(172deg, rgba(255, 255, 255, .97) 18%, rgba(206, 220, 255, .72) 52%, rgba(255, 255, 255, .9) 88%);
+  -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em var(--glow-css, rgba(112, 148, 255, .7))) drop-shadow(0 0 .3em var(--glow-css, rgba(112, 148, 255, .7)));
+  transition: filter .45s var(--ease-out);
+}
+html:not(.gl) .hero__name:hover .hero__text { filter: drop-shadow(0 0 .06em rgba(255, 255, 255, .65)) drop-shadow(0 0 .36em var(--glow-css, rgba(112, 148, 255, .7))) drop-shadow(0 0 .36em var(--glow-css, rgba(112, 148, 255, .7))); }
+/* by day the room is bright: the name is a deeper blue glass, as the room draws it, with the light behind it white */
+@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background-image: linear-gradient(172deg, rgba(64, 104, 228, .96) 18%, rgba(34, 66, 186, .9) 55%, rgba(72, 116, 236, .96) 88%); } }
+html[data-appearance="day"]:not(.gl) .hero__text { background-image: linear-gradient(172deg, rgba(64, 104, 228, .96) 18%, rgba(34, 66, 186, .9) 55%, rgba(72, 116, 236, .96) 88%); }
+@media (prefers-reduced-transparency: reduce) { html:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; } }
+@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background: #1f3fae; -webkit-background-clip: text; background-clip: text; } }
+@media (max-width: 699px) {
+  .hero { --hero-fs: min(18vw, 15svh, 120px); }
+  .hero__name { line-height: .98; }
+  .hero__w { display: block; }
+}
+.hero__hint { position: absolute; left: 16px; right: 16px; bottom: calc(32px + env(safe-area-inset-bottom)); margin: 0; text-align: center; color: var(--ink-2); font: 500 14px/1.3 var(--font); letter-spacing: .01em; opacity: 0; transition: opacity .5s var(--ease-out) .75s; }
+.hero__hint span { pointer-events: auto; cursor: pointer; }
+/* the day room can be bright behind it on a phone: a soft dark halo keeps the secondary ink above 4.5:1 */
+@media (prefers-color-scheme: light) { html:not([data-appearance="night"]) .hero__hint { text-shadow: 0 0 12px rgba(6, 18, 78, .7), 0 0 4px rgba(6, 18, 78, .5); } }
+html[data-appearance="day"] .hero__hint { text-shadow: 0 0 12px rgba(6, 18, 78, .7), 0 0 4px rgba(6, 18, 78, .5); }
+.hero.is-ready .hero__hint { opacity: 1; }
+.hero__coarse { display: none; }
+@media (pointer: coarse) { .hero__fine { display: none; } .hero__coarse { display: inline; } }
+html.is-entering .hero .hero__hint { opacity: 0; transition: opacity .12s; }
+html.is-entering .hero__name, html.is-entering .hero__hint span { pointer-events: none; }
+html:not(.gl).is-entering .hero { opacity: 0; transition: opacity .25s ease; }
 html.is-hello .space > * { opacity: 0; pointer-events: none; }
 html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards; }
 @keyframes boot-cover { to { opacity: 1; } }
 
-/* the written name, the home window's title */
-.name { position: relative; display: block; margin: -4px 0 0 -6px; cursor: pointer; }
-.name picture { display: block; }
-.name__svg { display: block; width: min(460px, 100%); height: auto; overflow: visible; }
-.name__svg path { fill: none; stroke: #fff; stroke-width: 22; stroke-linecap: round; stroke-linejoin: round; }
-html:not(.gl) .name__svg { filter: drop-shadow(0 0 10px rgba(210, 225, 255, .45)); }
-html.gl .name__svg { visibility: hidden; }
+/* the name as the home window's title: plain white text in Switzer (the hero hands off to it) */
+.win__head .name { display: block; margin: 0; font: 700 46px/1.04 var(--font-name); letter-spacing: -.03em; color: #fff; }
+.name__w { white-space: nowrap; }
 .home-head { align-items: center; }
 .avatar { flex: none; width: 60px; height: 60px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 2px rgba(255, 255, 255, .28); }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -319,19 +361,31 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 .card:active { scale: .98; }
 
 /* ---------- sheets (a project in front of its parent) ---------- */
-.sheet { left: calc(50% - min(var(--w-main), 920px) / 2 + 44px); width: calc(min(var(--w-main), 920px) - 88px); top: calc(var(--win-top) + 4svh); height: calc(var(--win-h) - 8svh); z-index: 5; }
+.sheet { left: calc(var(--cx) - min(var(--w-main), 920px) / 2 + 44px); width: calc(min(var(--w-main), 920px) - 88px); top: calc(var(--win-top) + 4svh); height: calc(var(--win-h) - 8svh); z-index: 5; }
 .close { position: absolute; left: 22px; top: 24px; z-index: 3; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--fill-2); color: #fff; }
 .close:hover { background: var(--fill-3); }
 .close svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 .close + .win__head { padding-left: 84px; }
-.is-behind > * { filter: brightness(calc(1 - var(--back, 1) * .5)) saturate(calc(1 - var(--back, 1) * .2)) blur(calc(var(--back, 1) * 1.5px)); }
-.win.is-behind > *, .toolbar.is-behind, .grab.is-behind { opacity: calc(1 - var(--back, 1) * 2.5); }
+.is-behind > * { filter: brightness(calc(1 - var(--back, 1) * .5)) saturate(calc(1 - var(--back, 1) * .2)); }   /* dimmed, never blurred: text stays sharp while it steps back */
+.win.is-behind > * { opacity: calc(1 - var(--back, 1) * 4); }   /* gone by a quarter of the way back, so a sheet's text and its parent's barely overlap */
+.toolbar.is-behind, .grab.is-behind { opacity: calc(1 - var(--back, 1) * 2.5); }
 .toolbar--sheet { top: calc(var(--win-top) + 4svh + var(--win-h) - 8svh - 28px); z-index: 6; }
+
+/* ---------- desktop: tab bar, main window and side window read as one group, centred on the screen ----------
+   The side window projects about 4.5% wider than its box (its far edge turns toward you), and the tab bar takes 78px
+   (64 plus its 14px gap), so the main window moves left by half the difference. That centres the group's outline,
+   and with it the visual weight of its three pieces. It stops where the opened tab bar (188px, 14px off the window,
+   12px from the screen's edge) would no longer fit to the window's left: below about 1460px the group sits up to
+   21px right of centre instead. */
+@media (min-width: 1360px) {
+  :root { --shift: min(calc((var(--gap-side) + var(--side-w) * 1.045 - 78px) / 2), calc(50vw - var(--w-main) / 2 - 214px)); }
+}
 
 /* ---------- laptop: no side windows; their content sits inside the window ---------- */
 .side--inline { position: static; width: auto; max-height: none; transform: none !important; margin-top: 44px; padding: 0; border-radius: 0; overflow: visible; background: none; box-shadow: none; }
 .side--inline::after { display: none; }
 .side--inline h2 { font-size: 22px; }
+.side--inline .side__part + .side__part { margin-top: 44px; }
 
 /* ---------- phones and narrow tablets ---------- */
 @media (max-width: 899px) {
@@ -354,16 +408,17 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .toolbar--inline { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 36px; }
   .cards, .cards--3 { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 12px; }   /* two columns even on a 360px phone */
   .lede { font-size: 17px; }
-  .name__svg { width: min(100%, 460px); }
+  .win__head .name { font-size: 42px; }
   .home-head { flex-direction: column-reverse; align-items: flex-start; gap: 18px; }
   .close + .win__head { padding-left: 76px; }
   .toolbar--inline.filters { margin: 0 0 18px; }
   .tbl--stats th, .tbl--stats td { padding: 10px 6px; }
 }
 @media (max-width: 699px) {
-  .name__svg { width: min(100%, 340px); }                /* the two-line name, as the hello writes it on phones */
+  .win__head .name { font-size: 44px; line-height: 1; }   /* the two-line name, as the hero sets it on phones */
+  .name__w { display: block; }
   .home-head .avatar { display: none; }
-  .home-head { padding-top: 40px; padding-left: calc(var(--pad) + 6px); }   /* the tall two-line name clears the 40px corner */
+  .home-head { padding-top: 32px; }
 }
 @media (max-width: 599px) {
   .facts { grid-template-columns: minmax(0, 1fr); gap: 2px 0; }
@@ -374,7 +429,7 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .win__head { padding-top: 18px; padding-left: calc(var(--pad) + 4px); }
   .win__head h1 { font-size: 24px; }
   .home-head { flex-direction: row; align-items: center; }
-  .name__svg { width: min(44vw, 340px); }
+  .win__head .name { font-size: 30px; }
   .avatar { width: 46px; height: 46px; }
   .win__body { padding-bottom: 84px; }
   :root { --dock-h: 54px; --dock-y: calc(10px + env(safe-area-inset-bottom)); --tab-w: min(340px, calc(100vw - 110px)); }
@@ -391,7 +446,7 @@ html.no-gl .hue, html:not(.js) .hue { display: none; }
 .hue__button:hover { scale: 1.06; }
 .hue__button:active { scale: .94; }
 .hue__button i { width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255, 255, 255, .85), 0 2px 6px rgba(0, 0, 0, .3); }
-.hue__panel { position: absolute; right: 0; bottom: 58px; width: 272px; padding: 16px; border-radius: 24px; background: var(--glass-css); -webkit-backdrop-filter: blur(28px) saturate(1.8) brightness(.5); backdrop-filter: blur(28px) saturate(1.8) brightness(.5);   /* dark enough for its labels over a light card */ box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 1px 0 rgba(255, 255, 255, .34), 0 24px 60px rgba(0, 0, 0, .4); transform-origin: 100% 100%; opacity: 0; scale: .94; transition: opacity .2s, scale .35s var(--ease-out); }
+.hue__panel { position: absolute; right: 0; bottom: 58px; width: 272px; padding: 16px; border-radius: 24px; background: var(--glass-css); -webkit-backdrop-filter: blur(28px) saturate(1.8) brightness(.5); backdrop-filter: blur(28px) saturate(1.8) brightness(.5);   /* dark enough for its labels over a light card */ box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 1px 0 rgba(255, 255, 255, .34), 0 24px 60px rgba(0, 0, 0, .4); transform-origin: 100% 100%; opacity: 0; scale: .98; transition: opacity .2s, scale .3s var(--ease-out); }   /* 98%: under 8px of travel at its far corner */
 .hue__panel.is-open { opacity: 1; scale: 1; }
 .hue__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .hue__head h2 { font: 700 17px/1.2 var(--font-display); }
@@ -415,7 +470,10 @@ html.no-gl .hue, html:not(.js) .hue { display: none; }
 .hue__seg button[aria-checked="true"] { background: #fff; color: #0b1138; }
 @media (max-width: 899px) {
   .hue { left: calc(var(--dock-x) + var(--tab-w) + 10px); right: auto; bottom: var(--dock-y); transition: opacity .25s; }
-  html.is-hello .hue { left: auto; right: calc(14px + env(safe-area-inset-right)); }   /* no dock during the hello: the corner */
+  html:is(.is-hello, .is-entering) .hue { left: auto; right: calc(14px + env(safe-area-inset-right)); }   /* no dock during the hero: the corner */
+  html:is(.is-hello, .is-entering) .hue__button { width: 46px; height: 46px; }   /* at its desktop size, clear of the hint on a 320px phone */
+  html:is(.is-hello, .is-entering) .hue__button i { width: 22px; height: 22px; }
+  html.is-entering .hue { opacity: 0; pointer-events: none; }   /* it steps out while the windows come in, and reappears in the dock */
   html:has(section.sheet:not(.is-closing)) .hue { opacity: 0; pointer-events: none; }   /* it steps away with the tab bar */
   .hue__button { width: var(--dock-h); height: var(--dock-h); }
   .hue__button i { width: 26px; height: 26px; }
@@ -430,12 +488,13 @@ html:not(.js) .win { display: block; overflow: visible; }
 html:not(.js) .win__body { overflow: visible; -webkit-mask: none; mask: none; padding-bottom: 40px; }
 html:not(.js) .tabs { display: flex; flex-wrap: wrap; order: -1; }
 html:not(.js) .tabs__label { opacity: 1; translate: none; }
-html:not(.js) .grab, html:not(.js) .hello { display: none; }
+html:not(.js) .grab, html:not(.js) .hero { display: none; }
 
 /* ---------- motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .15s !important; animation: none !important; }
   .hue__panel { scale: 1; }
+  .hero__hint { transition-delay: 0s; }
   .card:hover, .card:active, .btn:active { scale: 1; }
 }
 
@@ -444,16 +503,17 @@ html:not(.js) .grab, html:not(.js) .hello { display: none; }
   .room { display: none; }
   .glass { forced-color-adjust: auto; background: Canvas; border: 1px solid CanvasText; }
 }
-@media (forced-colors: active) and (prefers-color-scheme: light) { html:not(.gl) .name__svg { filter: invert(1); } }   /* the white name on a light canvas */
+@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } }
 
 /* ---------- print: plain text on white, Letter with half-inch margins ---------- */
 @page { size: letter; margin: .5in; }
 @media print {
   html, body { background: #fff !important; }
   body { min-height: 0; font-size: 10pt; line-height: 1.38; }
-  .room, .tabs, .toolbar, .toolbar--inline, .grab, .hello, .skip, .close, .avatar, .card__tag, .srow i, .side:has(.toc), .hue { display: none !important; }
+  .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue { display: none !important; }
   .space, .win, .sheet, .side { position: static !important; inset: auto !important; transform: none !important; translate: none !important; width: auto !important; height: auto !important; max-height: none !important; overflow: visible !important; background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 0 14pt !important; opacity: 1 !important; filter: none !important; perspective: none !important; }
   .space > *, .win > *, .sheet > * { opacity: 1 !important; filter: none !important; }
+  .side { -webkit-mask-image: none !important; mask-image: none !important; }   /* the side window's fade at its foot is for scrolling, not paper */
   .win, .sheet { display: block !important; }
   .glass::after { display: none !important; }
   /* a project open as a sheet prints on its own */
@@ -469,8 +529,7 @@ html:not(.js) .grab, html:not(.js) .hello { display: none; }
   .win__head { padding: 0 0 10pt !important; }
   .win__head h1 { font-size: 20pt; }
   .win__body { padding: 0 !important; overflow: visible !important; -webkit-mask: none !important; mask: none !important; }
-  .name__svg { display: block !important; visibility: visible !important; width: 3in !important; filter: invert(1) !important; }
-  .name { margin-left: 0; }                            /* on screen it leans 6px out to align the script; on paper that is into the margin */
+  .win__head .name { font-size: 24pt; opacity: 1 !important; }
   .section { margin-top: 16pt; }
   .section__head h2, .win__body h2, .side h2 { font-size: 13pt; }
   .lede { font-size: 11pt; }
@@ -523,5 +582,7 @@ html:not(.js) .grab, html:not(.js) .hello { display: none; }
   html[data-page="hockey"] .cv { gap: 3pt; }
   html[data-page="hockey"] .cv__head h3 { font-size: inherit; }
   html[data-page="hockey"] .side { margin-top: 0 !important; }
+  html[data-page="hockey"] .space > .side { grid-column: 1 / -1; display: grid !important; grid-template-columns: 1fr 1fr; column-gap: .3in; align-items: start; }   /* Measurables and Coach contacts side by side, as the two windows were */
+  html[data-page="hockey"] .side__part + .side__part { margin-top: 0; }
   html[data-page="hockey"] .side--inline { break-inside: avoid; }
 }

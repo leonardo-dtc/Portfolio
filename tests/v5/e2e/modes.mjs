@@ -4,7 +4,7 @@ import { open, BASE, PAGES, check } from './lib.mjs';
 {
   const { browser, page } = await open({ reduced: true });
   await page.goto(BASE, { waitUntil: 'load' });
-  await page.waitForSelector('.enter:not([hidden])', { timeout: 300 }).then(() => check(true, 'reduced motion: name written at once, Enter shown'), () => check(false, 'reduced motion: Enter shown within 300 ms'));
+  await page.waitForFunction(() => window.__hero && window.__hero.ink.on === 1, null, { timeout: 1500 }).then(() => check(true, 'reduced motion: the name is shown at once'), () => check(false, 'reduced motion: the name is shown at once'));
   await page.waitForTimeout(1600);                                   // past the room's 1.5 s start-up at full rate
   const t = await page.evaluate(async () => { const f0 = window.__roomFrames; await new Promise(r => setTimeout(r, 1500)); return { frames: window.__roomFrames - f0 }; });
   check(t.frames < 10, `reduced motion: the room stops redrawing when nothing moves (${t.frames} frames in 1.5 s)`);
@@ -13,7 +13,19 @@ import { open, BASE, PAGES, check } from './lib.mjs';
   const moved = await page.evaluate(() => getComputedStyle(document.querySelector('.space')).translate);
   await page.mouse.move(100, 100); await page.mouse.move(1300, 800);
   await page.waitForTimeout(300);
-  check(await page.evaluate(() => getComputedStyle(document.querySelector('.space')).translate) === moved, 'reduced motion: no parallax');
+  check(await page.evaluate(m => getComputedStyle(document.querySelector('.space')).translate === m && window.__room.state.shift.every(v => v === 0), moved), 'reduced motion: nothing leans with the pointer');
+  await browser.close();
+}
+{
+  // windows stay where they are when the pointer moves (only the light follows it, and the room leans behind them)
+  const { browser, page } = await open();
+  await page.goto(BASE + '?nohello', { waitUntil: 'load' });
+  await page.waitForTimeout(1200);
+  const at = () => page.evaluate(() => [document.getElementById('main'), document.querySelector('aside.side'), document.querySelector('nav.tabs')].map(e => { const r = e.getBoundingClientRect(); return [r.left, r.top].map(v => v.toFixed(1)).join(','); }).join(' ') + ' ' + getComputedStyle(document.querySelector('.space')).translate + ' ' + getComputedStyle(document.querySelector('.space')).perspectiveOrigin);
+  const before = await at();
+  await page.mouse.move(60, 60); await page.waitForTimeout(500); await page.mouse.move(1380, 840); await page.waitForTimeout(900);
+  check(await at() === before, 'the windows do not move with the pointer');
+  check(await page.evaluate(() => Math.abs(window.__room.state.shift[0]) > .001), 'the room behind them leans a little');
   await browser.close();
 }
 {
@@ -21,7 +33,7 @@ import { open, BASE, PAGES, check } from './lib.mjs';
   for (const p of PAGES) {
     await page.goto(BASE + p, { waitUntil: 'load' });
     check(await page.locator('#main h1').isVisible(), `no-JS ${p || 'home'}: title visible`);
-    check(!(await page.locator('.hello').isVisible()), `no-JS ${p || 'home'}: no hello`);
+    check(!(await page.locator('.hero').isVisible()), `no-JS ${p || 'home'}: no hero`);
   }
   await browser.close();
 }
@@ -50,7 +62,7 @@ import { open, BASE, PAGES, check } from './lib.mjs';
   const home = await pages('');
   check(home >= 1 && home <= 4, `print: home prints on ${home} pages`);
   await page.emulateMedia({ media: 'print' });
-  check(await page.evaluate(() => { const i = document.querySelector('.name__svg'); const s = getComputedStyle(i); return s.display !== 'none' && s.visibility === 'visible' && i.getBoundingClientRect().width > 100; }), 'print: the written name prints on Home');
+  check(await page.evaluate(() => { const h = document.querySelector('#main h1.name'); const s = getComputedStyle(h); return h.textContent.trim() === 'Leonardo Carvalho' && s.display !== 'none' && s.visibility === 'visible' && s.color === 'rgb(0, 0, 0)' && h.getBoundingClientRect().width > 100; }), 'print: the name prints on Home as black text');
   await page.emulateMedia({ media: null });
   const resume = await pages('resume/');
   check(resume >= 2 && resume <= 6, `print: résumé prints on ${resume} pages`);
