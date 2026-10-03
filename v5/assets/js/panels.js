@@ -1,6 +1,6 @@
 // Every element marked data-glass tells the room where its glass is. Flat elements give their box; elements
 // turned in 3D carry four zero-size corner probes, which the browser projects with the element's own transform.
-import { rectToQuad, invert3 } from './geometry.js';
+import { rectToQuad, invert3, mul3 } from './geometry.js';
 
 const KIND = { window: 0, ornament: 1, control: 2, prominent: 3 };  // prominent: the tinted glass of a primary button
 const MAX = 16;
@@ -37,7 +37,12 @@ export function readPanels(root = document, dpr = 1) {
     if (rad === undefined) { rad = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0; radiusCache.set(el, rad); }
     const scale = sx / (w * dpr);
     const r = Math.min(rad, Math.min(w, h) / 2) * dpr * scale;
-    inv.set(invert3(rectToQuad(sx, sy, quad)), n * 9);
+    let m = rectToQuad(sx, sy, quad);
+    // a side window taller than its room scrolls, and its probes scroll with its contents: they report its corners
+    // that many pixels up its own plane, so the map is shifted back down that plane to its true place
+    const st = probes.length === 4 ? el.scrollTop : 0;
+    if (st) m = mul3(m, [1, 0, 0, 0, 1, st * dpr, 0, 0, 1]);
+    inv.set(invert3(m), n * 9);
     box.set([sx, sy, r, KIND[el.dataset.glass] ?? 0], n * 4);
     state.set([Math.min(1, g.m), g.dim || 0, g.press || 0, 0], n * 4);
     n++;

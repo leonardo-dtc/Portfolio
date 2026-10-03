@@ -20,8 +20,9 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   check(await page.getAttribute('nav.tabs a[data-tab="work"]', 'aria-current') === 'page', 'Work tab is current');
   check(await page.evaluate(() => document.title.startsWith('Work')), 'the document title follows');
   // one side window, the same element as Home's: it stays where it is and its contents change
-  check(await page.waitForFunction(() => document.querySelectorAll('aside.side').length === 1 && document.querySelector('aside.side') === window.__side && !!document.getElementById('progress-h') && !!document.getElementById('exp-h'), null, { timeout: 2500 }).then(() => true, () => false), 'Work’s In progress and Experiments fill the same side window');
-  check(await page.evaluate(() => { const a = document.querySelector('aside.side'); return a.getAttribute('aria-labelledby') === 'progress-h exp-h' && a.querySelectorAll(':scope > .probe').length === 4 && !a.style.transform; }), 'the side window keeps its probes and its place, and takes the new labels');
+  // (round three: Work's Experiments moved out of the side window into the main window, under the cards)
+  check(await page.waitForFunction(() => document.querySelectorAll('aside.side').length === 1 && document.querySelector('aside.side') === window.__side && !!document.querySelector('aside.side #progress-h') && !!document.querySelector('#main #exp-h'), null, { timeout: 2500 }).then(() => true, () => false), 'Work’s In progress fills the same side window; its Experiments sit in the main window');
+  check(await page.evaluate(() => { const a = document.querySelector('aside.side'); return a.getAttribute('aria-labelledby') === 'progress-h' && a.querySelectorAll(':scope > .probe').length === 4 && !a.style.transform; }), 'the side window keeps its probes and its place, and takes the new labels');
   check(await page.evaluate(() => new URL(document.querySelector('nav.tabs a[data-tab="home"]').href).pathname === '/v5/'), 'tab links still resolve after the address changed');
 
   await page.click('a[href$="loquar/"]');

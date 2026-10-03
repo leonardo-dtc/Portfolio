@@ -82,6 +82,11 @@ typography:
     fontSize: "14px"
     fontWeight: 500
     lineHeight: 1.35
+  side-text:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', Roboto, system-ui, sans-serif"
+    fontSize: "15px"
+    fontWeight: 500
+    lineHeight: 1.36
   caption:
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', Roboto, system-ui, sans-serif"
     fontSize: "13px"
@@ -238,6 +243,19 @@ components:
     typography: "{typography.body}"
   row-hover:
     backgroundColor: "{colors.fill}"
+  experiment-open:
+    backgroundColor: "{colors.fill-2}"
+    textColor: "{colors.ink}"
+    padding: "13px 16px"
+  card-arrow:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.ground-night}"
+    rounded: "{rounded.pill}"
+    size: "32px"
+  side-scrollbar:
+    backgroundColor: "rgba(255, 255, 255, .5)"
+    rounded: "{rounded.pill}"
+    width: "4px"
   side-row:
     backgroundColor: "{colors.fill}"
     rounded: "{rounded.row}"
@@ -322,7 +340,7 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 - **Ink 2** (`{colors.ink-2}`, 78%): the second voice. The lede after its first sentence, prose, fact labels, side-window text, tabs at rest, the hero's hint by night.
 - **Ink 3** (`{colors.ink-3}`, 71%): the third voice. Dates, notes, captions, table heads, reference numerals, list bullets.
 - **Line** (`{colors.line}`, 14%): dividers inside a list group, table rows, the side-window list.
-- **Fill** (`{colors.fill}`, 6%), **Fill 2** (`{colors.fill-2}`, 14%) and **Fill 3** (`{colors.fill-3}`, 22%): the three fills on glass. Fill grounds list groups, cards without colour, résumé entries, fact boxes, tables and buttons at rest; Fill 2 is hover and the round icon wells; Fill 3 is the current tab's bubble and a hovered close button.
+- **Fill** (`{colors.fill}`, 6%), **Fill 2** (`{colors.fill-2}`, 14%) and **Fill 3** (`{colors.fill-3}`, 22%): the three fills on glass. Fill grounds list groups, cards without colour, résumé entries, fact boxes, tables and buttons at rest; Fill 2 is hover, the round icon wells and the wash under an opened experiment; Fill 3 is the current tab's bubble and a hovered close button.
 - **Tint** (`{colors.tint}`), **Tint Day** (`{colors.tint-day}`) and **Tint Strong** (`{colors.tint-strong}`): CSS glass only, under a 30px backdrop blur with `saturate(1.7) brightness(.8)`; Tint Day keeps the fallback dark enough over the bright day room; Tint Strong replaces it under reduced transparency.
 
 ### Named Rules
@@ -352,7 +370,8 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 - **Lead** (600, 18px, 1.4): the first-person sentence heading each group of the record, max 34em.
 - **Body** (500, 17px, 1.47, +.006em): prose (max 40em), rows, résumé text (16px inside entries), facts at 16px.
 - **Control** (650, 15px, line 1): buttons, the All work link, table of contents links; tabs and the close label at 16px.
-- **Meta** (500, 14px): dates, sublines, side-window text, references, figure captions, side facts.
+- **Side text** (500, 15px, 1.36): everything a side window says under its titles and bold lines: list text in Ink 2, side facts, notes and the side rows' second lines. Raised from 14px in round three so the angled window reads at a glance. The clock line ("9:41 AM in Groton") stays a 14px meta line.
+- **Meta** (500, 14px): dates, sublines, references, figure captions, the experiments' lines (on a 20px line box).
 - **Caption** (500, 13px): card sublines (two lines always reserved), table heads, experiment dates. Nothing on the site is under 12px.
 - **Manuscript** (600, `clamp(20px, 2.1vw, 24px)`, 1.3): the manuscript's title on its sheet, max 30em; 15px/1.22 on its card, clamped to three lines.
 
@@ -388,9 +407,10 @@ Without WebGL2, with scripts off, under reduced transparency or in forced colour
 - **Window shadow** (drawn by the room: 22px down, reach 90px, 34%; CSS fallback `0 30px 80px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.12)`): every window and sheet.
 - **Ornament shadow** (drawn: reach 40px, 22%; the tab bar's CSS glass `0 16px 40px rgba(0,0,0,.28)`): tab bar, toolbar.
 - **The halo and the pool behind the name** (the hero only): a Gaussian blur of the letters 40% of the font size wide, lit in blue, violet and pink (breathing over 10s) and leaning up to 5% of the font size toward the pointer; under it the room falls toward near black by night (a soft oval, deepest round the letters) and, by day, about 80% toward a saturated violet-blue that follows the halo and hugs the letters. Hover lifts the light by 22%, a press flares it and it settles back within about 250ms. The CSS hero draws the pool as a dark oval and a `text-shadow` shade hugging the letters.
-- **Card lift** (`0 10px 24px rgba(0,0,0,.16)`, hover `0 18px 40px rgba(0,0,0,.24)`): project cards, which sit on the window like objects.
+- **Card lift** (`0 10px 24px rgba(0,0,0,.16)`, hover and focus `0 18px 40px rgba(0,0,0,.24)`): project cards, which sit on the window like objects. The lift deepens; the card does not grow.
+- **Card arrow** (`0 6px 16px rgba(0,0,0,.26)`): the white round arrow at a card's top right.
 - **Screenshot shadow** (`0 10px 26px rgba(0,0,0,.26)` on a card, `0 14px 34px rgba(0,0,0,.24)` on a sheet figure): a screenshot resting on its colour.
-- **Hover light** (`radial-gradient(180px circle at pointer, rgba(255,255,255,.16), transparent 62%)`, plus-lighter; pressed 240px at 30%): cards, rows and buttons marked `data-hover`, the visionOS gaze light.
+- **Hover light** (`radial-gradient(180px circle at pointer, rgba(255,255,255,.16), transparent 62%)`, plus-lighter; pressed 240px at 30%): cards, rows and buttons marked `data-hover`, the visionOS gaze light (not the experiments, where the Fill 2 wash answers instead).
 - **Focus glow** (`outline 2px #fff, offset 3px, box-shadow 0 0 0 6px rgba(255,255,255,.18)`): every focusable element.
 
 ### Named Rules
@@ -412,8 +432,10 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **Page change:** the old contents fade out over 140ms (`cubic-bezier(.4, 0, 1, 1)`); the new ones fade in over 220ms rising 6px (`cubic-bezier(.2, .8, .2, 1)`). No blur and no scale. The window itself never leaves, and neither does the side window: its contents crossfade with the window's.
 
 ### The side window
-- One per page, on the right: Home's This fall (with a line for Groton's live time, "9:41 AM in Groton"), Work's In progress then Experiments, Hockey's Measurables then Coach contacts, About's portrait and From then Interests, the Résumé's Sections then Contact. Two parts sit 30px apart (44px as sections inside the window).
-- 28px radius, 24px by 22px padding, a 20px title, then side rows (a 38px round icon well in Fill 2, 34px in a floating side window, with a 19px stroked icon, a 15px bold line over 14px Ink 2), a divided list, facts at 14px, a table of contents, or the portrait. It arrives turning from 32 degrees to its 24 as it fades in (response .55, damping 1), fades out over its last 26px, and scrolls when what it holds is taller than its room.
+- One per page, on the right, holding only what fits beside the window: Home's This fall (with a line for Groton's live time, "9:41 AM in Groton"), Work's In progress (its Experiments moved into the main window, under the cards), Hockey's Measurables then Coach contacts (the Elite Prospects and NCSA rows print with it but are not shown on screen, where the toolbar carries both), About's portrait (cropped to 4:3 while it floats, `object-position: 50% 40%`) and From then Interests, the Résumé's Sections then Contact. Two parts sit 30px apart (44px as sections inside the window).
+- 28px radius, 24px by 22px padding, a 20px title, then side rows (a 38px round icon well in Fill 2, 34px in a floating side window, with a 19px stroked icon, a 15px bold line over 15px Ink 2), a divided list (15px Ink 2 under 15px bold lines), facts at 15px, notes at 15px, a table of contents, or the portrait. It arrives turning from 32 degrees to its 24 as it fades in (response .55, damping 1) and fades out over its last 26px.
+- **When it holds more than its room** it says so: a slim white capsule (4px wide, 50% white, 72% under the pointer, at least 44px long) runs in a 14px gutter at its right edge, 30px clear of the top and bottom corners. The gutter is kept whether or not it scrolls (`scrollbar-gutter: stable`, 8px of padding beside it), so the text keeps one measure; Firefox draws its own thin scrollbar in the same white. The window is then a tab stop, so the keyboard scrolls it. Its far corner probes are set from the window's width (the scroll box stops at the scrollbar), and the room shifts the glass back down the window's plane by however far it has scrolled, so the glass stays where the window is. In CSS glass its rim is a 1px border (white at 50% on top, 20% right, 34% below, 42% left) instead of the masked rim other panes draw, which the scroller would cut at its scrollbar and carry along as it scrolls.
+- **Fit at 1440×900** (content against its 728px room): Home 541, Work 331, Résumé 764 (scrolls 36px), Hockey 778 (scrolls 50px), About 905 (scrolls 177px). At 1680×1050 and wider only About scrolls (59 to 73px).
 
 ### Tab bar (ornament)
 - A 64px glass column whose right edge sits 14px off the window's left edge, vertically centred on it, 8px padding, 48px tabs with 24px stroked icons (1.7 stroke, round caps). Pointing at it for 120ms widens it to 188px toward the left: its right edge and its icons stay put, and each name slides in beside its icon on the open side (opacity .16s, 6px travel .3s, 60ms delay); it closes 300ms after the pointer leaves. Keyboard focus opens it too. It never covers the window where the screen has room; on laptops under about 1150px it leans over the window's edge, its backdrop deepening from `brightness(.74)` to `(.42)` as it widens so its names keep 4.5:1 over a light card. Its glass is always CSS glass (`data-glass-off`), so it stays true to its box at every width.
@@ -439,12 +461,15 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **Without the room** (no WebGL2) the same text is CSS neon over the hero's own copy of the room's still: a dark oval and a `text-shadow` shade hugging the letters (violet-blue by day); two traces of the name (a stroke under a black fill, `paint-order: stroke fill`, screened) on orbits of .024em and .022em (13s and 17s), each a pink and orange (or blue and cyan) pair crossfading over 11s and 15s; light translucent faces, a gradient of the colours clipped to the letters with a soft violet glow, and a second face crossfading over them in 16s; and a white-hot line on the edge. Every copy of the name lives in an `aria-hidden` span (or, inside the button, is generated content with empty alt text), so the name is read once. Only transform and opacity animate. Reduced motion holds it still; reduced transparency gives solid letters (white; by day deep navy `#142a85` on a soft light halo); forced colours give system text. Entering is a fade. Without scripts there is no hero.
 
 ### Cards (projects on their own screens' colours)
-- 20px radius, 4 to 5.1 aspect, the project's colour as the ground, the card lift shadow. A screenshot sits 8% in from the sides and 10% from the top (a phone screen 26% in, 9:17), with the name at 700 18px and a two-line 13px subline at 82% opacity pinned to the foot. The manuscript card is a page: its title in the serif over three grey rule lines.
-- **Hover:** scales to 1.02 with the larger lift over .45s; press .98; the hover light follows the pointer.
+- 20px radius, 4 to 5.3 aspect, the project's colour as the ground, the card lift shadow. A screenshot sits 8% in from the sides and 10% from the top (a phone screen 26% in, 9:17), with the name at 700 18px and a two-line 13px subline at 82% opacity pinned to the foot. The manuscript card is a page: its title in the serif over three grey rule lines, kept 30px clear of the top right corner for the arrow.
+- **The settle (hover and keyboard focus):** the card's frame stays still. What it shows (the screenshot, a drawing, the manuscript page) rests at 1.05 inside its rounded frame and settles to 1 over 800ms on the long ease. A 32px white round arrow (the primary button's white, a 16px Night Ground glyph, its own small shadow, no glass) sits 12px in from the top right: it grows from .8 while it turns from 45 degrees to 0 and fades in, over 450ms. The subline goes from 82% to full over 450ms, the lift deepens, and the visionOS light follows the pointer. Press .98. Focus adds the white ring and its glow.
+- **Touch** (no hover, or a coarse pointer) shows the arrow at rest and the screen at its size. **Reduced motion** keeps only the opacity: the arrow fades in, nothing scales or turns. Print drops the arrow.
+- **Images:** card screenshots ship a 320px derivative beside the 640 and 960 (or 720) ones, with `sizes="(min-width: 1385px) calc(10.9vw - 25px), (min-width: 900px) 126px, (min-width: 340px) 142px, 216px"`, the screenshot's real width: 132px at 1440, so the 320 serves 1440 and 390 at 1× and 2×, and the 640 serves a 320px phone at 2× and 1920 at 2×.
 
 ### Lists (visionOS list groups)
 - A Fill ground at 16px radius, rows divided by the Line, each row a two-column grid (title, then a nowrap 14px tabular date in Ink 3), 13px 16px padding; a row can carry a 14px Ink 3 subline. Hover lays a Fill over the row and the hover light.
-- **Experiments:** the same rows with the title in italic at 550 and 13px dates.
+- **A row under the pointer or the keyboard** (the record, the contact links, the side windows' link rows): its title leans 4px to the right over 450ms on the long ease, its date comes up to full ink over 450ms, and the rest of its list group steps back to 55% over 400ms. Other groups stay. Nothing blurs. Reduced motion keeps the date and the dim, without the lean; touch has none of it.
+- **Experiments** (one component, `ul.rows.exp`, the same list on Home and on Work): each row is its title in italic at 550 with its 13px date, and its line beneath them, spanning both columns (14px Ink 3 on a 20px line box, 2px under the title). At rest, on screens 900px and wider with a fine pointer and scripts, the line is folded away. Pointing at a row, or focusing it, unfolds the line (`grid-template-rows: auto 0fr` to `auto 1fr`, 500ms on the long ease) while it fades in (350ms), raises a Fill 2 wash under the row (500ms), brings its line and date to full ink (Ink 3 would fall to about 3.5:1 on the brighter wash; white keeps 5:1, Night and Day), and dims the other rows to 35% (300ms). The wash replaces the pointer's light on these rows, which on top of it would take white text under 4.5:1. The title never moves. While the pointer is over the list it decides which row is open; otherwise the focused row is. The list takes the opened line into the space below it (its bottom margin goes from 0 to -22px on the same curve and timing), so nothing after the list moves and the window's scroll height stays the same; moving from one row to the next swaps the two lines in step. Touch screens, phones, reduced motion, scripts off and print show every line at rest. Add one by copying an `<li>` into both lists.
 - **Résumé entries:** separate Fill cards (15px 18px, 10px apart), a 650 17px head with its date right, a 14px Ink 3 subline, 16px Ink 2 text and bullets as 5px Ink 3 dots.
 
 ### Sheets' furniture
@@ -459,8 +484,9 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **The motion rules:** text never blurs while it moves and content never moves on its own; blur belongs to the room. UI transitions run 150 to 300ms with at most about 8px of travel; bigger motion only answers the reader's own action (the hero's glide). Where several things move they stagger by 40 to 80ms.
 - **The hero's arrival:** the light, the halo and the pool come up together on a critically damped spring (response .8, about 0.9s), the echoes growing out of the outline with them; the hint follows from .75s over .5s. Then the light keeps moving on periods of 10s to 19s, slowly, while the letters stay put.
 - **Entering:** on the click the hint fades (120ms) and the room pulls focus (1 / 1); the name glides on one critically damped spring (response .65, about 0.7s, no overshoot), its size in log space, its weight from 780 to 700 and its colour to white (white within about 0.2s), while the light goes out as (1 - v)³, the echoes folding back into the letters and the pool lifting with it, redrawn at screen resolution every frame and read after the window has moved, so it never trails its slot. The main window's glass forms under it at once (from 98.5% scale); its contents fade in (240ms) once the name is within about half a line of its slot, then the side window (+60ms), the tab bar (+120ms) and the toolbar and window bar (+180ms). Landed, the name hands off: the HTML title fades in over the identical glyphs (150ms), then the ink goes from under it (100ms), and the effect is switched off.
-- **CSS micro-motion** uses one curve, `cubic-bezier(.16, 1, .3, 1)`: the tab bar's width (.42s), button press (.35s), card hover (.45s), the hero's hint (.5s).
-- **Reduced motion:** no glide, focus pull, lean, drift or springs; the hero's name is there at once and entering, page changes and sheets are 150ms crossfades (or none); the room does not redraw while nothing moves.
+- **CSS micro-motion** uses one curve, `cubic-bezier(.16, 1, .3, 1)`: the tab bar's width (.42s), button and card press (.35s), the hero's hint (.5s).
+- **Hovers that move content inside a still frame** use the long ease, `cubic-bezier(.22, 1, .36, 1)` (`--ease-long`), over 450 to 800ms, which covers most of the way in the first 100ms and then settles: the card's settle (800ms) and its arrow (450ms), a row's lean (450ms), an experiment opening (500ms). The frame (the card, the list group, the window) never moves; what steps back dims and never blurs. These are reveals answering the pointer, so they are longer than arrivals, which stay 150 to 300ms with at most 8px of travel.
+- **Reduced motion:** no glide, focus pull, lean, drift or springs; the hero's name is there at once and entering, page changes and sheets are 150ms crossfades (or none); the room does not redraw while nothing moves. Hovers keep only colour and opacity: no settle, no turning arrow (it fades in), no row lean, and every experiment shows its line at rest.
 
 ## Do's and Don'ts
 
@@ -478,8 +504,8 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **Don't** put glass inside glass: no frosted panel, card or button inside a window.
 - **Don't** tint text or headings; colour belongs to the room, the glass and a project's card.
 - **Don't** set a heading in a script or a display face, or set the system face larger than the 34px title.
-- **Don't** tilt anything in response to hover; the side window's angle is its place in the room, and hover answers with light and scale.
-- **Don't** blur text or a window's contents while they move, and don't move windows with the pointer: blur and lean belong to the room behind.
+- **Don't** tilt or grow anything in response to hover; the side window's angle is its place in the room, and hover answers with light and with content settling inside a still frame.
+- **Don't** blur text or a window's contents while they move, and don't move windows with the pointer: blur and lean belong to the room behind. What steps back (a row's group, the other experiments, a sheet's parent) dims; it never blurs.
 - **Don't** fade a sheet's parent through its glass without fading its contents; the room cannot frost HTML.
 - **Don't** put a small label above a title or section heading; the title carries itself.
 - **Don't** use tween durations for window, bubble or sheet motion; those are springs.

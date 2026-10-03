@@ -40,6 +40,7 @@
   --glass-css: rgba(40, 56, 196, .34);    /* CSS glass over page content (the tab bar, the color control); follows the color style */
 
   --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-long: cubic-bezier(.22, 1, .36, 1);   /* hovers that move content inside a still frame, over 450 to 800ms */
   color-scheme: dark;
 }
 
@@ -82,8 +83,21 @@ html:not(.gl) .room { display: none; }
 .win__body:focus-visible { box-shadow: none; outline: 2px solid rgba(255, 255, 255, .5); }
 
 /* one side window, on the right, a set gap from the main window and turned 24 degrees toward you about its near edge */
-.side { position: absolute; top: calc(var(--win-top) + var(--win-h) * .03); left: calc(var(--cx) + var(--w-main) / 2 + var(--gap-side)); width: var(--side-w); max-height: calc(var(--win-h) * .94); border-radius: 28px; padding: 24px 22px; overflow: auto; z-index: 1; scrollbar-width: none; transform-origin: 0% 50%; transform: rotateY(-24deg); }
+.side { position: absolute; top: calc(var(--win-top) + var(--win-h) * .03); left: calc(var(--cx) + var(--w-main) / 2 + var(--gap-side)); width: var(--side-w); max-height: calc(var(--win-h) * .94); border-radius: 28px; padding: 24px 22px; overflow: auto; z-index: 1; transform-origin: 0% 50%; transform: rotateY(-24deg); }
 .side:not(.side--inline) { will-change: transform; }
+/* when it holds more than its room, it says so: a slim white capsule scrolls at its right edge, clear of the corners.
+   Its 14px gutter is kept whether or not it scrolls, so the text keeps one measure (22px of padding either way). */
+.side:not(.side--inline) { scrollbar-gutter: stable; padding-right: 8px; }
+@supports not (scrollbar-gutter: stable) { .side:not(.side--inline) { padding-right: 22px; } }
+.side::-webkit-scrollbar { width: 14px; }
+.side::-webkit-scrollbar-track { background: none; margin: 30px 0; }
+.side::-webkit-scrollbar-thumb { min-height: 44px; border: 5px solid transparent; border-radius: 999px; background: rgba(255, 255, 255, .5) padding-box; }
+.side::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, .72); }
+@supports not selector(::-webkit-scrollbar) { .side { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .5) transparent; } }
+/* in CSS glass its rim is a border, not the ::after every other pane uses: a scroller clips what it holds at its
+   scrollbar and scrolls it, and a border is outside both (the same light: brighter at the top left, then the foot) */
+html:not(.gl) .side.glass:not(.side--inline)::after { display: none; }
+html:not(.gl) .side.glass:not(.side--inline) { border: 1px solid; border-color: rgba(255, 255, 255, .5) rgba(255, 255, 255, .2) rgba(255, 255, 255, .34) rgba(255, 255, 255, .42); }
 .side:focus-visible { outline-offset: -3px; box-shadow: none; border-radius: 28px; }   /* when it scrolls it takes focus; the ring keeps its corners */
 .side h2 { font: 700 20px/1.15 var(--font-display); letter-spacing: -.005em; }
 .side__part + .side__part { margin-top: 30px; }
@@ -93,6 +107,8 @@ html.gl .side:not(.side--inline) { -webkit-mask-image: linear-gradient(#000 calc
 .probe { position: absolute; width: 0; height: 0; pointer-events: none; }
 .probe[data-corner="0"] { left: 0; top: 0; } .probe[data-corner="1"] { right: 0; top: 0; }
 .probe[data-corner="2"] { right: 0; bottom: 0; } .probe[data-corner="3"] { left: 0; bottom: 0; }
+/* a scroller's padding box stops at its scrollbar, so the far corners are set from the window's own width */
+.side:not(.side--inline) > .probe:is([data-corner="1"], [data-corner="2"]) { right: auto; left: var(--side-w); }
 
 /* the tab bar: an ornament just off the window's left edge (its right edge 14px out). It opens to the left, its right
    edge and its icons staying put, so it never covers the window; only where the screen has no room for that (laptops
@@ -287,15 +303,15 @@ html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards;
 /* cards: each on its own screen's colour */
 .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.card { position: relative; display: block; aspect-ratio: 4 / 5.3; border-radius: var(--r-card); overflow: hidden; background: var(--c, var(--fill)); color: var(--ct, #fff); text-decoration: none; box-shadow: 0 10px 24px rgba(0, 0, 0, .16); transition: scale .45s var(--ease-out), box-shadow .45s var(--ease-out); isolation: isolate; }
+.card { position: relative; display: block; aspect-ratio: 4 / 5.3; border-radius: var(--r-card); overflow: hidden; background: var(--c, var(--fill)); color: var(--ct, #fff); text-decoration: none; box-shadow: 0 10px 24px rgba(0, 0, 0, .16); transition: box-shadow .45s var(--ease-long), scale .35s var(--ease-out); isolation: isolate; }
 .card[hidden] { display: none; }
-.card__shot { position: absolute; left: 8%; right: 8%; top: 10%; border-radius: 9px; overflow: hidden; box-shadow: 0 10px 26px rgba(0, 0, 0, .26); }
+.card__shot { position: absolute; left: 8%; right: 8%; top: 10%; border-radius: 9px; overflow: hidden; isolation: isolate; box-shadow: 0 10px 26px rgba(0, 0, 0, .26); }   /* (isolation: WebKit then clips a scaled picture to the rounded frame) */
 .card__shot img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
 .card__shot--tall { left: 26%; right: 26%; top: 7%; border-radius: 14px; }
 .card__shot--tall img { aspect-ratio: 9 / 17; }
 .card__text { position: absolute; left: 14px; right: 14px; bottom: 12px; }
 .card__text b { display: block; font: 700 18px/1.15 var(--font-display); }
-.card__text span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; min-height: 2.6em; margin-top: 3px; font-size: 13px; line-height: 1.3; opacity: .82; }
+.card__text span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; min-height: 2.6em; margin-top: 3px; font-size: 13px; line-height: 1.3; opacity: .82; transition: opacity .45s var(--ease-long); }
 .card__tag { position: absolute; left: 12px; top: 12px; z-index: 1; padding: 6px 10px; border-radius: 999px; font: 650 12px/1 var(--font); background: rgba(12, 18, 60, .66); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; }
 .card--paper { --c: var(--paper); --ct: #1b1b1f; }
 .card--gold { --c: var(--gold); --ct: #1b1b1f; }
@@ -305,7 +321,7 @@ html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards;
 .card--violet { --c: #4b3fb0; --ct: #fff; }
 .card--green { --c: #2f6e4f; --ct: #fff; }
 .card__page { position: absolute; inset: 15px 15px 84px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
-.card__paper { font: 600 15px/1.22 var(--serif); color: #1b1b1f; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card__paper { font: 600 15px/1.22 var(--serif); color: #1b1b1f; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding-right: 30px; }   /* the top right corner is the arrow's */
 .card__rules { display: grid; gap: 7px; }
 .card__rules i { display: block; height: 5px; border-radius: 4px; background: rgba(0, 0, 0, .1); }
 .card__rules i:nth-child(2) { width: 82%; } .card__rules i:nth-child(3) { width: 90%; }
@@ -314,16 +330,54 @@ html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards;
 .rows { border-radius: var(--r-row); background: var(--fill); overflow: hidden; }
 .rows > li + li { border-top: 1px solid var(--line); }
 .row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 13px 16px; text-decoration: none; color: #fff; }
+a.row { transition: opacity .4s var(--ease-long), background-color .25s ease; }
 a.row:hover { background: var(--fill); }
 .rows .row:focus-visible { outline-offset: -3px; box-shadow: inset 0 0 0 6px rgba(255, 255, 255, .18); }   /* the group clips its rows: the ring goes inside */
-.row__m { color: var(--ink-3); font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.row__t { transition: translate .45s var(--ease-long); }
+.row__m { color: var(--ink-3); font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; transition: color .45s var(--ease-long); }
 .row__t small { display: block; margin-top: 2px; color: var(--ink-3); font-size: 14px; }
 .lead { font: 600 18px/1.4 var(--font); color: #fff; margin: 0 0 12px; max-width: 34em; }
 .group + .group { margin-top: 30px; }
+/* a row under the pointer or the keyboard: its title leans 4px in (450ms on the long ease), its date comes up to full
+   ink, and the rest of its list group steps back to 55%. Nothing blurs; reduced motion keeps the colour and the dim. */
+@media screen and (hover: hover) and (pointer: fine) {
+  .rows:not(.exp):has(a.row:hover) a.row:not(:hover) { opacity: .55; }
+  a.row:hover .row__m { color: #fff; }
+}
+.rows:not(.exp):has(a.row:focus-visible):not(:has(a.row:hover)) a.row:not(:focus-visible) { opacity: .55; }
+a.row:focus-visible .row__m { color: #fff; }
+@media screen and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) { .rows:not(.exp) a.row:hover .row__t { translate: 4px 0; } }
+@media screen and (prefers-reduced-motion: no-preference) { .rows:not(.exp) a.row:focus-visible .row__t { translate: 4px 0; } }
 
-/* experiments */
-.exp .row__t em { font-style: italic; font-weight: 550; }
-.exp .row__m { font-size: 13px; }
+/* experiments: one component, on Home and on Work. At rest each is its italic title and its date; pointing at one (or
+   focusing it) unfolds its line beneath them (grid rows 0fr to 1fr, 500ms on the long ease) and raises a Fill 2 wash
+   while the others dim to 35%. Nothing blurs, and the title never moves. The list takes the opened line into the space
+   below it (a negative margin that grows as the line does), so nothing after it moves. Touch screens, phones, reduced
+   motion, scripts off and print show every line. Add one by copying an <li>. */
+.exp .row { row-gap: 0; transition: opacity .3s var(--ease-long), background-color .5s var(--ease-long); }
+.exp .row__t { display: contents; }
+.exp .row__t em { grid-area: 1 / 1; font-style: italic; font-weight: 550; }
+.exp .row__m { grid-area: 1 / 2; font-size: 13px; }
+.exp .row__t small { grid-area: 2 / 1 / 3 / -1; align-self: stretch; min-height: 0; overflow: hidden; margin: 0; line-height: 20px; }
+.exp .row__t small::before { content: ""; display: block; height: 2px; }   /* inside the clip, so a closed line is 0px */
+.exp a.row:hover, .exp a.row:focus-visible { background-color: var(--fill-2); }
+.exp a.row::before { content: none; }   /* the wash is the hover's answer here: the pointer's light on top of it would take white text under 4.5:1 */
+.exp .row__t small { transition: color .45s var(--ease-long); }
+.exp a.row:is(:hover, :focus-visible) small { color: #fff; }   /* on the brighter wash, Ink 3 would fall to 3.5:1; white keeps 5:1 */
+.exp:has(a.row:hover) a.row:focus-visible:not(:hover) { background-color: transparent; }   /* one wash: the pointer's */
+@media screen and (hover: hover) and (pointer: fine) { .exp:has(a.row:hover) a.row:not(:hover) { opacity: .35; } }
+.exp:has(a.row:focus-visible):not(:has(a.row:hover)) a.row:not(:focus-visible) { opacity: .35; }
+@media screen and (min-width: 900px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html.js .exp { transition: margin-bottom .5s var(--ease-long); }
+  html.js .exp .row { grid-template-rows: auto 0fr; transition: grid-template-rows .5s var(--ease-long), opacity .3s var(--ease-long), background-color .5s var(--ease-long); }
+  html.js .exp .row__t small { opacity: 0; transition: opacity .35s ease, color .45s var(--ease-long); }
+  html.js .exp a.row:is(:hover, :focus-visible) { grid-template-rows: auto 1fr; }
+  html.js .exp a.row:is(:hover, :focus-visible) small { opacity: 1; }
+  /* while the pointer is over the list it decides which row is open (kept apart, so a browser without :has still opens rows) */
+  html.js .exp:has(a.row:hover) a.row:focus-visible:not(:hover) { grid-template-rows: auto 0fr; }
+  html.js .exp:has(a.row:hover) a.row:focus-visible:not(:hover) small { opacity: 0; }
+  html.js .exp:has(a.row:is(:hover, :focus-visible)) { margin-bottom: -22px; }   /* one line: 2px and a 20px line box */
+}
 
 /* side-window rows */
 .srows { margin-top: 16px; display: grid; gap: 8px; }
@@ -333,9 +387,9 @@ a.row:hover { background: var(--fill); }
 .srow i { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--fill-2); }
 .srow svg { width: 19px; height: 19px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .srow b { display: block; font-size: 15px; line-height: 1.25; }
-.srow span { display: block; font-size: 14px; line-height: 1.3; color: var(--ink-2); }
+.srow span { display: block; font-size: 15px; line-height: 1.3; color: var(--ink-2); }
 .slist { margin-top: 14px; }
-.slist > li { padding: 11px 0; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.38; color: var(--ink-2); }
+.slist > li { padding: 11px 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.36; color: var(--ink-2); }
 .side:not(.side--inline) .slist > li { padding: 9px 0; }
 .slist > li:first-child { border-top: 0; }
 .slist b { display: block; margin-bottom: 2px; color: #fff; font-size: 15px; }
@@ -390,8 +444,8 @@ a.row:hover { background: var(--fill); }
 .refs a { overflow-wrap: anywhere; }
 
 /* side windows: facts, a table of contents, link rows, a portrait */
-.facts--side { margin-top: 14px; gap: 9px 14px; font-size: 14px; line-height: 1.35; }
-.side-note { margin-top: 12px; font-size: 14px; }
+.facts--side { margin-top: 14px; gap: 9px 14px; font-size: 15px; line-height: 1.35; }
+.side-note { margin-top: 12px; font-size: 15px; }
 .side-rows { margin-top: 14px; }
 .side-rows .row { padding: 11px 14px; font-size: 15px; }
 .toc { margin-top: 12px; display: grid; gap: 2px; }
@@ -400,11 +454,11 @@ a.row:hover { background: var(--fill); }
 .portrait { display: block; width: 100%; aspect-ratio: 1; border-radius: 20px; overflow: hidden; }
 .portrait img { width: 100%; height: 100%; object-fit: cover; }
 .side--inline .portrait { max-width: 220px; }
+.side:not(.side--inline) .portrait { aspect-ratio: 4 / 3; }   /* floating, the portrait is cropped to 4:3 so the window holds what it carries */
+.side:not(.side--inline) .portrait img { object-position: 50% 40%; }
+@media screen { .print-only { display: none !important; } }   /* on paper only: links the toolbar carries on screen */
 .slist a { color: #fff; text-decoration: none; }
 .slist a:hover { text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .5); }
-.exp-list > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline; font-size: 13px; line-height: 1.3; font-variant-numeric: tabular-nums; }
-.side:not(.side--inline) .exp-list > li { padding: 7px 0; }
-.exp-list b { margin: 0; font-style: italic; font-weight: 550; }
 
 /* work: cards drawn for projects without screenshots, and the filters */
 .card__art { display: grid; place-items: center; background: rgba(255, 255, 255, .08); box-shadow: none; }
@@ -422,7 +476,27 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 [data-hover]::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2; opacity: 0; background: radial-gradient(180px circle at var(--hx) var(--hy), rgba(255, 255, 255, .16), transparent 62%); transition: opacity .25s; mix-blend-mode: plus-lighter; }
 [data-hover]:hover::before { opacity: 1; }
 [data-hover]:active::before { opacity: 1; background: radial-gradient(240px circle at var(--hx) var(--hy), rgba(255, 255, 255, .30), transparent 64%); }
-.card:hover { scale: 1.02; box-shadow: 0 18px 40px rgba(0, 0, 0, .24); }
+/* The settle, in glass. The card's frame stays still; what it shows rests a touch large inside it (1.05) and settles to
+   size under the pointer or the keyboard (800ms on the long ease); a white arrow (the primary button's white, a Night
+   Ground glyph, no glass) grows in at the top right from .8 while it turns from 45 degrees (450ms); the subline comes up
+   from 82% to full; the visionOS light follows the pointer and the shadow deepens. Touch shows the arrow at rest;
+   reduced motion keeps only the opacity. */
+.card::after { content: ""; position: absolute; top: 12px; right: 12px; z-index: 3; width: 32px; height: 32px; border-radius: 50%; pointer-events: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 11 11 5M6.2 5H11v4.8' fill='none' stroke='%230b1138' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .26); transition: opacity .45s var(--ease-long), scale .45s var(--ease-long), rotate .45s var(--ease-long); }
+.card:hover { box-shadow: 0 18px 40px rgba(0, 0, 0, .24); }
+.card:focus-visible { box-shadow: 0 0 0 6px rgba(255, 255, 255, .18), 0 18px 40px rgba(0, 0, 0, .24); }
+.card:is(:hover, :focus-visible) .card__text span { opacity: 1; }
+@media screen and (hover: hover) and (pointer: fine) {
+  .card::after { opacity: 0; }
+  .card:is(:hover, :focus-visible)::after { opacity: 1; }
+}
+@media screen and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .card__shot > img, .card__shot > svg, .card__page { scale: 1.05; transition: scale .8s var(--ease-long); }
+  .card:is(:hover, :focus-visible) .card__shot > img, .card:is(:hover, :focus-visible) .card__shot > svg, .card:is(:hover, :focus-visible) .card__page { scale: 1; }
+  .card::after { scale: .8; rotate: 45deg; }
+  .card:is(:hover, :focus-visible)::after { scale: 1; rotate: 0deg; }
+}
 .card:active { scale: .98; }
 
 /* ---------- sheets (a project in front of its parent) ---------- */
@@ -560,7 +634,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   *, *::before, *::after { transition-duration: .15s !important; animation: none !important; }
   .hue__panel { scale: 1; }
   .hero__hint { transition-delay: 0s; }
-  .card:hover, .card:active, .btn:active { scale: 1; }
+  .card:active, .btn:active { scale: 1; }
 }
 
 /* ---------- forced colours ---------- */

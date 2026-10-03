@@ -66,6 +66,40 @@ WCAG 2.3.3 asks that motion set off by interaction can be turned off):
   the rest of the edition, and with frosted faces, bright rims and the light
   behind it reads at a glance in every palette, Night and Day.
 
+**Round three (October 2026): the creamy hovers, in glass, and side windows that
+fit.** Leonardo liked the dim-room edition's hovers ("smooth and creamy (image
+shape, subtitles, arrow, zoom)") and its experiments that open while the rest step
+back, and disliked anything blurred in motion. The plan is
+`docs/editions/round-3.md`; the rule it settles on is that a hover moves content
+inside a still frame, over 450 to 800 ms on `cubic-bezier(.22, 1, .36, 1)`, and that
+whatever steps back dims and never blurs. Rebuilt here in glass:
+
+- **Cards settle instead of growing.** The frame no longer scales to 1.02. The
+  screenshot (or drawing, or manuscript page) rests at 1.05 inside its rounded frame
+  and settles to 1 over 800 ms; a 32 px white round arrow with a Night Ground glyph
+  grows in at the top right from .8 while turning from 45 degrees (450 ms); the
+  subline comes up from 82% to full; the light follows the pointer and the shadow
+  deepens. Keyboard focus does the same; touch shows the arrow at rest; reduced
+  motion keeps only the fades.
+- **Rows lean.** A row in the record (and in any list of links) leans its title
+  4 px to the right over 450 ms, brings its date to full ink, and steps the rest of
+  its group back to 55%.
+- **Experiments open.** One component on Home and on Work: each shows its italic
+  title and date; pointing at one, or focusing it, unfolds its line (500 ms), raises a
+  Fill 2 wash and dims the others to 35%. The list takes the line into the space
+  below it, so nothing after it moves. Touch, phones, reduced motion, scripts off and
+  print show every line.
+- **Side windows hold what fits.** Work's Experiments moved into the main window
+  under the cards, so its side window is In progress alone; Hockey's side window no
+  longer shows the Elite Prospects and NCSA rows (the toolbar carries both; they still
+  print); About's portrait is cropped to 4:3 while it floats. Side-window text is
+  15 px (it was 14). Where a side window still holds more than its room (About,
+  Hockey and the Résumé at 1440×900, by 177, 50 and 36 px), a slim white capsule
+  scrollbar says so, and its glass now stays in place when it scrolls.
+- **Card images fit the card.** 320 px derivatives of the Loquar, Genuvalens and
+  OCAPEX screenshots, and `sizes` set to the screenshot's real width (132 px at
+  1440), so a 1440 or 390 screen at 1× or 2× loads the 320.
+
 ## The room
 
 - **One WebGL2 canvas behind everything.** The first pass draws the scene (a
@@ -208,7 +242,7 @@ the choice is kept in this browser only (`assets/js/hue.js`).
 | Path | Page | Copy source |
 | --- | --- | --- |
 | `index.html` | Home: the hero, then the name as the title, the introduction, work cards, experiments, the record as five first-person leads over dated rows, contact. Side window: This fall, with Groton's live time | `v4/index.html` (copy only) |
-| `work/` | All seven projects as cards, filtered by the toolbar (All, Research, Build, Music, Community). Side window: In progress, then Experiments | new, from the project pages |
+| `work/` | All seven projects as cards, filtered by the toolbar (All, Research, Build, Music, Community), then the experiments (the same list as Home's). Side window: In progress | new, from the project pages |
 | `hockey/` | Recruiting profile: stats with the sample size, how I play, academic snapshot, team history. Side window: Measurables, then Coach contacts. Prints on one Letter sheet | `v4/hockey/` |
 | `about/` | The essay, the facts and Now, fall 2026. Side window: the portrait and From, then Interests | `v4/about/` |
 | `resume/` | The full record with an anchor on every entry. Side window: Sections (jumps within the window), then Contact | `v4/resume/` |
@@ -234,12 +268,13 @@ South Florida, correspondence goes via a parent.
 | `assets/js/hero.js` | The hero: the name's layout read glyph by glyph from the page, its mask, the light and its interaction, the glide into the title and the hand-off, the fallbacks |
 | `assets/js/nav.js` | Page swaps (the side window kept in place), sheets, history, direct loads of projects |
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |
-| `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin |
+| `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
 | Kept, unreferenced | The written hello of the first round: `assets/js/hello.js` (the pen timeline and the Enter button), `name.js` and `name-data.js` (Sacramento traced to pen strokes), `assets/img/name.svg` and `name-2.svg` (the name as an SVG, one line and two), and `tools/trace-name/` outside the edition. Nothing imports or links them any more; they stay in case the written name comes back |
 | `DESIGN.md` | The design system, recorded from the built pages |
 
 Tools and checks live outside the edition: `tools/trace-name/` (kept, see
-above) and `tools/room-stills.mjs` regenerate the written name and the stills, and
+above) and `tools/room-stills.mjs` regenerate the written name and the stills,
+`tools/card-thumbs.mjs` makes the 320 px card images, and
 `tests/v5/` holds the unit tests and the browser checks.
 
 ## Checks
@@ -274,7 +309,9 @@ by machine yet.
 - **Motion:** one spring model everywhere, JavaScript-driven in the same frame as
   the glass, critically damped for anything with text. Text never blurs while it
   moves, content never moves on its own, and windows stay put under the pointer.
-  Reduced motion means no glide, focus pull, lean or drift, and 150 ms crossfades.
+  Hovers move content inside a still frame on the long ease (`--ease-long`, 450 to
+  800 ms); what steps back dims. Reduced motion means no glide, focus pull, lean,
+  drift or settle, and 150 ms crossfades.
 - **Budget:** the room renders at up to 1.5× device pixels, 60 fps while
   anything moves (the hero's light included), 30 fps while only the room
   drifts, and not at all when nothing moves under reduced motion. A machine averaging over 22 ms across its first 90
