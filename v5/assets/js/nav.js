@@ -27,6 +27,9 @@ export function initNav({ windows }) {
   const pin = () => { if (!pinned) { pinned = true; absolutize(document.body, here, { links: false }); } };
   absolutize(document.body, here, { media: false });
   history.replaceState({ ...(history.state || {}), v5: true }, '');
+  // a page loaded at an entry (résumé/#carnegie): the browser scrolled there before the window placed its parts
+  // (a chip row, a side window at the start), so land on it again once they are in place, and light it
+  if (location.hash.length > 1 && html.dataset.kind !== 'sheet' && !html.classList.contains('is-hello')) requestAnimationFrame(() => reveal(location.hash, true));
 
   // ---------- fetching ----------
   function load(url) {
@@ -77,7 +80,8 @@ export function initNav({ windows }) {
     win.replaceChildren(...fresh);
     let freshSide = [];
     if (side && info.side) {
-      for (const a of ['aria-labelledby', 'aria-label']) { const v = info.side.getAttribute(a); if (v) side.setAttribute(a, v); else side.removeAttribute(a); }
+      // its labels, and where its parts sit inside the window below 1360px (data-inline), come from the new page
+      for (const a of ['aria-labelledby', 'aria-label', 'data-inline']) { const v = info.side.getAttribute(a); if (v) side.setAttribute(a, v); else side.removeAttribute(a); }
       freshSide = copy(inner(info.side));
       inner(side).forEach(n => n.remove());
       side.append(...freshSide);
@@ -226,9 +230,27 @@ export function initNav({ windows }) {
   function reveal(hash, instant) {
     const el = document.getElementById(decodeURIComponent(hash.slice(1)));
     if (!el) return;
-    el.scrollIntoView({ behavior: instant || reduced.matches ? 'auto' : 'smooth', block: 'start' });
+    const smooth = !instant && !reduced.matches;
+    el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
     if (!el.matches('a[href], button, input, select, textarea, [tabindex]')) el.setAttribute('tabindex', '-1');
     el.focus({ preventScroll: true });
+    land(el, smooth);
+  }
+  // Landing on an entry lights it with a wash that fades over 1.2s (site.css .is-landed; none under reduced motion),
+  // once the scroll has arrived, so it is seen where it ends rather than spent on the way.
+  function land(el, smooth) {
+    const body = el.closest('.win__body');
+    const go = () => {
+      el.classList.remove('is-landed');
+      void el.offsetWidth;                                             // restart it when the same entry is landed on again
+      el.classList.add('is-landed');
+      el.addEventListener('animationend', () => el.classList.remove('is-landed'), { once: true });
+    };
+    if (!smooth || !body) { go(); return; }
+    let t = 0;
+    const once = () => { clearTimeout(t); body.removeEventListener('scrollend', once); go(); };
+    body.addEventListener('scrollend', once);
+    t = setTimeout(once, 900);                                         // a browser without scrollend, or nothing to scroll
   }
   function top() {
     const body = $front().querySelector('.win__body');
@@ -263,7 +285,15 @@ export function initNav({ windows }) {
     windows.hideNow(parts());
     const parentUrl = new URL(html.dataset.parent || '../', location.href);
     let doc = null;
-    try { doc = await Promise.race([load(parentUrl.href), new Promise(r => setTimeout(r, 600, null))]); } catch (e) { doc = null; }
+    // the parent has 600 ms and at least four frames: on a weak device a frame (the room's first draws) can take
+    // longer than that, and a parent that has already arrived must not lose to the clock while it waits to be read
+    const late = new Promise(r => {
+      let frames = 0, timeUp = false;
+      setTimeout(() => { timeUp = true; }, 600);
+      const tick = () => { if (++frames >= 4 && timeUp) r(null); else requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    });
+    try { doc = await Promise.race([load(parentUrl.href), late]); } catch (e) { doc = null; }
     const info = doc && read(doc);
     if (!info || !info.main) {                                        // no parent: the project stays the only window
       under = location.pathname;

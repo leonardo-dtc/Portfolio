@@ -5,6 +5,7 @@ import { createWindows } from './windows.js';
 import { createHero } from './hero.js';
 import { initNav } from './nav.js';
 import { initHue } from './hue.js';
+import { initSpy } from './spy.js';
 
 const html = document.documentElement;
 html.classList.add('js');
@@ -12,8 +13,13 @@ html.classList.add('js');
 let room = null;
 // reduced transparency and forced colours keep to CSS glass over the still (forced colours hide the canvas)
 const lessGlass = matchMedia('(prefers-reduced-transparency: reduce), (forced-colors: active)');
+// so does a device that asks for less data, or has 2 GB of memory or less: it starts on the still, which is the
+// same page in CSS glass (html[data-still] says why; a room that gives way later says so there too)
+const conn = navigator.connection, memory = navigator.deviceMemory;
+const weak = conn && conn.saveData ? 'save-data' : memory && memory <= 2 ? 'memory' : '';
+if (weak) html.dataset.still = weak;
 try {
-  if (!lessGlass.matches) room = createRoom(document.querySelector('canvas.room'));
+  if (!lessGlass.matches && !weak) room = createRoom(document.querySelector('canvas.room'));
 } catch (e) {
   console.warn('v5: the room could not start, using CSS glass', e);
   room = null;
@@ -22,7 +28,7 @@ html.classList.toggle('gl', !!room);
 html.classList.toggle('no-gl', !room);
 if (room) {
   window.__room = room;
-  room.onlost = () => { html.classList.remove('gl'); html.classList.add('no-gl'); };
+  room.onlost = (why = 'lost') => { html.classList.remove('gl'); html.classList.add('no-gl'); html.dataset.still = why; };
   // every frame, once the windows have moved, the room reads where the glass is
   room.source = () => readPanels(document, room.dpr);
   addEventListener('resize', forgetRadii);
@@ -39,7 +45,7 @@ window.__hue = initHue({ room });
 const hero = createHero({ room, windows });
 window.__hero = hero;
 if (html.classList.contains('is-hello')) hero.start();
-if (room) { const lost = room.onlost; room.onlost = () => { lost(); hero.abort(); }; }
+if (room) { const lost = room.onlost; room.onlost = (why) => { lost(why); hero.abort(); }; }
 
 // Work's filters and the print buttons are delegated from the document, so they keep working after a page swap
 document.addEventListener('click', (e) => {
@@ -74,5 +80,8 @@ document.addEventListener('v5:navigate', tick);
 
 const nav = initNav({ windows });
 window.__nav = nav;
+
+// the Résumé's Sections follow the reader
+initSpy();
 
 export { room, windows, hero, nav };

@@ -74,3 +74,28 @@ import { open, BASE, PAGES, check } from './lib.mjs';
   check(errors.length === 0, 'no console errors ' + errors.join(' | '));
   await browser.close();
 }
+{
+  // under 1360px the side window sits inside the window (Measurables first); the profile still prints on one page
+  for (const [w, h] of [[1024, 620], [390, 844]]) {
+    const { browser, page } = await open({ width: w, height: h, noGL: true });
+    await page.goto(BASE + 'hockey/', { waitUntil: 'load' });
+    await page.waitForTimeout(600);
+    const pdf = await page.pdf({ format: 'Letter', preferCSSPageSize: true, printBackground: false });
+    const n = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+    check(n === 1, `print from ${w}px: hockey fits one Letter page (${n})`);
+    await browser.close();
+  }
+}
+{
+  // a device that asks for less data, or has 2 GB of memory or less, starts on the still: the same page in CSS glass
+  for (const [why, init] of [['memory', () => Object.defineProperty(Navigator.prototype, 'deviceMemory', { get: () => 2 })], ['save-data', () => Object.defineProperty(Navigator.prototype, 'connection', { get: () => ({ saveData: true }) })]]) {
+    const { browser, page, errors } = await open();
+    await page.addInitScript(init);
+    await page.goto(BASE + '?nohello', { waitUntil: 'load' });
+    await page.waitForTimeout(600);
+    const r = await page.evaluate(() => ({ still: document.documentElement.dataset.still, gl: document.documentElement.classList.contains('gl'), room: getComputedStyle(document.querySelector('canvas.room')).display }));
+    check(r.still === why && !r.gl && r.room === 'none', `${why}: starts on the still (data-still=${r.still})`);
+    check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+    await browser.close();
+  }
+}

@@ -32,15 +32,46 @@ export function createWindows({ room }) {
     const body = main.querySelector('.win__body');
     const asides = [...document.querySelectorAll('aside.side')].sort((a, b) => (a.dataset.side === 'left' ? -1 : 1));
     if (mode === 'desktop') {
-      asides.forEach(a => a.classList.remove('side--inline'));
+      asides.forEach(a => { a.classList.remove('side--inline'); gather(a); });
       const out = asides.filter(a => a.parentElement !== space);
       if (out.length) main.after(...asides);
     } else if (body) {
-      asides.forEach(a => { a.classList.add('side--inline'); a.style.transform = ''; if (a.parentElement !== body) body.append(a); });
+      asides.forEach(a => { a.classList.add('side--inline'); a.style.transform = ''; inline(a, main, body); });
     }
     placeBubble(true);
     scrollable();
   }
+  // Below 1360px the side window's content sits inside the main window, placed by its role. data-inline on the
+  // aside gives one place for all of it, or one per part, in order: "start" before the main content (Hockey's
+  // Measurables and coach contacts, About's portrait), "end" after it (Home's This fall, Work's In progress), "pin"
+  // a row of chips pinned between the window's head and its body (the Résumé's Sections). The aside goes where its
+  // first start or end part goes; a part placed elsewhere is lifted out of it, and goes home at 1360px and wider.
+  const liftedOf = a => [...document.querySelectorAll('.side__part--lifted')].filter(p => p._home && p._home.aside === a);
+  function partsOf(a) {                                   // every part, in the aside or lifted out of it, in order
+    const inside = [...a.querySelectorAll(':scope > .side__part')];
+    inside.forEach((p, i) => { if (!p._home) p._home = { aside: a, index: i }; });
+    return [...inside, ...liftedOf(a)].sort((x, y) => x._home.index - y._home.index);
+  }
+  function putBack(p) {
+    const a = p._home.aside;
+    p.classList.remove('side__part--lifted', 'side__part--pin');
+    a.insertBefore(p, a.querySelectorAll(':scope > .side__part')[p._home.index] || null);
+  }
+  function inline(a, main, body) {
+    const words = (a.dataset.inline || 'end').split(/\s+/);
+    const places = partsOf(a).map(p => [p, words[Math.min(p._home.index, words.length - 1)]]);
+    const own = (places.find(([, w]) => w !== 'pin') || [null, words.find(w => w !== 'pin') || 'end'])[1];
+    if (own === 'start') { if (a.parentElement !== body) body.prepend(a); }
+    else if (a.parentElement !== body) body.append(a);
+    for (const [p, w] of places) {
+      if (w === own) { if (p.parentElement !== a) putBack(p); continue; }
+      p.classList.add('side__part--lifted');
+      p.classList.toggle('side__part--pin', w === 'pin');
+      if (w === 'pin') { if (p.parentElement !== main) body.before(p); }
+      else if (p.parentElement !== body) { if (w === 'start') body.prepend(p); else body.append(p); }
+    }
+  }
+  function gather(a) { liftedOf(a).sort((x, y) => x._home.index - y._home.index).forEach(putBack); }
   // A floating side window taller than its room scrolls; it becomes a tab stop then, so the keyboard can scroll it
   // in every browser (some make scrollers focusable on their own, some do not).
   function scrollable() {
@@ -249,6 +280,11 @@ export function createWindows({ room }) {
   const scroller = () => $front() && $front().querySelector('.win__body');
   const inHero = () => html.classList.contains('is-hello');            // the windows are hidden behind the hero
   addEventListener('wheel', (e) => {
+    // over the Résumé's pinned row of chips, which only scrolls sideways, a vertical wheel still scrolls the record
+    if (!inHero() && e.target.closest && e.target.closest('.side__part--pin') && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      const b = scroller(); if (b) b.scrollBy({ top: e.deltaY, left: 0 });
+      return;
+    }
     if (inHero() || (e.target.closest && e.target.closest('.win, .side, .sheet, .tabs, .toolbar'))) return;
     const b = scroller(); if (b) b.scrollBy({ top: e.deltaY, left: 0 });
   }, { passive: true });

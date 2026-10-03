@@ -114,6 +114,11 @@ typography:
     fontSize: "14px"
     fontWeight: 500
     lineHeight: 1.3
+  dock-label:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', Roboto, system-ui, sans-serif"
+    fontSize: "12px"
+    fontWeight: 600
+    lineHeight: 1.15
 rounded:
   sheet-phone: "40px"
   win: "32px"
@@ -137,6 +142,8 @@ spacing:
   side-w: "clamp(240px, 20vw, 350px)"
   gap-side: "clamp(40px, 3.4vw, 64px)"
   gap-tabs: "14px"
+  dock-gap: "8px"
+  labels-at-rest: "946px"
   measure: "44em"
 components:
   window:
@@ -156,6 +163,8 @@ components:
     width: "64px"
   tab-bar-open:
     width: "188px"
+  tab-bar-labelled:
+    width: "188px"
   tab:
     textColor: "{colors.ink-2}"
     rounded: "{rounded.pill}"
@@ -170,6 +179,12 @@ components:
     rounded: "{rounded.pill}"
     padding: "7px"
     height: "66px"
+  tab-phone:
+    textColor: "{colors.ink-2}"
+    rounded: "{rounded.pill}"
+    padding: "0 3px"
+    height: "52px"
+    typography: "{typography.dock-label}"
   toolbar:
     rounded: "{rounded.pill}"
     padding: "7px"
@@ -281,8 +296,18 @@ components:
     padding: "clamp(16px, 3vw, 28px)"
   toc-link:
     textColor: "{colors.ink-2}"
-    rounded: "{rounded.inner}"
+    rounded: "{rounded.pill}"
     padding: "9px 12px"
+  toc-link-current:
+    backgroundColor: "{colors.fill-3}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.pill}"
+  toc-chip:
+    backgroundColor: "{colors.fill}"
+    textColor: "{colors.ink-2}"
+    rounded: "{rounded.pill}"
+    padding: "0 16px"
+    height: "40px"
   avatar:
     rounded: "{rounded.pill}"
     size: "60px"
@@ -361,6 +386,7 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 ### Hierarchy
 - **The name in the hero** (Switzer 780, `min(8.2vw, 24svh, 160px)`, line 1, -.03em): about 70% of the viewport's width on one line from 700px wide; under 700px two lines ("Leonardo" over "Carvalho") at `min(18vw, 15svh, 120px)`, line .98. Neon light drawn by the room; CSS neon without it.
 - **The name as the home title** (Switzer 700, 46px, 1.04, -.03em; 42px under 900px; 44px on two lines under 700px; 30px on short landscape phones): plain white text, the glyphs the hero lands on.
+- **Dock label** (600, 12px, 1.15): the tab names under the icons on phones, Ink 2, the current one white.
 - **The hint** (500, 14px, Ink 2; by day Ink over a soft dark halo, since the drifting day room can be bright behind it on a phone): "Click the title to proceed", or "Tap the title to proceed" on coarse pointers, centred 32px above the foot of the screen and its safe area.
 - **Title** (700, 34px, 1.08, -.012em): the window's title on every page other than home, and each sheet's title. 30px under 900px.
 - **Headline** (700, 22px, 1.2, -.008em): section titles inside a window, and side-window titles when they sit inside the main window.
@@ -387,9 +413,10 @@ A room of navy, cobalt and violet at night and sky blue by day, glass tinted tow
 One room, and on it a main window `clamp(720px, 52vw, 1040px)` wide, 4.5svh from the top, with a height of the viewport less 14svh. Its head carries 30px top and 36px side padding (`{spacing.pad}`); its body scrolls inside the window with 18px above and 110px below, masked to fade over 22px at the top and over the last 78px, so text slides under the toolbar rather than being cut. Its scroll padding (30px above, 96px below) keeps whatever the keyboard focuses, or a link jumps to, clear of both fades and of the toolbar (and of the dock on phones). Wheel and keys anywhere in the room scroll the front window.
 
 Three layout modes, set by script at 1360px and 900px:
-- **Desktop (1360px and wider):** one side window `clamp(240px, 20vw, 350px)` wide floats `clamp(40px, 3.4vw, 64px)` right of the main window, 3% down the window's height, at most 94% of it tall (it scrolls past that), turned 24 degrees toward the reader about its near edge, so it projects about 4.5% wider than its box. The tab bar sits 14px off the main window's left edge. The three are one group: the main window moves left of centre by half the difference between the side window's reach (its gap plus its projected width) and the tab bar's 78px, which centres the group's outline and, with it, the visual weight of its three pieces. It stops where the opened tab bar (188px, 14px off the window, 12px from the screen's edge) would no longer fit to the window's left, so under about 1460px the group sits up to 21px right of centre. The room's space has a 120vw perspective from 50% 45%. The pointer moves the light and leans the room a little against it (up to 1.2% across, desktop only); the windows never move with it, as visionOS keeps windows fixed in space.
-- **Laptop (900 to 1359px):** the main window centred, the tab bar 14px off its left edge; no side window, its content sections inside the main window, 44px below the rest, with 22px titles. Opened, the tab bar keeps its right edge where the screen has room (from about 1150px); narrower, it keeps 12px from the screen's edge and leans over the window's edge, its backdrop deepened so the window's text stays frosted beneath it.
-- **Phone and narrow tablet (under 900px):** the window becomes a full-screen sheet 10px from every edge (plus safe areas) with a 40px radius and 22px padding; the tab bar becomes a floating capsule at the bottom, `min(320px, 100vw - 110px)` wide and 66px tall, icons only, with the color style control beside it as a 66px circle (the capsule sits centred alone when there is no room to colour); the toolbar's actions sit inline in the content; nothing is angled. During the hero the color style control waits in the corner at its 46px desktop size, clear of the hint. Under 700px the title is the two-line name and the avatar is dropped; under 600px the facts stack into one column.
+- **Desktop (1360px and wider):** one side window `clamp(240px, 20vw, 350px)` wide floats `clamp(40px, 3.4vw, 64px)` right of the main window, 3% down the window's height, at most 94% of it tall (it scrolls past that), turned 24 degrees toward the reader about its near edge, so where it stands it projects about 6.5% wider than its box. The tab bar sits 14px off the main window's left edge with its names showing (188px). The three are one group: the main window moves left of centre by half the difference between the side window's reach (its gap plus its projected width) and the labelled tab bar's 202px, which centres the group's outline (within 3px from 1360 to 1920px) and, with it, the visual weight of its three pieces. The shift is capped where the labelled bar would come within 12px of the screen's edge; at these widths it never does. The room's space has a 120vw perspective from 50% 45%. The pointer moves the light and leans the room a little against it (up to 1.2% across, desktop only); the windows never move with it, as visionOS keeps windows fixed in space.
+- **Laptop (900 to 1359px):** the tab bar 14px off the main window's left edge; no side window, its content inside the main window (below). From 946px the bar shows its names at rest and the bar and the window are centred as one group (the window 101px right of centre). Touch screens (`hover: none`), which cannot point at the bar, keep the names at every laptop width: the window narrows to `min(720px, 100vw - 226px)` to make the room. Under 946px with a pointer, the bar shows icons with the window centred, and opened it keeps 12px from the screen's edge and leans over the window's edge, its backdrop deepened so the window's text stays frosted beneath it.
+- **The side window inside the main window (under 1360px):** placed by its role, from `data-inline` on the aside (one word for all of it, or one per part in order): `start` before the main content, `end` after it, `pin` a row of chips between the window's head and its body. Hockey's Measurables (a compact two-column box on a Fill) and Coach contacts lead the page, before Stats; About's portrait and its From and Groton rows lead, its Interests close the page; the Résumé's Sections become chips pinned under the head and its Contact closes the page; Home's This fall and Work's In progress close theirs. Parts sit 44px from what follows, with 22px titles. At 1360px every lifted part goes back into its side window, in order.
+- **Phone and narrow tablet (under 900px):** the window becomes a full-screen sheet 10px from every edge (plus safe areas) with a 40px radius and 22px padding; the tab bar becomes a floating capsule at the bottom, `min(360px, 100vw - 90px)` wide and 66px tall, each icon (22px) over its name (12px, 600), with the color style control 8px beside it as a 66px circle (the capsule sits centred alone when there is no room to colour). Each tab takes an equal share and never less than its name, so five fit beside the circle from 360px, every tab 44px or wider. Under 360px the capsule takes the width alone (`100vw - 20px`) and the color control moves into the window's toolbar as a 44px Fill circle, its panel opening above the dock. The toolbar's actions sit inline in the content; nothing is angled. During the hero the color style control waits in the corner at its 46px desktop size, clear of the hint. Under 700px the title is the two-line name and the avatar is dropped; under 600px the facts stack into one column.
 
 Rhythm inside a window: 44px above each section, 16px under a section head, 30px between record groups, 12px under a lead, 16px between cards (12px on phones), 34px between prose blocks, 40px above a prose h2, 44px above a pager. Cards run four across (three on the Work page's filtered sets), and as many 132px columns as fit under 900px (two on a 360px phone). Sheets sit 44px inside the main window's sides (capped at 920px wide) and 4svh inside its top and bottom.
 
@@ -420,7 +447,7 @@ Without WebGL2, with scripts off, under reduced transparency or in forced colour
 
 ## Shapes
 
-Corners are concentric, larger outside and smaller within: the phone sheet 40px (`{rounded.sheet-phone}`), the main window and sheets 32px (`{rounded.win}`), the side window 28px (`{rounded.side}`), cards, figure tiles and the portrait 20px (`{rounded.card}`), list groups, résumé entries, fact boxes, tables and side-window rows 16px (`{rounded.row}`), table of contents links 12px (`{rounded.inner}`), and every control a full capsule (`{rounded.pill}`): buttons, tabs and their bubble, the toolbar, the phone tab bar, the skip link. The hero's focus ring rounds at .2em, 12px out from the name. The desktop tab bar is a 64px column with a 32px radius, so its ends are round. Screenshots on cards take 9px (14px when tall, a phone screen); sheet figures 10px. The avatar and icon wells are circles.
+Corners are concentric, larger outside and smaller within: the phone sheet 40px (`{rounded.sheet-phone}`), the main window and sheets 32px (`{rounded.win}`), the side window 28px (`{rounded.side}`), cards, figure tiles and the portrait 20px (`{rounded.card}`), list groups, résumé entries, fact boxes, tables and side-window rows 16px (`{rounded.row}`), inner corners 12px (`{rounded.inner}`), and every control a full capsule (`{rounded.pill}`): buttons, tabs and their bubble, table of contents links and chips, the toolbar, the phone tab bar, the skip link. The hero's focus ring rounds at .2em, 12px out from the name. The desktop tab bar is a column with a 32px radius (188px wide with its names, 64px with icons only), so its ends are round. Screenshots on cards take 9px (14px when tall, a phone screen); sheet figures 10px. The avatar and icon wells are circles.
 
 Borders are almost absent: rows inside a group are divided by the Line, tables by the Line under each row, and the CSS glass rim is a masked gradient, not a border. The window bar is a pill pair of 11px dot and 96px bar at 62% white.
 
@@ -432,15 +459,17 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **Page change:** the old contents fade out over 140ms (`cubic-bezier(.4, 0, 1, 1)`); the new ones fade in over 220ms rising 6px (`cubic-bezier(.2, .8, .2, 1)`). No blur and no scale. The window itself never leaves, and neither does the side window: its contents crossfade with the window's.
 
 ### The side window
-- One per page, on the right, holding only what fits beside the window: Home's This fall (with a line for Groton's live time, "9:41 AM in Groton"), Work's In progress (its Experiments moved into the main window, under the cards), Hockey's Measurables then Coach contacts (the Elite Prospects and NCSA rows print with it but are not shown on screen, where the toolbar carries both), About's portrait (cropped to 4:3 while it floats, `object-position: 50% 40%`) and From then Interests, the Résumé's Sections then Contact. Two parts sit 30px apart (44px as sections inside the window).
+- One per page, on the right, holding only what fits beside the window: Home's This fall (with a line for Groton's live time, "9:41 AM in Groton"), Work's In progress (its Experiments moved into the main window, under the cards), Hockey's Measurables then Coach contacts (the Elite Prospects and NCSA rows print with it but are not shown on screen, where the toolbar carries both), About's portrait (cropped to 4:3 while it floats, `object-position: 50% 40%`) and From then Interests, the Résumé's Sections then Contact. Two parts sit 30px apart (44px as sections inside the window, where each goes by its role: see Layout).
 - 28px radius, 24px by 22px padding, a 20px title, then side rows (a 38px round icon well in Fill 2, 34px in a floating side window, with a 19px stroked icon, a 15px bold line over 15px Ink 2), a divided list (15px Ink 2 under 15px bold lines), facts at 15px, notes at 15px, a table of contents, or the portrait. It arrives turning from 32 degrees to its 24 as it fades in (response .55, damping 1) and fades out over its last 26px.
 - **When it holds more than its room** it says so: a slim white capsule (4px wide, 50% white, 72% under the pointer, at least 44px long) runs in a 14px gutter at its right edge, 30px clear of the top and bottom corners. The gutter is kept whether or not it scrolls (`scrollbar-gutter: stable`, 8px of padding beside it), so the text keeps one measure; Firefox draws its own thin scrollbar in the same white. The window is then a tab stop, so the keyboard scrolls it. Its far corner probes are set from the window's width (the scroll box stops at the scrollbar), and the room shifts the glass back down the window's plane by however far it has scrolled, so the glass stays where the window is. In CSS glass its rim is a 1px border (white at 50% on top, 20% right, 34% below, 42% left) instead of the masked rim other panes draw, which the scroller would cut at its scrollbar and carry along as it scrolls.
 - **Fit at 1440×900** (content against its 728px room): Home 541, Work 331, Résumé 764 (scrolls 36px), Hockey 778 (scrolls 50px), About 905 (scrolls 177px). At 1680×1050 and wider only About scrolls (59 to 73px).
 
 ### Tab bar (ornament)
-- A 64px glass column whose right edge sits 14px off the window's left edge, vertically centred on it, 8px padding, 48px tabs with 24px stroked icons (1.7 stroke, round caps). Pointing at it for 120ms widens it to 188px toward the left: its right edge and its icons stay put, and each name slides in beside its icon on the open side (opacity .16s, 6px travel .3s, 60ms delay); it closes 300ms after the pointer leaves. Keyboard focus opens it too. It never covers the window where the screen has room; on laptops under about 1150px it leans over the window's edge, its backdrop deepening from `brightness(.74)` to `(.42)` as it widens so its names keep 4.5:1 over a light card. Its glass is always CSS glass (`data-glass-off`), so it stays true to its box at every width.
+- A glass column whose right edge sits 14px off the window's left edge, vertically centred on it, 8px padding, 48px tabs with 24px stroked icons (1.7 stroke, round caps). It is the first thing in every page's source, so Tab reaches it right after the skip link.
+- **Names at rest wherever they fit:** where the labelled bar (188px) fits left of the window with 12px to the screen's edge (every desktop width, laptops from 946px, touch screens from 900px), it rests open, each name beside its icon on the open side, at `brightness(.42)` so the names keep 4.5:1 over the brightest day room. Nothing about it moves on its own.
+- **Narrower, with a pointer:** a 64px column of icons. Pointing at it for 120ms widens it to 188px toward the left: its right edge and its icons stay put, and each name slides in beside its icon (opacity .16s, 6px travel .3s, 60ms delay); it closes 300ms after the pointer leaves. Keyboard focus opens it too. There it leans over the window's edge, its backdrop deepening from `brightness(.74)` to `(.42)` as it widens so its names keep 4.5:1 over a light card. Its glass is always CSS glass (`data-glass-off`), so it stays true to its box at every width.
 - **The bubble:** a Fill 3 pill with a 1px inner top highlight at 32% marks the current tab, moved by a spring (response .45, damping .8) that stretches it along its travel by up to 30% while it moves.
-- **Phone:** the floating bottom capsule, icons only, names kept for screen readers, the bubble 60px wide.
+- **Phone:** the floating bottom capsule, each 22px icon over its 12px name, at `brightness(.42)` so the names keep 4.5:1 over a light card scrolling beneath; the bubble as wide as its tab.
 
 ### Toolbar and buttons
 - **Toolbar:** a glass capsule crossing the window's bottom edge by 28px, 7px padding, 6px gaps, scrolling sideways if it must. On sheets it pages to the neighbouring projects.
@@ -480,14 +509,20 @@ Borders are almost absent: rows inside a group are divided by the Line, tables b
 - **References:** a numbered list at 14px in Ink 2 with Ink 3 numerals in a 26px column.
 - **Links in text:** white, underlined 1px at 45% white, 3px offset; the underline goes white on hover.
 
+### Sections (a table of contents that follows the reader)
+- The Résumé's Sections: 15px 600 links in Ink 2, capsules, a Fill on hover. In the floating side window they are a list; under 1360px they are a row of 40px chips (44px on touch) on a Fill, pinned between the window's head and its body, scrolling sideways under a fade at both ends, the heading kept for screen readers only.
+- **Following the reader** (`spy.js`): the section under the reading line (a quarter of the way down the window, at most 140px) marks its link with `aria-current` and the tab bar's bubble: Fill 3 with the 1px inner top highlight at 32%, in white. An IntersectionObserver on that line notices sections crossing it; the end of the record marks the last section. A jump from Sections marks its target at once and holds it until the scroll arrives, so the bubble never walks through the sections between. Under 1360px the current chip is scrolled into view within its row (never the window). The colour changes over .25s; nothing moves.
+- **Landing:** arriving at an entry by its anchor (a record row to `resume/#carnegie`, a direct load of that address) lights the entry with a Fill 3 wash that fades to its own Fill over 1.2s on `cubic-bezier(.22, 1, .36, 1)`, once the scroll has arrived. Under reduced motion there is no wash.
+
 ### Motion (one spring model)
-- Every geometric motion is a spring given as a response (seconds) and a damping ratio, stepped at 4ms substeps in the shared frame loop, which runs the springs first, then whatever reads their layout, then the room, so the glass is drawn where its window is in that same frame. Anything carrying text is critically damped: windows .5 / 1, the side window .55 / 1, ornaments .45 / 1, a sheet's parent stepping back .5 / 1, the pointer light .6 / 1 and the room's lean .9 / 1. The tab bubble (.45 / .8) and the window bar (.5 / .7) carry no text and may overshoot a little; press light .3 / 1.
+- Every geometric motion is a spring given as a response (seconds) and a damping ratio, stepped at 4ms substeps in the shared frame loop, integrating real frame time up to 120ms (a slow device skips frames instead of stretching the motion), which runs the springs first, then whatever reads their layout, then the room, so the glass is drawn where its window is in that same frame. Anything carrying text is critically damped: windows .5 / 1, the side window .55 / 1, ornaments .45 / 1, a sheet's parent stepping back .5 / 1, the pointer light .6 / 1 and the room's lean .9 / 1. The tab bubble (.45 / .8) and the window bar (.5 / .7) carry no text and may overshoot a little; press light .3 / 1.
 - **The motion rules:** text never blurs while it moves and content never moves on its own; blur belongs to the room. UI transitions run 150 to 300ms with at most about 8px of travel; bigger motion only answers the reader's own action (the hero's glide). Where several things move they stagger by 40 to 80ms.
 - **The hero's arrival:** the light, the halo and the pool come up together on a critically damped spring (response .8, about 0.9s), the echoes growing out of the outline with them; the hint follows from .75s over .5s. Then the light keeps moving on periods of 10s to 19s, slowly, while the letters stay put.
 - **Entering:** on the click the hint fades (120ms) and the room pulls focus (1 / 1); the name glides on one critically damped spring (response .65, about 0.7s, no overshoot), its size in log space, its weight from 780 to 700 and its colour to white (white within about 0.2s), while the light goes out as (1 - v)³, the echoes folding back into the letters and the pool lifting with it, redrawn at screen resolution every frame and read after the window has moved, so it never trails its slot. The main window's glass forms under it at once (from 98.5% scale); its contents fade in (240ms) once the name is within about half a line of its slot, then the side window (+60ms), the tab bar (+120ms) and the toolbar and window bar (+180ms). Landed, the name hands off: the HTML title fades in over the identical glyphs (150ms), then the ink goes from under it (100ms), and the effect is switched off.
 - **CSS micro-motion** uses one curve, `cubic-bezier(.16, 1, .3, 1)`: the tab bar's width (.42s), button and card press (.35s), the hero's hint (.5s).
 - **Hovers that move content inside a still frame** use the long ease, `cubic-bezier(.22, 1, .36, 1)` (`--ease-long`), over 450 to 800ms, which covers most of the way in the first 100ms and then settles: the card's settle (800ms) and its arrow (450ms), a row's lean (450ms), an experiment opening (500ms). The frame (the card, the list group, the window) never moves; what steps back dims and never blurs. These are reveals answering the pointer, so they are longer than arrivals, which stay 150 to 300ms with at most 8px of travel.
 - **Reduced motion:** no glide, focus pull, lean, drift or springs; the hero's name is there at once and entering, page changes and sheets are 150ms crossfades (or none); the room does not redraw while nothing moves. Hovers keep only colour and opacity: no settle, no turning arrow (it fades in), no row lean, and every experiment shows its line at rest.
+- **Weak devices:** the room's budget drops to 1x after 90 frames averaging over 22ms; if the next 30 frames it draws still average over 33ms it gives way to the still, and the page carries on in CSS glass, as after a lost WebGL context. Save-Data, or 2GB of memory or less, starts on the still. `html[data-still]` names the reason. A project loaded directly waits 600ms and at least four frames for the page behind it.
 
 ## Do's and Don'ts
 

@@ -132,6 +132,14 @@ html.gl .tabs.glass.is-behind { opacity: calc(1 - var(--back, 1) * .4); }   /* i
   html.js .tabs.is-open .tabs__label { translate: 0 0; }
 }
 .tabs.is-open .tabs__label { opacity: 1; translate: 0 0; transition-delay: .06s; }
+/* Names at rest wherever the labelled bar (188px) fits left of the main window with 12px to spare: every desktop
+   width, and laptops from 946px, where the bar and the window are centred as one group (below). On touch screens,
+   which cannot point at the bar, the window makes room for it from 900px. Narrower, it opens on hover or focus. */
+@media (min-width: 946px), (hover: none) and (min-width: 900px) {
+  html.js .tabs { width: 188px; right: min(var(--tabs-r), calc(100% - 200px)); }
+  html.js .tabs .tabs__label { opacity: 1; translate: 0 0; }
+  html.gl .tabs.glass { -webkit-backdrop-filter: blur(22px) saturate(1.7) brightness(.42); backdrop-filter: blur(22px) saturate(1.7) brightness(.42); }   /* its names keep 4.5:1 over the brightest day room */
+}
 .tabs__bubble { position: absolute; left: 8px; right: 8px; top: 8px; height: 48px; border-radius: 999px; background: var(--fill-3); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32); pointer-events: none; }
 html:not(.js) .tabs__bubble { display: none; }
 html:not(.js) .tabs a[aria-current="page"] { background: var(--fill-3); }
@@ -523,13 +531,20 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 .toolbar--sheet { top: calc(var(--win-top) + 4svh + var(--win-h) - 8svh - 28px); z-index: 6; }
 
 /* ---------- desktop: tab bar, main window and side window read as one group, centred on the screen ----------
-   The side window projects about 4.5% wider than its box (its far edge turns toward you), and the tab bar takes 78px
-   (64 plus its 14px gap), so the main window moves left by half the difference. That centres the group's outline,
-   and with it the visual weight of its three pieces. It stops where the opened tab bar (188px, 14px off the window,
-   12px from the screen's edge) would no longer fit to the window's left: below about 1460px the group sits up to
-   21px right of centre instead. */
+   The side window projects about 6.5% wider than its box where it stands (its far edge turns toward you), and the tab bar, labelled
+   at rest, takes 202px (188 plus its 14px gap), so the main window moves left by half the difference. That centres
+   the group's outline, and with it the visual weight of its three pieces. The shift never goes so far that the
+   labelled bar would have less than 12px to the screen's edge (at every width from 1360px it has more). */
 @media (min-width: 1360px) {
-  :root { --shift: min(calc((var(--gap-side) + var(--side-w) * 1.045 - 78px) / 2), calc(50vw - var(--w-main) / 2 - 214px)); }
+  :root { --shift: min(calc((var(--gap-side) + var(--side-w) * 1.065 - 202px) / 2), calc(50vw - var(--w-main) / 2 - 214px)); }
+}
+/* laptops: where the bar shows its names at rest, it and the main window are centred as one group (the window sits
+   101px right of centre, half the labelled bar and its 14px gap); touch screens narrow the window to make the room */
+@media (min-width: 946px) and (max-width: 1359px), (hover: none) and (min-width: 900px) and (max-width: 1359px) {
+  :root { --shift: -101px; }
+}
+@media (hover: none) and (min-width: 900px) and (max-width: 1359px) {
+  :root { --w-main: min(720px, calc(100vw - 226px)); }
 }
 
 /* ---------- laptop: no side windows; their content sits inside the window ---------- */
@@ -537,6 +552,34 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 .side--inline::after { display: none; }
 .side--inline h2 { font-size: 22px; }
 .side--inline .side__part + .side__part { margin-top: 44px; }
+/* placed by its role (data-inline, windows.js): at the start it leads the page, 44px above the first section; a part
+   lifted out of it keeps the same rhythm */
+.win__body > .side--inline:first-child { margin-top: 0; }
+.win__body > .side__part--lifted { margin-top: 44px; }
+.win__body > .side__part--lifted:first-child { margin-top: 0; }
+.side--inline .facts--side { padding: 16px 18px; border-radius: var(--r-row); background: var(--fill); font-size: 15px; }   /* Measurables: a compact two-column box */
+@media (max-width: 599px) {
+  .side--inline .facts--side { grid-template-columns: max-content minmax(0, 1fr); gap: 8px 14px; }
+  .side--inline .facts--side dd { margin-bottom: 0; }
+}
+/* the Résumé's Sections below 1360px: a row of chips that scrolls sideways, pinned between the window's head and its
+   body, so it stays in reach while the record scrolls beneath it (nothing slides under it) */
+#main:has(> .side__part--pin) { grid-template-rows: auto auto minmax(0, 1fr); }
+.side__part--pin { min-width: 0; }
+.side__part--pin h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.side__part--pin .toc { display: flex; gap: 8px; margin: 0; padding: 8px var(--pad) 6px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 30px), transparent); mask: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 30px), transparent); }
+.side__part--pin .toc::-webkit-scrollbar { display: none; }
+.side__part--pin .toc a { flex: none; display: flex; align-items: center; min-height: 40px; padding: 0 16px; background: var(--fill); white-space: nowrap; }
+.side__part--pin .toc a:not([aria-current="true"]):hover { background: var(--fill-2); }
+@media (pointer: coarse) { .side__part--pin .toc a { min-height: 44px; } }
+
+/* Sections follow the reader (spy.js): the current entry wears the tab bar's bubble, a Fill 3 capsule */
+.toc a { border-radius: 999px; transition: background-color .25s, color .25s; }
+.toc a[aria-current="true"] { background: var(--fill-3); color: #fff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32); }
+/* landing on an entry (a record row to résumé/#carnegie, say) lights it with a wash that fades over 1.2s */
+.cv > li.is-landed { animation: landed 1.2s cubic-bezier(.22, 1, .36, 1); }
+@keyframes landed { from { background-color: var(--fill-3); } }
 
 /* ---------- phones and narrow tablets ---------- */
 @media (max-width: 899px) {
@@ -546,12 +589,16 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .win__head h1 { font-size: 30px; }
   .win__body { padding-bottom: 130px; }
   .win { translate: none; }
-  /* the dock, as in iOS 26: the tab bar, and the color control beside it as its own circle */
-  :root { --dock-h: 66px; --dock-y: calc(22px + env(safe-area-inset-bottom)); --tab-w: min(320px, calc(100vw - 110px)); --dock-x: calc((100vw - var(--tab-w) - var(--dock-h) - 10px) / 2); }
+  /* the dock, as in iOS 26: the tab bar, each icon over its name, and the color control beside it as its own circle.
+     Each tab takes an equal share and never less than its name (12px), so five fit beside the circle from 360px;
+     narrower, the color control moves into the window's toolbar (hue.js) and the tab bar takes the width alone. */
+  :root { --dock-h: 66px; --dock-y: calc(22px + env(safe-area-inset-bottom)); --dock-gap: 8px; --tab-w: min(360px, calc(100vw - 16px - var(--dock-gap) - var(--dock-h))); --dock-x: calc((100vw - var(--tab-w) - var(--dock-h) - var(--dock-gap)) / 2); }
   html.no-gl { --dock-x: calc((100vw - var(--tab-w)) / 2); }   /* no color control without the room: the tab bar is centred alone */
   .tabs { left: var(--dock-x); top: auto; bottom: var(--dock-y); translate: 0 0; width: var(--tab-w); height: var(--dock-h); padding: 7px; display: flex; justify-content: space-between; gap: 0; border-radius: 999px; }
-  .tabs a { flex: 1; justify-content: center; height: 52px; padding: 0; }
-  .tabs__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }  /* icons only, names kept for screen readers */
+  html.gl .tabs.glass { -webkit-backdrop-filter: blur(22px) saturate(1.7) brightness(.42); backdrop-filter: blur(22px) saturate(1.7) brightness(.42); }   /* its names keep 4.5:1 over a light card scrolling beneath */
+  .tabs a { flex: 1 1 0; flex-direction: column; justify-content: center; gap: 3px; height: 52px; padding: 0 3px; overflow: visible; }
+  .tabs .icon { width: 22px; height: 22px; }
+  .tabs__label { font-size: 12px; font-weight: 600; line-height: 1.15; letter-spacing: 0; opacity: 1; translate: none; transition: none; }
   .tabs.is-open { width: var(--tab-w); }
   .tabs__bubble { top: 7px; bottom: 7px; height: auto; left: 7px; right: auto; width: 60px; }
   .tabs.is-behind, html.gl .tabs.glass.is-behind { opacity: calc(1 - var(--back, 1) * 2.5); }   /* it steps away: the sheet covers the screen */
@@ -583,7 +630,7 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .win__head .name { font-size: 30px; }
   .avatar { width: 46px; height: 46px; }
   .win__body { padding-bottom: 84px; }
-  :root { --dock-h: 54px; --dock-y: calc(10px + env(safe-area-inset-bottom)); --tab-w: min(340px, calc(100vw - 110px)); }
+  :root { --dock-h: 54px; --dock-y: calc(10px + env(safe-area-inset-bottom)); }
   .tabs { padding: 5px; }
   .tabs a { height: 44px; }
   .tabs__bubble { top: 5px; bottom: 5px; left: 5px; }
@@ -620,7 +667,7 @@ html.no-gl .hue, html:not(.js) .hue { display: none; }
 .hue__seg button { height: 32px; border: 0; border-radius: 999px; background: none; color: var(--ink-2); font: 650 13px/1 var(--font); cursor: pointer; }
 .hue__seg button[aria-checked="true"] { background: #fff; color: #0b1138; }
 @media (max-width: 899px) {
-  .hue { left: calc(var(--dock-x) + var(--tab-w) + 10px); right: auto; bottom: var(--dock-y); transition: opacity .25s; }
+  .hue { left: calc(var(--dock-x) + var(--tab-w) + var(--dock-gap)); right: auto; bottom: var(--dock-y); transition: opacity .25s; }
   html:is(.is-hello, .is-entering) .hue { left: auto; right: calc(14px + env(safe-area-inset-right)); }   /* no dock during the hero: the corner */
   html:is(.is-hello, .is-entering) .hue__button { width: 46px; height: 46px; }   /* at its desktop size, clear of the hint on a 320px phone */
   html:is(.is-hello, .is-entering) .hue__button i { width: 22px; height: 22px; }
@@ -630,6 +677,18 @@ html.no-gl .hue, html:not(.js) .hue { display: none; }
   .hue__button i { width: 26px; height: 26px; }
   .hue__panel { bottom: calc(var(--dock-h) + 10px); max-height: calc(100svh - var(--dock-h) - var(--dock-y) - 24px); overflow: auto; }
 }
+/* under 360px five labelled tabs take the dock's whole width: the control's button joins the window's toolbar (its
+   actions, inline at the foot of the page) as a fill like its neighbours, and the panel opens above the dock */
+@media (max-width: 359px) {
+  :root { --tab-w: calc(100vw - 20px); --dock-x: 10px; }
+  .hue.hue--toolbar { left: calc(10px + env(safe-area-inset-left)); right: calc(10px + env(safe-area-inset-right)); bottom: calc(var(--dock-y) + var(--dock-h) + 10px); }
+  html:has(section.sheet:not(.is-closing)) .hue.hue--toolbar { opacity: 1; pointer-events: auto; }   /* a sheet's own toolbar holds it then */
+  .hue--toolbar .hue__panel { left: 0; right: 0; bottom: 0; width: auto; max-width: 300px; margin: 0 auto; max-height: calc(100svh - var(--dock-h) - var(--dock-y) - 34px); transform-origin: 50% 100%; }
+  .toolbar--inline .hue__button { width: 44px; height: 44px; background: var(--fill); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+  .toolbar--inline .hue__button:hover { background: var(--fill-2); scale: 1; }
+  .toolbar--inline .hue__button i { width: 22px; height: 22px; }
+}
+html.no-gl .hue__button { display: none; }
 
 /* ---------- scripts off: a plain, readable stack ---------- */
 html:not(.js) body { padding: 12px 0 40px; }
@@ -700,7 +759,8 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   .cv > li { padding: 0 !important; }
   .facts, .facts--side { grid-template-columns: max-content minmax(0, 1fr) !important; gap: 2pt 14pt !important; font-size: inherit; }
   .facts dd { margin: 0 !important; }
-  .facts--box { padding: 0 !important; }
+  .facts--box, .side--inline .facts--side { padding: 0 !important; }
+  .side--inline .facts--side { background: none !important; font-size: inherit !important; }
   .tbl-wrap { overflow: visible !important; margin: 6pt 0; }
   .tbl th, .tbl td { padding: 3pt 6pt; }
   .fig { margin: 10pt 0; }
@@ -737,5 +797,6 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   html[data-page="hockey"] .side { margin-top: 0 !important; }
   html[data-page="hockey"] .space > .side { grid-column: 1 / -1; display: grid !important; grid-template-columns: 1fr 1fr; column-gap: .3in; align-items: start; }   /* Measurables and Coach contacts side by side, as the two windows were */
   html[data-page="hockey"] .side__part + .side__part { margin-top: 0; }
-  html[data-page="hockey"] .side--inline { break-inside: avoid; }
+  html[data-page="hockey"] .side--inline { break-inside: avoid; margin-bottom: 7pt !important; }   /* inside the window (under 1360px) it leads the first column */
+  html[data-page="hockey"] .side--inline .side__part + .side__part { margin-top: 7pt; }
 }

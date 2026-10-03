@@ -23,6 +23,7 @@ for (let i = 0; i < 70; i++) {
   if (!f.visible) hidden++;
 }
 check(trail[0] === 'skip', 'Tab starts at the skip link');
+check(trail.slice(1, 6).every(t => t === 'tabs') && trail[6] !== 'tabs', 'the five tabs come next, before the window (the tab bar is first in the source)');
 for (const part of ['scroller', 'content', 'tabs', 'toolbar']) check(seen.has(part), `Tab reaches the ${part}`);
 check(hidden === 0, `focus never lands on something hidden (${hidden})`);
 
@@ -49,7 +50,7 @@ check(/^\d{1,2}:\d{2}\s?(AM|PM) in Groton$/.test((await page.textContent('aside.
 check(errors.length === 0, 'no console errors ' + errors.join(' | '));
 await browser.close();
 {
-  // phones show the tabs as icons; each keeps its name for screen readers, with and without scripts
+  // phones show each tab as an icon over its name; every tab keeps its name for screen readers, with and without scripts
   for (const js of [true, false]) {
     const { browser, page } = await open({ width: 390, height: 844, js });
     await page.goto(BASE + 'work/', { waitUntil: 'load' });

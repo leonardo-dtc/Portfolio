@@ -124,3 +124,46 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   check(errors.length === 0, 'no console errors ' + errors.join(' | '));
   await browser.close();
 }
+{
+  // the Résumé's Sections follow the reader, and landing on an entry lights it (without WebGL, so timing is real)
+  const { browser, page, errors } = await open({ noGL: true });
+  const current = () => page.evaluate(() => [...document.querySelectorAll('.toc a[aria-current="true"]')].map(a => a.textContent).join('|'));
+  await page.goto(BASE + '?nohello', { waitUntil: 'load' });
+  await settle(page, 600);
+  await page.click('a.row[href$="resume/#carnegie"]');
+  await page.waitForFunction(() => document.documentElement.dataset.page === 'resume' && document.getElementById('carnegie'), null, { timeout: 4000 });
+  await page.waitForTimeout(250);
+  check(await page.evaluate(() => getComputedStyle(document.getElementById('carnegie')).animationName === 'landed'), 'landing on résumé/#carnegie lights the entry');
+  check(await current() === 'Music', 'and Sections marks Music');
+  await page.waitForTimeout(1500);
+  check(await page.evaluate(() => !document.getElementById('carnegie').classList.contains('is-landed')), 'the wash is gone after 1.2 s');
+  await page.evaluate(() => { const b = document.querySelector('#main .win__body'), s = document.getElementById('athletics').closest('section'); b.scrollTop += s.getBoundingClientRect().top - b.getBoundingClientRect().top + 20; });
+  await page.waitForTimeout(300);
+  check(await current() === 'Athletics', 'scrolling to Athletics marks it');
+  await page.click('.toc a[href$="#honors"]');
+  check(await current() === 'Honors', 'a jump from Sections marks its target at once');
+  await page.waitForTimeout(1200);
+  check(await current() === 'Honors', 'and keeps it once the scroll arrives');
+  check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+  await browser.close();
+}
+{
+  // phones and laptops: a page change places the new side window by its role (windows.refresh after the swap)
+  const { browser, page, errors } = await open({ width: 390, height: 844, noGL: true });
+  await page.goto(BASE + 'work/', { waitUntil: 'load' });
+  await settle(page, 600);
+  await page.click('nav.tabs a[data-tab="hockey"]');
+  await page.waitForURL('**/v5/hockey/');
+  await settle(page);
+  check(await page.evaluate(() => document.querySelector('#main .win__body').firstElementChild.matches('aside.side[data-inline="start"]') && !!document.getElementById('measure-h')), 'phone: after the swap, Hockey’s Measurables lead the window');
+  await page.click('nav.tabs a[data-tab="resume"]');
+  await page.waitForURL('**/v5/resume/');
+  await settle(page);
+  check(await page.evaluate(() => !!document.querySelector('#main > .side__part--pin .toc') && document.querySelector('#main .win__body').lastElementChild.matches('aside.side') && document.querySelectorAll('aside.side').length === 1), 'phone: the Résumé’s Sections are pinned and its Contact closes the page');
+  await page.click('nav.tabs a[data-tab="home"]');
+  await page.waitForURL(u => u.pathname === '/v5/');
+  await settle(page);
+  check(await page.evaluate(() => !document.querySelector('.side__part--pin') && document.querySelector('#main .win__body').lastElementChild.matches('aside.side')), 'phone: back on Home, nothing is pinned and This fall closes the page');
+  check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+  await browser.close();
+}

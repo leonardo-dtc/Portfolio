@@ -216,14 +216,30 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
 
 ## Glass mode: one room, many windows
 
-- **The main window** sits with the **tab bar** 14 px off its left edge: icons at
-  rest, names when you point at it (it opens to the left, its icons staying
-  put), and a bubble that stretches and slides to the next tab. The **toolbar**
-  crosses its bottom edge with the page's own actions. The **window bar** under
-  it drags 40 px and springs back.
+- **The main window** sits with the **tab bar** 14 px off its left edge, and a
+  bubble that stretches and slides to the next tab. The tab bar shows its names
+  at rest wherever the labelled bar fits to the window's left with 12 px to the
+  screen's edge: at every desktop width, and on laptops from 946 px, where bar
+  and window are centred as one group. Touch screens of 900 px and wider (an
+  iPad) cannot point at it, so the window narrows to make the room. On a narrower
+  laptop it shows icons, and its names when you point at it or focus it (it opens
+  to the left, its icons staying put). It comes first in every page's source, so
+  the keyboard reaches it right after the skip link. The **toolbar** crosses the
+  window's bottom edge with the page's own actions. The **window bar** under it
+  drags 40 px and springs back.
 - **One side window**, turned 24° toward you, floats on the right at 1360 px and
   wider, and tab bar, main window and side window are centred as one group.
-  Below 1360 px its content becomes sections inside the main window.
+  Below 1360 px its content goes inside the main window, placed by its role
+  (`data-inline` on the aside, one word for all of it or one per part):
+  Hockey's Measurables and Coach contacts come first, before Stats; About's
+  portrait comes first and its Interests last; the Résumé's Sections become a
+  row of chips pinned under the window's head; Home's This fall and Work's In
+  progress come last.
+- **The Résumé's Sections follow the reader:** the section under the reading
+  line wears the tab bar's bubble (a Fill 3 capsule, `aria-current`), and a jump
+  from Sections marks its target at once. Landing on an entry from elsewhere
+  (a record row to `resume/#carnegie`) lights it with a wash that fades over
+  1.2 s (`assets/js/spy.js`, `nav.js`).
 - **Changing page** crossfades the window's contents in place, and the side
   window's with them; no window moves and the tab bubble slides. Every page is
   still its own HTML file, so Back, Forward, deep links and printing all work.
@@ -232,17 +248,18 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   button (top left), Escape or Back closes a sheet, and its toolbar pages to the
   neighbouring projects. A project loaded directly opens as a sheet over Work.
 - **Below 900 px** the window becomes a full-screen sheet with a floating tab bar
-  at the bottom, as in iOS 26, and nothing is angled. Below 700 px the title is the
-  two-line name, as the hero sets it there.
+  at the bottom, as in iOS 26, each icon over its 12 px name, and nothing is
+  angled. Below 700 px the title is the two-line name, as the hero sets it there.
 
 ## The color style control
 
 A glass button in the bottom-right corner (beside the tab bar on phones, as in
-iOS 26) opens a small panel for trying colors: eight palettes (Cobalt, Violet,
-Rose, Ember, Gold, Emerald, Teal, Graphite), a Hue and a Vibrance slider, and
-Auto, Night or Day. It turns the whole room in the shader, so every pane of
-glass follows, and the hero's neon a third as far, within its Glowtime colours;
-the choice is kept in this browser only (`assets/js/hue.js`).
+iOS 26; under 360 px, where five labelled tabs take the whole dock, a fill
+button in the window's toolbar) opens a small panel for trying colors: eight
+palettes (Cobalt, Violet, Rose, Ember, Gold, Emerald, Teal, Graphite), a Hue and
+a Vibrance slider, and Auto, Night or Day. It turns the whole room in the shader,
+so every pane of glass follows, and the hero's neon a third as far, within its
+Glowtime colours; the choice is kept in this browser only (`assets/js/hue.js`).
 
 ## Pages
 
@@ -252,7 +269,7 @@ the choice is kept in this browser only (`assets/js/hue.js`).
 | `work/` | All seven projects as cards, filtered by the toolbar (All, Research, Build, Music, Community), then the experiments (the same list as Home's). Side window: In progress | new, from the project pages |
 | `hockey/` | Recruiting profile: stats with the sample size, how I play, academic snapshot, team history. Side window: Measurables, then Coach contacts. Prints on one Letter sheet | `v4/hockey/` |
 | `about/` | The essay, the facts and Now, fall 2026. Side window: the portrait and From, then Interests | `v4/about/` |
-| `resume/` | The full record with an anchor on every entry. Side window: Sections (jumps within the window), then Contact | `v4/resume/` |
+| `resume/` | The full record with an anchor on every entry. Side window: Sections (jumps within the window and follows the reader), then Contact | `v4/resume/` |
 | `work/aducanumab/`, `work/genuvalens/` | Research sheets: abstract, question, method, the numbers, findings, limitations, references | `v4/work/…` |
 | `work/loquar/`, `work/daedalus/`, `work/ocapex/`, `work/freecode/` | Product and community sheets | `v4/work/…` |
 | `work/this-site/` | This edition: the room, the name, the glass | new copy |
@@ -261,6 +278,50 @@ Facts and caveats come from the earlier copy and `CONTENT-REVIEW.md`; the design
 does not. Copy is first person, no en or em dashes, no superlatives, and no
 numbers on the landing. Coaches are named with their roles only, the hometown is
 South Florida, correspondence goes via a parent.
+
+## Adding a project or an experiment
+
+Every page repeats the same chrome (the tab bar first, then the main window, the
+side window and the toolbar), so a new item touches a few files by hand. In order:
+
+**A project** (a sheet over Work):
+
+1. Copy the closest project page to `work/<slug>/index.html` (a research sheet
+   from `aducanumab/` or `genuvalens/`, a product from `loquar/`). Keep the
+   `<html>` attributes `data-kind="sheet" data-tab="work" data-parent="../"`,
+   set `data-page="<slug>"`, the `<title>` ("Name · Leonardo Carvalho") and the
+   description, and keep `<meta name="robots" content="noindex">`. Keep the tab
+   bar where it is, before `<main>`, with Work current.
+2. Images go in `assets/img/` as WebP (and AVIF where it helps), EXIF stripped,
+   each with a `.json` sidecar naming its origin. Every URL is relative and its
+   case matches the file's exactly (GitHub Pages serves `/Portfolio/` and is case
+   sensitive).
+3. Pagers: the new sheet's own `.toolbar--sheet` and `.toolbar--inline` point to
+   its neighbours, and each neighbour's two pagers point to it (four links in
+   the neighbours, both directions).
+4. Work (`work/index.html`): a card in `.cards` with its colour class
+   (`card--paper`, `--gold`, `--blue`, `--sand`, `--ink`, `--violet`, `--green`
+   or a new one in `site.css`), `data-cat` (research, build, music or community)
+   for the filters, its tag and its screen or drawn art; and a line under In
+   progress in the side window if it is unfinished.
+5. Home (`index.html`), only if it belongs there: a row in the record's group
+   for its kind, or a swap among the four cards.
+6. Résumé (`resume/index.html`): an entry with an `id`, so rows elsewhere can
+   land on it.
+7. Tests: add `'work/<slug>/'` to `PAGES` in `tests/v5/e2e/lib.mjs`.
+
+**An experiment** (a small thing with no sheet of its own):
+
+1. A Résumé entry with an `id` for it to land on, or an existing one
+   (`#class-projects`, `#amora`, `#robotics`).
+2. A row in Home's Experiments (`index.html`) and a line in Work's Experiments
+   (`work/index.html`), each linking to `../resume/#<id>` (from Work) or
+   `resume/#<id>` (from Home), in the lowercase italic voice the others use.
+
+**Then run** the unit tests and the browser checks against the preview server:
+`pages` (every page loads, noindex, no overflow, no third-party requests),
+`links` (every link and `#target` resolves), `nav` (sheets and pagers),
+`layouts` and `modes` (scripts off, print); see Checks below.
 
 ## Files
 
@@ -273,7 +334,8 @@ South Florida, correspondence goes via a parent.
 | `assets/js/panels.js`, `geometry.js` | Where the glass is: element boxes and projected corners into inverse homographies |
 | `assets/js/windows.js` | Layout modes, the side window, tab bar, materialising, sheets, the window bar, the pointer's light and the room's lean, hover and press light, scrolling from anywhere |
 | `assets/js/hero.js` | The hero: the name's layout read glyph by glyph from the page, its mask, the light and its interaction, the glide into the title and the hand-off, the fallbacks |
-| `assets/js/nav.js` | Page swaps (the side window kept in place), sheets, history, direct loads of projects |
+| `assets/js/nav.js` | Page swaps (the side window kept in place), sheets, history, direct loads of projects, anchor landings and their wash |
+| `assets/js/spy.js` | The Résumé's Sections following the reader (any page with a `.toc` gets it) |
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |
 | `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
 | Kept, unreferenced | The written hello of the first round: `assets/js/hello.js` (the pen timeline and the Enter button), `name.js` and `name-data.js` (Sacramento traced to pen strokes), `assets/img/name.svg` and `name-2.svg` (the name as an SVG, one line and two), and `tools/trace-name/` outside the edition. Nothing imports or links them any more; they stay in case the written name comes back |
@@ -317,12 +379,22 @@ by machine yet.
   the glass, critically damped for anything with text. Text never blurs while it
   moves, content never moves on its own, and windows stay put under the pointer.
   Hovers move content inside a still frame on the long ease (`--ease-long`, 450 to
-  800 ms); what steps back dims. Reduced motion means no glide, focus pull, lean,
-  drift or settle, and 150 ms crossfades.
+  800 ms); what steps back dims. Springs integrate real frame time up to 120 ms
+  (in 4 ms substeps), so a slow device skips frames rather than stretching a
+  motion. Reduced motion means no glide, focus pull, lean, drift or settle, and
+  150 ms crossfades.
 - **Budget:** the room renders at up to 1.5× device pixels, 60 fps while
   anything moves (the hero's light included), 30 fps while only the room
-  drifts, and not at all when nothing moves under reduced motion. A machine averaging over 22 ms across its first 90
-  frames drops to 1× and stops the drift. Hidden tabs draw nothing.
+  drifts, and not at all when nothing moves under reduced motion. A machine
+  averaging over 22 ms across its first 90 frames drops to 1× and stops the
+  drift; if the next 30 frames it draws still
+  average over 33 ms, the room gives way to the still and the page carries on in
+  CSS glass (the path a lost WebGL context takes). A device asking for less data
+  (Save-Data) or with 2 GB of memory or less starts on the still.
+  `html[data-still]` says why (`save-data`, `memory`, `slow`, `lost`) and
+  `window.__room.log` records the budget's steps. A project loaded directly
+  gives the page behind it 600 ms and at least four frames to arrive, so a slow
+  first frame does not leave it without its parent. Hidden tabs draw nothing.
 - Hidden-until-ready content (film link, 2026-27 stats, schedule, résumé PDF) is
   an HTML comment saying what fills it.
 - Keep `<meta name="robots" content="noindex">` on every page, and make no

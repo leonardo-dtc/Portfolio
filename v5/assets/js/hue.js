@@ -123,7 +123,25 @@ export function initHue({ room }) {
   });
   // Escape closes the panel before anything else hears it (an open sheet stays open); a click elsewhere closes it
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) { e.stopPropagation(); e.preventDefault(); close(true); } }, true);
-  document.addEventListener('pointerdown', (e) => { if (isOpen() && !wrap.contains(e.target)) close(false); });
+  document.addEventListener('pointerdown', (e) => { if (isOpen() && !wrap.contains(e.target) && !button.contains(e.target)) close(false); });
+
+  // Under 360px five labelled tabs fill the dock, so the button joins the front window's toolbar (its actions, inline
+  // at the foot of the page or sheet; on Work, its filters) and the panel opens above the dock. During the hero it
+  // waits in the corner as before.
+  const narrow = matchMedia('(max-width: 359px)');
+  function place() {
+    const front = document.querySelector('section.sheet:not(.is-closing)') || document.getElementById('main');
+    const bar = narrow.matches && !html.matches('.is-hello, .is-entering') && front && (front.querySelector('.toolbar--inline:not(.filters)') || front.querySelector('.toolbar--inline'));
+    wrap.classList.toggle('hue--toolbar', !!bar);
+    const home = bar || wrap;
+    if (button.parentElement === home) return;
+    if (isOpen()) close(false);
+    home.append(button);
+  }
+  narrow.addEventListener('change', place);
+  document.addEventListener('v5:navigate', place);
+  new MutationObserver(place).observe(html, { attributes: true, attributeFilter: ['class'] });   // the hero leaving
+  place();
   // arrow keys move through a radio group and choose as they go (the swatches are a grid of four across)
   wrap.querySelectorAll('[role="radiogroup"]').forEach(g => g.addEventListener('keydown', (e) => {
     const all = [...g.querySelectorAll('[role="radio"]')], i = all.indexOf(document.activeElement), across = g.matches('.hue__swatches') ? 4 : 1;

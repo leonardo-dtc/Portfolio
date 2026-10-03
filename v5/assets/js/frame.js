@@ -5,7 +5,9 @@ const subs = new Set();
 let last = 0, running = false;
 
 function loop(now) {
-  const dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60;
+  // real frame time, up to 120 ms: a slow device skips frames instead of stretching every motion (springs substep at
+  // 4 ms, so a long step stays stable); past that (a tab coming back), motion resumes rather than jumping to its end
+  const dt = last ? Math.min(.12, (now - last) / 1000) : 1 / 60;
   last = now;
   for (const s of [...subs].sort((a, b) => a.order - b.order)) s.fn(dt, now / 1000);
   if (subs.size) requestAnimationFrame(loop);
