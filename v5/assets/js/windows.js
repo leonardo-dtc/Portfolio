@@ -173,10 +173,15 @@ export function createWindows({ room }) {
     return `scale(${(.985 + .015 * v).toFixed(4)})`;
   }
   function kindOf(el) { return el.matches('aside.side') ? (el.classList.contains('side--inline') ? 'inline' : 'side') : el.matches('.tabs, .toolbar, .grab') ? 'ornament' : 'window'; }
+  // A sheet and its toolbar show only over the part of their move where the parent's are gone (the parent's text is
+  // out by a quarter of the way back, its toolbar by two fifths), so opening or closing, two texts or two toolbars
+  // never show at once; everything else fades over the first 70% of its move.
+  const lead = el => el.matches('section.sheet') ? .25 : el.matches('.toolbar--sheet') ? .4 : 0;
   function setIn(el, v, from) {
     el.glass = el.glass || { m: 0, dim: 0 };
-    el.glass.m = clamp(v, 0, 1);
-    el.style.opacity = clamp(v * 1.4, 0, 1).toFixed(3);
+    const lo = lead(el), o = clamp((v - lo) * 1.4 / (1 - lo), 0, 1);
+    el.glass.m = el.matches('.toolbar--sheet') ? o : clamp(v, 0, 1);   // the toolbar's glass too: one capsule at a time
+    el.style.opacity = o.toFixed(3);
     if (from !== 'inline') el.style.transform = frameOf(el, v, from);
   }
   function settle(el) { el.style.opacity = ''; el.style.transform = ''; if (el.glass) el.glass.m = 1; if (el._spring) el._spring.snap(1); }

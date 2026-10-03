@@ -538,7 +538,7 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 .close svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 .close + .win__head { padding-left: 84px; }
 .is-behind > * { filter: brightness(calc(1 - var(--back, 1) * .5)) saturate(calc(1 - var(--back, 1) * .2)); }   /* dimmed, never blurred: text stays sharp while it steps back */
-.win.is-behind > * { opacity: calc(1 - var(--back, 1) * 4); }   /* gone by a quarter of the way back, so a sheet's text and its parent's barely overlap */
+.win.is-behind > * { opacity: calc(1 - var(--back, 1) * 4); }   /* gone by a quarter of the way back; a sheet's text shows only beyond that point (windows.js setIn), so the two never overlap */
 .toolbar.is-behind, .grab.is-behind { opacity: calc(1 - var(--back, 1) * 2.5); }
 .toolbar--sheet { top: calc(var(--win-top) + 4svh + var(--win-h) - 8svh - 28px); z-index: 6; }
 
@@ -760,6 +760,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue { display: none !important; }
   .space, .win, .sheet, .side { position: static !important; inset: auto !important; transform: none !important; translate: none !important; width: auto !important; height: auto !important; max-height: none !important; overflow: visible !important; background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; margin: 0 0 14pt !important; opacity: 1 !important; filter: none !important; perspective: none !important; }   /* (no border: the CSS glass rim of a floating side window has no place on paper) */
   .sr-live { display: none; }   /* nothing to announce on paper, and its 1px box can reach past the page's foot */
+  .space .print-contact { display: block !important; margin: 0 !important; white-space: nowrap; color: #000 !important; font-size: 10pt !important; }   /* the address a coach needs, where the avatar sits on screen: no added height */
   .space > *, .win > *, .sheet > * { opacity: 1 !important; filter: none !important; }
   .side { -webkit-mask-image: none !important; mask-image: none !important; }   /* the side window's fade at its foot is for scrolling, not paper */
   .win, .sheet { display: block !important; }
