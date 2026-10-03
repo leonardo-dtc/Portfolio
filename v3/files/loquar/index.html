@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>File 06 · Loquar · Leonardo Carvalho</title>
+<meta name="description" content="Loquar, a language-learning web app in development that teaches Mandarin through conversation in an open world. Leonardo Carvalho is co-founder and CTO.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#151515">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23151515'/%3E%3Crect x='6' y='36' width='52' height='14' fill='%23EA3D2E' transform='rotate(-8 32 43)'/%3E%3Ctext x='32' y='47' font-family='Anton,Impact,sans-serif' font-size='38' text-anchor='middle' fill='%23fff'%3ELC%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="../../assets/fonts/anton-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/metropolis-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/css/files.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<a class="skip" href="#file">Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/></symbol>
+</svg>
+
+<header class="chrome" aria-label="Page">
+  <a href="../../">Leonardo Carvalho</a>
+  <span aria-hidden="true">2026</span>
+</header>
+
+<main class="desk" id="main">
+  <!-- The drawer: this file's tab and the tabs of the other files. To add a file, see v3/README.md, "Project files". -->
+  <nav class="drawer" aria-label="Files">
+    <ol>
+      <li><a href="../aducanumab/" aria-label="04 Drug safety"><span><b>04</b> <span class="n-name">Drug safety</span></span></a></li>
+      <li><a href="../genuvalens/" aria-label="05 Knee exoskeleton"><span><b>05</b> <span class="n-name">Knee exoskeleton</span></span></a></li>
+      <li><a href="./" aria-current="page"><span>File 06 · Loquar</span></a></li>
+      <li><a href="../ocapex/" aria-label="07 OCAPEX"><span><b>07</b> <span class="n-name">OCAPEX</span></span></a></li>
+      <li><a href="../hockey/" aria-label="08 Goaltender"><span><b>08</b> <span class="n-name">Goaltender</span></span></a></li>
+      <li><a href="../resume/" aria-label="10 The record"><span><b>10</b> <span class="n-name">The record</span></span></a></li>
+    </ol>
+  </nav>
+
+  <article class="file" id="file" tabindex="-1" aria-labelledby="file-title" style="view-transition-name: file-06">
+    <div class="file__bar">
+      <a class="back" href="../../#loquar"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg>Back to sheet 06</a>
+    </div>
+
+    <header class="file__head">
+      <h1 class="file__title" id="file-title">Loquar</h1>
+      <p class="file__sub">A language-learning web app that teaches through conversation in an open world</p>
+      <p class="stamp"><span class="sr-only">Stage: </span>In development</p>
+      <dl class="facts">
+        <div><dt>Type</dt><dd>Product · Language-learning web app</dd></div>
+        <div><dt>Role</dt><dd>Co-founder and CTO: systems, interface design and code</dd></div>
+        <div><dt>Team</dt><dd>Founded by a friend; built with friends</dd></div>
+        <div><dt>First language</dt><dd>Mandarin</dd></div>
+        <div><dt>Status</dt><dd>In development. No release date has been announced.</dd></div>
+      </dl>
+      <p class="note"><b>Status.</b> Loquar is in development. The screenshots on this page are of the landing page, not the finished product, and there is no release date.</p>
+      <nav class="toc" aria-label="Sections of this file">
+        <ol>
+          <li><a href="#l-problem"><span>1</span> Problem</a></li>
+          <li><a href="#l-approach"><span>2</span> Approach</a></li>
+          <li><a href="#l-concepts"><span>3</span> Early concepts</a></li>
+          <li><a href="#l-interaction"><span>4</span> Interaction system</a></li>
+          <li><a href="#l-visual"><span>5</span> Visual design</a></li>
+          <li><a href="#l-impl"><span>6</span> Implementation</a></li>
+          <li><a href="#l-iter"><span>7</span> Iterations</a></li>
+          <li><a href="#l-state"><span>8</span> Current state</a></li>
+        </ol>
+      </nav>
+    </header>
+
+    <figure class="fig fig--lead">
+      <div class="fig__frame shot">
+        <img src="../../assets/img/loquar-openworld-1440.webp" srcset="../../assets/img/loquar-openworld-640.webp 640w, ../../assets/img/loquar-openworld-960.webp 960w, ../../assets/img/loquar-openworld-1440.webp 1440w" sizes="(min-width: 1180px) 960px, 100vw" width="1440" height="900" decoding="async" fetchpriority="high" alt="Loquar landing page: photographed city scenes fanned into a spiral beside the headline “A world of experiences. You choose which ones.” and a section titled “Two things level up at once”">
+      </div>
+      <figcaption>The open-world section of the landing page. Screenshot, in development.</figcaption>
+    </figure>
+
+    <section class="sec" aria-labelledby="l-problem">
+      <h2 class="sec__tab" id="l-problem"><span><span class="sec__n" aria-hidden="true">1</span>Problem</span></h2>
+      <div class="prose">
+        <p>Most language apps teach from a lesson list. I grew up speaking Mandarin at home, and I learned it by needing it: the words arrived with the situations that required them. Loquar is built on that idea. Put the learner in a place where the language is necessary, give them a companion to speak to, and let the language come from what they are trying to do.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="l-approach">
+      <h2 class="sec__tab" id="l-approach"><span><span class="sec__n" aria-hidden="true">2</span>Approach</span></h2>
+      <div class="prose">
+        <p>Loquar is an open world rather than a sequence of story events. The product opens as a city, not a syllabus: streets, counters and back rooms, with the people standing in them, and the learner chooses the way through. Every scene is meant to move the language and the reading of the culture together: words, tones and listening on one side; who orders, who pays and when “maybe” means no on the other.</p>
+        <p>We started with Mandarin because it is the language we can judge. The full product ships when it is ready.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="l-concepts">
+      <h2 class="sec__tab" id="l-concepts"><span><span class="sec__n" aria-hidden="true">3</span>Early concepts</span></h2>
+      <div class="prose"><p>Wireframes and the concepts we rejected will be added here once they can be shown.</p></div>
+      <div class="figgrid figgrid--2">
+        <figure class="fig"><div class="ph ph--32" role="img" aria-label="Placeholder for an early wireframe, 3 by 2"><span>To come · early wireframe · 3:2</span></div><figcaption>Early wireframe.</figcaption></figure>
+        <figure class="fig"><div class="ph ph--32" role="img" aria-label="Placeholder for a rejected concept, 3 by 2"><span>To come · rejected concept · 3:2</span></div><figcaption>A rejected concept, and why.</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="l-interaction">
+      <h2 class="sec__tab" id="l-interaction"><span><span class="sec__n" aria-hidden="true">4</span>Interaction system</span></h2>
+      <div class="prose">
+        <p>On the landing page the world is wound into a spiral: scrolling walks through it and dragging looks around. A progress line under each scene shows where the learner is in the sequence, and each scene carries the word it teaches, in characters and pinyin, before the description of what the scene is for.</p>
+      </div>
+      <figure class="fig">
+        <div class="fig__frame shot">
+          <img src="../../assets/img/loquar-journey-1280.webp" srcset="../../assets/img/loquar-journey-640.webp 640w, ../../assets/img/loquar-journey-800.webp 800w, ../../assets/img/loquar-journey-1280.webp 1280w" sizes="(min-width: 1100px) 900px, 100vw" width="1280" height="720" loading="lazy" decoding="async" alt="Loquar landing page section titled “A city, not a syllabus”, with word cards for taxi, airport and beef noodles fanned around a courtyard photograph, and the line “Scroll to move through the world · drag to look around”">
+        </div>
+        <figcaption>“A city, not a syllabus.” Landing page, screenshot.</figcaption>
+      </figure>
+      <figure class="fig">
+        <div class="ph ph--169" role="img" aria-label="Placeholder for a short interaction loop, 16 by 9"><span>To come · in-app interaction loop · 16:9</span></div>
+        <figcaption>A short loop of the in-app interaction. Clips play muted on hover, or on tap.</figcaption>
+      </figure>
+    </section>
+
+    <section class="sec" aria-labelledby="l-visual">
+      <h2 class="sec__tab" id="l-visual"><span><span class="sec__n" aria-hidden="true">5</span>Visual design</span></h2>
+      <div class="prose">
+        <p>The landing page sets photographs of real places and people into a paper-toned field, with a serif for the headlines and Chinese characters given room to sit large on their own cards. Product screens will be added here when they can be shown.</p>
+      </div>
+      <div class="figgrid figgrid--2">
+        <figure class="fig"><div class="ph ph--45" role="img" aria-label="Placeholder for a product screen, 4 by 5"><span>To come · product screen · 4:5</span></div><figcaption>Product screen.</figcaption></figure>
+        <figure class="fig"><div class="ph ph--45" role="img" aria-label="Placeholder for a product screen, 4 by 5"><span>To come · product screen · 4:5</span></div><figcaption>Product screen.</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="l-impl">
+      <h2 class="sec__tab" id="l-impl"><span><span class="sec__n" aria-hidden="true">6</span>Implementation</span></h2>
+      <div class="prose">
+        <p>I am responsible for implementing the systems, the interface and the code, and for the small things that make an app pleasant to use. Details of the stack will follow when the product ships.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="l-iter">
+      <h2 class="sec__tab" id="l-iter"><span><span class="sec__n" aria-hidden="true">7</span>Iterations</span></h2>
+      <div class="prose"><p>Iteration notes will be added as the product moves toward release.</p></div>
+    </section>
+
+    <section class="sec" aria-labelledby="l-state">
+      <h2 class="sec__tab" id="l-state"><span><span class="sec__n" aria-hidden="true">8</span>Current state</span></h2>
+      <div class="prose">
+        <p>In development. The landing page is public; the full product ships when it is ready, and no release date has been announced.</p>
+      </div>
+    </section>
+
+    <nav class="pager" aria-label="Previous and next files">
+      <a href="../genuvalens/" rel="prev">
+        <span class="pager__k">Previous · File 05</span>
+        <span class="pager__t">Knee exoskeleton</span>
+        <span class="pager__d"><span>Genuvalens, summer 2026</span></span>
+        <span class="pager__go" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#arrow"/></svg></span>
+      </a>
+      <a href="../ocapex/" rel="next">
+        <span class="pager__k">Next · File 07</span>
+        <span class="pager__t">OCAPEX</span>
+        <span class="pager__d"><span>Since 2022</span></span>
+        <span class="pager__go" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#arrow"/></svg></span>
+      </a>
+    </nav>
+    <div class="file__end">
+      <a class="back" href="../../#loquar"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg>Back to sheet 06</a>
+      <p class="colophon">Leonardo Carvalho · Groton School, Class of 2028 · Updated September 2026</p>
+    </div>
+  </article>
+</main>
+<script src="../../assets/js/files.js" defer></script>
+</body>
+</html>

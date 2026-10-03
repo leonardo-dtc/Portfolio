@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>File 04 · Drug safety · Leonardo Carvalho</title>
+<meta name="description" content="A comparative pharmacovigilance analysis of the 486 FDA adverse-event cases filed for aducanumab from 2016 to 2024, set beside lecanemab and donanemab. Independent research by Leonardo Carvalho, advised by Dr. Sujata K. Bhatia of Harvard University.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#151515">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23151515'/%3E%3Crect x='6' y='36' width='52' height='14' fill='%23EA3D2E' transform='rotate(-8 32 43)'/%3E%3Ctext x='32' y='47' font-family='Anton,Impact,sans-serif' font-size='38' text-anchor='middle' fill='%23fff'%3ELC%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="../../assets/fonts/anton-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/metropolis-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/css/files.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<a class="skip" href="#file">Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/></symbol>
+</svg>
+
+<header class="chrome" aria-label="Page">
+  <a href="../../">Leonardo Carvalho</a>
+  <span aria-hidden="true">2026</span>
+</header>
+
+<main class="desk" id="main">
+  <!-- The drawer: this file's tab and the tabs of the other files. To add a file, see v3/README.md, "Project files". -->
+  <nav class="drawer" aria-label="Files">
+    <ol>
+      <li><a href="./" aria-current="page"><span>File 04 · Drug safety</span></a></li>
+      <li><a href="../genuvalens/" aria-label="05 Knee exoskeleton"><span><b>05</b> <span class="n-name">Knee exoskeleton</span></span></a></li>
+      <li><a href="../loquar/" aria-label="06 Loquar"><span><b>06</b> <span class="n-name">Loquar</span></span></a></li>
+      <li><a href="../ocapex/" aria-label="07 OCAPEX"><span><b>07</b> <span class="n-name">OCAPEX</span></span></a></li>
+      <li><a href="../hockey/" aria-label="08 Goaltender"><span><b>08</b> <span class="n-name">Goaltender</span></span></a></li>
+      <li><a href="../resume/" aria-label="10 The record"><span><b>10</b> <span class="n-name">The record</span></span></a></li>
+    </ol>
+  </nav>
+
+  <article class="file" id="file" tabindex="-1" aria-labelledby="file-title" style="view-transition-name: file-04">
+    <div class="file__bar">
+      <a class="back" href="../../#research"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg>Back to sheet 04</a>
+    </div>
+
+    <header class="file__head">
+      <h1 class="file__title file__title--long" id="file-title">Amyloid-related imaging abnormalities dominate aducanumab’s complete post-marketing record</h1>
+      <p class="file__sub">A comparative pharmacovigilance analysis of FDA adverse-event reports</p>
+      <p class="stamp"><span class="sr-only">Stage: </span>Manuscript submitted</p>
+      <dl class="facts">
+        <div><dt>Type</dt><dd>Independent research, sole author</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+        <div><dt>Advisor</dt><dd>Dr. Sujata K. Bhatia, Harvard University</dd></div>
+        <div><dt>Status</dt><dd>Manuscript submitted to the Scholarly Review Journal; publication pending</dd></div>
+        <div><dt>Data</dt><dd>FDA Adverse Event Monitoring System (AEMS) Public Dashboard, retrieved August 31, 2026</dd></div>
+        <div><dt>Tools</dt><dd>Python, SciPy</dd></div>
+      </dl>
+      <p class="note"><b>What this is.</b> A pharmacovigilance analysis of adverse-event reports submitted to the FDA. It is not an efficacy study, and it is not Harvard research. I did the analysis and wrote the manuscript as independent work, with Dr. Sujata K. Bhatia of Harvard University advising on background, methods and presentation.</p>
+      <nav class="toc" aria-label="Sections of this file">
+        <ol>
+          <li><a href="#s-abstract"><span>1</span> Abstract</a></li>
+          <li><a href="#s-question"><span>2</span> Question</a></li>
+          <li><a href="#s-method"><span>3</span> Method</a></li>
+          <li><a href="#s-figures"><span>4</span> Figures</a></li>
+          <li><a href="#s-findings"><span>5</span> Findings</a></li>
+          <li><a href="#s-limits"><span>6</span> Limitations</a></li>
+          <li><a href="#s-refs"><span>7</span> References</a></li>
+        </ol>
+      </nav>
+    </header>
+
+    <section class="sec" aria-labelledby="s-abstract">
+      <h2 class="sec__tab" id="s-abstract"><span><span class="sec__n" aria-hidden="true">1</span>Abstract</span></h2>
+      <div class="prose">
+        <p class="abstract">Aducanumab (Aduhelm) was the first Alzheimer’s therapy approved for the disease’s pathology rather than its symptoms. It received accelerated approval in 2021 over the advice of the FDA’s own advisory committee, and Biogen withdrew it in 2024. I analyzed every adverse-event case filed for it in the FDA’s public dashboard, 486 cases received between 2016 and 2024, and repeated the procedure for its successors lecanemab and donanemab.</p>
+        <p>Of the 486 cases, 266 (54.7%) were serious, including 29 deaths (6.0%). Five amyloid-related imaging abnormality (ARIA) terms accounted for 253 reaction entries in 181 unique cases, 37.2% of the record. Reports were split almost evenly by sex, against a disease population that is mostly women. ARIA cases were reported by healthcare professionals far more often than other cases, 69.6% against 48.2%, and reporting volume followed the drug’s commercial life cycle rather than staying constant. Against lecanemab (25.7%) and donanemab (34.0%), aducanumab carried the largest ARIA share of the three.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="s-question">
+      <h2 class="sec__tab" id="s-question"><span><span class="sec__n" aria-hidden="true">2</span>Question</span></h2>
+      <div class="prose">
+        <p>Pharmacovigilance is the part of a drug’s life that begins after the trials end: detecting, assessing and understanding adverse effects once a medicine is in ordinary use. Adverse-event reporting systems are its main data source. Aducanumab is a sharp case because its whole commercial life, from first reports to withdrawal, is now closed, while two antibodies with the same mechanism and the same principal toxicity are in growing use.</p>
+        <p>I set four hypotheses before pulling the data. First, ARIA-related terms would dominate the reported profile. Second, women would account for the majority of reports overall and of ARIA reports specifically, because both the disease population and adverse-drug-reaction reporting in general are female-predominant. Third, ARIA cases would be reported disproportionately by healthcare professionals, because ARIA is detected on MRI rather than felt as a symptom. Fourth, reporting volume would track the drug’s regulatory and commercial life cycle rather than remain constant.</p>
+        <p>The question started at home. My grandfather died of Alzheimer’s disease.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="s-method">
+      <h2 class="sec__tab" id="s-method"><span><span class="sec__n" aria-hidden="true">3</span>Method</span></h2>
+      <div class="prose">
+        <p>I gathered the data from the FDA Adverse Event Monitoring System Public Dashboard on August 31, 2026. The dashboard is refreshed daily, so every count is bound to that retrieval date. I searched two names for the same antibody, “Aducanumab” and “Aducanumab-Avwa”, the generic and nonproprietary names reports may be filed under, and recorded the summary statistics, the data table and the time-trend chart.</p>
+        <p>Using the dashboard’s reaction-types view, I selected the five terms compatible with ARIA: ARIA-E, ARIA-H, cerebral haemorrhage, unspecified ARIA and superficial siderosis of the central nervous system. Those terms together form the ARIA subset, and their case counts, demographics and outcomes were compared with the rest of the record. All counts are unique cases as marked by the dashboard; one case can carry more than one reaction term. I replicated the sex-distribution and reaction-type results for lecanemab (“Lecanemab”, “Lecanemab-Irmb”) and donanemab (“Donanemab”, “Donanemab-Azbt”).</p>
+        <p>Proportions were compared with two-sided tests at α = .05: exact binomial tests for departures from sex parity, two-proportion z-tests between independent groups, and chi-squared tests of independence for dichotomous associations, with odds ratios and 95% confidence intervals. Comparisons involving the ARIA subset used the non-ARIA cases as the reference group. Wilson score intervals were used for single proportions. No adjustment was made for multiple comparisons, and the p values are descriptive. The analysis ran in Python with SciPy.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="s-figures">
+      <h2 class="sec__tab" id="s-figures"><span><span class="sec__n" aria-hidden="true">4</span>Figures</span></h2>
+      <div class="prose"><p class="small muted">All four figures are redrawn from the manuscript with the values as printed there. They describe submitted reports, not the likelihood of an event in treated patients.</p></div>
+
+      <figure class="fig">
+        <div class="fig__frame chart">
+          <div class="vbars" style="--max:250;--lines:5;--h:220px" role="img" aria-label="Aducanumab cases received by year: 18 in 2016, 0 in 2017, 3 in 2018, 14 in 2019, 0 in 2020, 17 in 2021, 223 in 2022, 160 in 2023, 51 in 2024, 0 in 2025">
+            <div class="vbars__plot">
+              <div class="vbar" style="--v:18"><b>18</b></div>
+              <div class="vbar" style="--v:0"><b>0</b></div>
+              <div class="vbar" style="--v:3"><b>3</b></div>
+              <div class="vbar" style="--v:14"><b>14</b></div>
+              <div class="vbar" style="--v:0"><b>0</b></div>
+              <div class="vbar" style="--v:17"><b>17</b></div>
+              <div class="vbar vbar--ac" style="--v:223"><b>223</b></div>
+              <div class="vbar" style="--v:160"><b>160</b></div>
+              <div class="vbar" style="--v:51"><b>51</b></div>
+              <div class="vbar" style="--v:0"><b>0</b></div>
+            </div>
+            <div class="vbars__labels"><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span></div>
+          </div>
+        </div>
+        <figcaption><b>Figure 1.</b> Adverse-event cases for aducanumab by year received, 2016 to 2025, unique cases. The 2022 peak is the first full year of clinical use after the June 2021 approval; there are no cases after 2024. Redrawn from the manuscript’s Figure 1.</figcaption>
+      </figure>
+
+      <figure class="fig">
+        <div class="fig__frame chart">
+          <div class="hbars" style="--max:114" role="img" aria-label="Ten most common reaction terms for aducanumab: ARIA-E 114, ARIA-H 78, headache 36, confusional state 33, cerebral haemorrhage 27, fall 23, dementia Alzheimer’s type 22, seizure 19, ARIA unspecified 17, superficial siderosis of the central nervous system 17">
+            <div class="hbars__row hbars__row--ac"><span class="hbars__label">ARIA-E (oedema or effusion)</span><span class="hbars__bar hbars__bar--ac" style="--v:114"><b>114</b></span></div>
+            <div class="hbars__row hbars__row--ac"><span class="hbars__label">ARIA-H (microhaemorrhages and haemosiderin deposits)</span><span class="hbars__bar hbars__bar--ac" style="--v:78"><b>78</b></span></div>
+            <div class="hbars__row"><span class="hbars__label">Headache</span><span class="hbars__bar" style="--v:36"><b>36</b></span></div>
+            <div class="hbars__row"><span class="hbars__label">Confusional state</span><span class="hbars__bar" style="--v:33"><b>33</b></span></div>
+            <div class="hbars__row hbars__row--ac"><span class="hbars__label">Cerebral haemorrhage</span><span class="hbars__bar hbars__bar--ac" style="--v:27"><b>27</b></span></div>
+            <div class="hbars__row"><span class="hbars__label">Fall</span><span class="hbars__bar" style="--v:23"><b>23</b></span></div>
+            <div class="hbars__row"><span class="hbars__label">Dementia Alzheimer’s type</span><span class="hbars__bar" style="--v:22"><b>22</b></span></div>
+            <div class="hbars__row"><span class="hbars__label">Seizure</span><span class="hbars__bar" style="--v:19"><b>19</b></span></div>
+            <div class="hbars__row hbars__row--ac"><span class="hbars__label">ARIA, unspecified</span><span class="hbars__bar hbars__bar--ac" style="--v:17"><b>17</b></span></div>
+            <div class="hbars__row hbars__row--ac"><span class="hbars__label">Superficial siderosis of the central nervous system</span><span class="hbars__bar hbars__bar--ac" style="--v:17"><b>17</b></span></div>
+          </div>
+        </div>
+        <figcaption><b>Figure 2.</b> The ten most common reaction terms for aducanumab, in cases. The five ARIA-related terms are in vermilion; terms can overlap within one case. Spellings follow the MedDRA dictionary used by the dashboard. Redrawn from the manuscript’s Figure 2.</figcaption>
+      </figure>
+
+      <div class="figgrid figgrid--2">
+        <figure class="fig">
+          <div class="fig__frame chart">
+            <div class="vbars" style="--max:40;--lines:4;--h:200px" role="img" aria-label="ARIA share of reported cases: aducanumab 37.2 percent, lecanemab 25.7 percent, donanemab 34.0 percent">
+              <div class="vbars__plot">
+                <div class="vbar vbar--ac" style="--v:37.2"><b>37.2%</b></div>
+                <div class="vbar" style="--v:25.7"><b>25.7%</b></div>
+                <div class="vbar" style="--v:34.0"><b>34.0%</b></div>
+              </div>
+              <div class="vbars__labels"><span>Aduca&shy;numab</span><span>Leca&shy;nemab</span><span>Dona&shy;nemab</span></div>
+            </div>
+          </div>
+          <figcaption><b>Figure 3.</b> ARIA share of reported cases for the three antibodies: 181 of 486, 957 of 3,728 and 1,100 of 3,238. Redrawn from the manuscript’s Figure 3.</figcaption>
+        </figure>
+        <figure class="fig">
+          <div class="fig__frame chart">
+            <div class="vbars vbars--pairs" style="--max:80;--lines:4;--h:200px" role="img" aria-label="Female share of cases with known sex, all cases against ARIA cases: aducanumab 52.8 and 53.8 percent, lecanemab 58.4 and 64.8 percent, donanemab 61.5 and 65.6 percent">
+              <div class="vbars__plot">
+                <div class="vpair"><div class="vbar" style="--v:52.8"><b>52.8</b></div><div class="vbar vbar--ac" style="--v:53.8"><b>53.8</b></div></div>
+                <div class="vpair"><div class="vbar" style="--v:58.4"><b>58.4</b></div><div class="vbar vbar--ac" style="--v:64.8"><b>64.8</b></div></div>
+                <div class="vpair"><div class="vbar" style="--v:61.5"><b>61.5</b></div><div class="vbar vbar--ac" style="--v:65.6"><b>65.6</b></div></div>
+              </div>
+              <div class="vbars__labels"><span>Aduca&shy;numab</span><span>Leca&shy;nemab</span><span>Dona&shy;nemab</span></div>
+              <div class="legend"><span>Female, all cases</span><span style="--sw:var(--red)">Female, ARIA cases</span></div>
+            </div>
+          </div>
+          <figcaption><b>Figure 4.</b> Female share of cases with known sex, in percent. Women are about 61% of Americans with Alzheimer’s dementia. Redrawn from the manuscript’s Figure 4.</figcaption>
+        </figure>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="tbl tbl--stack">
+          <caption><b>Table 1.</b> The three antibodies in the AEMS Public Dashboard, retrieved August 31, 2026. Lecanemab and donanemab remain in active use, so their counts keep changing.</caption>
+          <thead><tr><th scope="col">Category</th><th scope="col" class="num">Aducanumab</th><th scope="col" class="num">Lecanemab</th><th scope="col" class="num">Donanemab</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Total cases</th><td class="num" data-k="Aducanumab">486</td><td class="num" data-k="Lecanemab">3,728</td><td class="num" data-k="Donanemab">3,238</td></tr>
+            <tr><th scope="row">Serious cases, including deaths</th><td class="num" data-k="Aducanumab">266 (54.7%)</td><td class="num" data-k="Lecanemab">1,579 (42.4%)</td><td class="num" data-k="Donanemab">1,670 (51.6%)</td></tr>
+            <tr><th scope="row">Deaths</th><td class="num" data-k="Aducanumab">29 (6.0%)</td><td class="num" data-k="Lecanemab">154 (4.1%)</td><td class="num" data-k="Donanemab">74 (2.3%)</td></tr>
+            <tr><th scope="row">ARIA cases</th><td class="num" data-k="Aducanumab">181 (37.2%)</td><td class="num" data-k="Lecanemab">957 (25.7%)</td><td class="num" data-k="Donanemab">1,100 (34.0%)</td></tr>
+            <tr><th scope="row">ARIA-E cases</th><td class="num" data-k="Aducanumab">114 (23.5%)</td><td class="num" data-k="Lecanemab">504 (13.5%)</td><td class="num" data-k="Donanemab">518 (16.0%)</td></tr>
+            <tr><th scope="row">ARIA-H cases</th><td class="num" data-k="Aducanumab">78 (16.0%)</td><td class="num" data-k="Lecanemab">470 (12.6%)</td><td class="num" data-k="Donanemab">428 (13.2%)</td></tr>
+            <tr><th scope="row">Female, of cases with known sex</th><td class="num" data-k="Aducanumab">52.8%</td><td class="num" data-k="Lecanemab">58.4%</td><td class="num" data-k="Donanemab">61.5%</td></tr>
+            <tr><th scope="row">Female, of ARIA cases with known sex</th><td class="num" data-k="Aducanumab">53.8%</td><td class="num" data-k="Lecanemab">64.8%</td><td class="num" data-k="Donanemab">65.6%</td></tr>
+            <tr><th scope="row">Reported by healthcare professionals</th><td class="num" data-k="Aducanumab">56.2%</td><td class="num" data-k="Lecanemab">71.2%</td><td class="num" data-k="Donanemab">40.1%</td></tr>
+            <tr><th scope="row">First to last year received</th><td class="num" data-k="Aducanumab">2016 to 2024</td><td class="num" data-k="Lecanemab">2021 to 2026</td><td class="num" data-k="Donanemab">2024 to 2026</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="s-findings">
+      <h2 class="sec__tab" id="s-findings"><span><span class="sec__n" aria-hidden="true">5</span>Findings</span></h2>
+      <div class="prose">
+        <ol class="steps">
+          <li><b>ARIA dominated the record.</b> 181 of 486 cases (37.2%, 95% CI 33.1 to 41.6) involved at least one ARIA term, and the two principal ARIA terms were the two most reported reactions overall. Of the 181 ARIA cases, 61 were serious and 4 resulted in death.</li>
+          <li><b>Women did not form the expected majority.</b> Female patients accounted for 48.1% of all cases and 52.8% of cases with known sex. None of the four groups tested departed significantly from parity, and the female share of ARIA cases (53.8%) did not differ from the non-ARIA cases (52.2%, p = .74). That share matches the composition of the EMERGE and ENGAGE trials and sits well below the ARIA cases for the successor antibodies, 64.8% for lecanemab and 65.6% for donanemab. I read it as the signature of a small, trial-like treated population rather than a sex-specific susceptibility.</li>
+          <li><b>Healthcare professionals reported ARIA.</b> 69.6% of ARIA cases were professionally reported against 48.2% of non-ARIA cases, χ²(1, N = 486) = 21.2, p &lt; .001, odds ratio 2.46 (95% CI 1.67 to 3.63). ARIA cases were also less often coded as serious than other cases, 33.7% against 67.2%, which fits a finding usually made on scheduled MRI without symptoms.</li>
+          <li><b>Reporting followed the life cycle.</b> Cases peaked at 223 in 2022, the first full year of use, fell to 160 in 2023 and 51 in 2024, and stopped after withdrawal. The ARIA share of cases rose over the same period, from 36.8% in 2022 to 48.8% in 2023, coinciding with lecanemab’s traditional approval and the attention it brought to ARIA.</li>
+          <li><b>Aducanumab carried the largest ARIA share of the three.</b> 37.2% against 25.7% for lecanemab (z = 5.40, p &lt; .001) and 34.0% for donanemab (z = 1.42, p = .16). For ARIA-E alone, aducanumab’s 23.5% exceeded both successors.</li>
+        </ol>
+        <p>The comparison with the database as a whole runs the other way: aducanumab’s serious-or-fatal share (54.7%) was lower than the 63.3% across all products (z = −3.92, p &lt; .001). That is not evidence that the drug is safer. It reflects a reporting stream with a large share of non-serious, MRI-detected ARIA findings.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="s-limits">
+      <h2 class="sec__tab" id="s-limits"><span><span class="sec__n" aria-hidden="true">6</span>Limitations</span></h2>
+      <div class="prose">
+        <p>The limits are mostly those of spontaneous reporting, and the FDA attaches them to every dashboard query. A report does not establish that the drug caused the event. Reports can be duplicated, incomplete or unverified, and one patient can appear more than once. Because the size of the exposed population is unknown, neither incidence rates nor between-drug risk comparisons can be computed from report counts. Under-reporting is substantial and uneven: asymptomatic, MRI-detected ARIA is captured only when a clinician chooses to file it, so the ARIA proportions here are far below trial incidence and must not be read as real-world rates.</p>
+        <p>Sex was unspecified in 8.8% of aducanumab cases, and more often for lecanemab (10.1%) and donanemab (19.8%), which widens the uncertainty of the sex comparisons. With these case counts the sex analysis has limited power to detect a difference. The successor profiles are moving targets on a dashboard refreshed daily. And the dashboard does not distinguish spontaneous from study-derived reports, so the near-even sex split cannot be separated from the composition of the treated population.</p>
+        <p>Reporting patterns alone cannot establish causation or compare the drugs’ clinical safety. The FDA’s <a href="https://www.fda.gov/drugs/fdas-adverse-event-reporting-system-faers/fda-adverse-event-reporting-system-faers-public-dashboard" rel="noopener">guidance on interpreting adverse-event reports</a> is the reference for how these numbers should and should not be read.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="s-refs">
+      <h2 class="sec__tab" id="s-refs"><span><span class="sec__n" aria-hidden="true">7</span>References</span></h2>
+      <div class="prose">
+        <p class="small"><b>Manuscript.</b> <cite>Amyloid-Related Imaging Abnormalities Dominate Aducanumab’s Complete Post-Marketing Record: A Comparative Pharmacovigilance Analysis.</cite> Leonardo Carvalho, September 2026. Submitted to the Scholarly Review Journal; publication pending. A link will be added if it is published.</p>
+        <ol class="refs">
+          <li>U.S. Food and Drug Administration. FDA Adverse Event Monitoring System (AEMS), March 11, 2026. <a href="https://www.fda.gov/safety/fda-adverse-event-monitoring-system-aems" rel="noopener">fda.gov</a></li>
+          <li>Salloway S, et al. Amyloid-related imaging abnormalities in 2 phase 3 studies evaluating aducanumab in patients with early Alzheimer disease. JAMA Neurology, 2022;79(1):13-21. <a href="https://doi.org/10.1001/jamaneurol.2021.4161" rel="noopener">doi:10.1001/jamaneurol.2021.4161</a></li>
+          <li>Alexander GC, et al. Revisiting FDA approval of aducanumab. New England Journal of Medicine, 2021;385(9):769-771. <a href="https://doi.org/10.1056/NEJMp2110468" rel="noopener">doi:10.1056/NEJMp2110468</a></li>
+          <li>Huang J, Long X, Chen C. A real-world safety surveillance study of aducanumab through the FDA Adverse Event Reporting System. Frontiers in Pharmacology, 2025;16:1592204. <a href="https://doi.org/10.3389/fphar.2025.1592204" rel="noopener">doi:10.3389/fphar.2025.1592204</a></li>
+          <li>Hartnell NR, Wilson JP. Replication of the Weber effect using postmarketing adverse event reports voluntarily submitted to the United States Food and Drug Administration. Pharmacotherapy, 2004;24(6):743-749. <a href="https://doi.org/10.1592/phco.24.8.743.36068" rel="noopener">doi:10.1592/phco.24.8.743.36068</a></li>
+          <li>Pariente A, et al. Impact of safety alerts on measures of disproportionality in spontaneous reporting databases: the notoriety bias. Drug Safety, 2007;30(10):891-898. <a href="https://doi.org/10.2165/00002018-200730100-00007" rel="noopener">doi:10.2165/00002018-200730100-00007</a></li>
+          <li>Watson S, Caster O, Rochon PA, den Ruijter H. Reported adverse drug reactions in women and men: aggregated evidence from globally collected individual case reports during half a century. EClinicalMedicine, 2019;17:100188. <a href="https://doi.org/10.1016/j.eclinm.2019.10.001" rel="noopener">doi:10.1016/j.eclinm.2019.10.001</a></li>
+          <li>Alzheimer’s Association. 2025 Alzheimer’s disease facts and figures. Alzheimer’s &amp; Dementia, 2025;21(4):e70235. <a href="https://doi.org/10.1002/alz.70235" rel="noopener">doi:10.1002/alz.70235</a></li>
+          <li>van Dyck CH, et al. Lecanemab in early Alzheimer’s disease. New England Journal of Medicine, 2023;388(1):9-21. <a href="https://doi.org/10.1056/NEJMoa2212948" rel="noopener">doi:10.1056/NEJMoa2212948</a></li>
+          <li>Sims JR, et al. Donanemab in early symptomatic Alzheimer disease: the TRAILBLAZER-ALZ 2 randomized clinical trial. JAMA, 2023;330(6):512-527. <a href="https://doi.org/10.1001/jama.2023.13239" rel="noopener">doi:10.1001/jama.2023.13239</a></li>
+        </ol>
+      </div>
+    </section>
+
+    <nav class="pager" aria-label="Next file">
+      <a href="../genuvalens/" rel="next">
+        <span class="pager__k">Next · File 05</span>
+        <span class="pager__t">Knee exoskeleton</span>
+        <span class="pager__d"><span>Genuvalens, summer 2026</span></span>
+        <span class="pager__go" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#arrow"/></svg></span>
+      </a>
+    </nav>
+    <div class="file__end">
+      <a class="back" href="../../#research"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/></svg>Back to sheet 04</a>
+      <p class="colophon">Leonardo Carvalho · Groton School, Class of 2028 · Updated September 2026</p>
+    </div>
+  </article>
+</main>
+<script src="../../assets/js/files.js" defer></script>
+</body>
+</html>

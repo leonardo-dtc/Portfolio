@@ -703,3 +703,11 @@ html:not(.js) .cabinet { display: none; }
   .end { border: 0; padding: 0; }
   .end .colophon { margin: 0; text-align: left; }
 }
+
+/* files: view transition ----------------------------------------------------------------------------------
+   Cross-document view transitions between the deck and its project files (v3/files/, styled by files.css,
+   which holds the same rule and the file's rise). Opting the deck in lets a file rise over it on the way out
+   and fade back into its drawer on the way home; browsers without view transitions simply navigate. The
+   browser's default animation here is a crossfade (opacity only), which reduced motion keeps. */
+@view-transition { navigation: auto; }
+/* end files: view transition */

@@ -33,7 +33,7 @@ Then open `http://127.0.0.1:8778/v3/`.
 | `contact` | Let's talk: the framed poster, the email slab, the three profiles, the end strip | `v2/` footer, v4 and v5 contact sections |
 
 Every fact and caveat comes from the v2 pages and `CONTENT-REVIEW.md`. Copy is
-first person, no en or em dashes, no superlatives. Detail links point into v2.
+first person, no en or em dashes, no superlatives. Detail links open v3's own project files (below).
 
 ## How the transitions work
 
@@ -147,8 +147,60 @@ first person, no en or em dashes, no superlatives. Detail links point into v2.
 | `index.html` | The page: the rail, the cabinet, twelve sheets and an SVG sprite of torn edges, stickers and the arrow |
 | `assets/css/site.css` | Tokens, the rail and cabinet, sheets, motion, the compact mode for short windows, touch sizes, print |
 | `assets/js/site.js` | Headline wrapping, reveals, geometry, the recede, the rail label, the cabinet and its files, dots and keys |
+| `files/<slug>/index.html` | The project files: `aducanumab`, `genuvalens`, `loquar`, `ocapex`, `hockey` (the coach one-pager) and `resume` |
+| `assets/css/files.css` | The files' own stylesheet: tokens and faces as in `site.css`, the desk, drawer, paper, sections, figures, the pager, the view transition, print and the hockey one-page print |
+| `assets/js/files.js` | The hockey file's print button, and eager figures before printing (the files work without it) |
 | `assets/fonts/` | Anton (OFL, stands in for Impact), Metropolis from the deck package (Unlicense), Permanent Marker (Apache 2.0, stands in for the personal-use Shooting Star) |
 | `assets/img/` | Derivatives copied from v2; the goalie mask stickers rendered from `assets/model/GMask.obj` by `tools/make-mask-sticker.py`; the portrait cutout from `tools/make-cutout.py` (paper edge added in the same pass); the OCAPEX mark redrawn in the site's three colours |
+
+## Project files
+
+The deck curates; the files prove. Each project sheet's detail link ("Read the analysis", "Read the report",
+"See the project", "See the organization", "Full profile with coach contacts", "Music on the résumé", "Full
+résumé") opens a file of v3's own in `v3/files/<slug>/`, so nothing leaves the edition. A file is the
+cabinet's file pulled out and laid on the black desk: a paper document with a torn top and foot, its vermilion
+tab ("File 04 · Drug safety", the sheet's number and the rail's name) standing in the drawer among the other
+files' tabs (each a link; below 1080px they show only their numbers, below 600px only the current tab shows),
+"Back to sheet 04" to the sheet's anchor on the deck, the title in Anton, the line under it, a stamp for the
+stage taken from the status wording, the fact strip, the note that carries the caveat, the sections' own tabs,
+then sections behind black divider tabs, and the previous and next files as two index cards at the end.
+
+- **Copy** is moved unchanged from the editorial pages (`v2/work/<slug>/`, `v2/hockey/`, `v2/resume/`). The
+  exceptions are only where the editorial wording would be untrue here: Figure 2's ARIA terms are "in
+  vermilion", résumé links to work without a file (FreeCode, Daedalus, this site) point to their sheet, the
+  résumé's "This portfolio" uses the Loquar sheet's sentence, and the hockey stat line is the hockey sheet's.
+- **Order and numbers**: 04 Drug safety, 05 Knee exoskeleton, 06 Loquar, 07 OCAPEX, 08 Goaltender, 10 The
+  record. Previous and next follow that order; the descriptions on the cards are the cabinet's kickers.
+- **Hover**: the creamy grammar, rebuilt in paper. The cards settle flat from their tilt and lift 3px over
+  800ms on `cubic-bezier(.22, 1, .36, 1)`, the arrow grows from .8 and turns from 45 degrees over 450ms, the
+  card's line unfolds (grid rows 0fr to 1fr, 500ms) and the other card steps back by dimming its ink and paper
+  (colour, so its text keeps 4.5:1). Product screenshots settle from 1.05 to 1 inside their still frame;
+  research figures never crop. Drawer tabs rise 4px; coach contact rows step back the way the profile rows on
+  the contact sheet do. Touch screens and reduced motion show everything at rest; nothing blurs.
+- **Page change**: both stylesheets carry `@view-transition { navigation: auto; }` (in `site.css` it is the
+  delimited block at the very end). Coming from the deck, the deck stays put and dims under the desk while
+  the file and its drawer rise 40px in 360ms; from file to file the old one sinks 16px as it fades and the
+  drawer holds still. Each file names its paper (`view-transition-name: file-04` and so on, listed in
+  `files.css`). Reduced motion keeps a 200ms crossfade and no rise; other browsers simply navigate.
+- **To add a file**: copy the closest file's folder (research: `aducanumab`; product: `loquar`), change its
+  `<title>`, description, tab text, back link (`../../#<sheet id>`), stamp, facts and sections; give its
+  article `view-transition-name: file-NN` and add that name to the two `::view-transition-*(file-..)` lists
+  in `files.css`; add its tab to every file's drawer (in order) and fix the previous and next cards of its
+  neighbours; then point the sheet's detail link at `files/<slug>/`. Images go in `v3/assets/img/` as
+  derivatives; never link to another edition's files.
+- **The hockey one-pager**: `files/hockey/` puts measurables, the stat line with its sample size, how I play,
+  the academic snapshot, the coach contacts, Elite Prospects and NCSA, team history, prep and camps, and crew
+  and soccer on one page. "Print the one-pager" is a real button that calls `print()` (hidden without the
+  script and in print). The `@media print` block "Print: the hockey one-pager" in `files.css` lays it out on
+  one Letter page at 12mm margins: the head across the top, the six measurables in one row, then two columns,
+  type at 7 to 13pt, links printed with their addresses; the file's end and the desk are left out. It was
+  checked with `page.pdf({ format: 'Letter' })`: one page, with about 80px of the 965px page to spare. If a
+  section grows, print it again and tighten that block if it spills.
+- **Print** (every file): no desk, torn edges, tape or shadows; black tabs become rules; outside links print
+  their addresses; placeholders for photographs not yet supplied are left out; figures and charts print in
+  colour. 1rem is 10pt on paper, so the file's type scales together.
+- Hidden-until-ready blocks stay hidden with a comment saying what fills them: the hockey file's 2026-27 stat
+  tiles and schedule, the résumé's PDF button, and the film link (in the film note).
 
 ## Conventions
 
