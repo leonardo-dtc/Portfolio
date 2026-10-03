@@ -70,6 +70,17 @@ await browser.close();
       if (c !== null) clear.push(c);
     }
     check(clear.length === 8 && Math.min(...clear) >= 5, `${w}: Tab keeps each of the ${clear.length} Sections chips clear of the row's fades (least ${Math.min(...clear).toFixed(0)}px)`);
+    // a click on a chip half under the end fade still lands on it: the row does not scroll under a pressed pointer
+    await page.goto(BASE + 'resume/', { waitUntil: 'load' });
+    await page.waitForTimeout(700);
+    const t = await page.evaluate(() => {
+      const row = document.querySelector('.side__part--pin .toc'), R = row.getBoundingClientRect();
+      const a = [...row.querySelectorAll('a')].find(a => { const c = a.getBoundingClientRect(); return c.left < R.right - 30 && c.right > R.right - 20; });
+      return a && { hash: a.hash, x: R.right - 20, y: a.getBoundingClientRect().top + a.getBoundingClientRect().height / 2 };
+    });
+    if (t) { await page.mouse.click(t.x, t.y); await page.waitForTimeout(400); }
+    const went = t && await page.evaluate(h => { const a = document.querySelector('.toc a[aria-current="true"]'); return !!a && a.hash === h; }, t.hash);
+    check(went, `${w}: a click in a chip's faded end still jumps to its section (${t ? t.hash : 'no chip under the fade'})`);
     check(errors.length === 0, 'no console errors ' + errors.join(' | '));
     await browser.close();
   }

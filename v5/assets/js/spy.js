@@ -66,7 +66,11 @@ export function initSpy() {
     };
     let resized = 0;
     const onResize = () => { clearTimeout(resized); resized = setTimeout(() => { observe(); mark(); }, 150); };
-    const onFocus = (e) => { if (e.target.closest && e.target.closest('.side__part--pin .toc a')) keep(e.target, false); };
+    // only a chip the keyboard reaches: a click or a tap focuses the chip as it is pressed, and scrolling the row then
+    // would slide the next chip under the pointer before the press ends, losing the click (the jump it makes brings
+    // the chip to the row's start anyway)
+    const keyed = a => { try { return a.matches(':focus-visible'); } catch (_) { return true; } };
+    const onFocus = (e) => { const a = e.target.closest && e.target.closest('.side__part--pin .toc a'); if (a && keyed(a)) keep(a, false); };
 
     observe();
     mark();
