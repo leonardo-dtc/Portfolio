@@ -21,7 +21,9 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   check(hint.text === 'Click the title to proceed' && hint.opacity > .9, `the hint reads “${hint.text}”`);
   check(Math.abs(hint.bottom - 32) < 3 && hint.size >= 13 && hint.size <= 15, `the hint sits ${hint.bottom.toFixed(0)}px above the bottom at ${hint.size}px`);
   check(hint.tab < 0, 'the hint is not a tab stop');
-  // the name is drawn in the room: the band across it is brighter than the same band with the ink off
+  // the name is drawn in the room: the band across it differs from the same band with the ink off (by night the
+  // pool takes it toward near black under the neon, so on average it reads darker, not brighter; neon.mjs checks the
+  // colours and the ground)
   let s = await shotSampler(page);
   const box = await page.locator('.hero__name').boundingBox();
   const withInk = grey(await s.mean(box.x, box.y, box.width, box.height));
@@ -29,7 +31,7 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   await page.waitForTimeout(400);
   s = await shotSampler(page);
   const without = grey(await s.mean(box.x, box.y, box.width, box.height));
-  check(withInk > without + 4, `the name is drawn in the room (${withInk.toFixed(1)} with the light, ${without.toFixed(1)} without)`);
+  check(Math.abs(withInk - without) > 4, `the name is drawn in the room (${withInk.toFixed(1)} with the light, ${without.toFixed(1)} without)`);
   await page.evaluate(() => { window.__room.set({ ink: window.__hero.ink }); window.__room.kick(1); });
   // the light never stops moving, so the room stays at full rate while the hero shows (unless its budget tripped)
   await page.waitForTimeout(300);

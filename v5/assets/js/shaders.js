@@ -127,14 +127,15 @@ const float T_REST = 31.0;
 // the Glowtime colours, as light
 const vec3 N_ORANGE = vec3(1.00, 0.40, 0.05), N_PINK = vec3(1.00, 0.12, 0.46), N_MAGENTA = vec3(0.88, 0.12, 0.92);
 const vec3 N_VIOLET = vec3(0.52, 0.20, 1.00), N_BLUE = vec3(0.13, 0.34, 1.00), N_CYAN = vec3(0.08, 0.80, 1.00);
-// the main tube's colour along phi: orange (a wide stretch), hot pink, magenta, violet, electric blue, cyan, and back
+// the main tube's colour along phi: orange (a wide stretch), hot pink, magenta, violet, electric blue, cyan (a wide
+// stretch), and back
 vec3 neonRamp(float phi) {
   float s = 1.0 - abs(fract(phi) * 2.0 - 1.0);
-  vec3 c = mix(N_ORANGE, N_PINK, smoothstep(0.24, 0.40, s));
-  c = mix(c, N_MAGENTA, smoothstep(0.38, 0.50, s));
-  c = mix(c, N_VIOLET, smoothstep(0.50, 0.63, s));
-  c = mix(c, N_BLUE, smoothstep(0.63, 0.80, s));
-  return mix(c, N_CYAN, smoothstep(0.86, 1.00, s));
+  vec3 c = mix(N_ORANGE, N_PINK, smoothstep(0.21, 0.31, s));
+  c = mix(c, N_MAGENTA, smoothstep(0.33, 0.43, s));
+  c = mix(c, N_VIOLET, smoothstep(0.44, 0.52, s));
+  c = mix(c, N_BLUE, smoothstep(0.54, 0.62, s));
+  return mix(c, N_CYAN, smoothstep(0.64, 0.74, s));
 }
 // the halo's colour: only blue, violet and pink, saturated (no cyan or orange to go teal or maroon over the pool)
 vec3 haloRamp(float phi) {
@@ -145,8 +146,8 @@ vec3 haloRamp(float phi) {
 float edgeDist(float g) { g = clamp(g, 0.003, 0.997); return log(g / (1.0 - g)) / 1.7; }
 // a bloom round that edge, falling to nothing where the level runs out (about 3.4 softnesses away)
 float bloom(float d, float w) { return exp(-abs(d) / w) * smoothstep(3.3, 2.2, abs(d)); }
-// Three echoes of the outline, each its own colour family (pink to magenta, orange to red-orange, electric blue to
-// cyan; violet is the faces' and the halo's). Each: its drift (font sizes in x and y, and their periods in s; a
+// Three echoes of the outline, each its own colour family (pink to magenta, orange to amber, azure to cyan; violet is
+// the faces' and the halo's). Each: its drift (font sizes in x and y, and their periods in s; a
 // negative period turns the other way), the level it follows (in the outline's softnesses, + inside the letters) and
 // how far and how slowly that breathes, its slot on the colour turns, the wave on which it wanders from its turn (a
 // direction in radians per font size, a period, a phase), and its strength (orange the strongest, so it holds its own
@@ -154,9 +155,9 @@ float bloom(float d, float w) { return exp(-abs(d) / w) * smoothstep(3.3, 2.2, a
 const vec4 E_DRIFT[3] = vec4[3](vec4(0.024, 0.018, 13.0, -16.5), vec4(0.020, 0.024, -17.0, 12.0), vec4(0.026, 0.016, 19.0, -10.5));
 const vec4 E_LEVEL[3] = vec4[3](vec4(1.15, 0.35, 11.0, 1.0), vec4(-1.25, 0.35, 14.5, 2.4), vec4(-0.55, 0.55, 9.5, 4.1));
 const vec4 E_WAVE[3] = vec4[3](vec4(-0.9, 0.7, -15.0, 1.5), vec4(0.6, -1.1, 18.0, 3.0), vec4(-1.2, -0.4, -10.0, 4.5));
-const float E_SLOT[3] = float[3](0.25, 0.5, 0.75), E_GAIN[3] = float[3](1.0, 1.3, 0.95);
-const vec3 E_A[3] = vec3[3](N_PINK, N_ORANGE, N_BLUE);
-const vec3 E_B[3] = vec3[3](N_MAGENTA, vec3(1.00, 0.22, 0.10), N_CYAN);
+const float E_SLOT[3] = float[3](0.25, 0.5, 0.75), E_GAIN[3] = float[3](0.9, 1.3, 1.05);
+const vec3 E_A[3] = vec3[3](N_PINK, N_ORANGE, vec3(0.11, 0.48, 1.00));
+const vec3 E_B[3] = vec3[3](N_MAGENTA, vec3(1.00, 0.56, 0.08), N_CYAN);
 
 out vec4 o;
 float sdRound(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
@@ -231,8 +232,9 @@ void main() {
   // the letters' true edge, its colour flowing along the name (orange, hot pink, magenta, violet, electric blue,
   // cyan) with a white-hot core and a hair of red and blue split. Three echoes trace the outline again, each in its
   // own colour family, drifting a little and following a level just inside or outside the edge, so they cross the
-  // tube and add up toward white where they meet. The faces are translucent violet light, the halo behind leans
-  // toward the pointer, and the room falls into a pool under it all (near black by night, a deep violet-blue by day).
+  // tube and add up toward white where they meet. The faces are translucent light in the tube's colour (violet where
+  // it runs cool), the halo behind leans toward the pointer and falls away where the tube runs warm or icy, and the
+  // room gives way to a pool under it all (near black by night, a deep violet-blue by day).
   // The traces take turns being brightest (a cycle in 16 s sliding along the name) and wander on their own 10 to 19 s
   // waves; the letters never move. The echoes grow out of the outline as the light arrives and fold back as it goes,
   // and turning white the light goes out and the letters become plain white text. Seven reads of the mask.
@@ -283,12 +285,18 @@ void main() {
         // (its bloom goes where the field runs out, so nothing is left at the mask's edge)
         light += c * E_GAIN[i] * (exp(-di * di / 0.14) + 0.16 * bloom(di, 0.9) * smoothstep(3.35, 2.6, abs(ei))) * (0.95 + 0.65 * up) * (1.0 - 0.45 * smoothstep(0.6, 2.0, stray)) * grow;
       }
-      // the halo (read 7): the wide blur, leaning toward the pointer, breathing over 10 s, in blue, violet and pink
+      // the halo (read 7): the wide blur, leaning toward the pointer, breathing over 10 s, in blue, violet and pink.
+      // It and the violet in the faces fall away where the tube runs warm (orange, hot pink) or icy (cyan), so those
+      // stretches burn in their own colour on the dark instead of washing to salmon or blue
+      float warm = smoothstep(0.0, 0.3, cT.r - cT.b), icy = smoothstep(0.3, 0.6, cT.g - cT.r);
+      float cool = (1.0 - warm) * (1.0 - 0.7 * icy);
       float back = textureLod(uInk, mu - uInk1.yz * uInkX.x / isz, lk).b;
       vec3 haloC = haloRamp(phi * 0.7 + 0.15);
-      light += haloC * back * (0.3 + back) * mix(1.0, 0.5, uDay) * (0.88 + 0.12 * sin(TAU * t / 10.0)) * (1.0 - 0.6 * face);
-      // the faces: translucent violet light, tinted a little by the tube's colour, deepest away from the edge
-      light += mix(cT, vec3(0.46, 0.32, 1.0), 0.75) * face * (0.30 + 0.30 * smoothstep(0.4, 1.6, d));
+      light += haloC * back * (0.3 + back) * mix(0.6 * cool, 0.5, uDay) * (0.88 + 0.12 * sin(TAU * t / 10.0)) * (1.0 - 0.6 * face);
+      // the faces: translucent light in the tube's colour, deepest away from the edge: crimson where it runs warm (a
+      // dim orange face would read brown), violet where it runs cool. By day, violet and brighter, over the day pool
+      vec3 faceC = mix(mix(cT, N_PINK, 0.5 * warm * (1.0 - uDay)), vec3(0.46, 0.32, 1.0), mix(0.75 * cool, 0.75, uDay));
+      light += faceC * face * mix(0.16 + 0.18 * smoothstep(0.4, 1.6, d), 0.30 + 0.30 * smoothstep(0.4, 1.6, d), uDay);
       // the light leans toward the pointer: the tubes run hotter near it
       vec2 dl = (px - uInkL.xy) / max(uInkL.z, 1.0);
       light *= lit * (1.0 + 3.0 * uInkL.w * exp(-dot(dl, dl)));
@@ -298,14 +306,15 @@ void main() {
       float hot = max(max(light.r, light.g), light.b);
       light += vec3(max(hot - 1.8, 0.0) * 0.9);
       vec3 L = max(neonTurn(1.0 - exp(-light)), 0.0);
-      // the pool under the light, tied to the same light term. By night the room falls toward near black behind the
-      // name, a soft oval deepest round the letters; by day, where the room is bright, it falls about 80% toward a
-      // saturated violet-blue that follows the halo, hugging the letters
-      vec3 deepN = hueShift(vec3(0.15, 0.14, 0.26), uColor.x, uColor.y);
-      float poolN = max(smoothstep(1.0, 0.3, length(mu * 2.0 - 1.0)) * 0.7, smoothstep(0.0, 0.42, m.b));
+      // the pool under the light, tied to the same light term. By night the room gives way to near black behind the
+      // name (a mix, not a dimming, so no cobalt shows through round the letters), a soft oval and a hug of the wide
+      // blur, deepest round the letters; by day, where the room is bright, it falls about 80% toward a saturated
+      // violet-blue that follows the halo, hugging the letters
+      vec3 deepN = hueShift(vec3(0.010, 0.009, 0.026), uColor.x, uColor.y);
+      float poolN = max(smoothstep(1.0, 0.3, length(mu * 2.0 - 1.0)) * 0.8, smoothstep(0.0, 0.2, m.b));
       vec3 deepD = clamp(neonTurn(mix(vec3(0.14, 0.08, 0.56), haloC * 0.42, 0.4)), 0.0, 1.0);
       float poolD = smoothstep(0.0, 0.24, m.b) * 0.82;
-      vec3 ground = mix(col * mix(vec3(1.0), deepN, poolN * calm), mix(col, deepD, poolD * calm), uDay);
+      vec3 ground = mix(mix(col, deepN, poolN * calm), mix(col, deepD, poolD * calm), uDay);
       ground *= 1.0 - 0.2 * face * calm;
       vec3 neon = clamp(ground + L, 0.0, 1.0) * (1.0 - 0.5 * uInk0.y);
       // as the window's title it is plain white, as the HTML title it hands off to

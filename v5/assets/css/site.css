@@ -188,66 +188,77 @@ html.gl .hero__text { color: transparent; }
 html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s var(--ease-out); }
 .hero__neon { display: none; }
 /* Without the room (no WebGL2): the neon after the shader. The hero carries its own copy of the room's still (it lies
-   exactly over the page's), so light can be screened onto it. Over it, bottom to top: a dark pool (.hero::before);
-   two traces of the name (.hero__neon i), each a pair of copies on one slow orbit a few hundredths of an em round the
-   letters (13 s and 17 s), the second copy of each pair crossfading in and out over the first (pink and orange, blue
-   and cyan), so the colour turns without a repaint; the letters, light translucent violet with a soft glow, and a
-   second face in other colours crossfading over them (.hero__name::after, 16 s); and a white-hot line just outside
-   the letters' edge (.hero__neon::after). Every copy of the name that draws light is hidden from assistive technology
-   (inside the aria-hidden .hero__neon, or, in the button, generated content with empty alt text), so the name is read
-   once, as the button. A trace is the name's outline: a stroke under a black fill (paint-order), screened, so the
-   black adds nothing and hides the strokes Switzer's overlapping shapes would draw inside the letters. Only transform
-   and opacity animate, each on its own layer. The colours are the shader's, turned by the colour style as the shader
-   turns them (hue.js sets --neon-*). Still under reduced motion (the rule there stops every animation), solid under
-   reduced transparency, plain text in forced colours. */
+   exactly over the page's), so light can be screened onto it. Over it, bottom to top: a pool that covers the whole
+   name (.hero::before) and a shade hugging every letter (.hero__neon b), near black by night and a deep violet-blue by
+   day; two traces of the name (.hero__neon i), each a pair of copies on one slow orbit a few hundredths of an em round
+   the letters (13 s and 17 s): a solid orange (or cyan) trace, and over it a copy whose stroke shows a gradient with
+   gaps (hot pink and magenta, or electric blue and violet), crossfading in and out, so the colour turns along the name
+   without a repaint and orange and cyan always show in the gaps; the letters, translucent faces (dark and tinted by
+   night, light with a soft glow by day), and a second face in other colours crossfading over them
+   (.hero__name::after, 16 s); and a white-hot line just outside the letters' edge (.hero__neon::after). Every copy
+   of the name that draws light is hidden from assistive technology (inside the aria-hidden .hero__neon, or, in the
+   button, generated content with empty alt text), so the name is read once, as the button. A trace is the name's
+   outline: a stroke under a black fill (paint-order), screened, so the black adds nothing and hides the strokes
+   Switzer's overlapping shapes would draw inside the letters. Only transform and opacity animate, each on its own
+   layer. The colours are the shader's, turned by the colour style as the shader turns them (hue.js sets --neon-*).
+   Still under reduced motion (the rule there stops every animation), solid under reduced transparency, plain text in
+   forced colours. */
 html:not(.gl) .hero {
   background: #0b1138 url("../img/room-night.webp") center / cover no-repeat;
   --n-pink: var(--neon-pink, #ff1f75); --n-orange: var(--neon-orange, #ff660d); --n-violet: var(--neon-violet, #8533ff);
   --n-blue: var(--neon-blue, #2157ff); --n-cyan: var(--neon-cyan, #14ccff);
-  --pool: radial-gradient(closest-side, rgba(5, 4, 26, .78), rgba(5, 4, 26, .5) 55%, rgba(5, 4, 26, 0));
-  --pool-h: 3.1; --shade: rgba(4, 3, 22, .78);
+  --pool: radial-gradient(closest-side, rgba(2, 1, 10, .94) 50%, rgba(2, 1, 10, .55) 78%, rgba(2, 1, 10, 0));
+  --pool-h: 3.1; --shade: rgba(2, 1, 10, .9);
+  --shades: 0 0 .06em var(--shade), 0 0 .16em var(--shade), 0 0 .36em var(--shade);
+  /* the faces: each colour mixed with this, at these strengths (dark and tinted by night), and their glow */
+  --face: rgba(4, 2, 14, .7); --face-a: 40%; --face-b: 36%; --face-glow: 0%; --edge-glow: transparent;
 }
-html:not(.gl) .hero::before { content: ""; position: absolute; z-index: -2; left: 50%; top: 45%; width: min(100vw, calc(var(--hero-fs) * 10.4)); height: calc(var(--hero-fs) * var(--pool-h)); translate: -50% -50%; background: var(--pool); opacity: 0; transition: opacity .9s var(--ease-out); }
+html:not(.gl) .hero::before { content: ""; position: absolute; z-index: -2; left: 50%; top: 45%; width: min(100vw, calc(var(--hero-fs) * 11.6)); height: calc(var(--hero-fs) * var(--pool-h)); translate: -50% -50%; background: var(--pool); opacity: 0; transition: opacity .9s var(--ease-out); }
 html:not(.gl) .hero__neon { display: block; }
-/* the shade: the room falls dark right round the letters (near black by night, a saturated violet-blue by day) */
-.hero__neon b { z-index: -1; pointer-events: none; color: transparent; -webkit-text-fill-color: transparent; text-shadow: 0 0 .1em var(--shade), 0 0 .3em var(--shade); opacity: 0; transition: opacity .9s var(--ease-out); }
+/* the shade: the room falls dark right round the letters (near black by night, a deep violet-blue by day) */
+.hero__neon b { z-index: -1; pointer-events: none; color: transparent; -webkit-text-fill-color: transparent; text-shadow: var(--shades); opacity: 0; transition: opacity .9s var(--ease-out); }
 .hero.is-ready .hero__neon b { opacity: 1; }
-.hero__neon i { z-index: 1; pointer-events: none; font-style: normal; opacity: 0; color: var(--n-pink); -webkit-text-fill-color: #000; -webkit-text-stroke: .09em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .05em currentColor); will-change: transform; transition: opacity .9s var(--ease-out);
+.hero__neon i { z-index: 1; pointer-events: none; font-style: normal; opacity: 0; color: color-mix(in srgb, var(--n-orange) 75%, #ffb000); -webkit-text-fill-color: #000; -webkit-text-stroke: .07em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .05em currentColor); will-change: transform; transition: opacity .9s var(--ease-out);
   --ga: 40deg; --gr: .024em; transform: rotate(var(--ga)) translateX(var(--gr)) rotate(calc(-1 * var(--ga))); }
-.hero__neon i:nth-of-type(2) { color: var(--n-blue); --ga: 220deg; --gr: .022em; }
+.hero__neon i:nth-of-type(2) { color: var(--n-cyan); -webkit-text-stroke-width: .05em; --ga: 220deg; --gr: .022em; }
 .hero__neon b::before, .hero__neon i::before, .hero__neon i::after, .hero__neon::after, html:not(.gl) .hero__name::after { content: "Leonardo Carvalho"; }
 html:not(.gl) .hero__name::after { content: "Leonardo Carvalho" / ""; }   /* inside the button: drawn, not read (the button is named) */
-.hero__neon i::after { position: absolute; inset: .05em .12em; color: var(--n-orange); opacity: .55; }
-.hero__neon i:nth-of-type(2)::after { color: var(--n-cyan); opacity: .4; }
-.hero.is-ready .hero__neon i { opacity: .8; animation: hero-orbit 13s linear infinite; }
+/* the second copy: its stroke is clear and shows a gradient clipped to the text, so only the coloured stretches of it
+   cover the solid trace below */
+.hero__neon i::after { position: absolute; inset: .05em .12em; opacity: .55; -webkit-text-stroke-color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: linear-gradient(100deg, var(--n-pink) 0 12%, transparent 24% 44%, color-mix(in srgb, var(--n-pink) 55%, var(--n-violet)) 56% 64%, transparent 76% 90%, var(--n-pink)); }
+.hero__neon i:nth-of-type(2)::after { opacity: .4; background-image: linear-gradient(100deg, transparent 0 14%, var(--n-blue) 24% 30%, transparent 40% 62%, var(--n-violet) 72% 78%, transparent 88%); }
+.hero.is-ready .hero__neon i { opacity: .9; animation: hero-orbit 13s linear infinite; }
 .hero.is-ready .hero__neon i:nth-of-type(2) { animation: hero-orbit 17s linear infinite reverse; }
 .hero.is-ready .hero__neon i::after { animation: hero-turn 11s ease-in-out infinite alternate; }
 .hero.is-ready .hero__neon i:nth-of-type(2)::after { animation-duration: 15s; animation-delay: -6s; }
-.hero__name:hover ~ .hero__neon i { opacity: .94; }
+.hero__name:hover ~ .hero__neon i { opacity: 1; }
 .hero__name:active ~ .hero__neon i { opacity: 1; transition-duration: .08s; }
 @keyframes hero-orbit { to { transform: rotate(calc(var(--ga) + 360deg)) translateX(var(--gr)) rotate(calc(-1 * var(--ga) - 360deg)); } }
 @keyframes hero-turn { from { opacity: .1; } to { opacity: 1; } }
 html:not(.gl) .hero__text {
   color: transparent; -webkit-text-fill-color: transparent;
   background: linear-gradient(100deg, rgba(176, 125, 255, .84), rgba(240, 110, 196, .84) 36%, rgba(130, 160, 255, .84) 66%, rgba(186, 120, 255, .84));
-  background: linear-gradient(100deg, color-mix(in srgb, var(--n-violet) 58%, rgba(236, 228, 255, .62)), color-mix(in srgb, var(--n-pink) 52%, rgba(236, 228, 255, .62)) 36%, color-mix(in srgb, var(--n-blue) 52%, rgba(236, 228, 255, .62)) 66%, color-mix(in srgb, var(--n-violet) 58%, rgba(236, 228, 255, .62)));
+  background: linear-gradient(100deg, color-mix(in srgb, var(--n-violet) var(--face-a), var(--face)), color-mix(in srgb, var(--n-pink) var(--face-b), var(--face)) 36%, color-mix(in srgb, var(--n-blue) var(--face-b), var(--face)) 66%, color-mix(in srgb, var(--n-violet) var(--face-a), var(--face)));
   -webkit-background-clip: text; background-clip: text;
-  filter: drop-shadow(0 0 .26em color-mix(in srgb, var(--n-violet) 60%, transparent));
+  filter: drop-shadow(0 0 .26em color-mix(in srgb, var(--n-violet) var(--face-glow), transparent));
 }
 html:not(.gl) .hero__name::after {
   position: absolute; inset: .05em .12em; pointer-events: none; opacity: 0;
   color: transparent; -webkit-text-fill-color: transparent;
   background: linear-gradient(100deg, rgba(246, 150, 120, .84), rgba(186, 120, 255, .84) 40%, rgba(240, 110, 196, .84) 72%, rgba(116, 210, 255, .84));
-  background: linear-gradient(100deg, color-mix(in srgb, var(--n-orange) 52%, rgba(236, 228, 255, .62)), color-mix(in srgb, var(--n-violet) 58%, rgba(236, 228, 255, .62)) 40%, color-mix(in srgb, var(--n-pink) 52%, rgba(236, 228, 255, .62)) 72%, color-mix(in srgb, var(--n-cyan) 52%, rgba(236, 228, 255, .62)));
+  background: linear-gradient(100deg, color-mix(in srgb, var(--n-orange) var(--face-b), var(--face)), color-mix(in srgb, var(--n-violet) var(--face-a), var(--face)) 40%, color-mix(in srgb, var(--n-pink) var(--face-b), var(--face)) 72%, color-mix(in srgb, var(--n-cyan) var(--face-b), var(--face)));
   -webkit-background-clip: text; background-clip: text;
 }
 html:not(.gl) .hero.is-ready .hero__name::after { animation: hero-turn 16s ease-in-out -4s infinite alternate; }
 /* the white-hot line on the letters' edge (only its outer half shows) */
-.hero__neon::after { pointer-events: none; color: rgba(255, 242, 250, .95); -webkit-text-fill-color: #000; -webkit-text-stroke: .02em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .045em var(--n-pink)); opacity: 0; transition: opacity .9s var(--ease-out); }
+.hero__neon::after { pointer-events: none; color: rgba(255, 242, 250, .95); -webkit-text-fill-color: #000; -webkit-text-stroke: .02em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .045em var(--edge-glow)); opacity: 0; transition: opacity .9s var(--ease-out); }
 html:not(.gl) .hero.is-ready::before, .hero.is-ready .hero__neon::after { opacity: 1; }
-/* by day the room is bright: the room behind the name falls toward a saturated violet-blue, hugging the letters */
-@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(36, 18, 132, .5), rgba(36, 18, 132, .3) 50%, rgba(36, 18, 132, 0)); --pool-h: 2.2; --shade: rgba(34, 14, 124, .82); } }
-html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(36, 18, 132, .5), rgba(36, 18, 132, .3) 50%, rgba(36, 18, 132, 0)); --pool-h: 2.2; --shade: rgba(34, 14, 124, .82); }
+/* by day the room is bright: the pool under the whole name and a tight shade round every letter fall to a deep
+   violet-blue, as the shader's day pool does, so the light faces and the white-hot edge keep 3:1 or more against the
+   ground right beside them (over the pale sky the edge measured 1.7 to 2.6:1, the faces about 1:1) */
+@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(24, 10, 96, .94) 62%, rgba(24, 10, 96, .6) 84%, rgba(24, 10, 96, 0)); --pool-h: 2.2; --shade: rgba(24, 10, 96, .97); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .62); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
+html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(24, 10, 96, .94) 62%, rgba(24, 10, 96, .6) 84%, rgba(24, 10, 96, 0)); --pool-h: 2.2; --shade: rgba(24, 10, 96, .97); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .62); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
 /* reduced transparency: solid letters without the pool, traces or neon: white by night; by day a deep navy on a soft
    light halo, since the day room runs from pale sky to mid blue behind the name (5.4:1 or better against the darker
    parts round the letters, where #1f3fae alone measured 2.4:1) */

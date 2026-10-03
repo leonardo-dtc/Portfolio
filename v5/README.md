@@ -140,19 +140,31 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   - one crisp tube of light locked to the letters' true edge (the visible edge
     never moves), with a white-hot core and a hair of red and blue split, its
     colour flowing along the name through orange, hot pink, magenta, violet,
-    electric blue and cyan, a cycle in 14 s;
+    electric blue and cyan, with wide stretches of orange and cyan, a cycle in
+    14 s;
   - three echoes tracing the outline again, each in its own colours: pink to
-    magenta just inside the edge, orange just outside it, blue to cyan close to
-    it. Each drifts about 2% of the font size and breathes in and out of the edge,
-    so it crosses the tube, and fades as it strays, so the name never reads
-    double. Where traces cross, the light adds up and burns toward white on a
-    soft tone curve;
+    magenta just inside the edge, orange to amber just outside it (given more
+    strength than the other two), azure to cyan close to it. Each drifts about
+    2% of the font size and breathes in and out of the edge, so it crosses the
+    tube, and fades as it strays, so the name never reads double. Where traces
+    cross, the light adds up and burns toward white on a soft tone curve;
   - the traces take turns being brightest, a 16 s cycle sliding along the name,
     each wandering from its turn on its own 10 to 19 s wave;
-  - translucent violet faces, a halo behind in blue, violet and pink that leans
-    toward the pointer, and a pool under it all: near black by night; by day the
-    bright room falls about 80% toward a saturated violet-blue that follows the
-    halo, so the light reads on it.
+  - translucent faces in the tube's colour (crimson where it runs warm, violet
+    where it runs cool), a halo behind in blue, violet and pink that leans
+    toward the pointer and falls away where the tube runs orange, hot pink or
+    cyan, so those stretches burn in their own colour, and a pool under it all:
+    by night the room gives way to near black round the name; by day the bright
+    room falls about 80% toward a saturated violet-blue that follows the halo,
+    and the faces stay violet, so the light reads on it.
+- **Measured** (`tests/v5/e2e/neon.mjs`, a census of the bright, saturated
+  pixels in the name's box at 1440 by 900): by night orange and cyan each held
+  10% or more of the lit pixels in every frame of a 20 s sample (orange 15 to
+  27%, cyan 11 to 25%, pink and magenta 20 to 36%, blue and violet 20 to 38%),
+  and the ground 0.1 to 0.3 em from the letters measured a luminance of about
+  0.003. The reduced-motion still has 26% orange and 25% cyan. On two lines at
+  390 every frame sampled was 17% orange or more and 13% cyan or more. By day
+  the light stays mostly violet, blue and pink on the violet-blue pool.
 - **Colour style:** the palettes turn the light a third as far as the room and
   hold it inside the Glowtime family of hues, so each shifts which colours lead
   (Gold and Ember warm, Teal and Emerald cool, Graphite silver) and none turns
@@ -177,14 +189,18 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   effect switches off: after the hero the title is plain text, as Apple's
   guidance keeps Liquid Glass out of the content layer.
 - **Fallbacks:** without WebGL2 the neon is CSS. The hero carries its own copy
-  of the room's still, a shade that hugs the letters (near black by night, a
-  violet-blue by day), two neon traces of the name on slow orbits (pink
-  crossfading with orange, blue with cyan) screened onto it, light translucent
-  faces crossfading between two sets of the colours, and a white-hot line on the
-  edge. Only transform and opacity animate, each on its own layer, and the
-  palettes turn the colours as the shader does. Every copy of the name that
-  draws the light is hidden from assistive technology, so the name is read once,
-  as the button. Reduced motion holds it still; reduced transparency gives solid
+  of the room's still, a pool under the whole name and a shade that hugs the
+  letters (near black by night, a deep violet-blue by day), two neon traces of
+  the name on slow orbits screened onto it (a solid orange trace with stretches
+  of hot pink and magenta crossfading over it, and a solid cyan one with
+  electric blue and violet), translucent faces crossfading between two sets of
+  the colours (dark and tinted by night, light by day), and a white-hot line on
+  the edge. By night orange held 14 to 43% of the lit pixels in every frame
+  sampled; by day the name's edge measured 5.8:1 or more against the ground
+  just beyond its light at 1440 and 390, and the faces 2.3:1 or more. Only
+  transform and opacity animate, each on its own layer, and the palettes turn
+  the colours as the shader does. Every copy of the name that draws the light
+  is hidden from assistive technology, so the name is read once, as the button. Reduced motion holds it still; reduced transparency gives solid
   letters (white, or a deep navy on a soft light halo by day); forced colours
   give plain system text. Entering is a fade (150 ms under reduced
   motion). Without scripts there is no hero, and print shows the text title.
@@ -350,7 +366,7 @@ above) and `tools/room-stills.mjs` regenerate the written name and the stills,
 
 ```sh
 node --test tests/v5/unit/*.test.mjs
-node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), nav, modes, contrast, keys, perf, audit
+node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), neon (its colour), nav, modes, contrast, keys, perf, audit
 node tests/v5/e2e/capture.mjs # screenshots of every page at five widths into .impeccable/review/v5/
 ```
 
