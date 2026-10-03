@@ -189,7 +189,7 @@ Measured paths from the landing page:
 
 ## 2. Leonardo's design elements, tracked
 
-Every element he named, where it stands in each finalist, and how each can match it. "This round" says what is being built now; ❓ marks a question in [section 7](#7-taste-questions).
+Every element he named, where it stands in each finalist, and how each can match it. "This round" says what was built in this round; ❓ marks a question in [section 7](#7-taste-questions).
 
 ### Motion and hover
 
@@ -217,7 +217,7 @@ Every element he named, where it stands in each finalist, and how each can match
 | "A subtle interaction" | Code panel pauses on hover | Light leans toward the pointer (faint) | — | Part of the Glowtime work | Hero |
 | "Click the title to proceed", "a clean transition" | n/a | Present | — | Keep; scrolling to enter is a question | ❓T26 |
 | "With a reload for dev purposes, allow it to bring back the hero" | n/a | **Done** (`93be48c`) | — | A reload of home shows the hero; `?nohello` skips it | Done ❓T28 |
-| "The title effects and style to have the feel from the image [It's Glowtime], but animated and smooth" | n/a | In progress | — | Three prototypes, judged (section 5) | Hero |
+| "The title effects and style to have the feel from the image [It's Glowtime], but animated and smooth" | n/a | Built: neon flow (section 5) | — | Three prototypes, judged (section 5) | Hero |
 | Not "Apple's hello or cursive text" | Hand face is the deck's own | Present | — | — | — |
 
 ### Organization and navigation
@@ -313,7 +313,7 @@ These decide where his notes pull in different directions. Each is reversible an
 - **Behaviour:** "Click the title to proceed" stays the default. Choosing an app runs the same glide as the title, but lands on that page's window, with the tab bubble already on it.
 - **Plain links:** each icon is a real `<a href="hockey/">`, so it works without scripts and from the keyboard.
 - **Who it helps:** it turns the hero from a gate into a launcher. A first-time coach reaches Hockey in one action instead of two, which matters more now that a reload brings the hero back.
-- **The labelled dock goes with it.** Phones and touch tablets show names under the dock icons, as iOS does. This is being built now regardless.
+- **The labelled dock goes with it.** Phones show names under the dock icons, as iOS does, and touch tablets show the tab names at rest beside the window. Built this round regardless.
 - **Later, a second Home View page: the Archive.** Experiments and personal work float in the room as icons. Each opens one small auxiliary window. Icons must be drawn glyphs, not invented screenshots, until real captures exist.
 - **Possible extra: the colour style control as a "Color" app.** That would free its slot in the phone dock.
 - **Not recommended:**
@@ -327,14 +327,14 @@ These decide where his notes pull in different directions. Each is reversible an
 
 ### v3: the OS pieces, made of paper
 
-- **Routes on the cover (being built).** The words already in his handwritten line become doors: "goaltender" goes to Hockey, "researcher" to Research, "violist" to Music, and "portfolio" opens the index. Each has a marker underline. No new copy and no new objects.
+- **Routes on the cover (built).** The words already in his handwritten line become doors: "goaltender" goes to Hockey, "researcher" to Research, "violist" to Music, and "portfolio" opens the index. Each has a marker underline. No new copy and no new objects.
 - **The alternative is taped label stickers** in the cover's empty corner. It is more "desktop icon", and busier.
 
 ![v3 cover with taped shortcuts, 1440](round-3/v3-cover-stickers-1440.jpg)
 
-- **Find on the cabinet's drawer front (being built).** The OS search field, in paper. It filters folders, the record and the archive.
-- **Project files as the "windows" (being built).** Each project opens as a paper file rising over the deck, with its own address.
-- **Archive cards that open (being built).** Later they can hold images, arrangement pages or class games, once real captures exist.
+- **Find on the cabinet's drawer front (built).** The OS search field, in paper. It searches every sheet's text; matching folders keep their ink and quote the matching line, and Enter goes there.
+- **Project files as the "windows" (built).** Each project opens as a paper file rising over the deck, with its own address.
+- **Archive cards that open (built).** Later they can hold images, arrangement pages or class games, once real captures exist.
 - **Not recommended: a desk as the landing page.** It would throw away the cover and the slide-over, add a click before everything, and collapse into a list on phones.
 
 ### What it would do to the scores
@@ -401,7 +401,7 @@ These are estimates, to be re-scored after the change:
 Priority is the balanced weight times the expected gain, divided by effort.
 
 **Status key:**
-- **Now:** being built this round, with no taste question in the way.
+- **Now:** built this round, with no taste question in the way.
 - **Now, default:** built this round on a reversible default; the question is listed.
 - **Waits:** needs his answer first.
 
