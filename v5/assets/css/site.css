@@ -380,7 +380,7 @@ a.row:focus-visible .row__m { color: #fff; }
    while the others step back to Ink 2. Nothing blurs, and the title never moves. The list takes the opened line into the space
    below it (a negative margin that grows as the line does), so nothing after it moves. Touch screens, phones, reduced
    motion, scripts off and print show every line. Add one by copying an <li>. */
-.exp .row { row-gap: 0; transition: background-color .5s var(--ease-long); }
+.exp .row { row-gap: 0; align-content: start; transition: background-color .5s var(--ease-long); }   /* (start: mid-unfold the spare height would stretch the title's row and dip the line) */
 .exp .row__t { display: contents; }
 .exp .row__t em { grid-area: 1 / 1; font-style: italic; font-weight: 550; transition: color .4s var(--ease-long); }
 .exp .row__m { grid-area: 1 / 2; font-size: 13px; }
@@ -575,13 +575,25 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .side--inline .facts--side dd { margin-bottom: 0; }
 }
 /* the Résumé's Sections below 1360px: a row of chips that scrolls sideways, pinned between the window's head and its
-   body, so it stays in reach while the record scrolls beneath it (nothing slides under it) */
-#main:has(> .side__part--pin) { grid-template-rows: auto auto minmax(0, 1fr); }
+   body, so it stays in reach while the record scrolls beneath it (nothing slides under it). windows.js marks the window
+   has-pin (a class rather than :has(), which older browsers lack). In a window under 520px tall it is not pinned: it
+   leads the record and scrolls away with it, giving the reading height back. */
+#main.has-pin { grid-template-rows: auto auto minmax(0, 1fr); }
 .side__part--pin { min-width: 0; }
+.win__body > .side__part--pin { margin-inline: calc(-1 * var(--pad)); }   /* in the record, the row keeps the window's full width */
+.win__body > .side__part--pin + * { margin-top: 18px; }   /* and the record starts as far below it as it does below the pinned row */
 .side__part--pin h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.side__part--pin .toc { display: flex; gap: 8px; margin: 0; padding: 8px var(--pad) 6px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+/* (at least 36px at the end, so the last chip and its ring clear the 30px fade) */
+.side__part--pin .toc { display: flex; gap: 8px; margin: 0; padding: 8px max(var(--pad), 36px) 6px var(--pad); overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
   -webkit-mask: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 30px), transparent); mask: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 30px), transparent); }
-.side__part--pin .toc::-webkit-scrollbar { display: none; }
+@media not all and (hover: hover) { .side__part--pin .toc::-webkit-scrollbar { display: none; } }
+/* a pointer cannot swipe the row, so where one can hover a thin scrollbar says the row goes on (the wheel over the
+   row still scrolls the record) */
+@media (hover: hover) {
+  .side__part--pin .toc { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .5) transparent; }
+  .side__part--pin .toc::-webkit-scrollbar { height: 8px; }
+  .side__part--pin .toc::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: rgba(255, 255, 255, .5) padding-box; }
+}
 .side__part--pin .toc a { flex: none; display: flex; align-items: center; min-height: 40px; padding: 0 16px; background: var(--fill); white-space: nowrap; }
 .side__part--pin .toc a:not([aria-current="true"]):hover { background: var(--fill-2); }
 @media (pointer: coarse) { .side__part--pin .toc a { min-height: 44px; } }
@@ -605,7 +617,7 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
      Each tab takes an equal share and never less than its name (12px), so five fit beside the circle from 360px;
      narrower, the color control moves into the window's toolbar (hue.js) and the tab bar takes the width alone. */
   :root { --dock-h: 66px; --dock-y: calc(22px + env(safe-area-inset-bottom)); --dock-gap: 8px; --tab-w: min(360px, calc(100vw - 16px - var(--dock-gap) - var(--dock-h))); --dock-x: calc((100vw - var(--tab-w) - var(--dock-h) - var(--dock-gap)) / 2); }
-  html.no-gl { --dock-x: calc((100vw - var(--tab-w)) / 2); }   /* no color control without the room: the tab bar is centred alone */
+  html.no-room { --dock-x: calc((100vw - var(--tab-w)) / 2); }   /* no color control without the room from the start: the tab bar is centred alone (a room that gives way later moves nothing) */
   .tabs { left: var(--dock-x); top: auto; bottom: var(--dock-y); translate: 0 0; width: var(--tab-w); height: var(--dock-h); padding: 7px; display: flex; justify-content: space-between; gap: 0; border-radius: 999px; }
   html.gl .tabs.glass { -webkit-backdrop-filter: blur(22px) saturate(1.7) brightness(.42); backdrop-filter: blur(22px) saturate(1.7) brightness(.42); }   /* its names keep 4.5:1 over a light card scrolling beneath */
   .tabs a { flex: 1 1 0; flex-direction: column; justify-content: center; gap: 3px; height: 52px; padding: 0 3px; overflow: visible; }
@@ -651,7 +663,7 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 
 /* ---------- the color style control, bottom right: a playground for the room's palette ---------- */
 .hue { position: fixed; right: calc(18px + env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 20; }
-html.no-gl .hue, html:not(.js) .hue { display: none; }
+html.no-room .hue, html:not(.js) .hue { display: none; }
 .hue__button { display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; background: var(--glass-css); -webkit-backdrop-filter: blur(20px) saturate(1.7); backdrop-filter: blur(20px) saturate(1.7); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .28), inset 0 1px 0 rgba(255, 255, 255, .4), 0 10px 28px rgba(0, 0, 0, .3); transition: scale .35s var(--ease-out); }
 .hue__button:hover { scale: 1.06; }
 .hue__button:active { scale: .94; }
@@ -678,6 +690,16 @@ html.no-gl .hue, html:not(.js) .hue { display: none; }
 .hue__seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 16px; padding: 4px; border-radius: 999px; background: var(--fill); }
 .hue__seg button { height: 32px; border: 0; border-radius: 999px; background: none; color: var(--ink-2); font: 650 13px/1 var(--font); cursor: pointer; }
 .hue__seg button[aria-checked="true"] { background: #fff; color: #0b1138; }
+/* touch: the small controls answer a 44px target and look the same. The target reaches past each one invisibly: the
+   More links (All work, Résumé) and the panel's Reset, Auto, Night and Day; the sliders draw their track and thumb on
+   their own, so the input grows to 44px inside its row, and the two rows sit 8px further apart so their targets meet
+   without overlapping. */
+@media (pointer: coarse) {
+  .more, .hue__reset, .hue__seg button { position: relative; }
+  .more::after, .hue__reset::after, .hue__seg button::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 44px; translate: 0 -50%; }
+  .hue__range input { height: 44px; margin-block: -11px; }
+  .hue__range + .hue__range { margin-top: 22px; }
+}
 @media (max-width: 899px) {
   .hue { left: calc(var(--dock-x) + var(--tab-w) + var(--dock-gap)); right: auto; bottom: var(--dock-y); transition: opacity .25s; }
   html:is(.is-hello, .is-entering) .hue { left: auto; right: calc(14px + env(safe-area-inset-right)); }   /* no dock during the hero: the corner */
@@ -700,7 +722,7 @@ html.no-gl .hue, html:not(.js) .hue { display: none; }
   .toolbar--inline .hue__button:hover { background: var(--fill-2); scale: 1; }
   .toolbar--inline .hue__button i { width: 22px; height: 22px; }
 }
-html.no-gl .hue__button { display: none; }
+html.no-room .hue__button { display: none; }
 
 /* ---------- scripts off: a plain, readable stack ---------- */
 html:not(.js) body { padding: 12px 0 40px; }
@@ -714,7 +736,10 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
 
 /* ---------- motion preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: .15s !important; animation: none !important; }
+  /* only fades and colour changes, short: geometry (the tab bubble, the bar's width, a sheet's parent stepping back)
+     jumps to its place, so nothing slides, zooms or stretches */
+  *, *::before, *::after { transition-duration: .15s !important; transition-property: opacity, color, background-color, border-color, box-shadow !important; animation: none !important; }
+  .tabs__label { translate: none !important; }
   .hue__panel { scale: 1; }
   .hero__hint { transition-delay: 0s; }
   .card:active, .btn:active { scale: 1; }
@@ -733,7 +758,8 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   html, body { background: #fff !important; }
   body { min-height: 0; font-size: 10pt; line-height: 1.38; }
   .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue { display: none !important; }
-  .space, .win, .sheet, .side { position: static !important; inset: auto !important; transform: none !important; translate: none !important; width: auto !important; height: auto !important; max-height: none !important; overflow: visible !important; background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 0 14pt !important; opacity: 1 !important; filter: none !important; perspective: none !important; }
+  .space, .win, .sheet, .side { position: static !important; inset: auto !important; transform: none !important; translate: none !important; width: auto !important; height: auto !important; max-height: none !important; overflow: visible !important; background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; margin: 0 0 14pt !important; opacity: 1 !important; filter: none !important; perspective: none !important; }   /* (no border: the CSS glass rim of a floating side window has no place on paper) */
+  .sr-live { display: none; }   /* nothing to announce on paper, and its 1px box can reach past the page's foot */
   .space > *, .win > *, .sheet > * { opacity: 1 !important; filter: none !important; }
   .side { -webkit-mask-image: none !important; mask-image: none !important; }   /* the side window's fade at its foot is for scrolling, not paper */
   .win, .sheet { display: block !important; }

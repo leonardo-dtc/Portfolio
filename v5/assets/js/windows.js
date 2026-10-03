@@ -12,7 +12,7 @@ export function createWindows({ room }) {
   const html = document.documentElement;
   const space = document.querySelector('[data-space]');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const qDesk = matchMedia('(min-width: 1360px)'), qPhone = matchMedia('(max-width: 899px)');
+  const qDesk = matchMedia('(min-width: 1360px)'), qPhone = matchMedia('(max-width: 899px)'), qShort = matchMedia('(max-height: 520px)');
   const $main = () => document.getElementById('main');
   const $sheet = () => document.querySelector('section.sheet:not(.is-closing)');
   const $front = () => $sheet() || $main();
@@ -38,14 +38,17 @@ export function createWindows({ room }) {
     } else if (body) {
       asides.forEach(a => { a.classList.add('side--inline'); a.style.transform = ''; inline(a, main, body); });
     }
+    // a row pinned between the head and the body takes a grid row of its own (a class, not :has(), for older browsers)
+    main.classList.toggle('has-pin', !!main.querySelector(':scope > .side__part--pin'));
     placeBubble(true);
     scrollable();
   }
   // Below 1360px the side window's content sits inside the main window, placed by its role. data-inline on the
   // aside gives one place for all of it, or one per part, in order: "start" before the main content (Hockey's
   // Measurables and coach contacts, About's portrait), "end" after it (Home's This fall, Work's In progress), "pin"
-  // a row of chips pinned between the window's head and its body (the Résumé's Sections). The aside goes where its
-  // first start or end part goes; a part placed elsewhere is lifted out of it, and goes home at 1360px and wider.
+  // a row of chips pinned between the window's head and its body (the Résumé's Sections); in a window under 520px
+  // tall that row leads the body instead and scrolls away with it. The aside goes where its first start or end part
+  // goes; a part placed elsewhere is lifted out of it, and goes home at 1360px and wider.
   const liftedOf = a => [...document.querySelectorAll('.side__part--lifted')].filter(p => p._home && p._home.aside === a);
   function partsOf(a) {                                   // every part, in the aside or lifted out of it, in order
     const inside = [...a.querySelectorAll(':scope > .side__part')];
@@ -67,7 +70,10 @@ export function createWindows({ room }) {
       if (w === own) { if (p.parentElement !== a) putBack(p); continue; }
       p.classList.add('side__part--lifted');
       p.classList.toggle('side__part--pin', w === 'pin');
-      if (w === 'pin') { if (p.parentElement !== main) body.before(p); }
+      if (w === 'pin') {
+        if (qShort.matches) { if (p.parentElement !== body) body.prepend(p); }
+        else if (p.parentElement !== main) body.before(p);
+      }
       else if (p.parentElement !== body) { if (w === 'start') body.prepend(p); else body.append(p); }
     }
   }
@@ -81,7 +87,7 @@ export function createWindows({ room }) {
       else if (!over && a.getAttribute('tabindex') === '0') a.removeAttribute('tabindex');
     }
   }
-  qDesk.addEventListener('change', layout); qPhone.addEventListener('change', layout);
+  qDesk.addEventListener('change', layout); qPhone.addEventListener('change', layout); qShort.addEventListener('change', layout);
   let sized = 0;
   addEventListener('resize', () => { placeBubble(true); cancelAnimationFrame(sized); sized = requestAnimationFrame(scrollable); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(scrollable);
@@ -281,7 +287,8 @@ export function createWindows({ room }) {
   const inHero = () => html.classList.contains('is-hello');            // the windows are hidden behind the hero
   addEventListener('wheel', (e) => {
     // over the Résumé's pinned row of chips, which only scrolls sideways, a vertical wheel still scrolls the record
-    if (!inHero() && e.target.closest && e.target.closest('.side__part--pin') && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+    // (in a short window the row is inside the record, which the wheel scrolls on its own)
+    if (!inHero() && e.target.closest && e.target.closest('#main > .side__part--pin') && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
       const b = scroller(); if (b) b.scrollBy({ top: e.deltaY, left: 0 });
       return;
     }

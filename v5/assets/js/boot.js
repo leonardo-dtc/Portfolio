@@ -26,6 +26,10 @@ try {
 }
 html.classList.toggle('gl', !!room);
 html.classList.toggle('no-gl', !room);
+// The dock's layout is decided once, here: without a room from the start there is no color control, and the phone's
+// tab bar is centred alone. A room that gives way later (a lost context, a slow device) leaves both where they are,
+// so nothing jumps under a thumb; the control keeps working over CSS glass. no-room is never changed after this.
+html.classList.toggle('no-room', !room);
 if (room) {
   window.__room = room;
   room.onlost = (why = 'lost') => { html.classList.remove('gl'); html.classList.add('no-gl'); html.dataset.still = why; };

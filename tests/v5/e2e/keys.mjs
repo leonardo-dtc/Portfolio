@@ -50,6 +50,31 @@ check(/^\d{1,2}:\d{2}\s?(AM|PM) in Groton$/.test((await page.textContent('aside.
 check(errors.length === 0, 'no console errors ' + errors.join(' | '));
 await browser.close();
 {
+  // the Résumé's pinned chips (under 1360px): Tab scrolls each chip, ring and all, clear of the row's fades (opaque from
+  // 14px to 100% - 30px; the ring reaches 5px past the chip). The browser leaves a partly hidden chip where it is.
+  for (const [w, h] of [[1280, 800], [390, 844]]) {
+    const { browser, page, errors } = await open({ width: w, height: h, noGL: true, reduced: true });
+    await page.goto(BASE + 'resume/', { waitUntil: 'load' });
+    await page.waitForTimeout(700);
+    await page.evaluate(() => [...document.querySelectorAll('nav.tabs a')].pop().focus());
+    const clear = [];
+    for (let i = 0; i < 12 && clear.length < 8; i++) {
+      await page.keyboard.press('Tab');
+      await page.waitForTimeout(60);
+      const c = await page.evaluate(() => {
+        const a = document.activeElement, row = a.closest('.side__part--pin .toc');
+        if (!row) return null;
+        const R = row.getBoundingClientRect(), r = a.getBoundingClientRect();
+        return Math.min(r.left - (R.left + 14), (R.right - 30) - r.right);
+      });
+      if (c !== null) clear.push(c);
+    }
+    check(clear.length === 8 && Math.min(...clear) >= 5, `${w}: Tab keeps each of the ${clear.length} Sections chips clear of the row's fades (least ${Math.min(...clear).toFixed(0)}px)`);
+    check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+    await browser.close();
+  }
+}
+{
   // phones show each tab as an icon over its name; every tab keeps its name for screen readers, with and without scripts
   for (const js of [true, false]) {
     const { browser, page } = await open({ width: 390, height: 844, js });

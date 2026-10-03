@@ -252,11 +252,14 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   (`data-inline` on the aside, one word for all of it or one per part):
   Hockey's Measurables and Coach contacts come first, before Stats; About's
   portrait comes first and its Interests last; the Résumé's Sections become a
-  row of chips pinned under the window's head; Home's This fall and Work's In
+  row of chips pinned under the window's head (in a window under 520 px tall,
+  a row that leads the record and scrolls away with it; with a pointer, a thin
+  scrollbar under it says it goes on); Home's This fall and Work's In
   progress come last.
 - **The Résumé's Sections follow the reader:** the section under the reading
   line wears the tab bar's bubble (a Fill 3 capsule, `aria-current`), and a jump
-  from Sections marks its target at once. Landing on an entry from elsewhere
+  from Sections marks its target at once. A chip the keyboard reaches scrolls
+  clear of the row's fades, ring and all. Landing on an entry from elsewhere
   (a record row to `resume/#carnegie`) lights it with a wash that fades over
   1.2 s (`assets/js/spy.js`, `nav.js`).
 - **Changing page** crossfades the window's contents in place, and the side
@@ -279,6 +282,13 @@ palettes (Cobalt, Violet, Rose, Ember, Gold, Emerald, Teal, Graphite), a Hue and
 a Vibrance slider, and Auto, Night or Day. It turns the whole room in the shader,
 so every pane of glass follows, and the hero's neon a third as far, within its
 Glowtime colours; the choice is kept in this browser only (`assets/js/hue.js`).
+Where the room never started (no WebGL2, reduced transparency, Save-Data, a weak
+device) there is no control and the phone's tab bar is centred alone. That is
+decided once, as the page starts (`html.no-room`): a room that gives way later
+leaves the tab bar and the control where they are, the control turning the CSS
+glass and Night or Day, so nothing jumps under a thumb. On touch screens its
+Reset, Auto, Night, Day and sliders answer 44 px targets without changing how
+they look, as do the All work and Résumé links.
 
 ## Pages
 
@@ -401,13 +411,17 @@ by machine yet.
   800 ms); what steps back dims. Springs integrate real frame time up to 120 ms
   (in 4 ms substeps), so a slow device skips frames rather than stretching a
   motion. Reduced motion means no glide, focus pull, lean, drift or settle, and
-  150 ms crossfades.
+  150 ms crossfades: transitions run only on opacity and colour, so the tab
+  bubble, the tab bar's width and names and a sheet's parent jump to their places.
 - **Budget:** the room renders at up to 1.5× device pixels, 60 fps while
   anything moves (the hero's light included), 30 fps while only the room
   drifts, and not at all when nothing moves under reduced motion. A machine
-  averaging over 22 ms across its first 90 frames drops to 1× and stops the
-  drift; if the next 30 frames it draws still average over 37 ms (under about
-  27 fps: a device held to 30 fps to save power keeps the room), the room
+  whose first 90 drawn frames average over 22 ms drops to 1× and stops the
+  drift (each frame is timed by the tick after it, which carries its cost: while
+  only the room drifts it draws every other tick, so the drawn tick's own time
+  is the cheap tick before it); if the next 30 frames it draws still average
+  over 37 ms (under about 27 fps: a device held to 30 fps to save power keeps
+  the room), the room
   gives way to the still and the page carries on in
   CSS glass (the path a lost WebGL context takes). A device asking for less data
   (Save-Data) or with 2 GB of memory or less starts on the still.

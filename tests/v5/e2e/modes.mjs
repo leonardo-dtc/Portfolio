@@ -14,6 +14,9 @@ import { open, BASE, PAGES, check } from './lib.mjs';
   await page.mouse.move(100, 100); await page.mouse.move(1300, 800);
   await page.waitForTimeout(300);
   check(await page.evaluate(m => getComputedStyle(document.querySelector('.space')).translate === m && window.__room.state.shift.every(v => v === 0), moved), 'reduced motion: nothing leans with the pointer');
+  // transitions only fade or change colour: the tab bubble, the bar's width and a sheet's parent jump to their places
+  const props = await page.evaluate(() => ['.tabs__bubble', 'nav.tabs', '#main', '.tabs__label'].map(s => getComputedStyle(document.querySelector(s)).transitionProperty).join(', '));
+  check(!/\b(all|transform|translate|scale|width|right|left|top)\b/.test(props) && await page.evaluate(() => getComputedStyle(document.querySelector('.tabs__label')).translate === 'none'), `reduced motion: nothing slides, zooms or stretches (${[...new Set(props.split(', '))].join(', ')})`);
   await browser.close();
 }
 {
@@ -75,14 +78,16 @@ import { open, BASE, PAGES, check } from './lib.mjs';
   await browser.close();
 }
 {
-  // under 1360px the side window sits inside the window (Measurables first); the profile still prints on one page
-  for (const [w, h] of [[1024, 620], [390, 844]]) {
+  // under 1360px the side window sits inside the window (Measurables first); the profile still prints on one page.
+  // Without WebGL at 1440 the side window floats in CSS glass, its rim a border, which print clears (a 1px rim and
+  // the live region's box once pushed a blank second page)
+  for (const [w, h] of [[1440, 900], [1024, 620], [390, 844]]) {
     const { browser, page } = await open({ width: w, height: h, noGL: true });
     await page.goto(BASE + 'hockey/', { waitUntil: 'load' });
     await page.waitForTimeout(600);
     const pdf = await page.pdf({ format: 'Letter', preferCSSPageSize: true, printBackground: false });
     const n = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
-    check(n === 1, `print from ${w}px: hockey fits one Letter page (${n})`);
+    check(n === 1, `print from ${w}px without WebGL: hockey fits one Letter page (${n})`);
     await browser.close();
   }
 }
@@ -98,6 +103,25 @@ import { open, BASE, PAGES, check } from './lib.mjs';
     check(errors.length === 0, 'no console errors ' + errors.join(' | '));
     await browser.close();
   }
+}
+{
+  // a room that gives way mid-session (a lost context takes the same path as a slow device) moves nothing on a phone:
+  // the dock stays where it was and the color control stays, working over CSS glass
+  const { browser, page, errors } = await open({ width: 390, height: 844, touch: true });
+  await page.goto(BASE + 'hockey/', { waitUntil: 'load' });
+  await page.waitForTimeout(1500);
+  if (!(await page.evaluate(() => !!window.__room))) check(true, 'giving way: no WebGL here, nothing to lose');
+  else {
+    const at = () => page.evaluate(() => { const b = document.querySelector('.hue__button'); return [Math.round(document.querySelector('nav.tabs').getBoundingClientRect().left), getComputedStyle(b).display, Math.round(b.getBoundingClientRect().left)].join(' '); });
+    const before = await at();
+    await page.evaluate(() => document.querySelector('canvas.room').getContext('webgl2').getExtension('WEBGL_lose_context').loseContext());
+    await page.waitForFunction(() => document.documentElement.classList.contains('no-gl'), null, { timeout: 5000 });
+    await page.waitForTimeout(300);
+    const after = await at();
+    check(after === before && !after.includes('none'), `giving way: the dock and the color control stay put (${before} -> ${after})`);
+  }
+  check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+  await browser.close();
 }
 {
   // the budget's second look: a device held to 30 fps to save power keeps the room at 1x; one under about 27 fps gives
@@ -119,6 +143,28 @@ import { open, BASE, PAGES, check } from './lib.mjs';
     }
     const still = await page.evaluate(() => document.documentElement.dataset.still || '');
     check(kept ? log[1] === 'kept' && !still : log[1] === 'still' && still === 'slow', `${fps} fps: the room ${kept ? 'stays at 1x' : 'gives way to the still'} (${log.join(', ')}${still ? ', data-still=' + still : ''})`);
+    check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+    await browser.close();
+  }
+}
+{
+  // the budget's first look times the frames the room draws: on a 120 Hz screen a drawn frame's cost lands on the tick
+  // after it, and while only the room drifts it draws every other tick, so a device drawing at 20 fps (33 ms a frame)
+  // must still drop to 1x; one whose frames cost nothing takes no step. Fed a frame time, as above, with no pointer moving.
+  for (const [cost, trips] of [[33, true], [0, false]]) {
+    const { browser, page, errors } = await open({ width: 320, height: 240 });
+    await page.addInitScript((cost) => {
+      const raf = window.requestAnimationFrame.bind(window);
+      let native = -1, t = 0, drew = false;
+      const P = window.WebGL2RenderingContext && WebGL2RenderingContext.prototype;
+      if (P) { const draw = P.drawArrays; P.drawArrays = function (...a) { if (this.getParameter(this.FRAMEBUFFER_BINDING) === null) drew = true; return draw.apply(this, a); }; }
+      window.requestAnimationFrame = (cb) => raf((now) => { if (now !== native) { native = now; t += 1000 / 120 + (drew ? cost : 0); drew = false; } cb(t); });
+    }, cost);
+    await page.goto(BASE + 'hockey/', { waitUntil: 'load' });
+    if (!(await page.evaluate(() => !!window.__room))) { check(true, `first look, ${cost} ms frames: no WebGL here, nothing to budget`); await browser.close(); continue; }
+    await page.waitForFunction(() => window.__room.log.length > 0 || window.__roomFrames > 130, null, { timeout: 60000, polling: 200 });
+    const log = await page.evaluate(() => window.__room.log.map(e => `${e.event} at ${e.ms} ms`));
+    check(trips ? /^1x/.test(log[0] || '') : log.length === 0, `first look, drawn frames costing ${cost} ms at 120 Hz: ${trips ? 'drops to 1x' : 'takes no step'} (${log.join(', ') || 'no step'})`);
     check(errors.length === 0, 'no console errors ' + errors.join(' | '));
     await browser.close();
   }

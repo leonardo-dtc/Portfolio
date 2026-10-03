@@ -3,10 +3,21 @@
 // bar's bubble style, a Fill 3 capsule. An IntersectionObserver on that line notices sections crossing it; reaching
 // the end of the record marks the last section, however short. A jump from Sections marks its target at once and
 // holds it until the scroll has arrived, so the bubble does not walk through every section in between. Below 1360px,
-// where Sections is a row of chips, the current chip is kept in view.
+// where Sections is a row of chips, the current chip is kept in view, and so is a chip the keyboard focuses.
 export function initSpy() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let stop = () => {};
+  // The chip row scrolls a chip clear of its fades (14px at the start, 30px at the end), with room for the focus ring;
+  // it never scrolls the window. The current chip is brought to the row's start; a focused one only as far as it takes.
+  // (The browser does not scroll a chip that is only partly hidden when Tab reaches it.)
+  function keep(a, toStart) {
+    const row = a.closest('.side__part--pin .toc');
+    if (!row) return;
+    const r = row.getBoundingClientRect(), c = a.getBoundingClientRect(), pad = 36;
+    const before = c.left - (r.left + pad), past = c.right - (r.right - pad);
+    if (before >= 0 && past <= 0) return;
+    row.scrollTo({ left: row.scrollLeft + (before < 0 || toStart ? before : past), behavior: reduced.matches ? 'auto' : 'smooth' });
+  }
 
   function setup() {
     stop();
@@ -36,11 +47,7 @@ export function initSpy() {
       current = s;
       for (const [sec, a] of pairs) { if (sec === s) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }
       // the chip row scrolls the current chip into view (it never scrolls the window)
-      const a = pairs.find(p => p[0] === s)[1], row = a.closest('.side__part--pin .toc');
-      if (row) {
-        const r = row.getBoundingClientRect(), c = a.getBoundingClientRect(), pad = 36;
-        if (c.left < r.left + pad || c.right > r.right - pad) row.scrollTo({ left: row.scrollLeft + c.left - r.left - pad, behavior: reduced.matches ? 'auto' : 'smooth' });
-      }
+      keep(pairs.find(p => p[0] === s)[1], true);
     }
     function observe() {
       if (io) io.disconnect();
@@ -59,12 +66,14 @@ export function initSpy() {
     };
     let resized = 0;
     const onResize = () => { clearTimeout(resized); resized = setTimeout(() => { observe(); mark(); }, 150); };
+    const onFocus = (e) => { if (e.target.closest && e.target.closest('.side__part--pin .toc a')) keep(e.target, false); };
 
     observe();
     mark();
     body.addEventListener('scroll', atEnd, { passive: true });
     body.addEventListener('scrollend', release);
     document.addEventListener('click', onClick, true);
+    document.addEventListener('focusin', onFocus);
     addEventListener('resize', onResize);
     stop = () => {
       if (io) io.disconnect();
@@ -72,6 +81,7 @@ export function initSpy() {
       body.removeEventListener('scroll', atEnd);
       body.removeEventListener('scrollend', release);
       document.removeEventListener('click', onClick, true);
+      document.removeEventListener('focusin', onFocus);
       removeEventListener('resize', onResize);
       stop = () => {};
     };

@@ -67,7 +67,8 @@ for (const [w, h] of [[1024, 620], [390, 844], [320, 640]]) {
     return page.evaluate(() => {
       const body = document.querySelector('#main .win__body'), top = el => el && Math.round(el.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop);
       const pin = document.querySelector('#main > .side__part--pin');
-      return { first: body.firstElementChild.matches('aside.side'), last: body.lastElementChild.matches('aside.side, .side__part'), measure: top(document.getElementById('measure-h')), coaches: top(document.getElementById('coaches-h')), interests: top(document.getElementById('likes-h')), essay: top(body.querySelector('aside.side ~ *')), pinned: !!pin && pin.nextElementSibling === body && !!pin.querySelector('.toc') };
+      // (the window carries has-pin for the pinned row's grid row, not :has(), which older browsers lack)
+      return { first: body.firstElementChild.matches('aside.side'), last: body.lastElementChild.matches('aside.side, .side__part'), measure: top(document.getElementById('measure-h')), coaches: top(document.getElementById('coaches-h')), interests: top(document.getElementById('likes-h')), essay: top(body.querySelector('aside.side ~ *')), pinned: !!pin && pin.nextElementSibling === body && !!pin.querySelector('.toc') && document.getElementById('main').classList.contains('has-pin') };
     });
   };
   const hockey = await at('hockey/');
@@ -83,5 +84,24 @@ for (const [w, h] of [[1024, 620], [390, 844], [320, 640]]) {
     check(d.every(t => t.w >= 44 && t.fs >= 12 && t.op === 1 && t.fits), `${w}: each tab shows its name at 12px or more, every tab 44px or wider (narrowest ${Math.min(...d.map(t => t.w)).toFixed(1)})`);
   }
   check(errors.length === 0, `${w}: no console errors ${errors.join(' | ')}`);
+  await browser.close();
+}
+
+// In a window under 520px tall (a phone on its side, a short laptop window) the Résumé's chips are not pinned: they
+// lead the record and scroll away with it, so the record keeps its reading height
+for (const [w, h, touch] of [[844, 390, true], [1024, 500, false]]) {
+  const { browser, page, errors } = await open({ width: w, height: h, touch, noGL: true });
+  await page.goto(BASE + 'resume/', { waitUntil: 'load' });
+  await page.waitForTimeout(700);
+  const r = await page.evaluate(async () => {
+    const main = document.getElementById('main'), body = main.querySelector('.win__body'), part = document.querySelector('.side__part--pin');
+    const first = !!part && body.firstElementChild === part && !main.classList.contains('has-pin');
+    body.scrollTop = 300; await new Promise(res => setTimeout(res, 100));
+    const away = !!part && part.getBoundingClientRect().bottom < body.getBoundingClientRect().top;
+    body.scrollTop = 0;
+    return { first, away };
+  });
+  check(r.first && r.away, `${w}x${h}: the Résumé's chips lead the record, unpinned, and scroll away with it`);
+  check(errors.length === 0, `${w}x${h}: no console errors ${errors.join(' | ')}`);
   await browser.close();
 }
