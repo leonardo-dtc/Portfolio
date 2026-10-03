@@ -18,7 +18,7 @@ Three rules hold the system together:
    control.
 2. **Content moves inside a still frame.** Hovers are long and soft (450 to 800 ms on one ease-out curve)
    and move a few pixels in answer to the pointer. Nothing moves on its own except the reveals as a sheet
-   arrives and the cover's typing code panel.
+   arrives, the cover's typing code panel and the Scroll hint's three pulses (opacity, then it rests).
 3. **What steps back dims; it never blurs.** Text being read and things in motion are never blurred.
 
 ## Tokens
@@ -63,8 +63,9 @@ Nothing visible is set under 12px. The code panel is 12px monospace (it was 9px)
 ### Layout
 
 `--gutter` clamp(16px, 2.6vw, 36px), `--max` 1400px, `--chrome` 52px (44px in short windows), `--tear`
-64px (52px). On desktop, content keeps 40px clear of the rail and never comes within 70px of the screen's
-right edge, which leaves room for the index tab (59px wide).
+64px (52px). On desktop, content ends at least `max(gutter + 40px, 70px)` from the screen's right edge
+(less the margin outside `--max`), which leaves the rail label and the index tab (59px wide, 6px from the
+edge) clear of it: 11 to 15px at 1440px, 5px between the tab and the content at 1024px and below.
 
 ### Motion
 
@@ -114,7 +115,8 @@ drawer front. The current sheet's tab is vermilion with black text.
   pointer has left all three. A click on the folder button, the index tab, "portfolio" on the cover or
   "Open the index" pins it open. Keyboard focus on the folder button opens it; Enter moves focus to the
   current folder (no file until the reader moves); arrows, Home and End walk the folders; Tab moves on to
-  Find and Close; Escape closes and returns focus to whatever opened it. Non-modal: no backdrop, no focus
+  Find and Close, and tabbing on out of the rail, the tab and the cabinet (onto "portfolio" on the cover
+  too) closes it; Escape closes and returns focus to whatever opened it. Non-modal: no backdrop, no focus
   trap, no scroll lock.
 - *Z-order.* Folder `k`'s link stacks at `3k + 3`; its file is inside that link at `z-index: -1`, so it
   paints behind its own folder's front and tab but in front of every folder with a smaller `k`; divider `k`
@@ -138,7 +140,8 @@ printed on it, the reader's word written after it. `/` opens the cabinet at Find
 field. It searches the page's own text sheet by sheet (tiles, timeline rows, table rows and figures as
 units, otherwise the innermost headings, paragraphs and list items), matching each typed word at the
 start of a word, accents aside. Matching folders keep their ink and carry a count; the others fade to the
-muted ink (still 5.4:1). The best match (a sheet whose own name matches, then more matching lines, then
+muted ink (still 5.4:1), except the current sheet's vermilion tab, which keeps black (the muted ink would
+be 1.6:1 on vermilion). The best match (a sheet whose own name matches, then more matching lines, then
 the earlier sheet) has its file out, quoting the matching line with the word marked in vermilion. Up and
 Down step through the matches, Enter goes to the one that is out and rings the line in vermilion for a
 moment (colour only), Escape clears the word, then closes. The drawer's label reads
@@ -178,7 +181,9 @@ Index cards taped to the paper, four across on desktop. At rest a card shows its
 unfolds its line and link (grid rows 0fr to 1fr, 500ms), straightens the card to 0 degrees and lifts it
 4px while its tape presses (800ms), and steps the other cards back to .4 opacity, with no blur. The
 unfolding part hangs below the card's resting edge, over the gap, so the grid never moves; the card stays
-in front until it has folded again. A card near the foot of its sheet lifts as far as its line needs to
+in front until it has folded again. A card the row has stretched (its title is shorter than its
+neighbours') unfolds from just under its own title (`--fold-top`), never below an empty band. A card near
+the foot of its sheet lifts as far as its line needs to
 stay on the sheet (`--rise`, measured by the script). Cards without a link always show their line. Touch
 screens, print and pages without the script show every line. The script wraps the line and the link
 (`.entry__fold`), so the authored card stays one `<li>`.
@@ -205,7 +210,7 @@ Each sheet keeps 64px more space at its foot, so the pill never covers its last 
   `#shut`, hides it). Archive cards show every line; the hand line's strokes are faint until hovered.
 - **Reduced motion.** Fades stay, every transform goes: no recede, no reveals' travel, no slide (jumps are
   instant), no settle, lift or turn on hover; the cabinet and files fade; archive cards open in place.
-- **Print.** A plain document of 14 Letter pages: chrome, rail, index tab, cabinet, badges, tape and the
+- **Print.** A plain document of 13 Letter pages (the phones' clearance for the pill stays off paper): chrome, rail, index tab, cabinet, badges, tape and the
   frame are hidden; archive lines are shown; small vermilion text prints in `--red-ink`.
 
 ## Adding things

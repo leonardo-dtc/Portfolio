@@ -70,8 +70,10 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   line the cabinet's folders start on, so every dot is level with its own folder.
   Above the folder button stands the **index tab**: a small paper tab reading
   "Index", not blended, so the index is visible without hovering the screen edge.
-  Content keeps 40px clear of the rail, label and tab (and 70px of the screen's
-  edge). Below 900px the rail gives way to the pill (see Phones).
+  Content ends at least 70px from the screen's edge (the gutter plus 40px where
+  the gutter is wider), which keeps it 11 to 15px clear of the label and the tab at
+  1440px and 5px clear of the tab at 1024px. Below 900px the rail gives way to the
+  pill (see Phones).
 - **The cabinet (the index).** A compact paper file drawer, 336px wide, anchored
   beside the rail and sized to its content: one hairline folder per sheet with a
   trapezoid tab (each whole row is the folder's target), black divider tabs for
@@ -157,8 +159,9 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   unfolding and the reveal order come from the stylesheet and the script, so a
   copied card needs nothing else. At rest a card shows its year, kind and title;
   pointing at it (or tabbing to its link) unfolds its line and link (grid rows 0fr
-  to 1fr, 500ms) below its resting edge, so the grid never moves, while it
-  straightens, lifts and the other cards step back to .4 opacity. Touch screens,
+  to 1fr, 500ms) below its resting edge, so the grid never moves (a card the row
+  has stretched unfolds from just under its own title), while it straightens,
+  lifts and the other cards step back to .4 opacity. Touch screens,
   print and pages without the script show every line. Four cards a row on desktop,
   one or two on phones; two columns in print.
 - **The contact sheet.** On desktop the framed LET'S TALK (crown, star, tape and

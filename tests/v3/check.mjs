@@ -15,6 +15,7 @@
 //   5. cabinet     hovering a dot opens the cabinet; moving the mouse up to the pulled file and clicking it
 //                  lands on that file's own sheet
 //   6. routes      the cover's words go where they say; Find, the targets and the pill do their jobs
+//   6b. keyboard   tabbing out of the cabinet closes it; while Find filters, the current tab stays readable
 //   7. console     no errors on any load (with and without the script, reduced motion, phone)
 
 const BASE = process.env.BASE || 'http://127.0.0.1:8778/v3/';
@@ -303,6 +304,22 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const t1 = await rm.evaluate(() => { const c = document.querySelector('#loquar .card--a'), s = getComputedStyle(c); return { transform: s.transform, translate: s.translate, rotate: s.rotate, img: getComputedStyle(c.querySelector('img')).scale, other: getComputedStyle(document.querySelector('#loquar .card--b')).filter }; });
   check(t0 === t1.transform && t1.translate === 'none' && t1.rotate === 'none' && (t1.img === 'none' || t1.img === '1') && /opacity/.test(t1.other), 'reduced motion: a card hover changes opacity only', JSON.stringify(t1));
   await rm.context().close();
+}
+
+/* ---------- 6b. keyboard: tabbing out of the cabinet closes it; Find keeps the current tab readable ---------- */
+{
+  const page = await open();
+  await helpers(page);
+  await page.focus('.index-tab'); await page.keyboard.press('Enter'); await page.waitForTimeout(300);
+  const opened = await page.evaluate(() => document.getElementById('cabinet').classList.contains('is-open'));
+  await page.focus('.cabinet__close'); await page.keyboard.press('Tab'); await page.waitForTimeout(250);
+  const out = await page.evaluate(() => ({ open: document.getElementById('cabinet').classList.contains('is-open'), at: document.activeElement.textContent.trim() }));
+  check(opened && !out.open, `keyboard: Enter on the Index tab opens the cabinet, and tabbing on out of it (to "${out.at}") closes it`, JSON.stringify({ opened, ...out }));
+  await page.keyboard.press('/'); await page.waitForTimeout(250);
+  await page.keyboard.type('Carnegie'); await page.waitForTimeout(300);
+  const cur = await page.evaluate(() => { const t = document.querySelector('.folder.is-current:not(.is-match) .folder__tab'); return t ? window.__v3.pair(t, '::before') : null; });
+  check(cur && cur.ratio >= 4.5, `Find: the current sheet's vermilion tab stays readable while other sheets match (${cur && cur.ratio}:1)`, cur && `${cur.fg} on ${cur.bg}`);
+  await page.context().close();
 }
 
 /* ---------- 7. console ---------- */

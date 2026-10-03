@@ -418,7 +418,9 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
    title; pointing at it, or tabbing to its link, unfolds the line and the link (grid rows 0fr to 1fr,
    500ms), the card straightens to 0 degrees and lifts while its tape presses, and the other cards step back
    to .4 opacity (they dim; nothing blurs). The unfolding part hangs below the card's resting edge, over the
-   gap, so the grid never moves; the card stays in front until it has folded again. The script wraps the
+   gap, so the grid never moves; the card stays in front until it has folded again. A card whose title is
+   shorter than its neighbours' (so the row has stretched it) unfolds from just under its own title
+   (--fold-top, set by the script), never from below an empty band. The script wraps the
    line and the link in .entry__fold (only on cards with a link); touch screens, print and pages without the
    script show every line. */
 .entry__fold { display: grid; grid-template-rows: 1fr; }
@@ -426,7 +428,7 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .entry::before { transition: scale var(--t-arrow) var(--ease), box-shadow var(--t-arrow) var(--ease); }
 @media screen and (hover: hover) and (pointer: fine) {
   .js .entry.has-fold { z-index: 1; }
-  .js .entry__fold { position: absolute; z-index: 1; left: 0; right: 0; top: calc(100% - 1px); grid-template-rows: 0fr; padding: 0 1.05rem; background: var(--white); clip-path: inset(0 -60px -60px -60px); transition: grid-template-rows var(--t-open) var(--ease), box-shadow var(--t-open) var(--ease); }
+  .js .entry__fold { position: absolute; z-index: 1; left: 0; right: 0; top: var(--fold-top, calc(100% - 1px)); grid-template-rows: 0fr; padding: 0 1.05rem; background: var(--white); clip-path: inset(0 -60px -60px -60px); transition: grid-template-rows var(--t-open) var(--ease), box-shadow var(--t-open) var(--ease); }
   .js .entry__fold-in { overflow: hidden; }
   .js .entry__fold .entry__line { margin-top: 0; }
   .js .entry__fold .entry__link { margin-bottom: 1rem; }
@@ -489,7 +491,7 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .talk__foot { position: relative; background: var(--paper); color: var(--black); --fg: var(--black); --fg-2: var(--ink-2); --rule: var(--paper-2); }
 .talk__foot .tear { top: calc(1px - var(--tear)); color: var(--paper); }
 .talk__foot .sheet__in { min-height: 0; padding-block: clamp(.6rem, 1.6vh, 1.1rem) clamp(.9rem, 2.4vh, 1.5rem); }
-@media (max-width: 899px), (max-height: 539px) { .js .talk__foot .sheet__in { padding-bottom: 5rem; } } /* the colophon clears the pill */
+@media screen and (max-width: 899px), screen and (max-height: 539px) { .js .talk__foot .sheet__in { padding-bottom: 5rem; } } /* the colophon clears the pill (not in print) */
 .end { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
 .end__btn { display: inline-flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 1.15rem 0 .95rem; border: 2px solid var(--black); border-radius: 999px; background: transparent; color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease, translate 160ms var(--ease-out); }
 .end__btn svg { width: 16px; height: 16px; flex: none; }
@@ -535,9 +537,9 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
 .card__cap { transition: color 300ms ease; }
 .js .card.pop { transition-property: opacity, transform, translate, rotate, box-shadow, filter; transition-duration: 320ms, 460ms, var(--t-settle), var(--t-settle), var(--t-settle), 400ms; transition-timing-function: var(--ease-out), var(--ease-out), var(--ease), var(--ease), var(--ease), ease; transition-delay: calc(var(--i, 0) * var(--stagger)), calc(var(--i, 0) * var(--stagger)), 0s, 0s, 0s, 0s; }
 .card > .tape { transition: scale var(--t-arrow) var(--ease), box-shadow var(--t-arrow) var(--ease); }
-.collage:has(.card.is-link:hover) .card:not(:hover) { filter: opacity(.55); } /* steps back: opacity only */
-.card.is-link:hover .card__cap { color: var(--fg); }
 @media screen and (hover: hover) and (pointer: fine) {
+  .collage:has(.card.is-link:hover) .card:not(:hover) { filter: opacity(.55); } /* steps back: opacity only (not in print, not after a tap) */
+  .card.is-link:hover .card__cap { color: var(--fg); }
   .card.is-link .card__frame > img { scale: 1.06; transition: scale var(--t-settle) var(--ease); }
   .card.is-link:hover .card__frame > img { scale: 1; }
   .js .is-in .card.is-link:hover { translate: 0 -3px; rotate: calc(var(--rot, 0deg) * -.6); box-shadow: 0 28px 54px rgba(0,0,0,.42); }
@@ -584,12 +586,12 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
   .cols h3 { font-size: 1.4rem; padding-bottom: .3rem; }
   .cols li { padding: .3rem 0; }
   .list, .stat-list, .also, .hockey .stat-line { font-size: .76rem; }
-  .list { gap: .3rem; }
+  .list { gap: .2rem; }
   .split__text .list { margin-top: .75rem; }
   .list li { padding-top: .2rem; }
   .body { font-size: .86rem; }
   .cols ul { font-size: .75rem; line-height: 1.32; }
-  .cols li { padding: .25rem 0; }
+  .cols li { padding: .2rem 0; } /* the record and the lists a notch tighter, so they still stack at 1024x620 with the wider clearance for the index tab */
   .ticket { padding: .8rem 1rem; }
   .ticket .t { font-size: 1.5rem; }
   .ticket p { margin-top: .4rem; }
@@ -616,7 +618,7 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
 /* ---------- Touch screens at desktop widths (tablets in landscape): larger targets ---------- */
 @media (min-width: 900px) and (pointer: coarse) {
   :root { --row: 28px; --tabh: 20px; }
-  .rail__folder { width: 34px; height: 34px; margin-left: -7px; }
+  .rail .rail__folder { width: 34px; height: 34px; margin-left: -7px; } /* .rail: the base rule comes later in the file */
   .out a { min-height: 44px; }
   .entry__link { display: inline-flex; align-items: flex-end; min-height: 44px; }
 }
@@ -756,6 +758,7 @@ html:not(.js) .cabinet:target { display: block; }
 /* while finding, the folders without a match fade their tabs to the muted ink (still 5.4:1) and the
    matching ones carry a small vermilion count */
 .cabinet.is-finding .folder:not(.is-match) .folder__tab { color: var(--ink-2); }
+.cabinet.is-finding .folder.is-current:not(.is-match) .folder__tab { color: var(--black); } /* on the vermilion tab the muted ink would fall to 1.6:1 */
 .cabinet.is-finding .folder:not(.is-match) .folder__n { font-weight: 400; }
 .folder__hits { display: none; min-width: 18px; height: 14px; padding: 0 4px; margin-left: .15em; border-radius: 7px; background: var(--black); color: var(--white); font-size: var(--micro); font-weight: 700; line-height: 14px; letter-spacing: 0; text-align: center; }
 .cabinet.is-finding .folder.is-match .folder__hits { display: inline-block; }
@@ -808,8 +811,8 @@ html:not(.js) .cabinet__shut { display: inline-flex; }
   html.pill-away .index-tab, html.at-end .index-tab, html.index-open .index-tab { translate: -50% calc(100% + 24px); opacity: 0; pointer-events: none; }
   .chrome { mix-blend-mode: normal; background: var(--black); transition: translate 300ms var(--ease); }
   html.bars-away .chrome { translate: 0 -100%; }
-  .js .slide .sheet__in { padding-bottom: calc(clamp(1.25rem, 4vh, 3rem) + 64px); }
 }
+@media screen and (max-width: 899px), screen and (max-height: 539px) { .js .slide .sheet__in { padding-bottom: calc(clamp(1.25rem, 4vh, 3rem) + 64px); } } /* not in print, where there is no pill */
 /* the cabinet as a bottom panel (phones, and windows under 540px tall): rows 44px tall, no rising files (a
    tap opens the sheet), the drawer front with Find and Close kept in reach */
 @media (max-width: 899px), (max-height: 539px) {

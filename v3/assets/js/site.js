@@ -40,17 +40,23 @@
     fold.appendChild(inner); li.appendChild(fold);
     li.classList.add('has-fold');
   });
-  /* a card near the foot of its sheet lifts as far as its unfolded line needs to stay on the sheet
-     (--rise, measured with the layout: offsets, so the stacking's scale does not count) */
+  /* a card the row has stretched (its title is shorter than its neighbours') unfolds from just under its own
+     title (--fold-top), and a card near the foot of its sheet lifts as far as its unfolded line needs to stay
+     on the sheet (--rise); both measured with the layout: offsets, so the stacking's scale does not count */
   var folded = Array.prototype.slice.call(d.querySelectorAll('.entry.has-fold'));
   function riseCards() {
     folded.forEach(function (li) {
-      var sheet = li.closest('.sheet'), inner = li.querySelector('.entry__fold-in'), fold = li.querySelector('.entry__fold');
-      li.style.removeProperty('--rise');
+      var sheet = li.closest('.sheet'), inner = li.querySelector('.entry__fold-in'), fold = li.querySelector('.entry__fold'), title = li.querySelector('.entry__title');
+      li.style.removeProperty('--rise'); li.style.removeProperty('--fold-top');
       if (!sheet || !inner || getComputedStyle(fold).position !== 'absolute') return;
+      var foldTop = li.offsetHeight - 1;
+      if (title && title.offsetParent === li) {
+        var under = Math.ceil(title.offsetTop + title.offsetHeight + parseFloat(getComputedStyle(li).paddingBottom) - 1);
+        if (under < foldTop - 1) { foldTop = under; li.style.setProperty('--fold-top', under + 'px'); }
+      }
       var top = 0;
       for (var e = li; e && e !== sheet; e = e.offsetParent) top += e.offsetTop;
-      var over = top + li.offsetHeight + inner.scrollHeight + 12 - sheet.clientHeight;
+      var over = top + foldTop + inner.scrollHeight + 12 - sheet.clientHeight;
       if (over > 0) li.style.setProperty('--rise', Math.ceil(over) + 'px');
     });
   }
@@ -699,19 +705,23 @@
       b.addEventListener('click', function (e) { closeCabinet(e.detail === 0 || within(d.activeElement)); });
     });
 
-    /* focus leaving both the rail and the cabinet closes it, unless the pointer still holds it */
+    /* focus leaving the rail, the index tab and the cabinet closes it, unless the pointer still holds it.
+       A press on another opener ("portfolio" on the cover, "Open the index") leaves it to that opener's
+       click, which toggles it; tabbing onto one of them is leaving, so it closes. */
     function focusOut(e) {
       if (!isOpen) { if (!within(e.relatedTarget)) { clearTimeout(openT); openT = 0; } return; }
-      if (within(e.relatedTarget) || isOpener(e.relatedTarget)) return;
+      if (within(e.relatedTarget)) return;
       setTimeout(function () {
-        if (!isOpen || within(d.activeElement)) return;
+        var ae = d.activeElement;
+        if (!isOpen || within(ae)) return;
         if (pointerIn) { pull(-1); return; }
-        if (pinned && isOpener(d.activeElement)) return;
+        if (isOpener(ae)) { var kb = true; try { kb = ae.matches(':focus-visible'); } catch (err) { /* older engines */ } if (!kb) return; }
         closeCabinet(false);
       }, 0);
     }
     rail.addEventListener('focusout', focusOut);
     cabinet.addEventListener('focusout', focusOut);
+    if (indexTab) indexTab.addEventListener('focusout', focusOut);
 
     /* a press anywhere else closes it */
     d.addEventListener('pointerdown', function (e) {
