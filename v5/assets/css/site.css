@@ -155,7 +155,7 @@ html.gl .glass::after { display: none; }
 .hero { position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; --hero-fs: min(8.2vw, 24svh, 160px); }
 html.is-hello .hero, html.is-entering .hero { display: block; }
 /* the name's box: the button, and (without the room) the copies of the name that draw its light, set exactly as it is */
-.hero__name, .hero__neon i, .hero__neon b, html:not(.gl) .hero::after { position: absolute; left: 50%; top: 45%; translate: -50% -50%; margin: 0; padding: .05em .12em; font: 780 var(--hero-fs)/1 var(--font-name); letter-spacing: -.03em; white-space: nowrap; text-align: center; }
+.hero__name, .hero__neon i, .hero__neon b, .hero__neon::after { position: absolute; left: 50%; top: 45%; translate: -50% -50%; margin: 0; padding: .05em .12em; font: 780 var(--hero-fs)/1 var(--font-name); letter-spacing: -.03em; white-space: nowrap; text-align: center; }
 .hero__name { border: 0; border-radius: .2em; background: none; color: #fff; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
 .hero__name:focus-visible { outline: 2px solid #fff; outline-offset: 12px; box-shadow: 0 0 0 14px rgba(255, 255, 255, .08); border-radius: .2em; }
 .hero__w { white-space: nowrap; }
@@ -169,11 +169,13 @@ html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s v
    letters (13 s and 17 s), the second copy of each pair crossfading in and out over the first (pink and orange, blue
    and cyan), so the colour turns without a repaint; the letters, light translucent violet with a soft glow, and a
    second face in other colours crossfading over them (.hero__name::after, 16 s); and a white-hot line just outside
-   the letters' edge (.hero::after). A trace is the name's outline: a stroke under a black fill (paint-order),
-   screened, so the black adds nothing and hides the strokes Switzer's overlapping shapes would draw inside the
-   letters. Only transform and opacity animate, each on its own layer. The colours are the shader's, turned by the
-   colour style as the shader turns them (hue.js sets --neon-*). Still under reduced motion (the rule there stops every
-   animation), solid under reduced transparency, plain text in forced colours. */
+   the letters' edge (.hero__neon::after). Every copy of the name that draws light is hidden from assistive technology
+   (inside the aria-hidden .hero__neon, or, in the button, generated content with empty alt text), so the name is read
+   once, as the button. A trace is the name's outline: a stroke under a black fill (paint-order), screened, so the
+   black adds nothing and hides the strokes Switzer's overlapping shapes would draw inside the letters. Only transform
+   and opacity animate, each on its own layer. The colours are the shader's, turned by the colour style as the shader
+   turns them (hue.js sets --neon-*). Still under reduced motion (the rule there stops every animation), solid under
+   reduced transparency, plain text in forced colours. */
 html:not(.gl) .hero {
   background: #0b1138 url("../img/room-night.webp") center / cover no-repeat;
   --n-pink: var(--neon-pink, #ff1f75); --n-orange: var(--neon-orange, #ff660d); --n-violet: var(--neon-violet, #8533ff);
@@ -189,7 +191,8 @@ html:not(.gl) .hero__neon { display: block; }
 .hero__neon i { z-index: 1; pointer-events: none; font-style: normal; opacity: 0; color: var(--n-pink); -webkit-text-fill-color: #000; -webkit-text-stroke: .09em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .05em currentColor); will-change: transform; transition: opacity .9s var(--ease-out);
   --ga: 40deg; --gr: .024em; transform: rotate(var(--ga)) translateX(var(--gr)) rotate(calc(-1 * var(--ga))); }
 .hero__neon i:nth-of-type(2) { color: var(--n-blue); --ga: 220deg; --gr: .022em; }
-.hero__neon b::before, .hero__neon i::before, .hero__neon i::after, html:not(.gl) .hero::after, html:not(.gl) .hero__name::after { content: "Leonardo Carvalho"; }
+.hero__neon b::before, .hero__neon i::before, .hero__neon i::after, .hero__neon::after, html:not(.gl) .hero__name::after { content: "Leonardo Carvalho"; }
+html:not(.gl) .hero__name::after { content: "Leonardo Carvalho" / ""; }   /* inside the button: drawn, not read (the button is named) */
 .hero__neon i::after { position: absolute; inset: .05em .12em; color: var(--n-orange); opacity: .55; }
 .hero__neon i:nth-of-type(2)::after { color: var(--n-cyan); opacity: .4; }
 .hero.is-ready .hero__neon i { opacity: .8; animation: hero-orbit 13s linear infinite; }
@@ -216,29 +219,34 @@ html:not(.gl) .hero__name::after {
 }
 html:not(.gl) .hero.is-ready .hero__name::after { animation: hero-turn 16s ease-in-out -4s infinite alternate; }
 /* the white-hot line on the letters' edge (only its outer half shows) */
-html:not(.gl) .hero::after { pointer-events: none; color: rgba(255, 242, 250, .95); -webkit-text-fill-color: #000; -webkit-text-stroke: .02em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .045em var(--n-pink)); opacity: 0; transition: opacity .9s var(--ease-out); }
-html:not(.gl) .hero.is-ready::before, html:not(.gl) .hero.is-ready::after { opacity: 1; }
+.hero__neon::after { pointer-events: none; color: rgba(255, 242, 250, .95); -webkit-text-fill-color: #000; -webkit-text-stroke: .02em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .045em var(--n-pink)); opacity: 0; transition: opacity .9s var(--ease-out); }
+html:not(.gl) .hero.is-ready::before, .hero.is-ready .hero__neon::after { opacity: 1; }
 /* by day the room is bright: the room behind the name falls toward a saturated violet-blue, hugging the letters */
 @media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(36, 18, 132, .5), rgba(36, 18, 132, .3) 50%, rgba(36, 18, 132, 0)); --pool-h: 2.2; --shade: rgba(34, 14, 124, .82); } }
 html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(36, 18, 132, .5), rgba(36, 18, 132, .3) 50%, rgba(36, 18, 132, 0)); --pool-h: 2.2; --shade: rgba(34, 14, 124, .82); }
-/* reduced transparency: solid letters (white by night, a deep blue by day), without the pool, traces or glow */
+/* reduced transparency: solid letters without the pool, traces or neon: white by night; by day a deep navy on a soft
+   light halo, since the day room runs from pale sky to mid blue behind the name (5.4:1 or better against the darker
+   parts round the letters, where #1f3fae alone measured 2.4:1) */
 @media (prefers-reduced-transparency: reduce) {
   html:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; filter: none; }
-  html:not(.gl) .hero::before, html:not(.gl) .hero::after, html:not(.gl) .hero__name::after, html:not(.gl) .hero__neon { display: none; }
+  html:not(.gl) .hero::before, html:not(.gl) .hero__name::after, html:not(.gl) .hero__neon { display: none; }
+  html[data-appearance="day"]:not(.gl) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); }
 }
-@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background: #1f3fae; -webkit-background-clip: text; background-clip: text; } }
+@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); } }
 @media (max-width: 699px) {
   .hero { --hero-fs: min(18vw, 15svh, 120px); }
-  .hero__name, .hero__neon i, .hero__neon b, html:not(.gl) .hero::after { line-height: .98; }
+  .hero__name, .hero__neon i, .hero__neon b, .hero__neon::after { line-height: .98; }
   .hero__w { display: block; }
-  .hero__neon b::before, .hero__neon i::before, .hero__neon i::after, html:not(.gl) .hero::after, html:not(.gl) .hero__name::after { content: "Leonardo\A Carvalho"; white-space: pre; }
+  .hero__neon b::before, .hero__neon i::before, .hero__neon i::after, .hero__neon::after, html:not(.gl) .hero__name::after { content: "Leonardo\A Carvalho"; white-space: pre; }
+  html:not(.gl) .hero__name::after { content: "Leonardo\A Carvalho" / ""; }
   html:not(.gl) .hero::before { width: calc(var(--hero-fs) * 6.4); height: calc(var(--hero-fs) * (var(--pool-h) + 1.2)); }
 }
 .hero__hint { position: absolute; left: 16px; right: 16px; bottom: calc(32px + env(safe-area-inset-bottom)); margin: 0; text-align: center; color: var(--ink-2); font: 500 14px/1.3 var(--font); letter-spacing: .01em; opacity: 0; transition: opacity .5s var(--ease-out) .75s; }
 .hero__hint span { pointer-events: auto; cursor: pointer; }
-/* the day room can be bright behind it on a phone: a soft dark halo keeps the secondary ink above 4.5:1 */
-@media (prefers-color-scheme: light) { html:not([data-appearance="night"]) .hero__hint { text-shadow: 0 0 12px rgba(6, 18, 78, .7), 0 0 4px rgba(6, 18, 78, .5); } }
-html[data-appearance="day"] .hero__hint { text-shadow: 0 0 12px rgba(6, 18, 78, .7), 0 0 4px rgba(6, 18, 78, .5); }
+/* the day room can be bright behind it, most of all on a phone, where the drifting room put 0.16 luminance behind the
+   secondary ink (3.7:1): by day the hint is white over a soft dark halo, 4.8:1 or better over the brightest of it */
+@media (prefers-color-scheme: light) { html:not([data-appearance="night"]) .hero__hint { color: #fff; text-shadow: 0 0 12px rgba(6, 18, 78, .7), 0 0 4px rgba(6, 18, 78, .5); } }
+html[data-appearance="day"] .hero__hint { color: #fff; text-shadow: 0 0 12px rgba(6, 18, 78, .7), 0 0 4px rgba(6, 18, 78, .5); }
 .hero.is-ready .hero__hint { opacity: 1; }
 .hero__coarse { display: none; }
 @media (pointer: coarse) { .hero__fine { display: none; } .hero__coarse { display: inline; } }
@@ -560,7 +568,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   .room { display: none; }
   .glass { forced-color-adjust: auto; background: Canvas; border: 1px solid CanvasText; }
 }
-@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } .hero::before, .hero::after, .hero__name::after, .hero__neon { display: none !important; } html .hero { background: none !important; } }
+@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } .hero::before, .hero__name::after, .hero__neon { display: none !important; } html .hero { background: none !important; } }
 
 /* ---------- print: plain text on white, Letter with half-inch margins ---------- */
 @page { size: letter; margin: .5in; }

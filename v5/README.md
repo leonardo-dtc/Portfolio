@@ -141,9 +141,11 @@ WCAG 2.3.3 asks that motion set off by interaction can be turned off):
   crossfading with orange, blue with cyan) screened onto it, light translucent
   faces crossfading between two sets of the colours, and a white-hot line on the
   edge. Only transform and opacity animate, each on its own layer, and the
-  palettes turn the colours as the shader does. Reduced motion holds it still;
-  reduced transparency gives solid letters (white, or a deep blue by day); forced
-  colours give plain system text. Entering is a fade (150 ms under reduced
+  palettes turn the colours as the shader does. Every copy of the name that
+  draws the light is hidden from assistive technology, so the name is read once,
+  as the button. Reduced motion holds it still; reduced transparency gives solid
+  letters (white, or a deep navy on a soft light halo by day); forced colours
+  give plain system text. Entering is a fade (150 ms under reduced
   motion). Without scripts there is no hero, and print shows the text title.
 - Later home views (and `?nohello`) open straight into the windows; the session
   key is still `v5:hello`. Reloading the home page brings the hero back (the
