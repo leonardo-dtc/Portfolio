@@ -83,10 +83,11 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   motion keeps only the fades.
 - **Rows lean.** A row in the record (and in any list of links) leans its title
   4 px to the right over 450 ms, brings its date to full ink, and steps the rest of
-  its group back to 55%.
+  its group back: their titles go to Ink 2. (The dim-room edition's 55% took them
+  under 4.5:1 over the brightest glass; Ink 2 keeps them over it.)
 - **Experiments open.** One component on Home and on Work: each shows its italic
   title and date; pointing at one, or focusing it, unfolds its line (500 ms), raises a
-  Fill 2 wash and dims the others to 35%. The list takes the line into the space
+  Fill 2 wash and steps the other titles back to Ink 2. The list takes the line into the space
   below it, so nothing after it moves. Touch, phones, reduced motion, scripts off and
   print show every line.
 - **Side windows hold what fits.** Work's Experiments moved into the main window
@@ -99,6 +100,12 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
 - **Card images fit the card.** 320 px derivatives of the Loquar, Genuvalens and
   OCAPEX screenshots, and `sizes` set to the screenshot's real width (132 px at
   1440), so a 1440 or 390 screen at 1× or 2× loads the 320.
+- **Checked afterwards** (the same round): the arrow is left out on cards under
+  148 px wide, where it touched the tag (360 px phones, upright tablets); the
+  pointer's light is half as strong over rows and stays off the words of a card,
+  where it took white text under 4.5:1; focus and anchor jumps land clear of the
+  window's fades and its toolbar; in print the drawn cards keep their colour and
+  the room card's pane stays on its picture.
 
 ## The room
 

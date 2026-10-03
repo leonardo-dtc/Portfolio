@@ -77,7 +77,7 @@ html:not(.gl) .room { display: none; }
 .win__head { padding: 30px var(--pad) 10px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
 .win__head h1 { font: 700 34px/1.08 var(--font-display); letter-spacing: -.012em; }
 .win__head .sub { margin-top: 6px; color: var(--ink-2); font-size: 16px; }
-.win__body { overflow: auto; overscroll-behavior: contain; padding: 18px var(--pad) 110px; outline-offset: -4px;
+.win__body { overflow: auto; overscroll-behavior: contain; padding: 18px var(--pad) 110px; outline-offset: -4px; scroll-padding: 30px 0 96px;   /* what is focused or jumped to lands clear of the fades at the top and foot (and of the toolbar and the dock over the foot) */
   -webkit-mask: linear-gradient(transparent, #000 22px, #000 calc(100% - 78px), transparent calc(100% - 22px)); mask: linear-gradient(transparent, #000 22px, #000 calc(100% - 78px), transparent calc(100% - 22px));
   scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .25) transparent; }
 .win__body:focus-visible { box-shadow: none; outline: 2px solid rgba(255, 255, 255, .5); }
@@ -87,7 +87,7 @@ html:not(.gl) .room { display: none; }
 .side:not(.side--inline) { will-change: transform; }
 /* when it holds more than its room, it says so: a slim white capsule scrolls at its right edge, clear of the corners.
    Its 14px gutter is kept whether or not it scrolls, so the text keeps one measure (22px of padding either way). */
-.side:not(.side--inline) { scrollbar-gutter: stable; padding-right: 8px; }
+.side:not(.side--inline) { scrollbar-gutter: stable; padding-right: 8px; scroll-padding: 16px 0 36px; }   /* (a focused link lands clear of its fading foot) */
 @supports not (scrollbar-gutter: stable) { .side:not(.side--inline) { padding-right: 22px; } }
 .side::-webkit-scrollbar { width: 14px; }
 .side::-webkit-scrollbar-track { background: none; margin: 30px 0; }
@@ -303,7 +303,7 @@ html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards;
 /* cards: each on its own screen's colour */
 .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.card { position: relative; display: block; aspect-ratio: 4 / 5.3; border-radius: var(--r-card); overflow: hidden; background: var(--c, var(--fill)); color: var(--ct, #fff); text-decoration: none; box-shadow: 0 10px 24px rgba(0, 0, 0, .16); transition: box-shadow .45s var(--ease-long), scale .35s var(--ease-out); isolation: isolate; }
+.card { position: relative; display: block; aspect-ratio: 4 / 5.3; border-radius: var(--r-card); overflow: hidden; background: var(--c, var(--fill)); color: var(--ct, #fff); text-decoration: none; box-shadow: 0 10px 24px rgba(0, 0, 0, .16); transition: box-shadow .45s var(--ease-long), scale .35s var(--ease-out); isolation: isolate; container-type: inline-size; }
 .card[hidden] { display: none; }
 .card__shot { position: absolute; left: 8%; right: 8%; top: 10%; border-radius: 9px; overflow: hidden; isolation: isolate; box-shadow: 0 10px 26px rgba(0, 0, 0, .26); }   /* (isolation: WebKit then clips a scaled picture to the rounded frame) */
 .card__shot img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
@@ -321,7 +321,8 @@ html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards;
 .card--violet { --c: #4b3fb0; --ct: #fff; }
 .card--green { --c: #2f6e4f; --ct: #fff; }
 .card__page { position: absolute; inset: 15px 15px 84px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
-.card__paper { font: 600 15px/1.22 var(--serif); color: #1b1b1f; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding-right: 30px; }   /* the top right corner is the arrow's */
+.card__paper { font: 600 15px/1.22 var(--serif); color: #1b1b1f; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+@media screen { @container (min-width: 148px) { .card__paper { padding-right: 38px; } } }   /* the top right corner is the arrow's: 9px clear of it (on paper there is no arrow) */
 .card__rules { display: grid; gap: 7px; }
 .card__rules i { display: block; height: 5px; border-radius: 4px; background: rgba(0, 0, 0, .1); }
 .card__rules i:nth-child(2) { width: 82%; } .card__rules i:nth-child(3) { width: 90%; }
@@ -330,33 +331,38 @@ html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards;
 .rows { border-radius: var(--r-row); background: var(--fill); overflow: hidden; }
 .rows > li + li { border-top: 1px solid var(--line); }
 .row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 13px 16px; text-decoration: none; color: #fff; }
-a.row { transition: opacity .4s var(--ease-long), background-color .25s ease; }
+a.row { transition: background-color .25s ease; }
 a.row:hover { background: var(--fill); }
+/* the pointer's light, at half strength over a row: a row is all text, and at full strength it took white text to 4.1:1 */
+.rows a.row::before { background: radial-gradient(180px circle at var(--hx) var(--hy), rgba(255, 255, 255, .08), transparent 62%); }
+.rows a.row:active::before { background: radial-gradient(240px circle at var(--hx) var(--hy), rgba(255, 255, 255, .15), transparent 64%); }
 .rows .row:focus-visible { outline-offset: -3px; box-shadow: inset 0 0 0 6px rgba(255, 255, 255, .18); }   /* the group clips its rows: the ring goes inside */
-.row__t { transition: translate .45s var(--ease-long); }
+.row__t { transition: translate .45s var(--ease-long), color .4s var(--ease-long); }
 .row__m { color: var(--ink-3); font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; transition: color .45s var(--ease-long); }
 .row__t small { display: block; margin-top: 2px; color: var(--ink-3); font-size: 14px; }
 .lead { font: 600 18px/1.4 var(--font); color: #fff; margin: 0 0 12px; max-width: 34em; }
 .group + .group { margin-top: 30px; }
 /* a row under the pointer or the keyboard: its title leans 4px in (450ms on the long ease), its date comes up to full
-   ink, and the rest of its list group steps back to 55%. Nothing blurs; reduced motion keeps the colour and the dim. */
+   ink, and the rest of its list group steps back: their titles go to Ink 2 (400ms). Nothing blurs; reduced motion keeps
+   the colours. (A step back to 55%, the dim-room value, took the other titles to 3.3:1 over the brightest glass; Ink 2
+   keeps them over 4.5:1, and their dates stay at Ink 3, which already does.) */
 @media screen and (hover: hover) and (pointer: fine) {
-  .rows:not(.exp):has(a.row:hover) a.row:not(:hover) { opacity: .55; }
+  .rows:not(.exp):has(a.row:hover) a.row:not(:hover) .row__t { color: var(--ink-2); }
   a.row:hover .row__m { color: #fff; }
 }
-.rows:not(.exp):has(a.row:focus-visible):not(:has(a.row:hover)) a.row:not(:focus-visible) { opacity: .55; }
+.rows:not(.exp):has(a.row:focus-visible):not(:has(a.row:hover)) a.row:not(:focus-visible) .row__t { color: var(--ink-2); }
 a.row:focus-visible .row__m { color: #fff; }
 @media screen and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) { .rows:not(.exp) a.row:hover .row__t { translate: 4px 0; } }
 @media screen and (prefers-reduced-motion: no-preference) { .rows:not(.exp) a.row:focus-visible .row__t { translate: 4px 0; } }
 
 /* experiments: one component, on Home and on Work. At rest each is its italic title and its date; pointing at one (or
    focusing it) unfolds its line beneath them (grid rows 0fr to 1fr, 500ms on the long ease) and raises a Fill 2 wash
-   while the others dim to 35%. Nothing blurs, and the title never moves. The list takes the opened line into the space
+   while the others step back to Ink 2. Nothing blurs, and the title never moves. The list takes the opened line into the space
    below it (a negative margin that grows as the line does), so nothing after it moves. Touch screens, phones, reduced
    motion, scripts off and print show every line. Add one by copying an <li>. */
-.exp .row { row-gap: 0; transition: opacity .3s var(--ease-long), background-color .5s var(--ease-long); }
+.exp .row { row-gap: 0; transition: background-color .5s var(--ease-long); }
 .exp .row__t { display: contents; }
-.exp .row__t em { grid-area: 1 / 1; font-style: italic; font-weight: 550; }
+.exp .row__t em { grid-area: 1 / 1; font-style: italic; font-weight: 550; transition: color .4s var(--ease-long); }
 .exp .row__m { grid-area: 1 / 2; font-size: 13px; }
 .exp .row__t small { grid-area: 2 / 1 / 3 / -1; align-self: stretch; min-height: 0; overflow: hidden; margin: 0; line-height: 20px; }
 .exp .row__t small::before { content: ""; display: block; height: 2px; }   /* inside the clip, so a closed line is 0px */
@@ -365,11 +371,11 @@ a.row:focus-visible .row__m { color: #fff; }
 .exp .row__t small { transition: color .45s var(--ease-long); }
 .exp a.row:is(:hover, :focus-visible) small { color: #fff; }   /* on the brighter wash, Ink 3 would fall to 3.5:1; white keeps 5:1 */
 .exp:has(a.row:hover) a.row:focus-visible:not(:hover) { background-color: transparent; }   /* one wash: the pointer's */
-@media screen and (hover: hover) and (pointer: fine) { .exp:has(a.row:hover) a.row:not(:hover) { opacity: .35; } }
-.exp:has(a.row:focus-visible):not(:has(a.row:hover)) a.row:not(:focus-visible) { opacity: .35; }
+@media screen and (hover: hover) and (pointer: fine) { .exp:has(a.row:hover) a.row:not(:hover) em { color: var(--ink-2); } }
+.exp:has(a.row:focus-visible):not(:has(a.row:hover)) a.row:not(:focus-visible) em { color: var(--ink-2); }
 @media screen and (min-width: 900px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html.js .exp { transition: margin-bottom .5s var(--ease-long); }
-  html.js .exp .row { grid-template-rows: auto 0fr; transition: grid-template-rows .5s var(--ease-long), opacity .3s var(--ease-long), background-color .5s var(--ease-long); }
+  html.js .exp .row { grid-template-rows: auto 0fr; transition: grid-template-rows .5s var(--ease-long), background-color .5s var(--ease-long); }
   html.js .exp .row__t small { opacity: 0; transition: opacity .35s ease, color .45s var(--ease-long); }
   html.js .exp a.row:is(:hover, :focus-visible) { grid-template-rows: auto 1fr; }
   html.js .exp a.row:is(:hover, :focus-visible) small { opacity: 1; }
@@ -491,9 +497,15 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .card::after { opacity: 0; }
   .card:is(:hover, :focus-visible)::after { opacity: 1; }
 }
+/* a card narrower than 148px (two columns on a 360px phone, three at 500px, five on a tablet held upright) has no room
+   for the arrow beside its tag, so it goes without; the whole card is still the link */
+@container (max-width: 147.98px) { .card::after { display: none; } }
+/* the light falls on the picture and fades out above the words: over the white words of a blue or green card at full
+   strength it took them to 3.4:1 */
+.card::before { -webkit-mask-image: linear-gradient(#000 calc(100% - 132px), transparent calc(100% - 96px)); mask-image: linear-gradient(#000 calc(100% - 132px), transparent calc(100% - 96px)); }
 @media screen and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .card__shot > img, .card__shot > svg, .card__page { scale: 1.05; transition: scale .8s var(--ease-long); }
-  .card:is(:hover, :focus-visible) .card__shot > img, .card:is(:hover, :focus-visible) .card__shot > svg, .card:is(:hover, :focus-visible) .card__page { scale: 1; }
+  .card__shot > :is(img, svg, i), .card__page { scale: 1.05; transition: scale .8s var(--ease-long); }
+  .card:is(:hover, :focus-visible) :is(.card__shot > :is(img, svg, i), .card__page) { scale: 1; }
   .card::after { scale: .8; rotate: 45deg; }
   .card:is(:hover, :focus-visible)::after { scale: 1; rotate: 0deg; }
 }
@@ -701,6 +713,8 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   .card__page { margin-bottom: 6pt; }
   .card__text { margin: 0; }
   .card[href]::after { content: none; }
+  .card > .card__room { position: relative !important; }   /* its pane stays on the picture */
+  .card__art { background: var(--c) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }   /* the drawing is white: it keeps its card's colour */
   .portrait { width: 1.3in; }
   .side { break-inside: avoid; margin-top: 16pt !important; }
 
