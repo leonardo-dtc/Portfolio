@@ -14,7 +14,8 @@ python3 tools/serve.py 8778
 ```
 
 Then open `http://127.0.0.1:8778/v5/`. The hero plays on the first home view of
-a browser session; add `?nohello` to skip it.
+a browser session and on every reload of the home page; add `?nohello` to skip
+it.
 
 ## Where it comes from
 
@@ -109,7 +110,9 @@ WCAG 2.3.3 asks that motion set off by interaction can be turned off):
   fade into the windows. Reduced motion shows the name at once and fades in
   150 ms. Without scripts there is no hero, and print shows the text title.
 - Later home views (and `?nohello`) open straight into the windows; the session
-  key is still `v5:hello`.
+  key is still `v5:hello`. Reloading the home page brings the hero back (the
+  head script reads the navigation type), so it can be reviewed without
+  clearing storage.
 
 ## The glass
 

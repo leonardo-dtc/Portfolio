@@ -49,10 +49,12 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   check(after.text === 'Leonardo Carvalho' && after.opacity === '1' && /Switzer/.test(after.font) && after.color === 'rgb(255, 255, 255)', `the title is white text in Switzer ${after.weight}`);
   check(after.ink === null, 'the glass is off once the title has landed: it stays out of the content layer');
   check(after.main === '1' && after.hero === 'none', 'the window is in and the hero is gone');
-  await page.reload({ waitUntil: 'load' });
+  await page.goto(BASE, { waitUntil: 'load' });
   await page.waitForTimeout(400);
   check(!(await page.evaluate(() => document.documentElement.classList.contains('is-hello'))), 'a second view in the session skips the hero');
   check(await page.evaluate(() => !window.__room.state.ink && getComputedStyle(document.querySelector('#main h1.name')).opacity === '1'), 'and opens on the text title');
+  await page.reload({ waitUntil: 'load' });
+  check(await page.evaluate(() => document.documentElement.classList.contains('is-hello')), 'a reload brings the hero back');
   check(errors.length === 0, 'no console errors ' + errors.join(' | '));
   await browser.close();
 }
