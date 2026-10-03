@@ -482,7 +482,7 @@ Each question shows the default this round uses, or my recommendation where noth
 - **T8.** Cover routes: the underlined words in your handwritten line (built), or taped label stickers (mock above)?
 - **T9.** A file rising out of its folder (kept), or sliding out sideways to lie beside the drawer?
 - **T10.** Project files as their own pages (built: own address, clean print, no script), or overlays drawn over the deck like v5's sheets?
-- **T11.** Coach emails on the hockey sheet itself, or only in the hockey file and its print (built)?
+- **T11.** Coach email addresses: published (on the hockey sheet, or only in the hockey file and its print), or names and roles only? *Built: names and roles with "Addresses on request.", as v5 does (Leonardo's 2026-09-18 decision).*
 - **T12.** Small text on the red panels: black (built, v3's own rule), or a deeper red so the text can stay white?
 - **T13.** Should sheets replay their entrance every time you come back, or only the first time? *Unchanged: every time.*
 - **T14.** A long jump: a quick cut and one sheet sliding (built), or seeing every sheet flick past?

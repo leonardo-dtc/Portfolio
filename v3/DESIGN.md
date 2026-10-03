@@ -170,8 +170,9 @@ On hover: the image settles inside its still, overflow-hidden frame from 1.06 to
 60% of its tilt toward flat and lifts 3px as its shadow deepens (800ms); its tape presses down (scale .96,
 a tighter shadow, 450ms); the badge grows from .8 to 1 while its arrow turns from 45 degrees to 0 (450ms);
 the caption brightens to full ink; the card comes to the top of the collage (`z-index` 2 over a resting 1,
-dropping back once it has settled, 800ms after the pointer leaves), so its overlapping sibling never covers
-it. The other card in the collage steps back by colour, not opacity: its ink moves to `--ink-2` (5.45:1 on
+dropping back once it has settled, 800ms after the pointer leaves the collage; pointing at the other card
+puts it at 0 at once, so the other card rises over it without waiting), so its overlapping sibling never
+covers it. The other card in the collage steps back by colour, not opacity: its ink moves to `--ink-2` (5.45:1 on
 paper), the 486 card's vermilion pales to `#EA6256` (black text 5.55:1, the white figure 3.29:1), its
 shadow lightens, and only pictures fade to .55 (a photograph or the sketch, and the chart's bars as fill
 colour). Badges sit on the card's outer

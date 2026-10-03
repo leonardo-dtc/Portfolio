@@ -564,6 +564,9 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
   .collage:has(.card.is-link:hover) .card:not(:hover) .bar { background-color: rgb(21 21 21 / .45); }
   .collage:has(.card.is-link:hover) .card:not(:hover) .bar--ac { background-color: rgb(234 61 46 / .55); }
   .js .card.is-link:hover { z-index: 2; transition-delay: calc(var(--i, 0) * var(--stagger)), calc(var(--i, 0) * var(--stagger)), 0s, 0s, 0s, 0s, 0s, 0s; }
+  /* the delay is for a pointer that leaves the collage. Pointing at the other card puts this one under it at once:
+     level 0, not the resting 1, so the change also cuts short a drop already waiting (the pointer crossed the paper) */
+  .js .collage:has(.card.is-link:hover) .card.pop:not(:hover) { z-index: 0; transition-delay: calc(var(--i, 0) * var(--stagger)), calc(var(--i, 0) * var(--stagger)), 0s, 0s, 0s, 0s, 0s, 0s; }
   .card.is-link:hover .card__cap { color: var(--fg); }
   .card.is-link .card__frame > img { scale: 1.06; transition: scale var(--t-settle) var(--ease), opacity 400ms ease; }
   .card.is-link:hover .card__frame > img { scale: 1; }
@@ -666,6 +669,7 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
   .js .is-in .card.is-link:hover { translate: none; rotate: none; }
   .js .card.pop { transition: opacity 200ms ease, background-color 200ms ease, color 200ms ease, box-shadow 200ms ease; }
   .js .card.is-link:hover { transition-delay: 0s; } /* the card comes to the top at once, and drops back at once */
+  .js .collage:has(.card.is-link:hover) .card.pop:not(:hover) { transition-delay: 0s; }
   .card.is-link:hover > .tape { scale: none; }
   .card__go, .card__go svg { scale: none; rotate: none; }
   .card__go { transition: opacity 200ms ease; }

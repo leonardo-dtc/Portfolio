@@ -298,6 +298,15 @@ for (const slug of FILES) {
       const top = await page.evaluate(([id, k]) => { const a = document.querySelector(`#${id} .card--a`).getBoundingClientRect(), b = document.querySelector(`#${id} .card--b`).getBoundingClientRect(); const l = Math.max(a.left, b.left), t = Math.max(a.top, b.top), r = Math.min(a.right, b.right), btm = Math.min(a.bottom, b.bottom); if (l >= r || t >= btm) return null; const e = document.elementFromPoint((l + r) / 2, (t + btm) / 2), c = e && e.closest('.card'); return c ? (c.classList.contains('card--' + k) ? 'ok' : `card--${k} pointed at, the other card on top`) : 'nothing'; }, [id, k]);
       if (top !== null) tops.push(`${id}: ${top}`);
     }
+    /* from the second card back to the first, crossing the paper on the way: the first comes to the top at once,
+       not after the second card's 800ms drop */
+    const ptA = await pointIn(`#${id} .card--a`);
+    const off = await page.evaluate(id => { const r = document.querySelector(`#${id} .collage`).getBoundingClientRect(); return [r.left + 4, r.bottom + 30]; }, id);
+    await page.mouse.move(off[0], off[1], { steps: 3 }); await page.waitForTimeout(150);
+    await page.mouse.move(ptA[0], ptA[1], { steps: 3 }); await page.waitForTimeout(200);
+    const back = await page.evaluate(id => { const a = document.querySelector(`#${id} .card--a`).getBoundingClientRect(), b = document.querySelector(`#${id} .card--b`).getBoundingClientRect(); const l = Math.max(a.left, b.left), t = Math.max(a.top, b.top), r = Math.min(a.right, b.right), btm = Math.min(a.bottom, b.bottom); if (l >= r || t >= btm) return null; const e = document.elementFromPoint((l + r) / 2, (t + btm) / 2), c = e && e.closest('.card'); return c && c.classList.contains('card--a') ? 'ok' : 'card--a pointed at again, card--b still on top 200ms later'; }, id);
+    if (back !== null) tops.push(`${id} (back to card--a): ${back}`);
+    await page.mouse.move(700, 120); await page.waitForTimeout(900);
   }
   await goSheet('archive');
   const n = await page.evaluate(() => document.querySelectorAll('#archive .entry').length);

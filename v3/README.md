@@ -151,7 +151,8 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   in its still frame from 1.06 to 1 (800ms), the card eases toward flat and lifts
   3px, its tape presses, a round vermilion badge grows in while its arrow turns
   from 45 degrees (450ms), the caption brightens, and the card comes to the top of
-  the collage (it drops back 800ms after the pointer leaves). The other card steps
+  the collage (it drops back 800ms after the pointer leaves the collage, or at once
+  when the pointer moves on to the other card). The other card steps
   back by colour, not opacity: its ink goes to the muted ink and the 486 card's
   vermilion pales, so its text keeps 4.5:1; only its pictures (a photograph, the
   sketch, the chart's bars) fade to .55. Nothing blurs. See `DESIGN.md`.

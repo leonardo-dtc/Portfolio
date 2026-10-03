@@ -96,7 +96,7 @@ Where each lives and what makes it work:
 - Hometown wording: v1 to v3 say Lake Worth, Florida; v4 and v5 say South Florida (Leonardo's 2026-09-18 decision).
 - v4 and v5 hockey read "Born 2009. South Florida", which says he was born there; he was born in Beijing.
 - v3 still links into v2 for project detail; v2 and v3 copy still mentions two or three editions.
-- `v3/README.md` calls the goalie mask renders "Leonardo's own mask model"; PRODUCT.md says the model was downloaded.
+- ~~`v3/README.md` calls the goalie mask renders "Leonardo's own mask model"; PRODUCT.md says the model was downloaded.~~ Fixed in round three: the README now calls it a downloaded model.
 - v3's vermilion fails 4.5:1 for small white text (4.03:1) and as small text on paper (3.23:1).
 - v1 loads Google Fonts, the only third-party request in the site.
 - The repository's `references/repo` is a submodule pointer with no URL, which breaks GitHub's own Pages builder (the published site uses the Actions workflow and is unaffected).
