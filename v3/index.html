@@ -21,14 +21,15 @@
   <a href="#cover">Leonardo Carvalho</a>
   <span aria-hidden="true">2026</span>
 </header>
-<!-- The index tab: a small paper tab above the rail on desktop, a black pill at the bottom centre on phones
-     (where it also names the current sheet). It opens the cabinet; without the script it shows the cabinet as
-     the link's target. -->
-<a class="index-tab" href="#cabinet" data-index-open aria-controls="cabinet" aria-expanded="false"><span class="index-tab__k">Index</span><span class="index-tab__at" data-index-at> · 01 Cover</span></a>
+<!-- The index tab: a small paper tab above the rail on desktop, a black pill resting at the bottom right on
+     phones (where it also names the current sheet). It is the keyboard's one way into the index. It opens the
+     cabinet; without the script it shows the cabinet as the link's target. -->
+<a class="index-tab" href="#cabinet" data-index-open aria-controls="cabinet" aria-expanded="false"><span class="index-tab__k">Index</span><span class="index-tab__at" data-index-at> · 01<span class="index-tab__name"> Cover</span></span></a>
 <!-- The rail: one dot per sheet, the current sheet's number and name, and the folder button that opens the
-     cabinet. The dots share their row pitch with the cabinet's folders, so each dot sits level with its folder. -->
+     cabinet. The dots share their row pitch with the cabinet's folders, so each dot sits level with its folder.
+     The folder button is for the pointer (tabindex -1): the Index tab above it is the keyboard's one way in. -->
 <nav class="rail" aria-label="Sheets">
-  <button class="rail__folder" type="button" data-index-open aria-expanded="false" aria-controls="cabinet" aria-label="Index of the sheets" title="Index">
+  <button class="rail__folder" type="button" tabindex="-1" data-index-open aria-expanded="false" aria-controls="cabinet" aria-label="Index of the sheets" title="Index">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5h6.2l1.8 2h10v10H3z"/><path d="M3 7.5V5.8h5.4l1.5 1.7"/></svg>
   </button>
   <p class="rail__label" aria-hidden="true" data-rail-label><b>01</b> Cover</p>

@@ -18,8 +18,11 @@ Three rules hold the system together:
    control.
 2. **Content moves inside a still frame.** Hovers are long and soft (450 to 800 ms on one ease-out curve)
    and move a few pixels in answer to the pointer. Nothing moves on its own except the reveals as a sheet
-   arrives, the cover's typing code panel and the Scroll hint's three pulses (opacity, then it rests).
-3. **What steps back dims; it never blurs.** Text being read and things in motion are never blurred.
+   arrives, the cover's typing code panel (which the first key press finishes) and the Scroll hint's three
+   pulses (opacity, then it rests).
+3. **What steps back dims by colour; it never blurs.** Text being read and things in motion are never
+   blurred, and text that steps back keeps 4.5:1 (3:1 at 24px and up): its ink and paper change colour, and
+   only pictures fade with opacity.
 
 ## Tokens
 
@@ -62,7 +65,8 @@ Nothing visible is set under 12px. The code panel is 12px monospace (it was 9px)
 
 ### Layout
 
-`--gutter` clamp(16px, 2.6vw, 36px), `--max` 1400px, `--chrome` 52px (44px in short windows), `--tear`
+`--gutter` clamp(16px, 2.6vw, 36px), `--max` 1400px, `--chrome` 52px (44px in short windows, in the files
+too, so the chrome text never moves between the deck and a file), `--tear`
 64px (52px). On desktop, content ends at least `max(gutter + 40px, 70px)` from the screen's right edge
 (less the margin outside `--max`), which leaves the rail label and the index tab (59px wide, 6px from the
 edge) clear of it: 11 to 15px at 1440px, 5px between the tab and the content at 1024px and below.
@@ -92,7 +96,9 @@ slides in. Reveals replay each time a sheet comes back.
 cuts instantly to one screen before the target (after it, going back) and slides only the last sheet:
 cover to hockey moves the page 900px, where it used to sweep 6300px through six sheets. The page's own
 scroll position moves (the sticky sheets do the rest); any wheel, touch, press or scrolling key stops the
-slide at once. Reduced motion jumps. Keyboard focus landing in a stacked sheet brings it to rest.
+slide at once. Reduced motion jumps. Keyboard focus landing in a stacked sheet brings it to rest. A load
+with a `#id` goes to that sheet, except a load from Back or Forward (`performance` navigation type
+`back_forward`), where the browser's own restored position is where the reader was.
 
 ## The rail, the index tab and the cabinet
 
@@ -113,11 +119,13 @@ drawer front. The current sheet's tab is vermilion with black text.
 
 - *Opening.* Hovering the rail, the tab or the cabinet opens it after 120ms; it closes 300ms after the
   pointer has left all three. A click on the folder button, the index tab, "portfolio" on the cover or
-  "Open the index" pins it open. Keyboard focus on the folder button opens it; Enter moves focus to the
-  current folder (no file until the reader moves); arrows, Home and End walk the folders; Tab moves on to
+  "Open the index" pins it open. The index tab is the keyboard's one way in: the folder button has
+  `tabindex="-1"` (it is for the pointer), so the walk from the top is skip link, name, Index, then the
+  cover's routes, and focus never opens the cabinet by itself. Enter on the tab opens it and moves focus to
+  the current folder (no file until the reader moves); arrows, Home and End walk the folders; Tab moves on to
   Find and Close, and tabbing on out of the rail, the tab and the cabinet (onto "portfolio" on the cover
-  too) closes it; Escape closes and returns focus to whatever opened it. Non-modal: no backdrop, no focus
-  trap, no scroll lock.
+  too) closes it; Escape closes and returns focus to whatever opened it (the index tab when the pointer
+  opened it). Non-modal: no backdrop, no focus trap, no scroll lock.
 - *Z-order.* Folder `k`'s link stacks at `3k + 3`; its file is inside that link at `z-index: -1`, so it
   paints behind its own folder's front and tab but in front of every folder with a smaller `k`; divider `k`
   stands at `3k + 1`; the drawer front at 100.
@@ -128,9 +136,12 @@ drawer front. The current sheet's tab is vermilion with black text.
 - *Hover intent.* A pulled file covers the folders behind it, so on the way up to it the pointer may
   cross another folder's exposed edge or another dot. While the pointer is heading for the file (the
   current point lies in the hull of where it was a few moves ago and the file's corners: the safe
-  triangle), crossing another row does not swap the file. If the pointer stops short for 320ms, the row it
-  rests on wins. Moving straight up and down the dots is never "heading for the file", so scrubbing the
-  dots stays immediate.
+  triangle), crossing another row does not swap the file. The point that crosses into a row is part of
+  that hull (each row's `pointerenter` records it before deciding), and after a pause of 100ms the hull
+  starts again from where the pointer rested. If the pointer stops short for 320ms, the row it rests on
+  wins. Moving straight up and down the dots is never "heading for the file", so scrubbing the dots stays
+  immediate. `tests/v3/check.mjs` runs diagonal paths from the dots up to their files (`V3_AIM=full`: 108
+  paths, none may swap the file).
 - *Placement.* In windows too short for the top folder's file, the cabinet moves down; when the drawer
   front would fall below the window, it moves up; in very short windows the files leave out their summary
   line. Under 540px tall it becomes the bottom panel, and the pill replaces the rail (see Phones).
@@ -158,11 +169,16 @@ way.
 On hover: the image settles inside its still, overflow-hidden frame from 1.06 to 1 (800ms); the card eases
 60% of its tilt toward flat and lifts 3px as its shadow deepens (800ms); its tape presses down (scale .96,
 a tighter shadow, 450ms); the badge grows from .8 to 1 while its arrow turns from 45 degrees to 0 (450ms);
-the caption brightens to full ink. The other card in the collage steps back to .55 opacity (`filter:
-opacity()`, so it does not fight the reveal's own opacity transition). Badges sit on the card's outer
+the caption brightens to full ink; the card comes to the top of the collage (`z-index` 2 over a resting 1,
+dropping back once it has settled, 800ms after the pointer leaves), so its overlapping sibling never covers
+it. The other card in the collage steps back by colour, not opacity: its ink moves to `--ink-2` (5.45:1 on
+paper), the 486 card's vermilion pales to `#EA6256` (black text 5.55:1, the white figure 3.29:1), its
+shadow lightens, and only pictures fade to .55 (a photograph or the sketch, and the chart's bars as fill
+colour). Badges sit on the card's outer
 corner, half off the paper like a sticker (bottom left on the first card, bottom right on the second).
 Touch screens show the badge at rest. Reduced motion keeps the caption and the step back and drops every
-movement.
+movement. `tests/v3/check.mjs` points at each card and checks that no text is dimmed by opacity and every
+text still meets its threshold.
 
 ## The cover's routes
 
@@ -170,16 +186,19 @@ The handwritten line's words are links: "portfolio" opens the cabinet (without t
 `#cabinet`), "goaltender" goes to the hockey sheet, "researcher" to drug safety, "violist" to viola and
 violin. Under each lies a vermilion marker stroke, faint (42%) at rest; hover or focus draws it through
 in 300ms (left to right, a clip); touch screens show it drawn. Focus also draws a 2px vermilion ring. The
-line stacks above the title so the whole word takes the pointer. The words are inline, so each separator
-stays with the word before it when the line wraps. On phones "portfolio" is left out (the pill is the
-index there).
+line stacks above the title so the whole word takes the pointer. A dark halo (`text-shadow: 0 0 4px, 0 0
+10px`, `#151515`) keeps the code panel's lines from running through the words. The words are inline, so
+each separator stays with the word before it when the line wraps. On touch screens each word takes 44px
+with 12px of vertical padding, which moves no line (the stroke is offset to stay under the word). On phones
+"portfolio" is left out (the pill is the index there).
 
 ## The archive
 
 Index cards taped to the paper, four across on desktop. At rest a card shows its year (Anton, vermilion,
 24px), its kind (a black tag) and its title (the hand face). Pointing at a card, or tabbing to its link,
 unfolds its line and link (grid rows 0fr to 1fr, 500ms), straightens the card to 0 degrees and lifts it
-4px while its tape presses (800ms), and steps the other cards back to .4 opacity, with no blur. The
+4px while its tape presses (800ms), and steps the other cards back by colour, with no blur: `#F3F1F1`
+paper, `--ink-2` titles (6.05:1), the kind tag on `--ink-2` (white 6.8:1), the 24px vermilion year at 3.59:1. The
 unfolding part hangs below the card's resting edge, over the gap, so the grid never moves; the card stays
 in front until it has folded again. A card the row has stretched (its title is shorter than its
 neighbours') unfolds from just under its own title (`--fold-top`), never below an empty band. A card near
@@ -193,14 +212,18 @@ screens, print and pages without the script show every line. The script wraps th
 The page reads as a plain document with the same torn edges. Windows under 540px tall (a phone held
 sideways, a short browser window) get the same treatment: the sheets no longer stack there, and the rail
 with its tab would not fit beside the chrome. The rail gives way to **the pill**: the index
-tab restyled as a solid black pill with a paper hairline at the bottom centre, reading
-"Index · 08 Goaltender" (the current sheet, from the same names as the rail label), 44px tall. It opens
+tab restyled as a solid black pill with a paper hairline resting at the bottom right (12px from the edge,
+out of the middle of the reading column), reading "Index · 08 Goaltender" (the current sheet, from the same
+names as the rail label; in windows under 540px tall only "Index · 08", about 115px wide), 44px tall. It opens
 the cabinet as a bottom panel (rows 44px, at most 80% of the screen, Find and Close in the drawer front at
 the bottom, lifted above the on-screen keyboard while Find has it). The chrome gets a solid black strip, so
 the name never runs over text. While the reader scrolls down, the pill and the strip step away; the pill
 comes back on the way up or 650ms after scrolling stops, the strip on the way up or near the top. The
 direction must hold for 24px, and the position is clamped to the page, so rubber-banding past either end
 never flips it. The pill also steps aside while the end row (with its own "Open the index") is on screen.
+Keyboard focus never rests on something off screen: the strip comes back while its name has focus
+(`:focus-within`) and the pill while it has focus (`:focus-visible`). On touch screens the chrome's name is
+a 44px target.
 Each sheet keeps 64px more space at its foot, so the pill never covers its last lines.
 
 ## Without the script, reduced motion, print
@@ -236,8 +259,9 @@ kicker and one line. Leave the "Sheet NN / N" line as it is; the script writes i
    archive's sheet numbers. The HTML's own numbers are the fallback without the script: update them if you
    want that reading exact.
 5. Run `node tests/v3/check.mjs` (with `python3 tools/serve.py 8778` running): it checks that sections,
-   dots and folders match in number and order, the counts, links, text sizes, contrast, the cabinet, the
-   routes, Find, the pill and the console.
+   dots and folders match in number and order, the counts, links, text sizes, contrast (at rest and while
+   cards step back), the cabinet and its hover intent, the routes, Find, the pill, the keyboard walk, the
+   six project files and the console.
 
 Each sheet adds one 24px row to the rail and the cabinet; twelve need 401px of cabinet, and the drawer
 switches to the bottom panel (and the rail to the pill) in windows under 540px tall.
@@ -245,7 +269,8 @@ switches to the bottom panel (and the rail to the pill) in windows under 540px t
 ## Don'ts
 
 - Don't link to, embed or show another edition. Copy a file into `v3/assets` instead.
-- Don't blur anything being read or moving; step things back with opacity.
+- Don't blur anything being read or moving; step things back by colour (opacity only for pictures), so
+  dimmed text keeps 4.5:1.
 - Don't tilt anything toward the pointer. Straightening a tilted card on hover is a settle and is fine.
 - Don't set text under 12px, or small white text on vermilion.
 - Don't add motion that runs on its own.

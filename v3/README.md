@@ -54,8 +54,12 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   sheet's flow position (a plain anchor jump cannot reach a sticky sheet). A move of
   one sheet slides it over in 380ms; a longer jump cuts to one screen before the
   target and slides only the last sheet (cover to hockey travels 900px, not 6300px);
-  any wheel, touch, press or scrolling key takes over, and reduced motion jumps. On
-  phones the chrome has a solid black strip and steps away while you scroll down. Tabbing
+  any wheel, touch, press or scrolling key takes over, and reduced motion jumps. Coming
+  back with the browser's Back or Forward (from a file, say) does not jump to the old `#id`:
+  the browser puts the reader back where they were. On
+  phones the chrome has a solid black strip and steps away while you scroll down (it
+  comes back while its name has keyboard focus); on touch screens the name is a 44px
+  target. Tabbing
   into a sheet brings it to rest, so the sheet above it never covers the focused
   link, and the skip link (and any in-page link taken from the keyboard) moves
   focus to the sheet it lands on.
@@ -85,12 +89,14 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   the index tab or "portfolio" on the cover keeps it open; a second click closes
   it. Clicking a dot still goes straight to its sheet. It is
   non-modal (`<nav>` with an `aria-expanded` disclosure button, no backdrop, no
-  scroll lock, no focus trap): keyboard focus on the folder button opens it too,
-  Enter or Space moves focus to the current folder, arrows, Home and End walk the
+  scroll lock, no focus trap). The Index tab is the keyboard's one way in (the
+  folder button is for the pointer and stays out of the tab order): Enter on it
+  opens the cabinet and moves focus to the current folder, arrows, Home and End walk the
   folders, Tab moves through them and out (which closes it), Escape closes it
   and returns focus to where it came from, and a press anywhere else closes it.
-  With the script the dots leave the tab order, so the rail is one stop and the
-  cabinet is the keyboard path. Choosing a folder scrolls to the sheet with the
+  With the script the dots and the folder button leave the tab order, so the Index
+  tab is one stop, the cover's routes follow it, and the cabinet is the keyboard
+  path. Choosing a folder scrolls to the sheet with the
   page's own `go(i)` and closes the cabinet. Without the script the dots are plain
   anchors and the index links point at `#cabinet`, which shows the cabinet as
   their target (Close links to `#shut` and hides it). It never prints.
@@ -110,7 +116,9 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   time. A pulled file is part of its folder's link: clicking it opens its own
   sheet. On the way up to it the pointer may cross other folders' exposed edges
   or other dots; while it is heading for the file (a safe triangle from where it
-  was to the file's corners), those do not swap the file, and if it stops short
+  was to the file's corners, anchored where the pointer rested if it paused for
+  100ms; the point that crosses into a row counts too), those do not swap the file,
+  and if it stops short
   for 320ms the row it rests on wins. Scrubbing straight up and down the dots stays
   immediate. Its lowest part stays in the folder, below the text. In windows too
   short for the top folder's file the cabinet moves down, when the drawer front
@@ -119,32 +127,43 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   the pill in place of the rail, as on phones). Opened from the
   keyboard, focus lands on the current folder without a file until the reader
   moves. Reduced motion fades the files and the cabinet.
-- **Phones (below 900px).** A solid black pill with a paper hairline at the bottom
-  centre reads "Index · 08 Goaltender" (the current sheet) and opens the same
+- **Phones (below 900px).** A solid black pill with a paper hairline rests at the
+  bottom right, 12px from the edge, out of the middle of the reading column, and
+  reads "Index · 08 Goaltender" (the current sheet; in windows under 540px tall only
+  the number, "Index · 08") and opens the same
   cabinet as a bottom panel (at most 80% of the screen; rows 44px; the drawer front
   with Find and Close stays in reach at the bottom, above the keyboard). A tap on a
   folder goes straight to its sheet, so every sheet is two taps away: on a touch
   screen a preview would cost a third tap and the sheet itself is one tap further
   anyway. Files are not shown there. The pill steps away while you scroll down and
-  comes back on the way up or as soon as you stop; sheets keep 64px at their foot
+  comes back on the way up, as soon as you stop, or while it has keyboard focus;
+  sheets keep 64px at their foot
   so it never covers their last lines.
 - **The cover's routes.** In the handwritten line, "portfolio" opens the index,
   "goaltender" goes to the hockey sheet, "researcher" to drug safety and "violist"
   to music. A vermilion marker stroke lies faintly under each word and draws
-  through in 300ms on hover or focus (drawn already on touch screens).
+  through in 300ms on hover or focus (drawn already on touch screens). A dark halo
+  (`text-shadow`) round each word keeps the code panel's lines from running through
+  it. On touch screens each word is a 44px target (vertical padding on the inline
+  word, so no line moves; where the line wraps, the word below takes the overlap).
 - **The hover grammar.** The collage cards on drug safety, the knee exoskeleton and
   Loquar link where their sheet's own link goes. Pointing at one: the image settles
   in its still frame from 1.06 to 1 (800ms), the card eases toward flat and lifts
   3px, its tape presses, a round vermilion badge grows in while its arrow turns
-  from 45 degrees (450ms), the caption brightens, and the other card steps back to
-  .55 opacity. Nothing blurs. See `DESIGN.md`.
+  from 45 degrees (450ms), the caption brightens, and the card comes to the top of
+  the collage (it drops back 800ms after the pointer leaves). The other card steps
+  back by colour, not opacity: its ink goes to the muted ink and the 486 card's
+  vermilion pales, so its text keeps 4.5:1; only its pictures (a photograph, the
+  sketch, the chart's bars) fade to .55. Nothing blurs. See `DESIGN.md`.
 - **The code panel.** The cover's tilted editor types a preset script character by
   character: the aducanumab analysis with the real counts, the Genuvalens
   controller and its five-repetition simulation with the reported results, a
   Loquar scene function and a Daedalus labyrinth rebuild. Hovering pauses it and
   frees the panel to scroll; leaving resumes; on touch screens a tap pauses and a
   second tap resumes. It waits while the cover is covered or the tab is hidden, and
-  stops when the script ends. Reduced motion shows the whole script at once. Its
+  stops when the script ends. Reduced motion shows the whole script at once, and so
+  does the first key press anywhere on the page, so a keyboard reader never has
+  two minutes of typing beside them. Its
   text is 12px, the site's floor; the "Scroll" hint below pulses three times and rests.
 - **Details from the deck's tutorial** (GraphiqVibe, "How to create a Graphic Design
   PORTFOLIO in 2025"): the sliced letter in the title, the torn strip with recoloured
@@ -161,7 +180,9 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   pointing at it (or tabbing to its link) unfolds its line and link (grid rows 0fr
   to 1fr, 500ms) below its resting edge, so the grid never moves (a card the row
   has stretched unfolds from just under its own title), while it straightens,
-  lifts and the other cards step back to .4 opacity. Touch screens,
+  lifts and the other cards step back by colour, not opacity: a greyer paper
+  (`#F3F1F1`), the muted ink (6.05:1) and a muted kind tag (white on it 6.8:1); the
+  24px vermilion years keep 3.59:1. Touch screens,
   print and pages without the script show every line. Four cards a row on desktop,
   one or two on phones; two columns in print.
 - **The contact sheet.** On desktop the framed LET'S TALK (crown, star, tape and
@@ -194,7 +215,7 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
 | `assets/css/files.css` | The files' own stylesheet: tokens and faces as in `site.css`, the desk, drawer, paper, sections, figures, the pager, the view transition, print and the hockey one-page print |
 | `assets/js/files.js` | The hockey file's print button, and eager figures before printing (the files work without it) |
 | `DESIGN.md` | The system as built: tokens, type roles, the stack, the cabinet, the hover grammar, the archive, phones, and how to add a sheet, a file or a card |
-| `../tests/v3/check.mjs` | Browser checks: structure and counts, no links into other editions, the 12px floor, contrast, the cabinet, the routes, Find, the pill, console errors |
+| `../tests/v3/check.mjs` | Browser checks: structure and counts, no links into other editions (the deck, the six files and both stylesheets), the 12px floor (the files on screen and in print too), contrast at rest and while a card steps back, the cabinet and its hover intent, the routes, Find, the pill, the keyboard walk, touch targets, the hockey file on one Letter page, Back from a file, console errors with and without the script |
 | `assets/fonts/` | Anton (OFL, stands in for Impact), Metropolis from the deck package (Unlicense), Permanent Marker (Apache 2.0, stands in for the personal-use Shooting Star) |
 | `assets/img/` | Derivatives copied from v2; the goalie mask stickers rendered from `assets/model/GMask.obj` by `tools/make-mask-sticker.py`; the portrait cutout from `tools/make-cutout.py` (paper edge added in the same pass); the OCAPEX mark redrawn in the site's three colours |
 
@@ -205,7 +226,8 @@ The deck curates; the files prove. Each project sheet's detail link ("Read the a
 résumé") opens a file of v3's own in `v3/files/<slug>/`, so nothing leaves the edition. A file is the
 cabinet's file pulled out and laid on the black desk: a paper document with a torn top and foot, its vermilion
 tab ("File 04 · Drug safety", the sheet's number and the rail's name) standing in the drawer among the other
-files' tabs (each a link; below 1080px they show only their numbers, below 600px only the current tab shows),
+files' tabs (each a link; below 1080px they show only their numbers, below 600px only the current tab shows: its
+`<li>` carries `class="is-current"`, so this needs no `:has()`),
 "Back to sheet 04" to the sheet's anchor on the deck, the title in Anton, the line under it, a stamp for the
 stage taken from the status wording, the fact strip, the note that carries the caveat, the sections' own tabs,
 then sections behind black divider tabs, and the previous and next files as two index cards at the end.
@@ -214,15 +236,22 @@ then sections behind black divider tabs, and the previous and next files as two 
   exceptions are only where the editorial wording would be untrue here: Figure 2's ARIA terms are "in
   vermilion", résumé links to work without a file (FreeCode, Daedalus, this site) point to their sheet, the
   résumé's "This portfolio" uses the Loquar sheet's sentence, and the hockey stat line is the hockey sheet's.
+  The hockey file's coach contacts give each coach's name and role only, followed by "Addresses on request."
+  (the line v5 uses): Leonardo decided on 2026-09-18 that coach addresses are not published and correspondence
+  goes through a parent.
 - **Order and numbers**: 04 Drug safety, 05 Knee exoskeleton, 06 Loquar, 07 OCAPEX, 08 Goaltender, 10 The
   record. Previous and next follow that order; the descriptions on the cards are the cabinet's kickers.
 - **Hover**: the creamy grammar, rebuilt in paper. The cards settle flat from their tilt and lift 3px over
   800ms on `cubic-bezier(.22, 1, .36, 1)`, the arrow grows from .8 and turns from 45 degrees over 450ms, the
   card's line unfolds (grid rows 0fr to 1fr, 500ms) and the other card steps back by dimming its ink and paper
-  (colour, so its text keeps 4.5:1). Product screenshots settle from 1.05 to 1 inside their still frame;
-  research figures never crop. Drawer tabs rise 4px; coach contact rows step back the way the profile rows on
-  the contact sheet do. Touch screens and reduced motion show everything at rest; nothing blurs.
-- **Page change**: both stylesheets carry `@view-transition { navigation: auto; }` (in `site.css` it is the
+  (colour, so its text keeps 4.5:1). The line folds away only with the script (`html.js`), so without it every
+  pager line shows. Product screenshots settle from 1.05 to 1 inside their still frame; research figures never
+  crop. Drawer tabs rise 4px. Touch screens and reduced motion show everything at rest; nothing blurs. On touch
+  screens the back links, the link row, any contact links and the chrome's name are 44px targets (the type
+  does not change).
+- **Page change**: the files' chrome is 44px tall in the same short windows as the deck's (900px wide and up
+  to 820px tall, 52px otherwise), so the name and the year stay in one place and never show double while the
+  pages crossfade. Both stylesheets carry `@view-transition { navigation: auto; }` (in `site.css` it is the
   delimited block at the very end). Coming from the deck, the deck stays put while the desk comes up over it
   (160ms), then the file and its drawer rise 40px and fade in (300ms, from 100ms in), so the file does not
   fade in over the deck's text. From file to file the old one sinks 16px and is gone in 110ms before the new
@@ -234,22 +263,26 @@ then sections behind black divider tabs, and the previous and next files as two 
 - **To add a file**: copy the closest file's folder (research: `aducanumab`; product: `loquar`), change its
   `<title>`, description, tab text, back link (`../../#<sheet id>`), stamp, facts and sections; give its
   article `view-transition-name: file-NN` and add that name to the two `::view-transition-*(file-..)` lists
-  in `files.css` and to the two in `site.css`'s "files: view transition" block; add its tab to every file's drawer (in order) and fix the previous and next cards of its
-  neighbours; then point the sheet's detail link at `files/<slug>/`. Images go in `v3/assets/img/` as
-  derivatives; never link to another edition's files.
+  in `files.css` and to the two in `site.css`'s "files: view transition" block; add its tab to every file's drawer (in order; in
+  its own drawer the tab's `<li>` gets `class="is-current"` and the link `aria-current="page"`) and fix the previous and next
+  cards of its neighbours; then point the sheet's detail link at `files/<slug>/`, add the slug to the `FILES` list at the
+  top of `tests/v3/check.mjs` and run it. Images go in `v3/assets/img/` as derivatives; never link to another edition's
+  files.
 - **The hockey one-pager**: `files/hockey/` puts measurables, the stat line with its sample size, how I play,
   the academic snapshot, the coach contacts, Elite Prospects and NCSA, team history, prep and camps, and crew
   and soccer on one page. "Print the one-pager" is a real button that calls `print()` (hidden without the
   script and in print). The `@media print` block "Print: the hockey one-pager" in `files.css` lays it out on
-  one Letter page at 12mm margins: the head across the top, the six measurables in one row, then two columns,
-  type at 7 to 13pt, links printed with their addresses; the file's end and the desk are left out. It was
-  checked with `page.pdf({ format: 'Letter' })`: one page, with about 80px of the 965px page to spare. If a
-  section grows, print it again and tighten that block if it spills.
+  one Letter page at 12mm margins: the head across the top, the six measurables in one row, then two columns
+  (the contacts and team history column a little wider, one line per coach), type at 9 to 25pt (nothing under
+  9pt, the 12px floor), links printed with their addresses; the file's end and the desk are left out.
+  `tests/v3/check.mjs` checks it with `page.pdf({ format: 'Letter' })`: one page, with about 57px of the 965px
+  page to spare. If a section grows, run it again and tighten that block if it spills.
 - **Print** (every file): no desk, torn edges, tape or shadows; black tabs become rules; outside links print
   their addresses; placeholders for photographs not yet supplied are left out; figures and charts print in
   colour; the stamp follows the title (on the hockey page it stands straight at the top right). The page is
-  printed in a light colour scheme, so the margins stay white when background graphics are on. 1rem is 10pt
-  on paper, so the file's type scales together.
+  printed in a light colour scheme, so the margins stay white when background graphics are on. 1rem is 12pt
+  on paper, so the file's type scales together and the 12px floor (`--micro`) prints at 9pt; printed link
+  addresses are 9pt or more.
 - Hidden-until-ready blocks stay hidden with a comment saying what fills them: the hockey file's 2026-27 stat
   tiles and schedule, the résumé's PDF button, and the film link (in the film note).
 
@@ -258,8 +291,9 @@ then sections behind black divider tabs, and the previous and next files as two 
 - Torn edges are three 2800 by 72 paths in the sprite, sliced from the middle so
   they never stretch; the cover strip is a percentage polygon in `--strip`.
 - The crown, star and number badge are inline SVG symbols; the two mask stickers
-  (three-quarter on the cover, head-on at the end) are renders of Leonardo's own
-  mask model, posterized with a white sticker border.
+  (three-quarter on the cover, head-on at the end) are renders of a downloaded
+  goalie-mask model (`assets/model/GMask.obj`), not Leonardo's own mask,
+  posterized with a white sticker border.
 - Sheets alternate `slide--dark` and `slide--paper`; each re-points the same role
   tokens. Cards, tickets and the red panel re-point them again inside.
 - Text under 24px on vermilion is black (4.53:1); white stays only on display

@@ -1,4 +1,4 @@
-// Browser checks for the v3 poster edition (one page, twelve sheets).
+// Browser checks for the v3 poster edition (one page of twelve sheets, and the six project files in v3/files/).
 //
 //   python3 tools/serve.py 8778          # in another terminal, from the repository root
 //   node tests/v3/check.mjs              # BASE=http://127.0.0.1:8802/v3/ node tests/v3/check.mjs for another server
@@ -8,15 +8,27 @@
 //
 //   1. structure   the sections, the rail's dots and the cabinet's folders match in number and order, and the
 //                  counts the script writes (--n, "Sheet NN / N", folder numbers, "N sheets") agree with them
-//   2. editions    no link, image or stylesheet points into another edition of the portfolio
-//   3. 12px        no visible text under 12px (at rest, with the cabinet open, at desktop and phone widths)
+//   2. editions    no link, image or stylesheet points into another edition of the portfolio (the deck, every
+//                  file, site.css and files.css)
+//   3. 12px        no visible text under 12px (at rest, with the cabinet open, at desktop and phone widths; every
+//                  file on screen and in print, the printed link addresses included)
 //   4. contrast    the pairs fixed in round three pass (4.5:1, or 3:1 for large text), and a sweep of every text
 //                  element over a solid background finds nothing under its threshold
+//   4b. step back  pointing at a collage card or an archive card (or tabbing to one) steps the others back by
+//                  colour: no text is dimmed by opacity and every text still meets its threshold; the card
+//                  pointed at comes to the top
 //   5. cabinet     hovering a dot opens the cabinet; moving the mouse up to the pulled file and clicking it
 //                  lands on that file's own sheet
+//   5b. intent     diagonal paths from a dot up to its file keep that file out (V3_AIM=full runs all 108 paths);
+//                  scrubbing straight down the dots stays immediate
 //   6. routes      the cover's words go where they say; Find, the targets and the pill do their jobs
 //   6b. keyboard   tabbing out of the cabinet closes it; while Find filters, the current tab stays readable
-//   7. console     no errors on any load (with and without the script, reduced motion, phone)
+//   6c. keyboard   the walk from the top (the Index tab is the one way in); focus never rests on a hidden chrome
+//                  name or pill; the first key press finishes the code panel; 44px touch targets
+//   7. files       the hockey file prints on one Letter page; pager lines show without the script; the narrow
+//                  drawer shows one tab; the chrome text sits where the deck's does; Back returns to where the
+//                  reader was
+//   8. console     no errors on any load (with and without the script, reduced motion, phone, every file)
 
 const BASE = process.env.BASE || 'http://127.0.0.1:8778/v3/';
 async function loadPlaywright() {
@@ -33,13 +45,15 @@ function check(cond, msg, detail) {
 }
 const errors = [];
 const browser = await chromium.launch();
-async function open({ width = 1440, height = 900, js = true, reduced = false, touch = false } = {}) {
+/* the project files, v3/files/<slug>/: when you add a file, add its slug here */
+const FILES = ['aducanumab', 'genuvalens', 'loquar', 'ocapex', 'hockey', 'resume'];
+async function open({ width = 1440, height = 900, js = true, reduced = false, touch = false, path = '' } = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, javaScriptEnabled: js, reducedMotion: reduced ? 'reduce' : 'no-preference', ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const page = await ctx.newPage();
-  const tag = `${width}x${height}${js ? '' : ' no-js'}${reduced ? ' reduced' : ''}`;
+  const tag = `${path || '/'} ${width}x${height}${js ? '' : ' no-js'}${reduced ? ' reduced' : ''}`;
   page.on('console', m => { if (m.type() === 'error') errors.push(`${tag}: ${m.text()}`); });
   page.on('pageerror', e => errors.push(`${tag}: ${e.message}`));
-  await page.goto(BASE, { waitUntil: 'load' });
+  await page.goto(new URL(path, BASE).href, { waitUntil: 'load' });
   await page.waitForTimeout(js ? 1200 : 300);
   return page;
 }
@@ -101,6 +115,8 @@ const HELPERS = `
       if (svg && el.getScreenCTM) { const m = el.getScreenCTM(); return fs * Math.hypot(m.a, m.b); }
       return fs;
     },
+    /* how much an element's own opacity and its ancestors' (opacity and filter: opacity()) let through */
+    eff(el) { let a = 1; for (let e = el; e && e !== document.body; e = e.parentElement) { const cs = getComputedStyle(e); a *= +cs.opacity; const m = cs.filter.match(/opacity\\(([\\d.]+)\\)/); if (m) a *= +m[1]; } return a; },
     name(el) { return el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\\s+/).join('.') : '') + ' "' + el.textContent.trim().replace(/\\s+/g, ' ').slice(0, 40) + '"'; },
   };`;
 async function helpers(page) { await page.evaluate(HELPERS); }
@@ -153,10 +169,29 @@ async function helpers(page) { await page.evaluate(HELPERS); }
   const dir = base.pathname.replace(/[^/]*$/, '');      /* /v3/ or /Portfolio/v3/ */
   const bad = urls.filter(u => { const x = new URL(u.abs); return x.origin === base.origin && !x.pathname.startsWith(dir); });
   check(bad.length === 0, `no link or source leaves ${dir} for another edition (${urls.length} checked)`, bad.map(u => `${u.el} ${u.v}`));
-  const css = await (await page.request.get(new URL('assets/css/site.css', BASE).href)).text();
-  const cssBad = [...css.matchAll(/url\(([^)]+)\)/g)].map(m => m[1].replace(/['"]/g, '')).filter(u => !u.startsWith('data:') && new URL(u, new URL('assets/css/site.css', BASE)).pathname.indexOf(dir) !== 0);
-  check(cssBad.length === 0, 'the stylesheet loads nothing from another edition', cssBad);
+  for (const sheet of ['assets/css/site.css', 'assets/css/files.css']) {
+    const css = await (await page.request.get(new URL(sheet, BASE).href)).text();
+    const cssBad = [...css.matchAll(/url\(([^)]+)\)/g)].map(m => m[1].replace(/['"]/g, '')).filter(u => !u.startsWith('data:') && new URL(u, new URL(sheet, BASE)).pathname.indexOf(dir) !== 0);
+    check(cssBad.length === 0, `${sheet} loads nothing from another edition`, cssBad);
+  }
   await page.context().close();
+  /* every project file: its links, images, stylesheet and script stay in the edition, and it asks for nothing
+     from another origin */
+  for (const slug of FILES) {
+    const fp = await open({ path: `files/${slug}/` });
+    const furls = await fp.evaluate(() => {
+      const out = [];
+      document.querySelectorAll('a[href], link[href], img[src], img[srcset], source[srcset], script[src], use[href]').forEach(el => {
+        ['href', 'src'].forEach(k => { const v = el.getAttribute(k); if (v) out.push({ el: el.tagName.toLowerCase(), v, abs: new URL(v, location.href).href }); });
+        const ss = el.getAttribute('srcset'); if (ss) ss.split(',').forEach(part => { const v = part.trim().split(/\s+/)[0]; out.push({ el: 'srcset', v, abs: new URL(v, location.href).href }); });
+      });
+      return { out, loaded: performance.getEntriesByType('resource').map(r => r.name), robots: (document.querySelector('meta[name="robots"]') || {}).content };
+    });
+    const fbad = furls.out.filter(u => { const x = new URL(u.abs); return x.origin === base.origin && !x.pathname.startsWith(dir); });
+    const foreign = furls.loaded.filter(u => new URL(u).origin !== base.origin);
+    check(fbad.length === 0 && foreign.length === 0 && furls.robots === 'noindex', `files/${slug}/: nothing leaves ${dir}, nothing from another origin, noindex (${furls.out.length} checked)`, [...fbad.map(u => `${u.el} ${u.v}`), ...foreign]);
+    await fp.context().close();
+  }
 }
 
 /* ---------- 3. no visible text under 12px ---------- */
@@ -172,6 +207,28 @@ for (const [w, h, touch] of [[1440, 900, false], [1024, 620, false], [390, 844, 
   const small2 = await scan();
   check(small.length + small2.length === 0, `no visible text under 12px at ${w}x${h} (page and open cabinet)`, [...small, ...small2].map(x => `${x.px}px ${x.name}`));
   await page.context().close();
+}
+
+/* the files: on screen at desktop and phone widths, and in print, where 1rem is 12pt and nothing (not even a
+   printed link address) goes under 9pt (12px) */
+for (const slug of FILES) {
+  const small = [];
+  for (const [w, h, touch] of [[1440, 900, false], [390, 844, true]]) {
+    const fp = await open({ width: w, height: h, touch, path: `files/${slug}/` });
+    await helpers(fp);
+    small.push(...(await fp.evaluate(() => window.__v3.texts().map(el => ({ name: window.__v3.name(el), px: Math.round(window.__v3.px(el) * 10) / 10 })).filter(x => x.px < 11.95))).map(x => `${w}: ${x.px}px ${x.name}`));
+    if (!touch) {
+      await fp.emulateMedia({ media: 'print' });
+      const pr = await fp.evaluate(() => {
+        const t = window.__v3.texts().map(el => ({ name: window.__v3.name(el), px: Math.round(parseFloat(getComputedStyle(el).fontSize) * 10) / 10 })).filter(x => x.px < 11.95);
+        const addr = [...document.querySelectorAll('a[href^="http"]')].filter(a => a.checkVisibility()).map(a => ({ name: 'address after ' + a.textContent.trim().slice(0, 30), cs: getComputedStyle(a, '::after') })).filter(x => x.cs.content !== 'none' && x.cs.content !== 'normal').map(x => ({ name: x.name, px: Math.round(parseFloat(x.cs.fontSize) * 10) / 10 })).filter(x => x.px < 11.95);
+        return [...t, ...addr];
+      });
+      small.push(...pr.map(x => `print: ${x.px}px ${x.name}`));
+    }
+    await fp.context().close();
+  }
+  check(small.length === 0, `files/${slug}/: no visible text under 12px (1440, 390, and in print)`, small.slice(0, 12));
 }
 
 /* ---------- 4. contrast ---------- */
@@ -221,6 +278,46 @@ for (const [w, h, touch] of [[1440, 900, false], [1024, 620, false], [390, 844, 
   await ph.context().close();
 }
 
+/* ---------- 4b. the step back: by colour, so dimmed text keeps its contrast ---------- */
+{
+  const page = await open();
+  await helpers(page);
+  const goSheet = async id => { await page.evaluate(id => document.querySelector(`.rail a[href="#${id}"]`).click(), id); await page.mouse.move(700, 120); await page.waitForTimeout(1300); };
+  /* every text in a root: not dimmed by opacity, and over its solid colour at its threshold */
+  const audit = sel => page.evaluate(sel => window.__v3.texts().filter(el => document.querySelector(sel).contains(el)).map(el => ({ el: window.__v3.name(el), eff: window.__v3.eff(el), p: window.__v3.pair(el) })).filter(x => x.eff < 0.99 || (x.p && x.p.ratio < x.p.need)).map(x => `${x.el}: opacity ${x.eff.toFixed(2)}${x.p ? `, ${x.p.ratio}:1 (needs ${x.p.need}, ${x.p.fg} on ${x.p.bg})` : ''}`), sel);
+  /* a point on the card that the card itself takes (the other card may cover part of it) */
+  const pointIn = sel => page.evaluate(sel => { const c = document.querySelector(sel), r = c.getBoundingClientRect(); for (const fy of [.5, .3, .7, .2, .8]) for (const fx of [.5, .3, .7, .2, .8]) { const x = r.left + r.width * fx, y = r.top + r.height * fy, e = document.elementFromPoint(x, y); if (e && c.contains(e)) return [x, y]; } return null; }, sel);
+  const bad = [], tops = [];
+  for (const id of ['research', 'exoskeleton', 'loquar']) {
+    await goSheet(id);
+    for (const k of ['a', 'b']) {
+      const pt = await pointIn(`#${id} .card--${k}`);
+      await page.mouse.move(pt[0], pt[1], { steps: 4 }); await page.waitForTimeout(1000);
+      bad.push(...(await audit(`#${id} .collage`)).map(x => `${id}, card--${k} pointed at: ${x}`));
+      /* where the two cards overlap, the one pointed at is on top */
+      const top = await page.evaluate(([id, k]) => { const a = document.querySelector(`#${id} .card--a`).getBoundingClientRect(), b = document.querySelector(`#${id} .card--b`).getBoundingClientRect(); const l = Math.max(a.left, b.left), t = Math.max(a.top, b.top), r = Math.min(a.right, b.right), btm = Math.min(a.bottom, b.bottom); if (l >= r || t >= btm) return null; const e = document.elementFromPoint((l + r) / 2, (t + btm) / 2), c = e && e.closest('.card'); return c ? (c.classList.contains('card--' + k) ? 'ok' : `card--${k} pointed at, the other card on top`) : 'nothing'; }, [id, k]);
+      if (top !== null) tops.push(`${id}: ${top}`);
+    }
+  }
+  await goSheet('archive');
+  const n = await page.evaluate(() => document.querySelectorAll('#archive .entry').length);
+  for (const i of [0, Math.floor(n / 2), n - 1]) {
+    const pt = await page.evaluate(i => { const r = document.querySelectorAll('#archive .entry')[i].getBoundingClientRect(); return [r.left + r.width / 2, r.top + 30]; }, i);
+    await page.mouse.move(pt[0], pt[1], { steps: 3 }); await page.waitForTimeout(1000);
+    bad.push(...(await audit('#archive .entries')).map(x => `archive, card ${i + 1} pointed at: ${x}`));
+  }
+  check(bad.length === 0, 'pointing at a collage or archive card steps the others back by colour: no text dimmed by opacity, every text at its threshold', bad.slice(0, 12));
+  check(tops.length > 0 && tops.every(t => /: ok$/.test(t)), `the card pointed at comes to the top (${tops.length} overlaps)`, tops);
+  /* the keyboard's way: tabbing to an archive card's link */
+  await page.mouse.move(700, 120); await page.waitForTimeout(600);
+  await page.evaluate(() => { const links = document.querySelectorAll('#archive .entry__link'); links[0].focus(); });
+  await page.keyboard.press('Tab'); await page.waitForTimeout(1500);
+  const kb = await audit('#archive .entries');
+  const focusedIn = await page.evaluate(() => !!document.activeElement.closest('#archive .entry'));
+  check(focusedIn && kb.length === 0, 'tabbing to an archive card steps the others back by colour too', kb.slice(0, 8));
+  await page.context().close();
+}
+
 /* ---------- 5. the cabinet: hover opens it, the pulled file takes the click ---------- */
 for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const page = await open({ width: w, height: h });
@@ -254,6 +351,47 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   await page.context().close();
 }
 
+/* ---------- 5b. hover intent: from a dot up and left to its pulled file, the file stays out ----------
+   Mouse moves at a hand's pace (CDP events 8 or 16 ms apart, 12 or 30 of them) from the centre of a dot to the
+   middle of its file, 5, 10 or 20% of the way down it. Crossing the other folders' edges and dots on the way
+   must not swap the file, and the point reached must be that file (so a click opens its sheet).
+   V3_AIM=full runs every dot below the cabinet's top: 9 dots, 108 paths. */
+{
+  const page = await open();
+  const client = await page.context().newCDPSession(page);
+  const mv = (x, y) => client.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+  const FULL = process.env.V3_AIM === 'full';
+  const names = FULL ? ['Viola & violin', 'The record', 'OCAPEX', 'Contact', 'Goaltender', 'Loquar', 'Drug safety', 'About me', 'Archive'] : ['Viola & violin', 'The record', 'OCAPEX'];
+  const out = () => page.evaluate(() => { const f = document.querySelector('.folder.is-out .folder__btn'); return f ? f.getAttribute('href') : null; });
+  const wrong = []; let n = 0;
+  for (const name of names) for (const ms of FULL ? [8, 16] : [16]) for (const steps of FULL ? [12, 30] : [12]) for (const frac of [0.05, 0.1, 0.2]) {
+    await mv(700, 800); await page.waitForTimeout(900);
+    const dot = await page.$eval(`.rail a[data-name="${name}"]`, a => { const r = a.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+    await mv(dot[0], dot[1]); await page.waitForTimeout(700);
+    const before = await out();
+    const fb = await page.evaluate(() => { const f = document.querySelector('.folder.is-out .file'); if (!f) return null; const r = f.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom]; });
+    n++;
+    if (!fb) { wrong.push(`${name}: no file out`); continue; }
+    const tx = (fb[0] + fb[2]) / 2, ty = fb[1] + (fb[3] - fb[1]) * frac;
+    for (let i = 1; i <= steps; i++) { await mv(dot[0] + (tx - dot[0]) * i / steps, dot[1] + (ty - dot[1]) * i / steps); await new Promise(r => setTimeout(r, ms)); }
+    await page.waitForTimeout(500);
+    const after = await out();
+    const under = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y), a = e && e.closest('.folder__btn'); return a ? a.getAttribute('href') : null; }, [tx, ty]);
+    if (after !== before || under !== before) wrong.push(`${name}, ${steps} moves ${ms}ms apart, ${frac * 100}% down: ${before} became ${after} (under the pointer ${under})`);
+  }
+  check(wrong.length === 0, `hover intent: ${n - wrong.length} of ${n} diagonal paths from a dot up to its file keep that file out`, wrong);
+  /* scrubbing: straight down from one dot to the next, a short rest brings the next file out */
+  await mv(700, 800); await page.waitForTimeout(900);
+  const d1 = await page.$eval('.rail a[data-name="Loquar"]', a => { const r = a.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+  const d2 = await page.$eval('.rail a[data-name="OCAPEX"]', a => { const r = a.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+  await mv(d1[0], d1[1]); await page.waitForTimeout(700);
+  for (let i = 1; i <= 4; i++) { await mv(d1[0], d1[1] + (d2[1] - d1[1]) * i / 4); await new Promise(r => setTimeout(r, 16)); }
+  await page.waitForTimeout(150);
+  const scrub = await out();
+  check(scrub === '#ocapex', `scrubbing straight down the dots stays immediate (150ms after reaching OCAPEX: ${scrub})`);
+  await page.context().close();
+}
+
 /* ---------- 6. routes, Find, the pill, no script ---------- */
 {
   const page = await open();
@@ -283,11 +421,16 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   await page.context().close();
 
   const ph = await open({ width: 390, height: 844, touch: true });
-  const pill = await ph.evaluate(() => { const t = document.querySelector('.index-tab'), r = t.getBoundingClientRect(); return { text: t.textContent.replace(/\s+/g, ' ').trim(), centred: Math.abs((r.left + r.right) / 2 - innerWidth / 2) < 2, bottom: innerHeight - r.bottom, h: r.height, bg: getComputedStyle(t).backgroundColor }; });
-  check(/^Index · 01 Cover$/.test(pill.text) && pill.centred && pill.h >= 44 && pill.bg === 'rgb(21, 21, 21)', `phones: a black pill at the bottom centre reads "${pill.text}" (${pill.h}px)`);
+  const pillAt = p => p.evaluate(() => { const t = document.querySelector('.index-tab'), r = t.getBoundingClientRect(); return { text: t.innerText.replace(/\s+/g, ' ').trim().toLowerCase(), right: Math.round(innerWidth - r.right), bottom: Math.round(innerHeight - r.bottom), w: Math.round(r.width), h: r.height, bg: getComputedStyle(t).backgroundColor }; });
+  const pill = await pillAt(ph);
+  check(pill.text === 'index · 01 cover' && pill.right === 12 && pill.bottom === 14 && pill.h >= 44 && pill.bg === 'rgb(21, 21, 21)', `phones: a black pill rests at the bottom right (12px in, 14px up) and reads "${pill.text}" (${pill.w}x${pill.h})`, JSON.stringify(pill));
   await ph.tap('.index-tab'); await ph.waitForTimeout(400);
   check(await ph.evaluate(() => document.getElementById('cabinet').classList.contains('is-open')), 'phones: the pill opens the bottom panel');
   await ph.context().close();
+  const ls = await open({ width: 844, height: 390, touch: true });
+  const pill2 = await pillAt(ls);
+  check(pill2.text === 'index · 01' && pill2.right === 12 && pill2.w <= 130, `windows under 540px tall: the pill names the number only, "${pill2.text}" (${pill2.w}px wide)`, JSON.stringify(pill2));
+  await ls.context().close();
 
   const nojs = await open({ js: false });
   const nj = await nojs.evaluate(() => ({ dots: [...document.querySelectorAll('.rail > a')].every(a => a.tabIndex === 0 || !a.hasAttribute('tabindex')), cabinet: getComputedStyle(document.getElementById('cabinet')).display }));
@@ -301,8 +444,8 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const card = await rm.$('#loquar .card--a'); const b = await card.boundingBox();
   const t0 = await rm.evaluate(() => getComputedStyle(document.querySelector('#loquar .card--a')).transform);
   await rm.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 3 }); await rm.waitForTimeout(300);
-  const t1 = await rm.evaluate(() => { const c = document.querySelector('#loquar .card--a'), s = getComputedStyle(c); return { transform: s.transform, translate: s.translate, rotate: s.rotate, img: getComputedStyle(c.querySelector('img')).scale, other: getComputedStyle(document.querySelector('#loquar .card--b')).filter }; });
-  check(t0 === t1.transform && t1.translate === 'none' && t1.rotate === 'none' && (t1.img === 'none' || t1.img === '1') && /opacity/.test(t1.other), 'reduced motion: a card hover changes opacity only', JSON.stringify(t1));
+  const t1 = await rm.evaluate(() => { const c = document.querySelector('#loquar .card--a'), s = getComputedStyle(c), o = document.querySelector('#loquar .card--b'); return { transform: s.transform, translate: s.translate, rotate: s.rotate, img: getComputedStyle(c.querySelector('img')).scale, otherImg: getComputedStyle(o.querySelector('img')).opacity, otherCard: getComputedStyle(o).opacity + ' ' + getComputedStyle(o).filter }; });
+  check(t0 === t1.transform && t1.translate === 'none' && t1.rotate === 'none' && (t1.img === 'none' || t1.img === '1') && +t1.otherImg < 1 && t1.otherCard === '1 none', 'reduced motion: a card hover moves nothing; the other card steps back by colour and its picture fades', JSON.stringify(t1));
   await rm.context().close();
 }
 
@@ -322,7 +465,111 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   await page.context().close();
 }
 
-/* ---------- 7. console ---------- */
+/* ---------- 6c. keyboard: the walk, focus that is always on screen, the code panel; touch targets ---------- */
+{
+  /* the Index tab is the one way into the index: the folder button is out of the tab order, so focus never
+     opens the cabinet on its way to the cover's routes */
+  const page = await open();
+  const walk = [];
+  for (let k = 0; k < 7; k++) { await page.keyboard.press('Tab'); await page.waitForTimeout(60); walk.push(await page.evaluate(() => document.activeElement.textContent.trim().replace(/\s+/g, ' '))); }
+  const cab = await page.evaluate(() => document.getElementById('cabinet').classList.contains('is-open'));
+  const want = ['Skip to content', 'Leonardo Carvalho', 'Index · 01 Cover', 'portfolio', 'goaltender', 'researcher', 'violist'];
+  check(!cab && want.every((t, i) => walk[i] === t), `keyboard: the walk from the top is skip, name, Index, then the cover's routes (and the cabinet stays shut)`, walk.join(' | '));
+  /* the code panel: a keyboard has no hover to pause it, so the first key press finishes it at once */
+  const typed = await page.evaluate(() => ({ len: document.querySelector('[data-code-out]').textContent.length, done: document.querySelector('[data-code]').classList.contains('is-done') }));
+  await page.waitForTimeout(1200);
+  const later = await page.evaluate(() => document.querySelector('[data-code-out]').textContent.length);
+  await page.context().close();
+  const rm = await open({ reduced: true });
+  const full = await rm.evaluate(() => document.querySelector('[data-code-out]').textContent.length);
+  await rm.context().close();
+  check(typed.done && typed.len === full && later === full, `keyboard: the first key press finishes the code panel (${typed.len} of ${full} characters, nothing typed after)`, JSON.stringify({ typed, later, full }));
+
+  /* narrow windows: the chrome's strip and the pill step away while scrolling down, but come back while they
+     hold keyboard focus */
+  const ph = await open({ width: 720, height: 800 });
+  await ph.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight / 2, behavior: 'instant' }));
+  await ph.waitForTimeout(400);
+  const away = await ph.evaluate(() => document.documentElement.classList.contains('bars-away'));
+  await ph.keyboard.press('Tab'); await ph.keyboard.press('Tab'); await ph.waitForTimeout(450);
+  const name = await ph.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(); return { text: a.textContent.trim(), top: Math.round(r.top), bottom: Math.round(r.bottom) }; });
+  await ph.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+  await ph.waitForTimeout(900);
+  const atEnd = await ph.evaluate(() => document.documentElement.className);
+  await ph.keyboard.press('Tab'); await ph.waitForTimeout(450);
+  const pill = await ph.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(), cs = getComputedStyle(a); return { cls: a.className, top: Math.round(r.top), bottom: Math.round(r.bottom), opacity: +cs.opacity, vh: innerHeight }; });
+  check(away && name.text === 'Leonardo Carvalho' && name.top >= 0, `narrow windows: the chrome's name comes back while it has focus (top ${name.top}px)`, JSON.stringify(name));
+  check(/at-end/.test(atEnd) && pill.cls === 'index-tab' && pill.opacity === 1 && pill.top >= 0 && pill.bottom <= pill.vh, `narrow windows: at the foot, the Index pill comes back while it has focus (opacity ${pill.opacity}, ${pill.top} to ${pill.bottom} of ${pill.vh})`, JSON.stringify({ atEnd, pill }));
+  await ph.context().close();
+
+  /* touch screens: the routes and the chrome's name are 44px tall targets, and the whole height takes the tap
+     (measured along the word's own height: the hand line is tilted 3 degrees) */
+  const tp = await open({ width: 390, height: 844, touch: true });
+  const tt = await tp.evaluate(() => [...document.querySelectorAll('.route'), document.querySelector('.chrome a')].filter(a => a.getClientRects().length && a.checkVisibility()).map(a => {
+    const r = a.getClientRects()[0], cx = r.left + r.width / 2, cy = r.top + r.height / 2, h = a.offsetHeight;
+    const hit = y => { const e = document.elementFromPoint(cx, y); return !!e && (e === a || a.contains(e)); };
+    return { t: a.textContent.trim(), h, ends: hit(cy - h / 2 + 2) && hit(cy + h / 2 - 2) };
+  }));
+  check(tt.length >= 4 && tt.every(x => x.h >= 44 && x.ends), `touch: the cover's routes and the chrome's name take 44px (${tt.map(x => x.t + ' ' + x.h).join(', ')})`, JSON.stringify(tt));
+  await tp.context().close();
+}
+
+/* ---------- 7. the files ---------- */
+{
+  /* the coach one-pager prints on one Letter page */
+  const hk = await open({ path: 'files/hockey/' });
+  const pdf = await hk.pdf({ format: 'Letter' });
+  const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+  check(pages === 1, `files/hockey/ prints on one Letter page (${pages})`);
+  await hk.context().close();
+
+  /* without the script every pager line shows (a hover reveal needs a resting twin) */
+  const nj = await open({ path: 'files/hockey/', js: false });
+  const lines = await nj.evaluate(() => [...document.querySelectorAll('.pager__d > span')].map(s => ({ o: +getComputedStyle(s).opacity, h: Math.round(s.getBoundingClientRect().height) })));
+  check(lines.length === 2 && lines.every(l => l.o === 1 && l.h >= 12), `files without the script: the pager's lines show (${lines.map(l => l.h + 'px').join(', ')})`, JSON.stringify(lines));
+  await nj.context().close();
+
+  /* phones: the drawer shows only the current tab (a class, not :has()), the page never scrolls sideways, and
+     the back, link-row and contact links and the chrome's name are 44px targets */
+  const narrow = [];
+  for (const slug of FILES) {
+    const fp = await open({ width: 390, height: 844, touch: true, path: `files/${slug}/` });
+    const r = await fp.evaluate(() => ({
+      tabs: [...document.querySelectorAll('.drawer li')].filter(li => li.getBoundingClientRect().width > 0).length,
+      wide: document.documentElement.scrollWidth - innerWidth,
+      small: [...document.querySelectorAll('.back, .linkrow a, .contacts a, .chrome a')].filter(a => a.checkVisibility()).map(a => [a.textContent.trim().slice(0, 24), Math.round(a.getBoundingClientRect().height)]).filter(x => x[1] < 44),
+    }));
+    if (r.tabs !== 1 || r.wide > 0 || r.small.length) narrow.push(`${slug}: ${JSON.stringify(r)}`);
+    await fp.context().close();
+  }
+  check(narrow.length === 0, 'files at 390: one drawer tab, no sideways scroll, 44px touch targets', narrow);
+
+  /* the chrome's text sits where the deck's does, so it does not show double while the page changes */
+  const off = [];
+  for (const [w, h] of [[1440, 900], [1280, 800], [1024, 620]]) {
+    const at = async path => { const p = await open({ width: w, height: h, path }); const y = await p.evaluate(() => { const a = document.querySelector('.chrome a'), rg = document.createRange(); rg.selectNodeContents(a); const r = rg.getBoundingClientRect(); return Math.round((r.top + r.bottom) / 2 * 10) / 10; }); await p.context().close(); return y; };
+    const deck = await at(''), file = await at('files/aducanumab/');
+    if (Math.abs(deck - file) > 1) off.push(`${w}x${h}: deck ${deck}, file ${file}`);
+  }
+  check(off.length === 0, 'the chrome\'s name sits at the same height on the deck and in a file (1440x900, 1280x800, 1024x620)', off);
+
+  /* Back from a file lands where the reader was, not on the sheet in the old #hash */
+  const bp = await open({ path: '#research' });
+  const y0 = await bp.evaluate(() => { window.scrollTo({ top: 7 * innerHeight, behavior: 'instant' }); return Math.round(scrollY); });
+  await bp.waitForTimeout(500);
+  await bp.goto(new URL('files/hockey/', BASE).href, { waitUntil: 'load' }); await bp.waitForTimeout(300);
+  await bp.goBack({ waitUntil: 'load' }); await bp.waitForTimeout(1200);
+  const back = await bp.evaluate(() => ({ y: Math.round(scrollY), hash: location.hash, type: (performance.getEntriesByType('navigation')[0] || {}).type }));
+  check(Math.abs(back.y - y0) < 50, `Back from a file returns to where the reader was (${y0} -> ${back.y}, ${back.type}, hash ${back.hash})`, JSON.stringify(back));
+  await bp.context().close();
+  const hp = await open({ path: '#hockey' });
+  check(await hp.evaluate(() => document.querySelector('.rail a[aria-current="true"]').getAttribute('href')) === '#hockey', 'a fresh load of #hockey still lands on the hockey sheet');
+  await hp.context().close();
+  /* and the files load without errors with the script off */
+  for (const slug of FILES) { const fp = await open({ path: `files/${slug}/`, js: false }); await fp.context().close(); }
+}
+
+/* ---------- 8. console ---------- */
 check(errors.length === 0, 'no console errors', errors);
 
 await browser.close();

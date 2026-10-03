@@ -334,11 +334,25 @@
       atBottom();
       timer = setTimeout(tick, ch === '\n' ? 140 + Math.random() * 120 : 16 + Math.random() * 26);
     }
-    if (reduce) {
-      segs.forEach(function (seg) { if (seg.file) return; var sp = d.createElement('span'); if (seg.cls) sp.className = seg.cls; sp.textContent = seg.text; out.appendChild(sp); });
-      if (fileEl) fileEl.textContent = 'daedalus/labyrinth.lua';
+    /* the rest of the script at once, as reduced motion shows it: from the segment being typed to the end */
+    function finish() {
+      if (done) return;
+      clearTimeout(timer); timer = 0; done = true;
+      if (span && ci > 0) { span.textContent += segs[si].text.slice(ci); si++; }
+      span = null; ci = 0;
+      for (; si < segs.length; si++) {
+        var seg = segs[si];
+        if (seg.file) { if (fileEl) fileEl.textContent = seg.file; continue; }
+        var sp = d.createElement('span'); if (seg.cls) sp.className = seg.cls; sp.textContent = seg.text; out.appendChild(sp);
+      }
       codeBox.classList.add('is-done');
+    }
+    if (reduce) {
+      finish();
     } else {
+      /* a keyboard has no hover to pause it with: the first key press anywhere finishes the script at once,
+         so nothing types on while the reader tabs through the page */
+      d.addEventListener('keydown', finish, { once: true });
       /* a mouse pauses by hovering; touch and pen toggle with a tap (their enter and
          leave fire around every tap, so they must not drive the pause) */
       var tapped = false;
@@ -352,7 +366,7 @@
 
   /* ---- the rail and the cabinet ----
      The rail is always on screen: a dot per sheet, the current sheet's number and name, and the folder
-     button, with the paper index tab standing above it. Hovering or focusing it opens the cabinet beside it
+     button, with the paper index tab standing above it. Hovering it opens the cabinet beside it
      after a short intent delay, and it closes after a grace period once the pointer has left both; it stays
      open while the pointer is over either. A click on the folder button or the index tab keeps it open (a
      second click closes it). Hovering a dot or a folder, or focusing a folder, pulls that folder's file up;
@@ -386,7 +400,7 @@
   function isOpener(el) { return openers.indexOf(el) >= 0; }
   function mouseLike(e) { return e.pointerType === 'mouse' || e.pointerType === 'pen'; }
   function setExpanded(v) { openers.forEach(function (b) { b.setAttribute('aria-expanded', v ? 'true' : 'false'); }); }
-  function homeButton() { return phoneMQ.matches ? indexTab : railBtn; }
+  function homeButton() { return indexTab || railBtn; } /* the index tab is the keyboard's way in (the folder button is out of the tab order) */
 
   /* one file out at a time; its dot lights up with it */
   function pull(k) {
@@ -408,6 +422,9 @@
   var locs = [], lastMove = 0, aimT = 0, wantK = -1, wantDwell = 0;
   function trackMove(e) {
     if (!mouseLike(e)) return;
+    /* after a pause (100ms without moving) the triangle starts where the pointer rested, not where it was
+       before the pause */
+    if (Date.now() - lastMove > 100) locs = locs.slice(-1);
     locs.push([e.clientX, e.clientY]); if (locs.length > 4) locs.shift();
     lastMove = Date.now();
     if (aimT) { if (aiming()) { clearTimeout(aimT); aimT = setTimeout(aimDone, AIM_DELAY); } else { clearTimeout(aimT); aimT = 0; pullSoon(wantK, wantDwell); } }
@@ -664,6 +681,7 @@
     dots.forEach(function (a, i) {
       a.addEventListener('pointerenter', function (e) {
         if (!mouseLike(e) || panelMQ.matches || folderOf[i] === undefined) return;
+        trackMove(e); /* first, so the safe triangle includes the point that crossed into this row */
         quiet = false;
         want(folderOf[i], isOpen ? PULL_DWELL : OPEN_DELAY + 60);
       });
@@ -671,6 +689,7 @@
     folderLinks.forEach(function (a, k) {
       a.addEventListener('pointerenter', function (e) {
         if (!mouseLike(e) || panelMQ.matches) return;
+        trackMove(e); /* first, so the safe triangle includes the point that crossed into this row */
         quiet = false;
         want(k, PULL_DWELL);
       });
@@ -678,7 +697,9 @@
     });
     cabinet.addEventListener('pointermove', function (e) { if (mouseLike(e)) quiet = false; });
 
-    /* focusing the folder button opens the cabinet too (keyboard focus only, after the same delay) */
+    /* focusing the folder button opens the cabinet too (keyboard focus only, after the same delay). The button
+       is out of the tab order (tabindex -1: the index tab is the keyboard's way in), so this now answers only
+       a script or assistive technology that focuses it. */
     railBtn.addEventListener('focus', function () {
       if (holdFocusOpen) { holdFocusOpen = false; return; }
       if (panelMQ.matches || isOpen) return;
@@ -791,7 +812,11 @@
   }
 
   /* the index tab names the current sheet on phones, from the same names as the rail label */
-  function writeAt(i) { if (indexAt) indexAt.textContent = ' · ' + pad(i) + ' ' + (names[i] || ''); }
+  function writeAt(i) {
+    if (!indexAt) return;
+    var nm = d.createElement('span'); nm.className = 'index-tab__name'; nm.textContent = ' ' + (names[i] || '');
+    indexAt.textContent = ' · ' + pad(i); indexAt.appendChild(nm);
+  }
 
   /* on phones the pill steps aside while the end row, which has its own "Open the index", is on screen
      (the CSS applies it below 900px only) */
@@ -959,7 +984,12 @@
   if (d.fonts && d.fonts.ready) d.fonts.ready.then(function () { setTimeout(measure, 50); });
   /* the browser's own fragment jump can land after ours (and, with sticky
      sheets, in the wrong place), so correct it once more shortly after load */
-  function jumpToHash() { var i = indexOfHash(location.hash); if (i > 0) go(i, true); }
+  function jumpToHash() {
+    /* coming back with Back or Forward, the browser restores where the reader was; the old #hash is not news */
+    var nv = window.performance && performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (nv && nv.type === 'back_forward') return;
+    var i = indexOfHash(location.hash); if (i > 0) go(i, true);
+  }
   /* an address ending in #cabinet (the index links' target without the script) opens the index */
   if (location.hash === '#cabinet' && cabinet) { if (history.replaceState) history.replaceState(null, '', location.pathname); openCabinet('pin'); }
   window.addEventListener('load', function () {
