@@ -85,30 +85,66 @@ WCAG 2.3.3 asks that motion set off by interaction can be turned off):
 - **The name** is "Leonardo Carvalho" in Switzer at 780, tracked -0.03 em, one
   line from 700 px wide and two lines ("Leonardo" over "Carvalho") below. It is a
   real button ("Leonardo Carvalho. Enter the portfolio") holding the name as
-  text: with the room that text is transparent and the room draws the glass
-  from it, so the hero, its layout and its control are one element.
-- **The glass:** a mask of the letters (the letters, a soft height for their
-  bevel, a wide blur for the light behind) that the room turns into solid glass:
-  frosted faces lit from behind, a bright rim on the side facing the light, a
-  shaded far bevel, a soft highlight and a shimmer of moving surface. The light
-  behind spills round the letters in the color style's hue. By day the faces are
-  a deeper cobalt so the name reads against the bright room.
-- **Interaction:** the highlight and the glow lean gently toward the pointer,
-  hovering lifts the light, a press flares it briefly; nothing moves the letters.
-  The glass and the light come up over about 0.9 s (at once under reduced
-  motion), and the hint at the foot of the screen follows: "Click the title to
-  proceed", or "Tap the title to proceed" on touch screens.
+  text: with the room that text is transparent and the room draws the name in
+  light from it, so the hero, its layout and its control are one element.
+- **Where it comes from:** in round three Leonardo asked for the feel of Apple's
+  "It's Glowtime." art, animated and smooth: a logo traced several times in
+  translucent neon (hot pink, magenta, orange, violet, electric blue, cyan) on
+  near black, the overlaps burning toward white, a soft bloom. Three treatments
+  were built and judged; this is the neon one, with the colour turns and the
+  day pool of a traced-light version and the arrival of an iridescent-glass one.
+- **The light:** the room reads a mask of the letters (the letters, a soft copy
+  whose half level is their outline, a wide blur for the halo and the pool) seven
+  times a pixel, and only inside the name's box:
+  - one crisp tube of light locked to the letters' true edge (the visible edge
+    never moves), with a white-hot core and a hair of red and blue split, its
+    colour flowing along the name through orange, hot pink, magenta, violet,
+    electric blue and cyan, a cycle in 14 s;
+  - three echoes tracing the outline again, each in its own colours: pink to
+    magenta just inside the edge, orange just outside it, blue to cyan close to
+    it. Each drifts about 2% of the font size and breathes in and out of the edge,
+    so it crosses the tube, and fades as it strays, so the name never reads
+    double. Where traces cross, the light adds up and burns toward white on a
+    soft tone curve;
+  - the traces take turns being brightest, a 16 s cycle sliding along the name,
+    each wandering from its turn on its own 10 to 19 s wave;
+  - translucent violet faces, a halo behind in blue, violet and pink that leans
+    toward the pointer, and a pool under it all: near black by night; by day the
+    bright room falls about 80% toward a saturated violet-blue that follows the
+    halo, so the light reads on it.
+- **Colour style:** the palettes turn the light a third as far as the room and
+  hold it inside the Glowtime family of hues, so each shifts which colours lead
+  (Gold and Ember warm, Teal and Emerald cool, Graphite silver) and none turns
+  it lime or green.
+- **Motion:** the light runs on the room's clock and the room draws at full rate
+  while the hero shows. On a machine that tripped the room's budget the clock
+  stops, so the light holds still until the pointer moves it. Under reduced
+  motion it is one still, chosen with orange and at least two traces showing.
+- **Interaction:** hovering lifts the light by 22% and runs it hotter near the
+  pointer; a press flares it and the burn rolls off. Nothing moves the letters.
+  The light comes up over about 0.9 s, the echoes growing out of the outline as
+  it does (at once under reduced motion), and the hint at the foot of the screen
+  follows: "Click the title to proceed", or "Tap the title to proceed" on touch
+  screens.
 - **Entering:** click or tap the title (or its hint), or press Return. The room
   pulls focus; the name glides into the main window's title slot on one
-  critically damped spring of about 0.7 s, turning white and easing from weight
-  780 to 700; the window's glass forms under it, then its contents, the side
-  window and the tab bar fade in. Landed, it hands off to the HTML title (the
-  same glyphs) and the glass switches off: after the hero the title is plain
-  text, as Apple's guidance keeps Liquid Glass out of the content layer.
-- **Fallbacks:** without WebGL2, under reduced transparency or in forced colours
-  the hero is the same text in CSS glass with a CSS glow, the same hint, and a
-  fade into the windows. Reduced motion shows the name at once and fades in
-  150 ms. Without scripts there is no hero, and print shows the text title.
+  critically damped spring of about 0.7 s, turning white (white within about 0.2 s)
+  and easing from weight 780 to 700, while the light goes out as (1 - v)³, the
+  echoes folding back into the letters and the pool lifting with them; the
+  window's glass forms under it, then its contents, the side window and the tab
+  bar fade in. Landed, it hands off to the HTML title (the same glyphs) and the
+  effect switches off: after the hero the title is plain text, as Apple's
+  guidance keeps Liquid Glass out of the content layer.
+- **Fallbacks:** without WebGL2 the neon is CSS. The hero carries its own copy
+  of the room's still, a shade that hugs the letters (near black by night, a
+  violet-blue by day), two neon traces of the name on slow orbits (pink
+  crossfading with orange, blue with cyan) screened onto it, light translucent
+  faces crossfading between two sets of the colours, and a white-hot line on the
+  edge. Only transform and opacity animate, each on its own layer, and the
+  palettes turn the colours as the shader does. Reduced motion holds it still;
+  reduced transparency gives solid letters (white, or a deep blue by day); forced
+  colours give plain system text. Entering is a fade (150 ms under reduced
+  motion). Without scripts there is no hero, and print shows the text title.
 - Later home views (and `?nohello`) open straight into the windows; the session
   key is still `v5:hello`. Reloading the home page brings the hero back (the
   head script reads the navigation type), so it can be reviewed without
@@ -162,8 +198,8 @@ A glass button in the bottom-right corner (beside the tab bar on phones, as in
 iOS 26) opens a small panel for trying colors: eight palettes (Cobalt, Violet,
 Rose, Ember, Gold, Emerald, Teal, Graphite), a Hue and a Vibrance slider, and
 Auto, Night or Day. It turns the whole room in the shader, so every pane of
-glass and the hero's name and the light behind it follow; the choice is kept in this
-browser only (`assets/js/hue.js`).
+glass follows, and the hero's neon a third as far, within its Glowtime colours;
+the choice is kept in this browser only (`assets/js/hue.js`).
 
 ## Pages
 
@@ -190,10 +226,10 @@ South Florida, correspondence goes via a parent.
 | `assets/css/site.css` | The one stylesheet: Switzer's `@font-face`, tokens, the room, windows and ornaments, CSS glass, the hero, content components, sheets, layouts, preferences, print |
 | `assets/fonts/` | `switzer-variable.woff2` (Switzer, Indian Type Foundry, via Fontshare; weights 100 to 900) and its licence, `FFL-switzer.txt` (the ITF Free Font License allows self-hosting and wordmarks). The name only; everything else is the system face |
 | `assets/js/boot.js` | Entry: starts the room, the windows, the hero and navigation; the Work filters, print buttons and Groton's clock |
-| `assets/js/room.js`, `shaders.js` | The WebGL2 room: scene, composite, glass panels and the ink (the hero's glass name); frame budget |
+| `assets/js/room.js`, `shaders.js` | The WebGL2 room: scene, composite, glass panels and the ink (the hero's name in neon light); frame budget |
 | `assets/js/panels.js`, `geometry.js` | Where the glass is: element boxes and projected corners into inverse homographies |
 | `assets/js/windows.js` | Layout modes, the side window, tab bar, materialising, sheets, the window bar, the pointer's light and the room's lean, hover and press light, scrolling from anywhere |
-| `assets/js/hero.js` | The hero: the name's layout read glyph by glyph from the page, its glass mask, the light and its interaction, the glide into the title and the hand-off, the fallbacks |
+| `assets/js/hero.js` | The hero: the name's layout read glyph by glyph from the page, its mask, the light and its interaction, the glide into the title and the hand-off, the fallbacks |
 | `assets/js/nav.js` | Page swaps (the side window kept in place), sheets, history, direct loads of projects |
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |
 | `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin |
@@ -238,8 +274,8 @@ by machine yet.
   moves, content never moves on its own, and windows stay put under the pointer.
   Reduced motion means no glide, focus pull, lean or drift, and 150 ms crossfades.
 - **Budget:** the room renders at up to 1.5× device pixels, 60 fps while
-  anything moves, 30 fps while only the room drifts, and not at all when nothing
-  moves under reduced motion. A machine averaging over 22 ms across its first 90
+  anything moves (the hero's light included), 30 fps while only the room
+  drifts, and not at all when nothing moves under reduced motion. A machine averaging over 22 ms across its first 90
   frames drops to 1× and stops the drift. Hidden tabs draw nothing.
 - Hidden-until-ready content (film link, 2026-27 stats, schedule, résumé PDF) is
   an HTML comment saying what fills it.

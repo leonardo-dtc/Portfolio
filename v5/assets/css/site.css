@@ -150,32 +150,89 @@ html.gl .glass::after { display: none; }
 
 /* ---------- the hero ---------- */
 /* The name, heavy and blocky, is a real button: with the room it is transparent text (its layout and the control)
-   and the room draws it in Liquid Glass; without the room it is the same text in CSS glass with a CSS glow. */
+   and the room draws it in neon light (after Apple's "It's Glowtime"); without the room it is the same text with the
+   neon approximated in CSS (below). */
 .hero { position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; --hero-fs: min(8.2vw, 24svh, 160px); }
 html.is-hello .hero, html.is-entering .hero { display: block; }
-.hero__name { position: absolute; left: 50%; top: 45%; translate: -50% -50%; margin: 0; padding: .05em .12em; border: 0; border-radius: .2em; background: none; color: #fff; font: 780 var(--hero-fs)/1 var(--font-name); letter-spacing: -.03em; white-space: nowrap; text-align: center; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
+/* the name's box: the button, and (without the room) the copies of the name that draw its light, set exactly as it is */
+.hero__name, .hero__neon i, .hero__neon b, html:not(.gl) .hero::after { position: absolute; left: 50%; top: 45%; translate: -50% -50%; margin: 0; padding: .05em .12em; font: 780 var(--hero-fs)/1 var(--font-name); letter-spacing: -.03em; white-space: nowrap; text-align: center; }
+.hero__name { border: 0; border-radius: .2em; background: none; color: #fff; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
 .hero__name:focus-visible { outline: 2px solid #fff; outline-offset: 12px; box-shadow: 0 0 0 14px rgba(255, 255, 255, .08); border-radius: .2em; }
 .hero__w { white-space: nowrap; }
 .hero__text { display: inline-block; opacity: 0; }
 html.gl .hero__text { color: transparent; }
 html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s var(--ease-out); }
+.hero__neon { display: none; }
+/* Without the room (no WebGL2): the neon after the shader. The hero carries its own copy of the room's still (it lies
+   exactly over the page's), so light can be screened onto it. Over it, bottom to top: a dark pool (.hero::before);
+   two traces of the name (.hero__neon i), each a pair of copies on one slow orbit a few hundredths of an em round the
+   letters (13 s and 17 s), the second copy of each pair crossfading in and out over the first (pink and orange, blue
+   and cyan), so the colour turns without a repaint; the letters, light translucent violet with a soft glow, and a
+   second face in other colours crossfading over them (.hero__name::after, 16 s); and a white-hot line just outside
+   the letters' edge (.hero::after). A trace is the name's outline: a stroke under a black fill (paint-order),
+   screened, so the black adds nothing and hides the strokes Switzer's overlapping shapes would draw inside the
+   letters. Only transform and opacity animate, each on its own layer. The colours are the shader's, turned by the
+   colour style as the shader turns them (hue.js sets --neon-*). Still under reduced motion (the rule there stops every
+   animation), solid under reduced transparency, plain text in forced colours. */
+html:not(.gl) .hero {
+  background: #0b1138 url("../img/room-night.webp") center / cover no-repeat;
+  --n-pink: var(--neon-pink, #ff1f75); --n-orange: var(--neon-orange, #ff660d); --n-violet: var(--neon-violet, #8533ff);
+  --n-blue: var(--neon-blue, #2157ff); --n-cyan: var(--neon-cyan, #14ccff);
+  --pool: radial-gradient(closest-side, rgba(5, 4, 26, .78), rgba(5, 4, 26, .5) 55%, rgba(5, 4, 26, 0));
+  --pool-h: 3.1; --shade: rgba(4, 3, 22, .78);
+}
+html:not(.gl) .hero::before { content: ""; position: absolute; z-index: -2; left: 50%; top: 45%; width: min(100vw, calc(var(--hero-fs) * 10.4)); height: calc(var(--hero-fs) * var(--pool-h)); translate: -50% -50%; background: var(--pool); opacity: 0; transition: opacity .9s var(--ease-out); }
+html:not(.gl) .hero__neon { display: block; }
+/* the shade: the room falls dark right round the letters (near black by night, a saturated violet-blue by day) */
+.hero__neon b { z-index: -1; pointer-events: none; color: transparent; -webkit-text-fill-color: transparent; text-shadow: 0 0 .1em var(--shade), 0 0 .3em var(--shade); opacity: 0; transition: opacity .9s var(--ease-out); }
+.hero.is-ready .hero__neon b { opacity: 1; }
+.hero__neon i { z-index: 1; pointer-events: none; font-style: normal; opacity: 0; color: var(--n-pink); -webkit-text-fill-color: #000; -webkit-text-stroke: .09em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .05em currentColor); will-change: transform; transition: opacity .9s var(--ease-out);
+  --ga: 40deg; --gr: .024em; transform: rotate(var(--ga)) translateX(var(--gr)) rotate(calc(-1 * var(--ga))); }
+.hero__neon i:nth-of-type(2) { color: var(--n-blue); --ga: 220deg; --gr: .022em; }
+.hero__neon b::before, .hero__neon i::before, .hero__neon i::after, html:not(.gl) .hero::after, html:not(.gl) .hero__name::after { content: "Leonardo Carvalho"; }
+.hero__neon i::after { position: absolute; inset: .05em .12em; color: var(--n-orange); opacity: .55; }
+.hero__neon i:nth-of-type(2)::after { color: var(--n-cyan); opacity: .4; }
+.hero.is-ready .hero__neon i { opacity: .8; animation: hero-orbit 13s linear infinite; }
+.hero.is-ready .hero__neon i:nth-of-type(2) { animation: hero-orbit 17s linear infinite reverse; }
+.hero.is-ready .hero__neon i::after { animation: hero-turn 11s ease-in-out infinite alternate; }
+.hero.is-ready .hero__neon i:nth-of-type(2)::after { animation-duration: 15s; animation-delay: -6s; }
+.hero__name:hover ~ .hero__neon i { opacity: .94; }
+.hero__name:active ~ .hero__neon i { opacity: 1; transition-duration: .08s; }
+@keyframes hero-orbit { to { transform: rotate(calc(var(--ga) + 360deg)) translateX(var(--gr)) rotate(calc(-1 * var(--ga) - 360deg)); } }
+@keyframes hero-turn { from { opacity: .1; } to { opacity: 1; } }
 html:not(.gl) .hero__text {
   color: transparent; -webkit-text-fill-color: transparent;
-  background: linear-gradient(172deg, rgba(255, 255, 255, .97) 18%, rgba(206, 220, 255, .72) 52%, rgba(255, 255, 255, .9) 88%);
+  background: linear-gradient(100deg, rgba(176, 125, 255, .84), rgba(240, 110, 196, .84) 36%, rgba(130, 160, 255, .84) 66%, rgba(186, 120, 255, .84));
+  background: linear-gradient(100deg, color-mix(in srgb, var(--n-violet) 58%, rgba(236, 228, 255, .62)), color-mix(in srgb, var(--n-pink) 52%, rgba(236, 228, 255, .62)) 36%, color-mix(in srgb, var(--n-blue) 52%, rgba(236, 228, 255, .62)) 66%, color-mix(in srgb, var(--n-violet) 58%, rgba(236, 228, 255, .62)));
   -webkit-background-clip: text; background-clip: text;
-  filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em var(--glow-css, rgba(112, 148, 255, .7))) drop-shadow(0 0 .3em var(--glow-css, rgba(112, 148, 255, .7)));
-  transition: filter .45s var(--ease-out);
+  filter: drop-shadow(0 0 .26em color-mix(in srgb, var(--n-violet) 60%, transparent));
 }
-html:not(.gl) .hero__name:hover .hero__text { filter: drop-shadow(0 0 .06em rgba(255, 255, 255, .65)) drop-shadow(0 0 .36em var(--glow-css, rgba(112, 148, 255, .7))) drop-shadow(0 0 .36em var(--glow-css, rgba(112, 148, 255, .7))); }
-/* by day the room is bright: the name is a deeper blue glass, as the room draws it, with the light behind it white */
-@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background-image: linear-gradient(172deg, rgba(64, 104, 228, .96) 18%, rgba(34, 66, 186, .9) 55%, rgba(72, 116, 236, .96) 88%); } }
-html[data-appearance="day"]:not(.gl) .hero__text { background-image: linear-gradient(172deg, rgba(64, 104, 228, .96) 18%, rgba(34, 66, 186, .9) 55%, rgba(72, 116, 236, .96) 88%); }
-@media (prefers-reduced-transparency: reduce) { html:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; } }
+html:not(.gl) .hero__name::after {
+  position: absolute; inset: .05em .12em; pointer-events: none; opacity: 0;
+  color: transparent; -webkit-text-fill-color: transparent;
+  background: linear-gradient(100deg, rgba(246, 150, 120, .84), rgba(186, 120, 255, .84) 40%, rgba(240, 110, 196, .84) 72%, rgba(116, 210, 255, .84));
+  background: linear-gradient(100deg, color-mix(in srgb, var(--n-orange) 52%, rgba(236, 228, 255, .62)), color-mix(in srgb, var(--n-violet) 58%, rgba(236, 228, 255, .62)) 40%, color-mix(in srgb, var(--n-pink) 52%, rgba(236, 228, 255, .62)) 72%, color-mix(in srgb, var(--n-cyan) 52%, rgba(236, 228, 255, .62)));
+  -webkit-background-clip: text; background-clip: text;
+}
+html:not(.gl) .hero.is-ready .hero__name::after { animation: hero-turn 16s ease-in-out -4s infinite alternate; }
+/* the white-hot line on the letters' edge (only its outer half shows) */
+html:not(.gl) .hero::after { pointer-events: none; color: rgba(255, 242, 250, .95); -webkit-text-fill-color: #000; -webkit-text-stroke: .02em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .045em var(--n-pink)); opacity: 0; transition: opacity .9s var(--ease-out); }
+html:not(.gl) .hero.is-ready::before, html:not(.gl) .hero.is-ready::after { opacity: 1; }
+/* by day the room is bright: the room behind the name falls toward a saturated violet-blue, hugging the letters */
+@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(36, 18, 132, .5), rgba(36, 18, 132, .3) 50%, rgba(36, 18, 132, 0)); --pool-h: 2.2; --shade: rgba(34, 14, 124, .82); } }
+html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(36, 18, 132, .5), rgba(36, 18, 132, .3) 50%, rgba(36, 18, 132, 0)); --pool-h: 2.2; --shade: rgba(34, 14, 124, .82); }
+/* reduced transparency: solid letters (white by night, a deep blue by day), without the pool, traces or glow */
+@media (prefers-reduced-transparency: reduce) {
+  html:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; filter: none; }
+  html:not(.gl) .hero::before, html:not(.gl) .hero::after, html:not(.gl) .hero__name::after, html:not(.gl) .hero__neon { display: none; }
+}
 @media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background: #1f3fae; -webkit-background-clip: text; background-clip: text; } }
 @media (max-width: 699px) {
   .hero { --hero-fs: min(18vw, 15svh, 120px); }
-  .hero__name { line-height: .98; }
+  .hero__name, .hero__neon i, .hero__neon b, html:not(.gl) .hero::after { line-height: .98; }
   .hero__w { display: block; }
+  .hero__neon b::before, .hero__neon i::before, .hero__neon i::after, html:not(.gl) .hero::after, html:not(.gl) .hero__name::after { content: "Leonardo\A Carvalho"; white-space: pre; }
+  html:not(.gl) .hero::before { width: calc(var(--hero-fs) * 6.4); height: calc(var(--hero-fs) * (var(--pool-h) + 1.2)); }
 }
 .hero__hint { position: absolute; left: 16px; right: 16px; bottom: calc(32px + env(safe-area-inset-bottom)); margin: 0; text-align: center; color: var(--ink-2); font: 500 14px/1.3 var(--font); letter-spacing: .01em; opacity: 0; transition: opacity .5s var(--ease-out) .75s; }
 .hero__hint span { pointer-events: auto; cursor: pointer; }
@@ -503,7 +560,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   .room { display: none; }
   .glass { forced-color-adjust: auto; background: Canvas; border: 1px solid CanvasText; }
 }
-@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } }
+@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } .hero::before, .hero::after, .hero__name::after, .hero__neon { display: none !important; } html .hero { background: none !important; } }
 
 /* ---------- print: plain text on white, Letter with half-inch margins ---------- */
 @page { size: letter; margin: .5in; }

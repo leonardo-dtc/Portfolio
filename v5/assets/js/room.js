@@ -100,7 +100,7 @@ export function createRoom(canvas) {
     const x = ink && ink.xform ? ink.xform : [1, 0, 0];
     gl.uniform3f(uc.uInkX, x[0], x[1], x[2]);
     const lean = ink && ink.lean ? ink.lean : [0, 0], hl = ink && ink.light ? ink.light : [0, 0, 1, 0];
-    gl.uniform4f(uc.uInk1, ink ? (ink.glow || 0) : 0, lean[0], lean[1], 0);
+    gl.uniform4f(uc.uInk1, ink ? (ink.glow || 0) : 0, lean[0], lean[1], ink ? (ink.fs || 0) : 0);
     gl.uniform4f(uc.uInkL, hl[0], hl[1], hl[2], hl[3]);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
@@ -113,6 +113,7 @@ export function createRoom(canvas) {
   const api = {
     get dpr() { return dpr; },
     get lod() { return maxLod; },
+    get slow() { return slow; },                         // the budget tripped: 1x, and the room's own motion stopped
     set(o) { Object.assign(st, o); st.fast = Math.max(st.fast, .5); },
     source: null,                                        // () => panels, read each frame just before drawing
     // panels arrive every frame; only a change in them wakes the room to full rate

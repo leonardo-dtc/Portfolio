@@ -1,4 +1,4 @@
-// The hero (the first home view of a session): the name in Liquid Glass with the light behind it, the hint at the
+// The hero (the first home view of a session): the name in neon light, the hint at the
 // foot of the screen, the title as the control (click, Return, the hint), the glide into the window's title and the
 // hand-off to the HTML title; later views skip it; reduced motion, phones, no WebGL and reduced transparency.
 import { open, BASE, check } from './lib.mjs';
@@ -29,8 +29,12 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   await page.waitForTimeout(400);
   s = await shotSampler(page);
   const without = grey(await s.mean(box.x, box.y, box.width, box.height));
-  check(withInk > without + 4, `the name is drawn in the room (${withInk.toFixed(1)} with the glass, ${without.toFixed(1)} without)`);
+  check(withInk > without + 4, `the name is drawn in the room (${withInk.toFixed(1)} with the light, ${without.toFixed(1)} without)`);
   await page.evaluate(() => { window.__room.set({ ink: window.__hero.ink }); window.__room.kick(1); });
+  // the light never stops moving, so the room stays at full rate while the hero shows (unless its budget tripped)
+  await page.waitForTimeout(300);
+  const awake = await page.evaluate(() => ({ slow: window.__room.slow, fast: window.__room.state.fast }));
+  check(awake.slow === true || awake.fast > 0, `the room stays awake for the light (${awake.slow ? 'budget tripped: held still' : 'full rate'})`);
   // no wheel or swipe to enter any more
   await page.mouse.move(720, 700);
   await page.mouse.wheel(0, 400);
@@ -102,13 +106,16 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   await browser.close();
 }
 {
-  // no WebGL: the hero is the name as CSS glass text, with the same hint, and entering is a fade
+  // no WebGL: the hero is the name in CSS neon, with the same hint, and entering is a fade
   const { browser, page, errors } = await open({ noGL: true });
   await page.goto(BASE, { waitUntil: 'load' });
   await ready(page);
   await page.waitForTimeout(1200);
-  const r = await page.evaluate(() => ({ gl: document.documentElement.classList.contains('gl'), hello: document.documentElement.classList.contains('is-hello'), text: +getComputedStyle(document.querySelector('.hero__text')).opacity, clip: getComputedStyle(document.querySelector('.hero__text')).backgroundClip }));
-  check(!r.gl && r.hello && r.text > .9 && /text/.test(r.clip), 'no WebGL: the hero is the name in CSS glass');
+  const r = await page.evaluate(() => ({ gl: document.documentElement.classList.contains('gl'), hello: document.documentElement.classList.contains('is-hello'), text: +getComputedStyle(document.querySelector('.hero__text')).opacity, clip: getComputedStyle(document.querySelector('.hero__text')).backgroundClip, neon: getComputedStyle(document.querySelector('.hero__neon')).display }));
+  check(!r.gl && r.hello && r.text > .9 && /text/.test(r.clip) && r.neon !== 'none', 'no WebGL: the hero is the name in CSS neon');
+  // the CSS neon moves only by transform and opacity, so the weakest machines composite it without repainting
+  const props = await page.evaluate(() => [...new Set(document.getAnimations().filter(a => a.effect && a.effect.target && a.effect.target.closest('.hero')).flatMap(a => a.effect.getKeyframes().flatMap(k => Object.keys(k).filter(p => !['offset', 'computedOffset', 'easing', 'composite'].includes(p)))))]);
+  check(props.length > 0 && props.every(p => p === 'transform' || p === 'opacity'), `no WebGL: the neon animates only transform and opacity (${props.join(', ')})`);
   await page.locator('.hero__name').click();
   check(await done(page, 4000), 'no WebGL: a click fades into the windows');
   check(errors.length === 0, 'no console errors ' + errors.join(' | '));

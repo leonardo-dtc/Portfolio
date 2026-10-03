@@ -1,19 +1,25 @@
-// The hero: "Leonardo Carvalho" in Switzer, heavy and blocky, drawn by the room as solid Liquid Glass with a light
-// behind it. The title is the control: click or tap it (or press Return) and the name glides into the main window's
-// title slot, turning white, and hands off to the HTML title, which is plain text from then on (Liquid Glass stays
+// The hero: "Leonardo Carvalho" in Switzer, heavy and blocky, drawn by the room in neon light (after Apple's "It's
+// Glowtime"): a crisp tube of flowing colour locked to every letter's outline, three echoes tracing it again in their
+// own colours (pink, orange, blue) a little inside and outside the edge, translucent violet faces, and a pool with a
+// coloured halo behind (the ink in shaders.js). The echoes grow out of the outline as the light arrives. The title is
+// the control: click or tap it (or press Return) and the name glides into the main window's title slot, the light
+// going out as it turns white, and hands off to the HTML title, which is plain text from then on (the effect stays
 // out of the content layer). Without the room (no WebGL2, reduced transparency, forced colours) the same name is HTML
-// text with a CSS glass treatment and glow, and entering is a fade.
+// text with the neon approximated in CSS (solid under reduced transparency, plain in forced colours), and entering
+// is a fade.
 //
 // Layouts are read from the page itself, glyph by glyph: the hero button and the window's title are real text set
 // by the stylesheet, so the mask is drawn exactly where (and as) the browser sets them, and the glide ends on the
-// title's own glyphs. The mask (red the letters, green a soft height for their bevel, blue a wide blur of them for
-// the light behind) is redrawn at screen resolution on every frame of the glide.
+// title's own glyphs. The mask (red the letters, green a soft copy of them whose half level is the outline the neon
+// follows, blue a wide blur of them for the halo and the pool) is redrawn at screen resolution on every frame of the
+// glide.
 import { createSpring, tween } from './springs.js';
 import { onFrame } from './frame.js';
 
 // the same stack as --font-name in site.css, so if Switzer cannot load, the canvas and the title fall back alike
 const FAMILY = '"Switzer", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, system-ui, sans-serif';
-const BEVEL = .035, GLOW = .3;              // the bevel and the light behind, as fractions of the font size
+const TUBE = .024, GLOW = .4;               // the outline's softness and the halo's, as fractions of the font size
+const DRIFT = .05;                          // how far the echoes stray from the outline, with their glow (font sizes)
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const wait = s => new Promise(r => setTimeout(r, s * 1000));
 
@@ -82,13 +88,13 @@ export function createHero({ room, windows }) {
   const ctx = document.createElement('canvas').getContext('2d');
   const canvas = document.createElement('canvas'), g = canvas.getContext('2d');
   const letters = document.createElement('canvas'), lg = letters.getContext('2d');
-  // on: how much shows; white: 0 is glass, 1 the white title; px: the bevel; glow: the light behind (with hover and
-  // press); lean: the glow's lean toward the pointer; light: the highlight on the faces (x, y, radius, strength)
-  const ink = { on: 0, dim: 0, white: 0, px: 4, glow: 0, lean: [0, 0], light: [0, 0, 1, 0], canvas, dirty: false, xform: [1, 0, 0] };
+  // on: how much shows; white: 0 is neon, 1 the white title; px: the outline's softness; fs: the font size; glow: the
+  // light (with hover and press); lean: the halo's lean toward the pointer; light: the hot spot (x, y, radius, strength)
+  const ink = { on: 0, dim: 0, white: 0, px: 3, fs: 100, glow: 0, lean: [0, 0], light: [0, 0, 1, 0], canvas, dirty: false, xform: [1, 0, 0] };
   let drawnAt = 0;                                                         // the room's pixel ratio the mask was drawn for
   function draw(L, withGlow) {
-    const dpr = drawnAt = room.dpr, fs = L.size * dpr, bev = fs * BEVEL, gs = fs * GLOW, b = bounds(L);
-    const m = Math.ceil((withGlow ? gs * 2.8 : bev * 3) + 4);
+    const dpr = drawnAt = room.dpr, fs = L.size * dpr, bev = fs * TUBE, gs = fs * GLOW, b = bounds(L);
+    const m = Math.ceil((withGlow ? gs * 2.6 : bev * 4 + fs * DRIFT) + 4);
     const ox = Math.floor(b.x0 * dpr) - m, oy = Math.floor(b.y0 * dpr) - m;
     const cw = Math.ceil(b.x1 * dpr) + m - ox, ch = Math.ceil(b.y1 * dpr) + m - oy;
     for (const c of [canvas, letters]) if (c.width !== cw || c.height !== ch) { c.width = cw; c.height = ch; }
@@ -112,12 +118,12 @@ export function createHero({ room, windows }) {
     }
     g.shadowColor = 'transparent';
     ink.xform = [1, -ox, -oy];
-    ink.px = bev;
+    ink.px = bev; ink.fs = fs;
     ink.dirty = true;
     room.kick(.3);
   }
 
-  // ---------- the light: the highlight and the glow lean gently toward the pointer ----------
+  // ---------- the light: the hot spot and the halo lean gently toward the pointer ----------
   const glowS = createSpring({ value: 1, response: .45, damping: 1 });   // 1 at rest, lifted by hover, flared by a press
   let shown = 0;                                                           // the arrival, 0 to 1
   function lightFor(L, glowLeft) {
@@ -159,7 +165,10 @@ export function createHero({ room, windows }) {
       const settled = glowS.step(dt);
       lightFor(H, 1);
       ink.on = shown;
-      if (!settled || shown < 1) room.kick(.1);                          // full rate only while the light or the arrival moves
+      // the light never stops moving, so the room draws at full rate while the hero shows; on a machine that tripped
+      // the room's budget (its clock stopped) and under reduced motion (one still), only while the light or the
+      // arrival moves
+      if (!settled || shown < 1 || !(reduced.matches || room.slow)) room.kick(.1);
     }, 1);
     if (reduced.matches) shown = 1;
     else tween(createSpring({ value: 0, response: .8, damping: 1 }), 1, v => { shown = clamp(v, 0, 1); });

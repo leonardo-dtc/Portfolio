@@ -1,6 +1,6 @@
 // The color style control (bottom right): palettes, a hue and vibrance to play with, and Night, Day or Auto.
 // It turns the whole room (and so every pane of glass, and the hero's name and the light behind it) in the shader;
-// the few pieces of CSS glass follow through --glass-css, and the CSS hero's glow through --glow-css. The choice is
+// the few pieces of CSS glass follow through --glass-css, and the CSS hero's neon through --neon-*. The choice is
 // kept in this browser only.
 import { createSpring, tween } from './springs.js';
 
@@ -9,12 +9,23 @@ const PRESETS = [
   ['gold', 'Gold', 178, .95], ['emerald', 'Emerald', -80, .9], ['teal', 'Teal', -45, 1], ['graphite', 'Graphite', 0, .12],
 ];
 const DEFAULT = { preset: 'cobalt', hue: 0, sat: 1, look: 'auto' };
+// the hero's neon colours, as in shaders.js (N_PINK and the rest)
+const NEON = [['pink', [1, .12, .46]], ['orange', [1, .4, .05]], ['violet', [.52, .2, 1]], ['blue', [.13, .34, 1]], ['cyan', [.08, .8, 1]]];
 const KEY = 'v5:color';
 
 // the same YIQ turn as the shader, for swatches and CSS glass
 function turn([r, g, b], deg, k) {
   const y = .299 * r + .587 * g + .114 * b, i = .596 * r - .274 * g - .322 * b, q = .211 * r - .523 * g + .312 * b;
   const h = Math.atan2(q, i) - deg * Math.PI / 180, c = Math.hypot(i, q) * k;
+  const I = c * Math.cos(h), Q = c * Math.sin(h);
+  return [y + .956 * I + .621 * Q, y - .272 * I - .647 * Q, y - 1.106 * I + 1.703 * Q].map(v => Math.round(Math.min(1, Math.max(0, v)) * 255));
+}
+// the shader's turn for the hero's neon (neonTurn in shaders.js): a third as far as the room, three quarters of the
+// vibrance, and held inside the Glowtime family of hues (orange through pink, violet and blue to cyan)
+function neonTurn([r, g, b], deg, k) {
+  const y = .299 * r + .587 * g + .114 * b, i = .596 * r - .274 * g - .322 * b, q = .211 * r - .523 * g + .312 * b;
+  const T = 2 * Math.PI, d = Math.atan2(q, i + 1e-6) - deg / 3 * Math.PI / 180 - 1.676 + Math.PI;
+  const h = 1.676 + Math.max(-1.745, Math.min(1.745, ((d % T) + T) % T - Math.PI)), c = Math.hypot(i, q) * (.25 + .75 * k);
   const I = c * Math.cos(h), Q = c * Math.sin(h);
   return [y + .956 * I + .621 * Q, y - .272 * I - .647 * Q, y - 1.106 * I + 1.703 * Q].map(v => Math.round(Math.min(1, Math.max(0, v)) * 255));
 }
@@ -59,7 +70,9 @@ export function initHue({ room }) {
     if (room) room.set({ color: [h * Math.PI / 180, k], day: d });
     const base = d > .5 ? [.10, .16, .52] : [.16, .22, .77];
     html.style.setProperty('--glass-css', rgb(turn(base, h, k), d > .5 ? .5 : .34));
-    html.style.setProperty('--glow-css', rgb(turn(d > .5 ? [.86, .93, 1] : [.44, .58, 1], h, k), .7));
+    // the hero's neon (its CSS version), turned as the shader turns it, so every palette keeps the Glowtime colours
+    // and only shifts which of them lead
+    for (const [n, c] of NEON) html.style.setProperty(`--neon-${n}`, rgb(neonTurn(c, h, k)));
     button.querySelector('i').style.background = swatch(h, k);
   }
   function apply(animate) {
