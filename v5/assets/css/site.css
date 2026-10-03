@@ -188,9 +188,10 @@ html.gl .hero__text { color: transparent; }
 html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s var(--ease-out); }
 .hero__neon { display: none; }
 /* Without the room (no WebGL2): the neon after the shader. The hero carries its own copy of the room's still (it lies
-   exactly over the page's), so light can be screened onto it. Over it, bottom to top: a pool that covers the whole
-   name (.hero::before) and a shade hugging every letter (.hero__neon b), near black by night and a deep violet-blue by
-   day; two traces of the name (.hero__neon i), each a pair of copies on one slow orbit a few hundredths of an em round
+   exactly over the page's), so light can be screened onto it. Over it, bottom to top: by night the stage, the whole
+   still given way to near black from the first paint (.hero::after), as the room's own stage does; by day a pool that
+   covers the whole name (.hero::before) and a shade hugging every letter (.hero__neon b) in a deep violet-blue;
+   two traces of the name (.hero__neon i), each a pair of copies on one slow orbit a few hundredths of an em round
    the letters (13 s and 17 s): a solid orange (or cyan) trace, and over it a copy whose stroke shows a gradient with
    gaps (hot pink and magenta, or electric blue and violet), crossfading in and out, so the colour turns along the name
    without a repaint and orange and cyan always show in the gaps; the letters' faces (dark, tinted and translucent
@@ -207,15 +208,17 @@ html:not(.gl) .hero {
   background: #0b1138 url("../img/room-night.webp") center / cover no-repeat;
   --n-pink: var(--neon-pink, #ff1f75); --n-orange: var(--neon-orange, #ff660d); --n-violet: var(--neon-violet, #8533ff);
   --n-blue: var(--neon-blue, #2157ff); --n-cyan: var(--neon-cyan, #14ccff);
-  --pool: radial-gradient(closest-side, rgba(2, 1, 10, .94) 50%, rgba(2, 1, 10, .55) 78%, rgba(2, 1, 10, 0));
-  --pool-h: 3.1; --shade: rgba(2, 1, 10, .9);
-  --shades: 0 0 .06em var(--shade), 0 0 .16em var(--shade), 0 0 .36em var(--shade);
+  /* by night the stage (7% of the still left in it, as in the shader) and no pool or shade, so nothing outlines the
+     name: its light lies on the dark */
+  --stage: rgba(3, 2, 10, .93); --pool: none; --pool-h: 3.1; --shade: transparent; --shades: none;
   /* the faces: each colour mixed with this, at these strengths (dark and tinted by night), and their glow */
   --face: rgba(4, 2, 14, .7); --face-a: 40%; --face-b: 36%; --face-glow: 0%; --edge-glow: transparent;
 }
+html:not(.gl) .hero::after { content: ""; position: absolute; z-index: -3; inset: 0; background: var(--stage); pointer-events: none; }
 html:not(.gl) .hero::before { content: ""; position: absolute; z-index: -2; left: 50%; top: 45%; width: min(100vw, calc(var(--hero-fs) * 11.6)); height: calc(var(--hero-fs) * var(--pool-h)); translate: -50% -50%; background: var(--pool); opacity: 0; transition: opacity .9s var(--ease-out); }
 html:not(.gl) .hero__neon { display: block; }
-/* the shade: the room falls dark right round the letters (near black by night, a deep violet-blue by day) */
+/* the shade: by day the room falls to a deep violet-blue right round the letters (by night there is none: the stage
+   is the ground) */
 .hero__neon b { z-index: -1; pointer-events: none; color: transparent; -webkit-text-fill-color: transparent; text-shadow: var(--shades); opacity: 0; transition: opacity .9s var(--ease-out); }
 .hero.is-ready .hero__neon b { opacity: 1; }
 .hero__neon i { z-index: 1; pointer-events: none; font-style: normal; opacity: 0; color: color-mix(in srgb, var(--n-orange) 75%, #ffb000); -webkit-text-fill-color: #000; -webkit-text-stroke: .07em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .05em currentColor); will-change: transform; transition: opacity .9s var(--ease-out);
@@ -258,8 +261,8 @@ html:not(.gl) .hero.is-ready::before, .hero.is-ready .hero__neon::after { opacit
    letters sit on it too) and a tight shade round every letter fall to a deep violet-blue, as the shader's day pool
    does, and the faces are nearly opaque, so the white-hot edge and the faces keep 3:1 or more against the ground
    right beside them, still or moving (over the pale sky the edge measured 1.7 to 2.6:1, the faces about 1:1) */
-@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(24, 10, 96, .94) 70%, rgba(24, 10, 96, .6) 88%, rgba(24, 10, 96, 0)); --pool-h: 2.2; --shade: rgba(24, 10, 96, .97); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
-html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --pool: radial-gradient(closest-side, rgba(24, 10, 96, .94) 70%, rgba(24, 10, 96, .6) 88%, rgba(24, 10, 96, 0)); --pool-h: 2.2; --shade: rgba(24, 10, 96, .97); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
+@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, rgba(24, 10, 96, .94) 70%, rgba(24, 10, 96, .6) 88%, rgba(24, 10, 96, 0)); --pool-h: 2.2; --shade: rgba(24, 10, 96, .97); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
+html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, rgba(24, 10, 96, .94) 70%, rgba(24, 10, 96, .6) 88%, rgba(24, 10, 96, 0)); --pool-h: 2.2; --shade: rgba(24, 10, 96, .97); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
 /* reduced transparency: solid letters without the pool, traces or neon: white by night; by day a deep navy on a soft
    light halo, since the day room runs from pale sky to mid blue behind the name (5.4:1 or better against the darker
    parts round the letters, where #1f3fae alone measured 2.4:1) */
@@ -750,7 +753,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   .room { display: none; }
   .glass { forced-color-adjust: auto; background: Canvas; border: 1px solid CanvasText; }
 }
-@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } .hero::before, .hero__name::after, .hero__neon { display: none !important; } html .hero { background: none !important; } }
+@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } .hero::before, .hero::after, .hero__name::after, .hero__neon { display: none !important; } html .hero { background: none !important; } }
 
 /* ---------- print: plain text on white, Letter with half-inch margins ---------- */
 @page { size: letter; margin: .5in; }

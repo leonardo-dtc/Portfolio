@@ -1,6 +1,7 @@
-// The hero (the first home view of a session): the name in neon light, the hint at the
-// foot of the screen, the title as the control (click, Return, the hint), the glide into the window's title and the
-// hand-off to the HTML title; later views skip it; reduced motion, phones, no WebGL and reduced transparency.
+// The hero (the first home view of a session): the name in neon light on the dark stage, the hint at the
+// foot of the screen, the title as the control (click, Return, the hint), the glide into the window's title as the
+// lights come up, and the hand-off to the HTML title; later views skip it; reduced motion, phones, no WebGL and
+// reduced transparency.
 import { open, BASE, check } from './lib.mjs';
 import { shotSampler, grey } from './pixels.mjs';
 
@@ -21,9 +22,8 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   check(hint.text === 'Click the title to proceed' && hint.opacity > .9, `the hint reads “${hint.text}”`);
   check(Math.abs(hint.bottom - 32) < 3 && hint.size >= 13 && hint.size <= 15, `the hint sits ${hint.bottom.toFixed(0)}px above the bottom at ${hint.size}px`);
   check(hint.tab < 0, 'the hint is not a tab stop');
-  // the name is drawn in the room: the band across it differs from the same band with the ink off (by night the
-  // pool takes it toward near black under the neon, so on average it reads darker, not brighter; neon.mjs checks the
-  // colours and the ground)
+  // the name is drawn in the room: the band across it differs from the same band with the ink off (the room's dark
+  // stage stays under it; neon.mjs checks the colours, the stage and how the light falls into it)
   let s = await shotSampler(page);
   const box = await page.locator('.hero__name').boundingBox();
   const withInk = grey(await s.mean(box.x, box.y, box.width, box.height));
@@ -42,7 +42,10 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   await page.mouse.wheel(0, 400);
   await page.waitForTimeout(500);
   check(await page.evaluate(() => window.__hero.state === 'hero'), 'a scroll does not enter');
-  // Return anywhere enters
+  // Return anywhere enters. Every frame from here to the landing, the stage (the room's light held down while the
+  // hero shows) and how white the name has turned, the glide's own progress
+  const atRest = await page.evaluate(() => window.__room.state.stage);
+  await page.evaluate(() => { const log = window.__lights = []; const tick = () => { log.push([window.__room.state.stage, window.__hero.ink.white || 0]); if (window.__hero.state !== 'done') requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
   await page.evaluate(() => document.activeElement && document.activeElement.blur());
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => !document.documentElement.classList.contains('is-hello'), null, { timeout: 4000 });
@@ -55,6 +58,11 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   check(after.text === 'Leonardo Carvalho' && after.opacity === '1' && /Switzer/.test(after.font) && after.color === 'rgb(255, 255, 255)', `the title is white text in Switzer ${after.weight}`);
   check(after.ink === null, 'the glass is off once the title has landed: it stays out of the content layer');
   check(after.main === '1' && after.hero === 'none', 'the window is in and the hero is gone');
+  // the lights come up on the glide's spring: by night the stage holds the room down while the hero shows, and
+  // entering it lifts on the term the neon goes out on, (1 - v)³, never rising again, so it is gone when the name lands
+  const lights = await page.evaluate(() => ({ log: window.__lights, now: window.__room.state.stage, still: document.documentElement.dataset.still || '' }));
+  const L = lights.log, falls = L.every((l, i) => !i || l[0] <= L[i - 1][0] + 1e-6), onTerm = L.filter(l => l[1] > 0 && l[1] < 1).every(([st, w]) => Math.abs(st - Math.pow(1 - w, 3)) < .01);
+  check(atRest === 1 && L.length > 2 && falls && onTerm && lights.now === 0, `the lights come up as the name glides home (the stage ${atRest} while the hero shows, then over ${L.length} frames ${L.slice(0, 8).map(l => l[0].toFixed(2)).join(' ')}${L.length > 8 ? ' ...' : ''}; ${lights.now} once landed${lights.still ? `; the room gave way (${lights.still}) and the CSS took over` : ''})`);
   await page.goto(BASE, { waitUntil: 'load' });
   await page.waitForTimeout(400);
   check(!(await page.evaluate(() => document.documentElement.classList.contains('is-hello'))), 'a second view in the session skips the hero');
@@ -89,6 +97,7 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   await page.waitForTimeout(80);
   check(await page.evaluate(() => window.__room.state.defocus === 0), 'reduced motion: no focus pull');
   check(await done(page, 3000), 'reduced motion: the window is in');
+  check(await page.evaluate(() => window.__room.state.stage === 0), 'reduced motion: the lights are up with it (a 150 ms crossfade)');
   check(errors.length === 0, 'no console errors ' + errors.join(' | '));
   await browser.close();
 }

@@ -1,18 +1,19 @@
 // The hero: "Leonardo Carvalho" in Switzer, heavy and blocky, drawn by the room in neon light (after Apple's "It's
 // Glowtime"): a crisp tube of flowing colour locked to every letter's outline, three echoes tracing it again in their
 // own colours (pink, orange, cyan) a little inside and outside the edge, translucent faces in the tube's colours, and
-// a pool with a coloured halo behind, near black by night (the ink in shaders.js). The echoes grow out of the outline
-// as the light arrives. The title is the control: click or tap it (or press Return) and the name glides into the main
-// window's title slot, the light going out as it turns white, and hands off to the HTML title, which is plain text
-// from then on (the effect stays out of the content layer). Without the room (no WebGL2, reduced transparency, forced
-// colours) the same name is HTML text with the neon approximated in CSS (solid under reduced transparency, plain in
-// forced colours), and entering is a fade.
+// a coloured bloom behind (the ink in shaders.js). By night the whole room gives way to a dark stage while the hero
+// shows, so the light blooms into near black; by day there is none. The echoes grow out of the outline as the light
+// arrives. The title is the control: click or tap it (or press Return) and the name glides into the main window's
+// title slot, the light going out as it turns white while the room's lights come up, and hands off to the HTML title,
+// which is plain text from then on (the effect stays out of the content layer). Without the room (no WebGL2, reduced
+// transparency, forced colours) the same name is HTML text with the neon approximated in CSS over its own dark stage
+// (solid under reduced transparency, plain in forced colours), and entering is a fade.
 //
 // Layouts are read from the page itself, glyph by glyph: the hero button and the window's title are real text set
 // by the stylesheet, so the mask is drawn exactly where (and as) the browser sets them, and the glide ends on the
 // title's own glyphs. The mask (red the letters, green a soft copy of them whose half level is the outline the neon
-// follows, blue a wide blur of them for the halo and the pool) is redrawn at screen resolution on every frame of the
-// glide.
+// follows, blue a wide blur of them for the bloom and the day pool) is redrawn at screen resolution on every frame of
+// the glide.
 import { createSpring, tween } from './springs.js';
 import { onFrame } from './frame.js';
 
@@ -150,7 +151,9 @@ export function createHero({ room, windows }) {
     state = 'hero';
     space.inert = true;
     windows.hideNow(all(parts()));
-    if (glass()) { room.set({ defocus: 1, ink }); ink.on = 0; ink.white = 0; }
+    // the stage: by night the room gives way to near black at once, from the first frame it draws, before the light
+    // comes up on it (the page's own CSS keeps it dark until then); by day the shader leaves it out
+    if (glass()) { room.set({ defocus: 1, ink, stage: 1 }); ink.on = 0; ink.white = 0; }
     listen();
     await fontsReady();
     if (state !== 'hero') return;
@@ -242,6 +245,7 @@ export function createHero({ room, windows }) {
     let T = measure(title, ctx) || H, t = 0;
     await new Promise(resolve => {
       const off = onFrame((dt) => {
+        if (state !== 'entering') { off(); resolve(); return; }          // the room went away mid-glide (abort)
         t += dt;
         glide.step(dt); glowS.step(dt);
         T = measure(title, ctx) || T;
@@ -259,11 +263,15 @@ export function createHero({ room, windows }) {
         const glowLeft = Math.pow(1 - v, 2);
         ink.white = v;
         ink.on = shown;
+        // the lights come up: the stage lifts on the term the neon goes out on, (1 - v)³, so the room's light rises
+        // as the name glides and the window's glass forms in it
+        room.set({ stage: glowLeft * (1 - v) });
         if ((1 - v) * travel < .25 && Math.abs(glide.velocity) * travel < 2) {
           off();
           draw(T, false);
           lightFor(T, 0);
           ink.white = 1;
+          room.set({ stage: 0 });
           resolve();
           return;
         }
@@ -272,6 +280,7 @@ export function createHero({ room, windows }) {
         lightFor(L, glowLeft);
       }, 1);
     });
+    if (state !== 'entering') return;                                     // abort() has already finished it
     if (contentAt == null) { contentAt = t; arrivals.push(windows.materialise([p.side, p.tabs, p.bar, p.grab].filter(Boolean))); }
     // The hand-off: the HTML title fades in over the identical white glyphs (150 ms), then the ink goes from under
     // it (100 ms). Two half-faded copies of one glyph would read paler than either, so the title comes in on top.
@@ -290,13 +299,29 @@ export function createHero({ room, windows }) {
     await Promise.all(arrivals);
   }
 
-  // reduced motion, or no room: the hero fades out and the windows fade in (150 ms crossfades under reduced motion)
+  // reduced motion, or no room: the hero fades out and the windows fade in (150 ms crossfades under reduced motion).
+  // With the room, its light comes up as the name's light goes out, over the same 150 ms (250 ms otherwise) in real
+  // time, as the windows' CSS fades run; without it, the CSS hero fades with its stage
   async function fade(p) {
     if (room) room.set({ defocus: 0 });
-    ink.on = 0;
+    let lights = null;
+    if (room && glass()) {
+      const T = reduced.matches ? .15 : .25, on = ink.on, stage = room.state.stage, t0 = performance.now();
+      lights = new Promise(resolve => {
+        const off = onFrame(() => {
+          const k = state === 'entering' ? clamp((performance.now() - t0) / 1000 / T, 0, 1) : 1;
+          ink.on = on * (1 - k);
+          room.set({ stage: stage * (1 - k) });
+          if (k >= 1) { off(); resolve(); }
+        }, 1);
+      });
+    } else {
+      ink.on = 0;
+      if (room) room.set({ stage: 0 });
+    }
     const title = titleOf();
     if (title) title.style.opacity = '';
-    await windows.materialise(all(p), { stagger: reduced.matches ? 0 : .06 });
+    await Promise.all([windows.materialise(all(p), { stagger: reduced.matches ? 0 : .06 }), lights]);
     finish(true);
   }
 
@@ -305,7 +330,7 @@ export function createHero({ room, windows }) {
     cleanup();
     state = 'done';
     ink.on = 0; ink.glow = 0;
-    if (room) room.set({ ink: null, defocus: 0 });
+    if (room) room.set({ ink: null, defocus: 0, stage: 0 });
     canvas.width = canvas.height = letters.width = letters.height = 1;     // the mask is not needed again
     const p = parts(), title = titleOf();
     if (title) title.style.opacity = '';

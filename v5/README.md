@@ -134,9 +134,20 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   near black, the overlaps burning toward white, a soft bloom. Three treatments
   were built and judged; this is the neon one, with the colour turns and the
   day pool of a traced-light version and the arrival of an iridescent-glass one.
+- **The stage:** by night, while the hero shows, the whole room gives way to near
+  black, as in the Glowtime art, and the name's light blooms into it: one mix of
+  everything the room draws, 93% of the way toward `vec3(.010, .009, .026)`
+  (turned by the colour style), so the room's shapes are only faintly there and
+  no edge or shape outlines the name anywhere (the near-black pool that hugged
+  the name's box, and read as a black slab on the cobalt room, is gone). It is a
+  uniform in the composite and reads nothing more. It is there from the first
+  frame: the page's CSS darkens the hero's copy of the room's still from the
+  first paint (the home page's head script reads a stored Night or Day before
+  that paint, so a choice against the system does not show the other room
+  first), and the room's first frame is already dark. By day there is no stage.
 - **The light:** the room reads a mask of the letters (the letters, a soft copy
-  whose half level is their outline, a wide blur for the halo and the pool) seven
-  times a pixel, and only inside the name's box:
+  whose half level is their outline, a wide blur for the bloom and the day pool)
+  seven times a pixel, and only inside the name's box:
   - one crisp tube of light locked to the letters' true edge (the visible edge
     never moves), with a white-hot core and a hair of red and blue split, its
     colour flowing along the name through orange, hot pink, magenta, violet,
@@ -151,20 +162,34 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   - the traces take turns being brightest, a 16 s cycle sliding along the name,
     each wandering from its turn on its own 10 to 19 s wave;
   - translucent faces in the tube's colour (crimson where it runs warm, violet
-    where it runs cool), a halo behind in blue, violet and pink that leans
-    toward the pointer and falls away where the tube runs orange, hot pink or
-    cyan, so those stretches burn in their own colour, and a pool under it all:
-    by night the room gives way to near black round the name; by day the bright
-    room falls about 80% toward a saturated violet-blue that follows the halo,
-    and the faces stay violet, so the light reads on it.
-- **Measured** (`tests/v5/e2e/neon.mjs`, a census of the bright, saturated
-  pixels in the name's box at 1440 by 900): by night orange and cyan each held
-  10% or more of the lit pixels in every frame of a 20 s sample (orange 14 to
-  27%, cyan 11 to 25%, pink and magenta 20 to 36%, blue and violet 20 to 38%),
-  and the ground 0.1 to 0.3 em from the letters measured a luminance of about
-  0.003. The reduced-motion still has 26% orange and 25% cyan. On two lines at
-  390 every frame sampled was 17% orange or more and 12% cyan or more. By day
-  the light stays mostly violet, blue and pink on the violet-blue pool.
+    where it runs cool), and behind them, leaning toward the pointer, the bloom:
+    by night the light spreading into the dark round the name, in each
+    stretch's own colour close to the letters (so orange and cyan stretches
+    glow orange and cyan and keep their hue) and blue, violet and pink further
+    out, easing off near the letters so it falls into the stage without a step,
+    and gone before the blur runs out, so the mask's box never shows; by day a
+    halo in blue, violet and pink over a pool: the bright room falls about 80%
+    toward a saturated violet-blue that follows the halo, and the faces stay
+    violet, so the light reads on it.
+- **Measured** (`tests/v5/e2e/neon.mjs`; at 1440 by 900 unless named). The
+  stage: by night the room outside the name's box measures a mean luminance of
+  about 0.002, with the room or in the CSS hero, at 1440 and 390 (the cobalt
+  room there measured 0.044, 0.045 at 390, and 0.040 in the CSS hero), and the
+  hint 12:1 against it (7.4:1 before). The light falls into it smoothly:
+  in bands 0.1 em wide by distance from the letters, in eight directions round
+  them, from 0.1 em out (past the tube's own light) to 3 em, no step between
+  neighbouring bands was over 0.007 in any frame of a 20 s sample, or 0.0093 on
+  two lines at 390 (the pool's edge stepped by up to 0.015, and 0.023 at 390),
+  and nothing rises. A screencast of the first frames of a first visit and of a
+  reload never shows the bright room (0.002 at most outside the name, where
+  the old first frames showed 0.046). The colour, a census of the bright,
+  saturated pixels in the name's box: by night orange and cyan each held 10%
+  or more of the lit pixels in every frame of the 20 s sample (orange 16 to
+  29%, cyan 11 to 27%, pink and magenta 20 to 35%, blue and violet 19 to 35%),
+  with 1 to 6% of the box burning toward white where traces cross; the
+  reduced-motion still has 27% orange and 26% cyan; on two lines at 390 every
+  frame was 19% orange or more and 13% cyan or more. By day the light stays
+  mostly violet, blue and pink on the violet-blue pool, unchanged to the pixel.
 - **Colour style:** the palettes turn the light a third as far as the room and
   hold it inside the Glowtime family of hues, so each shifts which colours lead
   (Gold and Ember warm, Teal and Emerald cool, Graphite silver) and none turns
@@ -173,6 +198,8 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   while the hero shows. On a machine that tripped the room's budget the clock
   stops, so the light holds still until the pointer moves it. Under reduced
   motion it is one still, chosen with orange and at least two traces showing.
+  The stage holds either way (it is part of every frame the room draws), and if
+  the room gives way to the still the CSS hero's stage takes over.
 - **Interaction:** hovering lifts the light by 22% and runs it hotter near the
   pointer; a press flares it and the burn rolls off. Nothing moves the letters.
   The light comes up over about 0.9 s, the echoes growing out of the outline as
@@ -183,30 +210,38 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   pulls focus; the name glides into the main window's title slot on one
   critically damped spring of about 0.7 s, turning white (white within about 0.2 s)
   and easing from weight 780 to 700, while the light goes out as (1 - v)³, the
-  echoes folding back into the letters and the pool lifting with them; the
-  window's glass forms under it, then its contents, the side window and the tab
-  bar fade in. Landed, it hands off to the HTML title (the same glyphs) and the
+  echoes folding back into the letters. The lights come up on the same term: the
+  stage lifts as the neon goes out (half of it in about 90 ms, under 2% by
+  270 ms, never overshooting), so the room's light rises as the window's glass
+  forms under the name, and it is gone well before the name lands; then the
+  window's contents, the side window and the tab bar fade in. Under reduced
+  motion the stage and the name's light crossfade out over 150 ms as the windows
+  fade in. Landed, it hands off to the HTML title (the same glyphs) and the
   effect switches off: after the hero the title is plain text, as Apple's
   guidance keeps Liquid Glass out of the content layer.
-- **Fallbacks:** without WebGL2 the neon is CSS. The hero carries its own copy
-  of the room's still, a pool under the whole name and a shade that hugs the
-  letters (near black by night, a deep violet-blue by day), two neon traces of
-  the name on slow orbits screened onto it (a solid orange trace with stretches
-  of hot pink and magenta crossfading over it, and a solid cyan one with
-  electric blue and violet), faces crossfading between two sets of the colours
-  (dark, tinted and translucent by night; light and nearly opaque by day), and
-  a white-hot line on the edge. By night orange held 14 to 43% of the lit
-  pixels in every frame sampled; by day the name's edge measured 6.9:1 or more
+- **Fallbacks:** without WebGL2 the neon is CSS (so too on a weak device that
+  starts on the still, a room that gives way, and reduced transparency). The hero
+  carries its own copy of the room's still: by night the stage lies over it from
+  the first paint (`rgba(3, 2, 10, .93)`, with no pool or shade, so no edge
+  outlines the name); by day a pool under the whole name and a shade that hugs
+  the letters in a deep violet-blue. Screened onto that: two neon traces of the
+  name on slow orbits (a solid orange trace with stretches of hot pink and
+  magenta crossfading over it, and a solid cyan one with electric blue and
+  violet), faces crossfading between two sets of the colours (dark, tinted and
+  translucent by night; light and nearly opaque by day), and a white-hot line
+  on the edge. By night orange held 12 to 39% of the lit pixels in every frame
+  sampled at 1440 and 390, on a stage measuring a mean luminance of about 0.002
+  round it; by day the name's edge measured 6.9:1 or more
   against the ground just beyond its light at 1440 and 390, and the faces 3.4:1
   or more against the pool round the letters, the reduced-motion still
   included. Only transform and opacity animate, each on its own layer, and the
   palettes turn the colours as the shader does. Every copy of the name that
   draws the light is hidden from assistive technology, so the name is read
   once, as the button. Reduced motion holds it still; reduced transparency
-  gives solid letters (white, or a deep navy on a soft light halo by day);
-  forced colours give plain system text. Entering is a fade (150 ms under
-  reduced motion). Without scripts there is no hero, and print shows the text
-  title.
+  gives solid letters (white on the stage, or a deep navy on a soft light halo
+  by day); forced colours give plain system text. Entering fades the hero out,
+  its stage with it (250 ms; 150 ms under reduced motion). Without scripts there
+  is no hero, and print shows the text title.
 - Later home views (and `?nohello`) open straight into the windows; the session
   key is still `v5:hello`. Reloading the home page brings the hero back (the
   head script reads the navigation type), so it can be reviewed without
@@ -359,10 +394,10 @@ side window and the toolbar), so a new item touches a few files by hand. In orde
 | `assets/css/site.css` | The one stylesheet: Switzer's `@font-face`, tokens, the room, windows and ornaments, CSS glass, the hero, content components, sheets, layouts, preferences, print |
 | `assets/fonts/` | `switzer-variable.woff2` (Switzer, Indian Type Foundry, via Fontshare; weights 100 to 900) and its licence, `FFL-switzer.txt` (the ITF Free Font License allows self-hosting and wordmarks). The name only; everything else is the system face |
 | `assets/js/boot.js` | Entry: starts the room, the windows, the hero and navigation; the Work filters, print buttons and Groton's clock |
-| `assets/js/room.js`, `shaders.js` | The WebGL2 room: scene, composite, glass panels and the ink (the hero's name in neon light); frame budget |
+| `assets/js/room.js`, `shaders.js` | The WebGL2 room: scene, composite, glass panels, the hero's dark stage and the ink (its name in neon light); frame budget |
 | `assets/js/panels.js`, `geometry.js` | Where the glass is: element boxes and projected corners into inverse homographies |
 | `assets/js/windows.js` | Layout modes, the side window, tab bar, materialising, sheets, the window bar, the pointer's light and the room's lean, hover and press light, scrolling from anywhere |
-| `assets/js/hero.js` | The hero: the name's layout read glyph by glyph from the page, its mask, the light and its interaction, the glide into the title and the hand-off, the fallbacks |
+| `assets/js/hero.js` | The hero: the name's layout read glyph by glyph from the page, its mask, the stage, the light and its interaction, the glide into the title as the lights come up and the hand-off, the fallbacks |
 | `assets/js/nav.js` | Page swaps (the side window kept in place), sheets, history, direct loads of projects, anchor landings and their wash |
 | `assets/js/spy.js` | The Résumé's Sections following the reader (any page with a `.toc` gets it) |
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |

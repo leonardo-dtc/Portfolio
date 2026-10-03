@@ -26,14 +26,15 @@ export function createRoom(canvas) {
   gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   const uniforms = (p, names) => Object.fromEntries(names.map(n => [n, gl.getUniformLocation(p, n)]));
   const us = uniforms(sceneP, ['uRes', 'uTime', 'uDay', 'uAspect', 'uShift', 'uColor']);
-  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uColor', 'uInk1', 'uInkL']);
+  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uColor', 'uInk1', 'uInkL', 'uStage']);
 
   const tex = gl.createTexture(), fbo = gl.createFramebuffer(), inkTex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, inkTex);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
   let w = 0, h = 0, maxLod = 6;
   let dpr = Math.min(devicePixelRatio || 1, 1.5);
-  const st = { defocus: 0, day: 0, shift: [0, 0], light: [innerWidth * .3, -200], panels: { count: 0 }, ink: null, pointer: [-1e4, -1e4], color: [0, 1], fast: 1.5 };
+  // stage: the hero's dark stage (1 while the name shows, 0 the room's own light; by night only, in the shader)
+  const st = { defocus: 0, day: 0, shift: [0, 0], light: [innerWidth * .3, -200], panels: { count: 0 }, ink: null, pointer: [-1e4, -1e4], color: [0, 1], fast: 1.5, stage: 0 };
 
   function size() {
     const nw = Math.max(1, Math.round(innerWidth * dpr)), nh = Math.max(1, Math.round(innerHeight * dpr));
@@ -113,7 +114,7 @@ export function createRoom(canvas) {
     gl.uniform2f(uc.uRes, w, h);
     gl.uniform1f(uc.uLod, Math.max(0, st.defocus) * maxLod);
     gl.uniform1f(uc.uFrostLod, Math.log2(Math.max(4, 26 * dpr)));
-    gl.uniform1f(uc.uTime, clock); gl.uniform1f(uc.uDay, st.day);
+    gl.uniform1f(uc.uTime, clock); gl.uniform1f(uc.uDay, st.day); gl.uniform1f(uc.uStage, Math.max(0, Math.min(1, st.stage)));
     gl.uniform2f(uc.uLight, st.light[0] * dpr, st.light[1] * dpr);
     gl.uniform2f(uc.uPointer, st.pointer[0] * dpr, st.pointer[1] * dpr);
     gl.uniform2f(uc.uColor, st.color[0], st.color[1]);
