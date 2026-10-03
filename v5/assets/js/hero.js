@@ -1,12 +1,12 @@
 // The hero: "Leonardo Carvalho" in Switzer, heavy and blocky, drawn by the room in neon light (after Apple's "It's
 // Glowtime"): a crisp tube of flowing colour locked to every letter's outline, three echoes tracing it again in their
 // own colours (pink, orange, cyan) a little inside and outside the edge, translucent faces in the tube's colours, and
-// a pool with a coloured halo behind, near black by night (the ink in shaders.js). The echoes grow out of the outline as the light arrives. The title is
-// the control: click or tap it (or press Return) and the name glides into the main window's title slot, the light
-// going out as it turns white, and hands off to the HTML title, which is plain text from then on (the effect stays
-// out of the content layer). Without the room (no WebGL2, reduced transparency, forced colours) the same name is HTML
-// text with the neon approximated in CSS (solid under reduced transparency, plain in forced colours), and entering
-// is a fade.
+// a pool with a coloured halo behind, near black by night (the ink in shaders.js). The echoes grow out of the outline
+// as the light arrives. The title is the control: click or tap it (or press Return) and the name glides into the main
+// window's title slot, the light going out as it turns white, and hands off to the HTML title, which is plain text
+// from then on (the effect stays out of the content layer). Without the room (no WebGL2, reduced transparency, forced
+// colours) the same name is HTML text with the neon approximated in CSS (solid under reduced transparency, plain in
+// forced colours), and entering is a fade.
 //
 // Layouts are read from the page itself, glyph by glyph: the hero button and the window's title are real text set
 // by the stylesheet, so the mask is drawn exactly where (and as) the browser sets them, and the glide ends on the

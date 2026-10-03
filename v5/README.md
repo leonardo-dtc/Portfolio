@@ -159,11 +159,11 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
     and the faces stay violet, so the light reads on it.
 - **Measured** (`tests/v5/e2e/neon.mjs`, a census of the bright, saturated
   pixels in the name's box at 1440 by 900): by night orange and cyan each held
-  10% or more of the lit pixels in every frame of a 20 s sample (orange 15 to
+  10% or more of the lit pixels in every frame of a 20 s sample (orange 14 to
   27%, cyan 11 to 25%, pink and magenta 20 to 36%, blue and violet 20 to 38%),
   and the ground 0.1 to 0.3 em from the letters measured a luminance of about
   0.003. The reduced-motion still has 26% orange and 25% cyan. On two lines at
-  390 every frame sampled was 17% orange or more and 13% cyan or more. By day
+  390 every frame sampled was 17% orange or more and 12% cyan or more. By day
   the light stays mostly violet, blue and pink on the violet-blue pool.
 - **Colour style:** the palettes turn the light a third as far as the room and
   hold it inside the Glowtime family of hues, so each shifts which colours lead
@@ -193,17 +193,20 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   letters (near black by night, a deep violet-blue by day), two neon traces of
   the name on slow orbits screened onto it (a solid orange trace with stretches
   of hot pink and magenta crossfading over it, and a solid cyan one with
-  electric blue and violet), translucent faces crossfading between two sets of
-  the colours (dark and tinted by night, light by day), and a white-hot line on
-  the edge. By night orange held 14 to 43% of the lit pixels in every frame
-  sampled; by day the name's edge measured 5.8:1 or more against the ground
-  just beyond its light at 1440 and 390, and the faces 2.3:1 or more. Only
-  transform and opacity animate, each on its own layer, and the palettes turn
-  the colours as the shader does. Every copy of the name that draws the light
-  is hidden from assistive technology, so the name is read once, as the button. Reduced motion holds it still; reduced transparency gives solid
-  letters (white, or a deep navy on a soft light halo by day); forced colours
-  give plain system text. Entering is a fade (150 ms under reduced
-  motion). Without scripts there is no hero, and print shows the text title.
+  electric blue and violet), faces crossfading between two sets of the colours
+  (dark, tinted and translucent by night; light and nearly opaque by day), and
+  a white-hot line on the edge. By night orange held 14 to 43% of the lit
+  pixels in every frame sampled; by day the name's edge measured 6.9:1 or more
+  against the ground just beyond its light at 1440 and 390, and the faces 3.4:1
+  or more against the pool round the letters, the reduced-motion still
+  included. Only transform and opacity animate, each on its own layer, and the
+  palettes turn the colours as the shader does. Every copy of the name that
+  draws the light is hidden from assistive technology, so the name is read
+  once, as the button. Reduced motion holds it still; reduced transparency
+  gives solid letters (white, or a deep navy on a soft light halo by day);
+  forced colours give plain system text. Entering is a fade (150 ms under
+  reduced motion). Without scripts there is no hero, and print shows the text
+  title.
 - Later home views (and `?nohello`) open straight into the windows; the session
   key is still `v5:hello`. Reloading the home page brings the hero back (the
   head script reads the navigation type), so it can be reviewed without

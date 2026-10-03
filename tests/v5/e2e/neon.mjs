@@ -2,8 +2,9 @@
 // cyan on near black. A census of the bright, saturated pixels in the name's box (lit: value .6 or more and
 // saturation .2 or more, binned by hue), the ground right round the letters (0.1 to 0.3 em out), and, without the
 // room by day, the name's edge (the brighter half of a band 0.03 em either side of the outline) against the ground
-// just beyond its light (0.06 to 0.15 em out). The letters are drawn again from the page's own layout (glyph by
-// glyph, as hero.js draws its mask), widened or narrowed with a stroke to find each band.
+// just beyond its light (0.06 to 0.15 em out), and the faces against the pool beyond that (0.15 to 0.3 em out). The
+// letters are drawn again from the page's own layout (glyph by glyph, as hero.js draws its mask), widened or
+// narrowed with a stroke to find each band.
 import { open, BASE, check } from './lib.mjs';
 
 async function measure(page) {
@@ -29,7 +30,7 @@ async function measure(page) {
       return g.getImageData(0, 0, W, H).data;
     };
     const band = (a, b) => { const A = mask(a), B = mask(b); return i => B[i] > 127 && A[i] <= 127; };   // in b, not in a
-    const ring = band(.1, .3), near = band(.06, .15), edge = band(-.03, .03), face = band(-1, -.05);
+    const ring = band(.1, .3), near = band(.06, .15), edge = band(-.03, .03), face = band(-1, -.05), pool = band(.15, .3);
     const shot = new OffscreenCanvas(W, H), sg = shot.getContext('2d'); sg.drawImage(img, 0, 0);
     const d = sg.getImageData(0, 0, W, H).data;
     const lin = v => { v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; };
@@ -50,17 +51,19 @@ async function measure(page) {
     // the ground right round the letters, and the edge, the faces and the ground beside them at the first, middle
     // and last letter
     const P = Math.round(.35 * size * k), rg = [];
-    const parts = [0, glyphs.length >> 1, glyphs.length - 1].map(j => ({ ch: glyphs[j].ch, x0: glyphs[j].x0, x1: glyphs[j].x1, y: glyphs[j].y, edge: [], near: [], face: [] }));
+    const parts = [0, glyphs.length >> 1, glyphs.length - 1].map(j => ({ ch: glyphs[j].ch, x0: glyphs[j].x0, x1: glyphs[j].x1, y: glyphs[j].y, edge: [], near: [], face: [], pool: [] }));
     for (let y = Math.max(0, Y0 - P); y < Math.min(H, Y1 + P); y++) for (let x = Math.max(0, X0 - P); x < Math.min(W, X1 + P); x++) {
       const p = y * W + x, i = p * 4;
       if (ring(i)) rg.push(lum(i));
       for (const q of parts) {
-        if (x < q.x0 - P * .3 || x > q.x1 + P * .3 || y > q.y + P * .3 || y < q.y - size * k) continue;
+        if (x < q.x0 - P || x > q.x1 + P || y > q.y + P || y < q.y - size * k) continue;
+        if (pool(i)) q.pool.push(lum(i));
+        if (x < q.x0 - P * .3 || x > q.x1 + P * .3 || y > q.y + P * .3) continue;
         if (edge(i)) q.edge.push(lum(i)); else if (near(i)) q.near.push(lum(i)); else if (face(i)) q.face.push(lum(i));
       }
     }
     const cr = (a, b) => (Math.max(a, b) + .05) / (Math.min(a, b) + .05);
-    return { pct, lit, ground: med(rg), parts: parts.map(q => { const e = at(q.edge, .75), n = med(q.near), f = med(q.face); return { ch: q.ch, edge: cr(e, n), face: cr(f, n), near: n }; }) };
+    return { pct, lit, ground: med(rg), parts: parts.map(q => { const e = at(q.edge, .75), n = med(q.near), f = med(q.face), o = med(q.pool); return { ch: q.ch, edge: cr(e, n), face: cr(f, n), pool: cr(f, o), near: n }; }) };
   }, png.toString('base64'));
 }
 const f1 = v => v.toFixed(1);
@@ -102,6 +105,8 @@ for (const [width, height] of [[1440, 900], [390, 844]]) {
   await browser.close();
 }
 // without the room: a real orange trace by night, and by day the edge at 3:1 or more against the ground beside it
+// and the faces at 3:1 or more against the pool round the letters (the still, under reduced motion, is the dimmest:
+// the second face is not there to lift them)
 {
   const { browser, page } = await open({ noGL: true, reduced: true });
   await page.goto(BASE, { waitUntil: 'load' });
@@ -111,14 +116,15 @@ for (const [width, height] of [[1440, 900], [390, 844]]) {
   check(s.ground < .03, `no WebGL, night: the ground round the letters is near black (${s.ground.toFixed(3)})`);
   await browser.close();
 }
-for (const [width, height] of [[1440, 900], [390, 844]]) {
-  const { browser, page } = await open({ noGL: true, scheme: 'light', width, height, touch: width < 700 });
+for (const [width, height, reduced] of [[1440, 900, false], [390, 844, false], [1440, 900, true]]) {
+  const { browser, page } = await open({ noGL: true, scheme: 'light', width, height, reduced, touch: width < 700 });
   await page.goto(BASE, { waitUntil: 'load' });
   await ready(page); await page.waitForTimeout(1600);
-  for (let n = 0; n < 3; n++) {
+  for (let n = 0; n < (reduced ? 1 : 3); n++) {
     if (n) await page.waitForTimeout(3000);
-    const s = await measure(page);
-    check(s.parts.every(q => q.edge >= 3), `no WebGL, day ${width}: the edge against the ground beside it ${s.parts.map(q => `${q.ch} ${q.edge.toFixed(2)}:1`).join(', ')} (faces ${s.parts.map(q => q.face.toFixed(2)).join(', ')})`);
+    const s = await measure(page), where = `no WebGL, day ${width}${reduced ? ', the still' : ''}`;
+    check(s.parts.every(q => q.edge >= 3), `${where}: the edge against the ground beside it ${s.parts.map(q => `${q.ch} ${q.edge.toFixed(2)}:1`).join(', ')}`);
+    check(s.parts.every(q => q.pool >= 3), `${where}: the faces against the pool ${s.parts.map(q => `${q.ch} ${q.pool.toFixed(2)}:1`).join(', ')}`);
   }
   await browser.close();
 }
