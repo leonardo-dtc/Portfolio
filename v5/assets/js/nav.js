@@ -239,6 +239,8 @@ export function initNav({ windows }) {
   // Landing on an entry lights it with a wash that fades over 1.2s (site.css .is-landed; none under reduced motion),
   // once the scroll has arrived, so it is seen where it ends rather than spent on the way.
   function land(el, smooth) {
+    // only a record entry takes the wash, and only where it can fade (with no animation to end it, the mark would stay)
+    if (reduced.matches || !el.matches('.cv > li')) return;
     const body = el.closest('.win__body');
     const go = () => {
       el.classList.remove('is-landed');

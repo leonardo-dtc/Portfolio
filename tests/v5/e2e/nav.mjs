@@ -132,9 +132,9 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   await settle(page, 600);
   await page.click('a.row[href$="resume/#carnegie"]');
   await page.waitForFunction(() => document.documentElement.dataset.page === 'resume' && document.getElementById('carnegie'), null, { timeout: 4000 });
-  await page.waitForTimeout(250);
-  check(await page.evaluate(() => getComputedStyle(document.getElementById('carnegie')).animationName === 'landed'), 'landing on résumé/#carnegie lights the entry');
-  check(await current() === 'Music', 'and Sections marks Music');
+  // polled rather than after a fixed wait: V5_SLOW stretches fixed waits, and a stretched one outlasts the 1.2 s wash
+  check(await page.waitForFunction(() => getComputedStyle(document.getElementById('carnegie')).animationName === 'landed', null, { timeout: 1000, polling: 30 }).then(() => true, () => false), 'landing on résumé/#carnegie lights the entry');
+  check(await page.waitForFunction(() => [...document.querySelectorAll('.toc a[aria-current="true"]')].map(a => a.textContent).join('|') === 'Music', null, { timeout: 1000, polling: 30 }).then(() => true, () => false), 'and Sections marks Music');
   await page.waitForTimeout(1500);
   check(await page.evaluate(() => !document.getElementById('carnegie').classList.contains('is-landed')), 'the wash is gone after 1.2 s');
   await page.evaluate(() => { const b = document.querySelector('#main .win__body'), s = document.getElementById('athletics').closest('section'); b.scrollTop += s.getBoundingClientRect().top - b.getBoundingClientRect().top + 20; });

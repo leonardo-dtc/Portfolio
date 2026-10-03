@@ -60,14 +60,16 @@ export function createRoom(canvas) {
   const off = onFrame((dt) => {
     if (document.hidden || lost) return;
     // budget, second look: once the room has dropped to 1x, the next 30 frames it draws (after 5 to settle) are timed;
-    // still slower than 33 ms on average, it gives way to the still, the CSS glass path a lost context takes
+    // still under about 27 fps on average (over 37 ms), it gives way to the still, the CSS glass path a lost context
+    // takes. A device held to 30 fps to save power (a phone in Low Power Mode, a laptop's energy saver) runs at 33 ms
+    // a frame by design, so it keeps the room at 1x rather than losing it a few seconds in.
     if (slow && drew && after < 35) {
       after++;
       if (after > 5) acc1 += Math.min(dt, .1);
       if (after === 35) {
-        const avg = acc1 / 30;
-        note(avg > .033 ? 'still' : 'kept', avg * 1000);
-        if (avg > .033) { giveWay('slow'); return; }
+        const avg = acc1 / 30, weak = avg > 1 / 27;
+        note(weak ? 'still' : 'kept', avg * 1000);
+        if (weak) { giveWay('slow'); return; }
       }
     }
     drew = false;

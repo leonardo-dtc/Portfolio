@@ -99,3 +99,27 @@ import { open, BASE, PAGES, check } from './lib.mjs';
     await browser.close();
   }
 }
+{
+  // the budget's second look: a device held to 30 fps to save power keeps the room at 1x; one under about 27 fps gives
+  // way to the still. The frame loop is fed a steady frame time, so the result does not depend on this machine's speed.
+  for (const [fps, kept] of [[30, true], [24, false]]) {
+    const { browser, page, errors } = await open({ width: 640, height: 400 });
+    await page.addInitScript((fps) => {
+      const raf = window.requestAnimationFrame.bind(window);
+      let native = -1, t = 0;
+      window.requestAnimationFrame = (cb) => raf((now) => { if (now !== native) { native = now; t += 1000 / fps; } cb(t); });
+    }, fps);
+    await page.goto(BASE + 'hockey/', { waitUntil: 'load' });
+    if (!(await page.evaluate(() => !!window.__room))) { check(true, `${fps} fps: no WebGL here, nothing to budget`); await browser.close(); continue; }
+    let log = [];
+    for (let i = 0; i < 80 && log.length < 2; i++) {                   // a reader moving the pointer keeps the room drawing
+      await page.mouse.move(200 + (i % 2) * 200, 200);
+      await page.waitForTimeout(400);
+      log = await page.evaluate(() => window.__room.log.map(e => e.event));
+    }
+    const still = await page.evaluate(() => document.documentElement.dataset.still || '');
+    check(kept ? log[1] === 'kept' && !still : log[1] === 'still' && still === 'slow', `${fps} fps: the room ${kept ? 'stays at 1x' : 'gives way to the still'} (${log.join(', ')}${still ? ', data-still=' + still : ''})`);
+    check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+    await browser.close();
+  }
+}

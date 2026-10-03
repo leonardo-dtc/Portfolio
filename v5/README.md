@@ -387,8 +387,9 @@ by machine yet.
   anything moves (the hero's light included), 30 fps while only the room
   drifts, and not at all when nothing moves under reduced motion. A machine
   averaging over 22 ms across its first 90 frames drops to 1× and stops the
-  drift; if the next 30 frames it draws still
-  average over 33 ms, the room gives way to the still and the page carries on in
+  drift; if the next 30 frames it draws still average over 37 ms (under about
+  27 fps: a device held to 30 fps to save power keeps the room), the room
+  gives way to the still and the page carries on in
   CSS glass (the path a lost WebGL context takes). A device asking for less data
   (Save-Data) or with 2 GB of memory or less starts on the still.
   `html[data-still]` says why (`save-data`, `memory`, `slow`, `lost`) and
