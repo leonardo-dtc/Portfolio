@@ -372,21 +372,27 @@ These are estimates, to be re-scored after the change:
   - a soft bloom;
   - white glowing text.
 
-  Three treatments of the name are being prototyped in isolated copies, then scored by three judges (fidelity and feel, general audience and legibility, motion craft and robustness):
-  - **A, Traced light:** three or four drifting contour ribbons over a translucent fill.
-  - **B, Neon flow:** neon tubes with colour travelling around the outline.
-  - **C, Iridescent glass:** today's glass letters lit by swirling iridescent light.
+  Three treatments of the name were prototyped in isolated copies and scored by three judges (fidelity and feel; general audience and legibility; motion craft and robustness):
 
-  Every variant must:
-  - keep the name instantly legible;
-  - move slowly and smoothly (periods of 6 to 20 s, the letters never moving);
-  - show one still frame under reduced motion;
-  - rotate with the colour style control;
-  - read by day;
-  - have a CSS fallback;
-  - hand off cleanly to the window title.
+  | Variant | What it is | Scores (out of 10) |
+  |---|---|---|
+  | A, Traced light | four drifting contour ribbons over a translucent fill | 7, 6, 6 |
+  | **B, Neon flow** | one crisp neon tube on the true outline, colour flowing along the name | **8, 8, 7.5** |
+  | C, Iridescent glass | the glass letters lit by swirling iridescent light | 6, 3.5, 4 |
 
-  The winner is integrated with the best ideas of the others; screenshots of all three go to Leonardo for the final choice (T41).
+  **B won unanimously and is built** (`v5/assets/js/hero.js`, the ink section of `shaders.js`). Its weak points were fixed with ideas from the other two:
+  - **The tube:** one crisp band of light on the letters' true edge, with a white-hot core and a hair of red/blue split. The letters' visible edge never moves.
+  - **The echoes:** three thin traces of the outline, one per colour family (pink to magenta, orange, blue to cyan). Each drifts 2 to 2.6% of the font size over 10.5 to 19 s and breathes in and out of the edge, so it crosses the tube. Where light piles up it burns toward white.
+  - **No doubled name:** each trace fades as it strays.
+  - **Colour cycle:** the traces take turns on a 16 s cycle sliding along the name.
+  - **Arrival and entry:** the traces grow out of the outline as the hero arrives and fold back as it enters.
+  - **Day:** the room behind the name falls toward a saturated violet-blue that hugs the letters, instead of a grey smudge.
+  - **Colour styles:** the neon turns a third as far as the room and stays within the Glowtime colours, so Rose and Gold no longer turn it lime.
+  - **Frame rate:** the room draws at full rate while the hero shows, unless the device is slow.
+  - **Without WebGL2:** CSS neon over the room's still image, with screened traces and a white-hot edge. Only transform and opacity animate.
+  - **Cost:** seven texture reads per pixel, only inside the name's box.
+
+  Screenshots of all three went to Leonardo; he can still pick A or C (T41).
 
 ---
 
