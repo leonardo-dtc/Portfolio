@@ -178,14 +178,18 @@ then sections behind black divider tabs, and the previous and next files as two 
   research figures never crop. Drawer tabs rise 4px; coach contact rows step back the way the profile rows on
   the contact sheet do. Touch screens and reduced motion show everything at rest; nothing blurs.
 - **Page change**: both stylesheets carry `@view-transition { navigation: auto; }` (in `site.css` it is the
-  delimited block at the very end). Coming from the deck, the deck stays put and dims under the desk while
-  the file and its drawer rise 40px in 360ms; from file to file the old one sinks 16px as it fades and the
-  drawer holds still. Each file names its paper (`view-transition-name: file-04` and so on, listed in
-  `files.css`). Reduced motion keeps a 200ms crossfade and no rise; other browsers simply navigate.
+  delimited block at the very end). Coming from the deck, the deck stays put while the desk comes up over it
+  (160ms), then the file and its drawer rise 40px and fade in (300ms, from 100ms in), so the file does not
+  fade in over the deck's text. From file to file the old one sinks 16px and is gone in 110ms before the new
+  one rises; the drawer holds still (no travel even from the foot of a long file) and only its current tab
+  changes. Going home, the file and its drawer sink and are gone in 130ms while the deck comes back out of
+  the black (220ms, from 90ms in; that part is `site.css`'s). Each file names its paper
+  (`view-transition-name: file-04` and so on, listed in `files.css` and in that `site.css` block). Reduced
+  motion keeps crossfades only, with no rise or sink; other browsers simply navigate.
 - **To add a file**: copy the closest file's folder (research: `aducanumab`; product: `loquar`), change its
   `<title>`, description, tab text, back link (`../../#<sheet id>`), stamp, facts and sections; give its
   article `view-transition-name: file-NN` and add that name to the two `::view-transition-*(file-..)` lists
-  in `files.css`; add its tab to every file's drawer (in order) and fix the previous and next cards of its
+  in `files.css` and to the two in `site.css`'s "files: view transition" block; add its tab to every file's drawer (in order) and fix the previous and next cards of its
   neighbours; then point the sheet's detail link at `files/<slug>/`. Images go in `v3/assets/img/` as
   derivatives; never link to another edition's files.
 - **The hockey one-pager**: `files/hockey/` puts measurables, the stat line with its sample size, how I play,
@@ -198,7 +202,9 @@ then sections behind black divider tabs, and the previous and next files as two 
   section grows, print it again and tighten that block if it spills.
 - **Print** (every file): no desk, torn edges, tape or shadows; black tabs become rules; outside links print
   their addresses; placeholders for photographs not yet supplied are left out; figures and charts print in
-  colour. 1rem is 10pt on paper, so the file's type scales together.
+  colour; the stamp follows the title (on the hockey page it stands straight at the top right). The page is
+  printed in a light colour scheme, so the margins stay white when background graphics are on. 1rem is 10pt
+  on paper, so the file's type scales together.
 - Hidden-until-ready blocks stay hidden with a comment saying what fills them: the hockey file's 2026-27 stat
   tiles and schedule, the résumé's PDF button, and the film link (in the film note).
 

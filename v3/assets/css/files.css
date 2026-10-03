@@ -92,6 +92,8 @@ cite { font-style: italic; }
 .drawer a[aria-current="page"] { --th: 40px; padding: 0 22px; background: var(--red); font-size: .8125rem; font-weight: 700; letter-spacing: .14em; clip-path: polygon(0 100%, 12px 0, calc(100% - 12px) 0, 100% 100%); }
 .drawer a:focus-visible { outline: none; background: var(--white); box-shadow: inset 0 3px 0 var(--black); }
 .drawer a[aria-current="page"]:focus-visible { background: var(--red); box-shadow: inset 0 3px 0 var(--black); }
+/* the label is underlined too, so focus does not rest on a change of paper alone */
+.drawer a:focus-visible > span, .toc a:focus-visible { text-decoration: underline 2px; text-underline-offset: 4px; }
 @media (hover: hover) and (pointer: fine) {
   .drawer a:not([aria-current]) { transition: translate var(--t-arrow) var(--ease), background var(--t-fast) ease; }
   .drawer a:not([aria-current]):hover { translate: 0 -4px; background: var(--paper); }
@@ -127,9 +129,10 @@ cite { font-style: italic; }
 .file__sub b { font-weight: 700; }
 .file__meta { margin-top: .9rem; font-weight: 700; font-size: .8125rem; letter-spacing: .12em; line-height: 1.5; text-transform: uppercase; text-wrap: balance; }
 /* the stamp: the stage, inked in vermilion (24px and up, so 3:1 applies). It sits at the top right of the
-   paper, level with the way back; on narrow screens it follows the title instead. */
+   paper, level with the way back; below 900px, where its tilted foot would come down onto the title, it
+   follows the title instead. */
 .stamp { position: absolute; z-index: 1; top: clamp(14px, 1.6vw, 22px); right: var(--pad); padding: .32em .55em .26em; max-width: 16em; border: 3px solid var(--red); outline: 1.5px solid var(--red); outline-offset: -8px; color: var(--red); font: 400 1.5rem/1.05 var(--display); letter-spacing: .05em; text-align: center; text-transform: uppercase; text-wrap: balance; rotate: -5deg; transform-origin: 100% 0; }
-@media (max-width: 759px) {
+@media (max-width: 899px) {
   .stamp { position: relative; top: auto; right: auto; justify-self: start; margin: 1.6rem 0 .25rem 4px; font-size: 1.5rem; rotate: -3deg; }
 }
 
@@ -274,6 +277,9 @@ cite { font-style: italic; }
 .pager__go svg { width: 16px; height: 16px; rotate: var(--a); }
 .pager a:focus-visible { outline: 2px solid var(--black); outline-offset: 4px; }
 @media (hover: hover) and (pointer: fine) {
+  /* room for the line to unfold into, so opening a card never pushes the end of the file down */
+  .pager a { min-height: 9.5rem; }
+  @media (max-width: 799px) { .pager a { min-height: 11.25rem; } } /* the longer lines wrap to two here */
   .pager a { transition: rotate var(--t-settle) var(--ease), translate var(--t-settle) var(--ease), box-shadow var(--t-settle) var(--ease), background-color var(--t-step) var(--ease), color var(--t-step) var(--ease); }
   .pager__d { grid-template-rows: 0fr; transition: grid-template-rows var(--t-open) var(--ease); }
   .pager__d > span { opacity: 0; translate: 0 -6px; transition: opacity 350ms ease, translate var(--t-open) var(--ease); }
@@ -338,6 +344,8 @@ html:not(.js) .print-btn { display: none; } /* printing from the button needs th
 .hk .sec__tab > span { font-size: clamp(1.2rem, 1rem + .7vw, 1.55rem); }
 .stat-line { font: 400 clamp(1.5rem, 1.15rem + 1.5vw, 2.35rem)/1.15 var(--display); letter-spacing: .02em; }
 .stat-line .cap { display: block; margin-top: .55rem; font: 400 var(--small)/1.5 var(--sans); letter-spacing: 0; color: var(--ink-2); }
+/* the notes that follow a stat line, a row of tiles or the timeline keep a little air from them */
+.hk .stat-line + .prose, .hk .acad-note, .hk .hist-note { margin-top: 1.1rem; }
 .hk .prose { font-size: .9375rem; }
 .hk .prose > * + * { margin-top: .8em; }
 .film { position: relative; margin-top: clamp(1.75rem, 4vw, 2.5rem); }
@@ -366,18 +374,25 @@ html:not(.js) .print-btn { display: none; } /* printing from the button needs th
 .strip p:not(.meta) { margin-top: .45rem; font-size: var(--small); line-height: 1.5; }
 
 /* ---------- Page changes: the file rises out of the cabinet ----------
-   Where the browser has cross-document view transitions, the page it came from stays put and dims under the
-   desk while the file (and its drawer, coming from the deck) rises 40px into place in 360ms; going from file to
-   file, the old file sinks a little as it fades. No blur, nothing scales. Elsewhere the link simply navigates. */
+   Where the browser has cross-document view transitions, the page it came from stays put while the desk comes
+   up over it and dims it (160ms); then the file (and its drawer, coming from the deck) rises 40px into place,
+   starting 100ms in, so the file hardly ever fades in over the text of the page beneath. Going from file to
+   file, the old file sinks 16px and is gone in 110ms before the new one rises, and the drawer holds still: it
+   does not travel, even when the old file was scrolled far down; only its current tab changes. No blur,
+   nothing scales.
+   Elsewhere the link simply navigates. The way back to the deck is in site.css ("files: view transition"). */
 @view-transition { navigation: auto; }
 ::view-transition-old(root) { animation: none; }
-::view-transition-new(root) { animation: vt-fade-in 360ms ease both; }
+::view-transition-new(root) { animation: vt-fade-in 160ms ease both; }
 ::view-transition-new(file-04), ::view-transition-new(file-05), ::view-transition-new(file-06),
 ::view-transition-new(file-07), ::view-transition-new(file-08), ::view-transition-new(file-10),
-::view-transition-new(drawer):only-child { animation: vt-fade-in 120ms ease both, vt-rise 360ms var(--ease) both; }
+::view-transition-new(drawer):only-child { animation: vt-fade-in 160ms ease 100ms both, vt-rise 300ms var(--ease) 100ms both; }
 ::view-transition-old(file-04), ::view-transition-old(file-05), ::view-transition-old(file-06),
-::view-transition-old(file-07), ::view-transition-old(file-08), ::view-transition-old(file-10) { animation: vt-fade-out 240ms ease both, vt-sink 240ms ease-in both; }
-::view-transition-group(drawer) { animation-duration: 360ms; animation-timing-function: var(--ease); }
+::view-transition-old(file-07), ::view-transition-old(file-08), ::view-transition-old(file-10) { animation: vt-fade-out 110ms ease-in both, vt-sink 110ms ease-in both; }
+/* from file to file the drawer neither travels nor crossfades two rows of labels: its current tab changes at once */
+::view-transition-group(drawer) { animation: none; }
+::view-transition-old(drawer) { animation: none; opacity: 0; }
+::view-transition-new(drawer) { animation: none; }
 @keyframes vt-fade-in { from { opacity: 0; } }
 @keyframes vt-fade-out { to { opacity: 0; } }
 @keyframes vt-rise { from { transform: translateY(40px); } }
@@ -389,6 +404,8 @@ html:not(.js) .print-btn { display: none; } /* printing from the button needs th
   ::view-transition-old(*) { animation-name: vt-fade-out !important; }
   ::view-transition-old(root) { animation: none !important; }
   ::view-transition-group(*) { animation-duration: 0s !important; }
+  ::view-transition-old(drawer) { opacity: 1; animation-fill-mode: both !important; } /* a plain crossfade here (opacity stays animatable) */
+  ::view-transition-new(drawer) { animation-fill-mode: both !important; }
   .drawer a, .back svg, .chrome a, .pager a, .pager__go, .pager__go svg, .shot img { transition: none !important; }
   .drawer a:hover { translate: none !important; }
   .back:hover svg { translate: none !important; }
@@ -415,6 +432,7 @@ html:not(.js) .print-btn { display: none; } /* printing from the button needs th
   :root { --text: 10.5pt; --indent: 0px; }
   html { font-size: 13.333px; } /* 1rem = 10pt, so every rem size in the file scales to paper together */
   html, body { background: #fff !important; color: #000; }
+  html { color-scheme: light; } /* a dark scheme paints the page margins black when background graphics are on */
   body { font-size: 10.5pt; line-height: 1.45; }
   .skip, .drawer, .file__bar, .toc, .pager, .print-btn, .file__end .back { display: none !important; }
   .chrome { height: auto; padding: 0 0 6mm; color: #000; font-size: 8pt; }
@@ -424,7 +442,7 @@ html:not(.js) .print-btn { display: none; } /* printing from the button needs th
   .file__title { font-size: 30pt; }
   .file__title--long { font-size: 22pt; max-width: none; }
   .file__sub { font-size: 13pt; }
-  .stamp { rotate: none; margin: 0; padding: .2em .45em; border-width: 1.5px; outline: none; color: #000; border-color: #000; font-size: 12pt; }
+  .stamp { position: static; justify-self: start; rotate: none; margin: 3mm 0 0; padding: .2em .45em; border-width: 1.5px; outline: none; color: #000; border-color: #000; font-size: 12pt; } /* with the bar left out, a stamp at the top right would sit on the title */
   .facts { border-top-width: 2px; }
   .facts > div { box-shadow: inset -1px 0 #ccc, inset 0 -1px #ccc; break-inside: avoid; }
   .note { rotate: none; box-shadow: none; border: 1px solid #999; max-width: none; }
@@ -467,7 +485,7 @@ html:not(.js) .print-btn { display: none; } /* printing from the button needs th
   .hk-id { padding-right: 0; }
   .hk .file__sub { max-width: none; margin-top: 1.4mm; font-size: 9.5pt; line-height: 1.3; }
   .hk .file__meta { margin-top: 1mm; font-size: 7.5pt; letter-spacing: .08em; }
-  .hk .stamp { position: absolute; top: 1mm; right: 0; font-size: 9.5pt; letter-spacing: .06em; }
+  .hk .stamp { position: absolute; top: 1mm; right: 0; margin: 0; rotate: none; font-size: 9.5pt; letter-spacing: .06em; }
   .hk .num-badge { display: none; }
   .hk .note.film { margin-top: 2mm; padding: 0; border: 0; font-size: 8pt; line-height: 1.35; }
   .hk .sec { margin-top: 3.2mm; }

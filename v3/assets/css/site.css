@@ -707,7 +707,22 @@ html:not(.js) .cabinet { display: none; }
 /* files: view transition ----------------------------------------------------------------------------------
    Cross-document view transitions between the deck and its project files (v3/files/, styled by files.css,
    which holds the same rule and the file's rise). Opting the deck in lets a file rise over it on the way out
-   and fade back into its drawer on the way home; browsers without view transitions simply navigate. The
-   browser's default animation here is a crossfade (opacity only), which reduced motion keeps. */
+   (those animations are files.css's). On the way home, the rules below: the file and its drawer sink 16px
+   and are gone in 130ms, while the deck comes back up out of the black desk (220ms, starting 90ms in), so the
+   file's text never sits over the deck's. Reduced motion keeps the fades without the sink; browsers without
+   view transitions simply navigate. */
 @view-transition { navigation: auto; }
+::view-transition-old(root) { animation: none; }
+::view-transition-new(root) { animation: vtf-in 220ms ease 90ms both; }
+::view-transition-old(file-04), ::view-transition-old(file-05), ::view-transition-old(file-06),
+::view-transition-old(file-07), ::view-transition-old(file-08), ::view-transition-old(file-10),
+::view-transition-old(drawer) { animation: vtf-out 130ms ease-in both, vtf-sink 130ms ease-in both; }
+@keyframes vtf-in { from { opacity: 0; } }
+@keyframes vtf-out { to { opacity: 0; } }
+@keyframes vtf-sink { to { transform: translateY(16px); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(file-04), ::view-transition-old(file-05), ::view-transition-old(file-06),
+  ::view-transition-old(file-07), ::view-transition-old(file-08), ::view-transition-old(file-10),
+  ::view-transition-old(drawer) { animation: vtf-out 160ms ease both; }
+}
 /* end files: view transition */
