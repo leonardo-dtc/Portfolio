@@ -25,6 +25,7 @@
   --white: #FFFFFF;
   --paper-2: #D5D0CF;       /* rules on paper */
   --ink-2: #5E5A5A;         /* muted on paper, 5.4:1 */
+  --red-ink: #B92B1C;       /* vermilion for small text on paper or white: 4.9:1 on paper, 6.1:1 on white */
   --stage-2: #B1ADAB;       /* muted on black, 8.2:1 */
   --stage-well: #202020;
   /* roles, re-pointed per slide */
@@ -53,8 +54,16 @@
   --t: 240ms;
   --t-reveal: 560ms;
   --stagger: 60ms;
-  /* the index: the rail's dots and the cabinet's folders share one row pitch */
-  --row: 22px;
+  /* the hover grammar (carried from the dim-room edition's behaviour, drawn in paper here): content moves
+     inside a still frame on one long ease-out, so it starts at once and spends its time arriving softly */
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --t-settle: 800ms;        /* an image settling in its frame, a card easing flat */
+  --t-arrow: 450ms;         /* the badge growing in and its arrow turning */
+  --t-open: 500ms;          /* an archive card unfolding its line */
+  /* the index: the rail's dots and the cabinet's folders share one row pitch (24px: WCAG 2.5.8);
+     --n is the number of sheets, written by the script from the sections (12 is the fallback) */
+  --n: 12;
+  --row: 24px;
   --tabh: 18px;
   /* the cover's torn red strip, in percent of the title box */
   --strip: polygon(26.0% 66.94%, 29.36% 68.95%, 32.73% 67.2%, 36.09% 66.0%, 39.45% 69.7%, 42.82% 63.71%, 46.18% 64.13%, 49.55% 62.1%, 52.91% 62.68%, 56.27% 62.41%, 59.64% 62.34%, 63.0% 59.28%, 66.36% 62.66%, 69.73% 60.43%, 73.09% 58.85%, 76.45% 57.87%, 79.82% 57.79%, 83.18% 56.32%, 86.55% 56.6%, 89.91% 55.06%, 93.27% 54.93%, 96.64% 53.43%, 100.0% 54.96%, 100.0% 69.46%, 96.64% 70.68%, 93.27% 72.79%, 89.91% 71.07%, 86.55% 71.91%, 83.18% 72.15%, 79.82% 75.35%, 76.45% 73.55%, 73.09% 76.68%, 69.73% 76.85%, 66.36% 77.71%, 63.0% 78.32%, 59.64% 77.46%, 56.27% 79.01%, 52.91% 78.77%, 49.55% 79.81%, 46.18% 79.22%, 42.82% 80.3%, 39.45% 79.55%, 36.09% 82.84%, 32.73% 82.33%, 29.36% 82.38%, 26.0% 82.41%);
@@ -71,7 +80,7 @@ a { color: inherit; }
 b { font-weight: 700; }
 :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.skip { position: fixed; top: 8px; left: 8px; z-index: 200; background: var(--red); color: #fff; padding: .6rem .9rem; font-weight: 700; text-decoration: none; transform: translateY(-200%); }
+.skip { position: fixed; top: 8px; left: 8px; z-index: 200; background: var(--red); color: var(--black); padding: .6rem .9rem; font-weight: 700; text-decoration: none; transform: translateY(-200%); } /* text on vermilion is black: 4.5:1 */
 .skip:focus { transform: none; outline-color: #fff; }
 .slide:focus { outline: none; } /* a sheet takes focus only as the skip link's target */
 
@@ -79,21 +88,22 @@ b { font-weight: 700; }
 .chrome { position: fixed; top: 0; left: 0; right: 0; height: var(--chrome); z-index: 100; display: flex; align-items: center; justify-content: space-between; padding-inline: var(--gutter); font-size: var(--small); letter-spacing: .12em; text-transform: uppercase; color: #fff; mix-blend-mode: difference; pointer-events: none; }
 .chrome a { pointer-events: auto; text-decoration: none; }
 .chrome a:focus-visible { outline-color: #fff; }
-/* The rail: a dot per sheet, each on an invisible hit cell one row tall and 20 to 36px wide (the dots
+/* The rail: a dot per sheet, each on an invisible hit cell one row tall and 24 to 36px wide (the dots
    themselves are 8px), the current sheet's number and name running down beside them, and the folder
-   button on top. The rows start at 50% - 6 rows + 16px (so the rail, button included, is centred), the
+   button on top. The rows start at 50% - n/2 rows + 16px (so the rail, button included, is centred), the
    same line the cabinet's folders start on, so each dot sits level with its folder. */
-.rail { --ext: clamp(0px, calc(var(--gutter) - 20px), 16px); position: fixed; right: calc(var(--gutter) - 10px - var(--ext)); top: calc(50% - 6 * var(--row) - 24px); z-index: 100; display: grid; grid-template-columns: 13px calc(20px + var(--ext)); grid-template-rows: 34px repeat(12, var(--row)); column-gap: 2px; padding: 6px 0 10px 10px; mix-blend-mode: difference; } /* --ext: the cells run on toward the screen edge as far as the gutter allows */
+.rail { --ext: clamp(0px, calc(var(--gutter) - 20px), 16px); position: fixed; right: calc(var(--gutter) - 10px - var(--ext)); top: calc(50% - var(--n) * var(--row) / 2 - 24px); z-index: 100; display: grid; grid-template-columns: 13px max(24px, calc(20px + var(--ext))); grid-template-rows: 34px repeat(var(--n), var(--row)); column-gap: 2px; padding: 6px 0 10px 10px; mix-blend-mode: difference; } /* --ext: the cells run on toward the screen edge as far as the gutter allows */
 .rail a { position: relative; grid-column: 2; display: block; height: var(--row); border-radius: 6px; }
 .rail a:first-of-type { grid-row: 2; } /* row 1 is the folder button's, even when it is hidden (no script) */
 .rail a::before { content: ""; position: absolute; left: 10px; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: rgba(255,255,255,.38); transition: background var(--t-fast) ease, transform var(--t) var(--ease-out); }
 .rail a[aria-current="true"]::before { background: #fff; transform: scale(1.4); }
 .rail a.is-hot::before { background: #fff; }
 .rail a:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
-.rail__label { grid-column: 1; grid-row: 2 / span 12; justify-self: center; align-self: start; margin: 4px 0 0; writing-mode: vertical-rl; font-size: var(--micro); line-height: 13px; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; color: #fff; transition: opacity 120ms ease; }
+.rail__label { grid-column: 1; grid-row: 2 / -1; justify-self: center; align-self: start; margin: 4px 0 0; writing-mode: vertical-rl; font-size: var(--micro); line-height: 13px; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; color: #fff; transition: opacity 120ms ease; }
 .rail__label b { font-weight: 700; margin-bottom: .55em; }
 .rail__label.is-swapping, .rail.is-indexing .rail__label { opacity: 0; }
 html:not(.js) .rail__label { display: none; } /* without the script it could not follow the reader */
+html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* holds the folder button's row, so no dot is placed in it */
 @media (hover: hover) and (pointer: fine) { .rail a:hover::before { background: #fff; } }
 
 /* ---------- Slides as sheets ---------- */
@@ -112,8 +122,9 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 /* Where the sheet above does not stay behind this one (phones, short windows, no script, or a sheet too
    tall to stick), a dark sheet's torn edge tears from that paper instead of from the page's black. */
 .slide--paper + .slide--dark::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: calc(var(--chrome) + var(--tear)); background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .056 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 220px 220px, var(--paper); pointer-events: none; } /* paper with the sheet's grain baked in */
-/* the dot rail and its label sit in the right margin; until the page is wide enough for that, content keeps clear of them */
-@media screen and (min-width: 900px) { .slide:not(.cover):not(.talk) .sheet__in, .talk__foot .sheet__in { padding-right: max(var(--gutter), calc(var(--gutter) + 33px - max(0px, (100vw - var(--max)) / 2))); } }
+/* the dot rail, its label and the index tab sit in the right margin; until the page is wide enough for that,
+   content keeps 40px clear of them, and never comes within 70px of the screen's edge (the tab is 59px wide) */
+@media screen and (min-width: 900px) { .slide:not(.cover):not(.talk) .sheet__in, .talk__foot .sheet__in { padding-right: max(var(--gutter), calc(max(var(--gutter) + 40px, 70px) - max(0px, (100vw - var(--max)) / 2))); } }
 
 /* Desktop: sticky stacking. Gated on size so tall content never gets stuck. */
 @media (min-width: 900px) and (min-height: 600px) {
@@ -140,7 +151,7 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .js .is-in .bar { transform: none; }
 .js .strip-wrap { clip-path: inset(0 100% 0 0); transition: clip-path 620ms var(--ease-out) 380ms; }
 .js .is-in .strip-wrap { clip-path: inset(0 0 0 0); }
-@keyframes hint { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+@keyframes hint { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 
 /* ---------- Shared type ---------- */
 .title { font: 400 var(--title)/.9 var(--display); text-transform: uppercase; letter-spacing: -.005em; color: var(--fg); text-wrap: balance; }
@@ -163,6 +174,7 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 @keyframes redraw { 0% { transform: scaleX(1); transform-origin: right; } 45% { transform: scaleX(0); transform-origin: right; } 50% { transform: scaleX(0); transform-origin: left; } 100% { transform: scaleX(1); transform-origin: left; } }
 @media (hover: hover) and (pointer: fine) {
   .more:hover { color: var(--red); }
+  .slide--paper .more:hover, .card .more:hover { color: var(--red-ink); } /* 13px on paper */
   .more:hover::after { animation: redraw 460ms var(--ease-out); }
   .linkrow a:hover { color: var(--red); background-size: 100% 2px; }
   .chrome a { transition: letter-spacing 200ms var(--ease-out); }
@@ -188,7 +200,8 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 /* ---------- Cards, placeholders, media ---------- */
 .card { position: absolute; background: var(--paper); color: var(--black); --fg: var(--black); --fg-2: var(--ink-2); --rule: var(--paper-2); box-shadow: 0 18px 40px rgba(0,0,0,.35); }
 .slide--paper .card { box-shadow: 0 14px 32px rgba(0,0,0,.22); }
-.card--red { background: var(--red); color: #fff; --fg: #fff; --fg-2: rgba(255,255,255,.82); --rule: rgba(255,255,255,.35); }
+.card--red { background: var(--red); color: var(--black); --fg: var(--black); --fg-2: var(--black); --rule: rgba(21,21,21,.35); }
+.card--red .big { color: var(--white); } /* display size: white stays (3:1 for large text) */
 .card--dark { background: var(--black); color: #fff; --fg: #fff; --fg-2: var(--stage-2); --rule: #2E2E2E; }
 .card__in { padding: clamp(.75rem, 1.6vw, 1.25rem); }
 .card__k { font-size: var(--micro); letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: var(--fg); }
@@ -210,7 +223,17 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .cover .sheet__in { grid-template-rows: minmax(0, 1fr) auto; align-content: stretch; }
 .cover__stage { position: relative; display: grid; align-content: center; justify-items: center; padding-block: clamp(.5rem, 4vh, 3rem); }
 .cover__block { position: relative; display: grid; justify-items: start; width: max-content; max-width: 100%; padding-left: clamp(56px, 6.5vw, 104px); }
-.cover__hand { position: relative; z-index: 1; rotate: -3deg; margin: 0 0 .45em 2%; font-size: clamp(1.15rem, .9rem + 1.3vw, 2.1rem); text-wrap: balance; }
+.cover__hand { position: relative; z-index: 2; rotate: -3deg; margin: 0 0 .45em 2%; font-size: clamp(1.15rem, .9rem + 1.3vw, 2.1rem); text-wrap: balance; }
+/* the hand line's words are routes: a vermilion marker stroke lies under each, faint at rest; pointing at a
+   word or focusing it draws the stroke through in 300ms (on touch screens it is drawn already). The line
+   stacks above the title (z-index 2), whose line box reaches up under it, so the whole word takes the pointer. */
+.route { position: relative; color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.route::before, .route::after { content: ""; position: absolute; left: -.06em; right: -.1em; bottom: -.04em; height: .3em; z-index: -1; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 9.5C34 6.8 61 8.6 92 7.1s68-2.6 105-.9' fill='none' stroke='%23EA3D2E' stroke-width='6.5' stroke-linecap='round'/%3E%3Cpath d='M9 11.4c40-1.9 92-3.3 182-2.6' fill='none' stroke='%23EA3D2E' stroke-width='3' stroke-linecap='round' opacity='.7'/%3E%3C/svg%3E") 0 100% / 100% 100% no-repeat; }
+.route::before { opacity: .42; }
+.route::after { clip-path: inset(0 100% 0 0); transition: clip-path 300ms var(--ease); }
+.route:hover::after, .route:focus-visible::after { clip-path: inset(0 0 0 0); }
+.route:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; border-radius: 2px; }
+@media (hover: none) { .route::before { opacity: 0; } .route::after { clip-path: none; } }
 @media (min-width: 600px) { .cover__hand { max-width: calc(113% - clamp(120px, 14.5vw, 215px) - 20px); } } /* ends before the mask */
 .cover__title { position: relative; z-index: 1; font: 400 clamp(3.6rem, 16.6vw, 15.4rem)/.88 var(--display); letter-spacing: -.01em; text-transform: uppercase; color: #fff; white-space: nowrap; }
 .cover__title .name, .cover__title .w { display: block; }
@@ -219,16 +242,16 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .slice { position: relative; display: inline-block; }
 .slice > span:first-child { display: inline-block; clip-path: polygon(-2% -2%, 102% -2%, 102% 34%, -2% 66%); transform: translate(-.024em, -.014em); }
 .slice > span:last-child { position: absolute; left: 0; top: 0; clip-path: polygon(-2% 66%, 102% 34%, 102% 102%, -2% 102%); transform: translate(.024em, .014em); }
-.cover__code { position: absolute; left: calc(-1 * clamp(40px, 4.5vw, 72px)); top: -8%; width: clamp(180px, 17vw, 250px); height: clamp(300px, 46vh, 420px); z-index: 0; background: #181818; border: 1px solid #333; box-shadow: 0 18px 40px rgba(0,0,0,.5); display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
-.code__bar { display: flex; align-items: center; gap: 5px; padding: 6px 9px; background: #222; font-size: .58rem; letter-spacing: .06em; color: var(--stage-2); }
+.cover__code { position: absolute; left: calc(-1 * clamp(40px, 4.5vw, 72px)); top: -8%; width: clamp(196px, 19vw, 290px); height: clamp(300px, 46vh, 420px); z-index: 0; background: #151515; border: 1px solid #333; box-shadow: 0 18px 40px rgba(0,0,0,.5); display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+.code__bar { display: flex; align-items: center; gap: 5px; padding: 6px 9px; background: #222; font-size: var(--micro); letter-spacing: .02em; color: var(--stage-2); white-space: nowrap; overflow: hidden; }
 .code__bar span { width: 8px; height: 8px; border-radius: 50%; background: #555; }
 .code__bar span:first-child { background: var(--red); }
 .code__bar b { margin-left: 6px; font-weight: 400; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.code__body { margin: 0; padding: 8px 10px 40px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; font: 400 .56rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #bdb9b7; white-space: pre; tab-size: 4; -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); }
+.code__body { margin: 0; padding: 9px 11px 40px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; font: 400 var(--micro)/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #bdb9b7; white-space: pre; tab-size: 4; -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); }
 .code__body::-webkit-scrollbar { display: none; }
 .code__body .k { color: var(--red); }
 .code__body .n { color: #fff; }
-.code__body .c { color: #6f6b69; }
+.code__body .c { color: #8A8684; } /* 5:1 on the panel */
 .code__body code::after { content: ""; display: inline-block; width: .5em; height: 1em; margin-left: 1px; vertical-align: -.15em; background: var(--red); animation: blink 1s steps(2, start) infinite; }
 .cover__code.is-done .code__body code::after, .cover__code.is-paused .code__body code::after { animation: none; }
 .cover__code.is-paused .code__body { -webkit-mask-image: none; mask-image: none; }
@@ -249,7 +272,7 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .cover__foot .tag { justify-self: start; }
 .tag { position: relative; display: inline-block; background: var(--paper); color: var(--black); font-weight: 700; font-size: var(--small); letter-spacing: .12em; text-transform: uppercase; text-wrap: balance; padding: .95em 1.3em; --rot: -6deg; transform: rotate(var(--rot)); transform-origin: 20% 100%; margin-left: 2%; }
 .tag .tape { left: -22px; top: -14px; width: 84px; height: 24px; transform: rotate(-38deg); }
-.cover__hint { font-size: var(--micro); letter-spacing: .24em; text-transform: uppercase; color: var(--stage-2); padding-bottom: .4rem; animation: hint 2.6s ease-in-out infinite; }
+.cover__hint { font-size: var(--micro); letter-spacing: .24em; text-transform: uppercase; color: var(--stage-2); padding-bottom: .4rem; animation: hint 2.6s ease-in-out 1.4s 3; } /* three pulses, then it rests */
 @media (max-width: 599px) {
   .cover__title { font-size: clamp(3.4rem, 18.5vw, 6rem); }
   .cover__hand-p { display: none; }
@@ -282,16 +305,16 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 
 /* ---------- 03 Skills ---------- */
 .skills .sheet__in { padding-top: 1rem; }
-.panel { position: relative; background: var(--red); color: #fff; --fg: #fff; --fg-2: rgba(255,255,255,.85); --rule: rgba(255,255,255,.35); padding: clamp(1.5rem, 4vw, 4rem) clamp(1.25rem, 4vw, 4.5rem) clamp(3.25rem, 4vw, 4rem); display: grid; gap: clamp(1.5rem, 3vw, 3rem); }
+.panel { position: relative; background: var(--red); color: var(--black); --fg: var(--black); --fg-2: var(--black); --rule: rgba(21,21,21,.35); padding: clamp(1.5rem, 4vw, 4rem) clamp(1.25rem, 4vw, 4.5rem) clamp(3.25rem, 4vw, 4rem); display: grid; gap: clamp(1.5rem, 3vw, 3rem); }
 @media (min-width: 900px) { .panel { grid-template-columns: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 6fr); } }
-.panel h3 { font: 400 clamp(2rem, 4.2vw, 4rem)/.95 var(--display); text-transform: uppercase; }
+.panel h3 { font: 400 clamp(2rem, 4.2vw, 4rem)/.95 var(--display); text-transform: uppercase; color: var(--white); } /* 32px and up: white stays */
 .panel ul { margin-top: 1.1rem; display: grid; gap: .45rem; font-size: clamp(.95rem, .85rem + .4vw, 1.125rem); letter-spacing: .05em; text-transform: uppercase; }
 .panel p { margin-top: .9rem; font-size: var(--small); letter-spacing: .05em; text-transform: uppercase; line-height: 1.55; }
 .panel p b { display: block; margin-bottom: .1rem; }
 .panel .micro { margin-top: 1.4rem; color: var(--fg-2); }
 .tools { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.1rem; }
 .tools span { display: grid; place-items: center; width: 3.4rem; height: 3.4rem; background: var(--black); color: #fff; font-weight: 700; font-size: .95rem; border-radius: 7px; }
-.panel .tape--a { right: -14px; top: -12px; transform: rotate(-38deg); width: 128px; }
+.panel .tape--a { right: -4px; top: -12px; transform: rotate(-38deg); width: 128px; } /* stays clear of the index tab */
 .panel .tape--b { left: -16px; bottom: -14px; transform: rotate(-38deg); width: 118px; }
 
 /* ---------- Project slides: charts, tables, lists ---------- */
@@ -317,7 +340,7 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .stat-list div { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 1rem; padding: .4rem 0; border-top: 1px solid var(--rule); }
 .stat-list div:last-child { border-bottom: 1px solid var(--rule); }
 .stat-list .n { font: 400 1.05rem/1 var(--display); letter-spacing: .02em; white-space: nowrap; }
-.stat-list .ac { color: var(--red); }
+.stat-list .ac { color: var(--red-ink); } /* 17px on paper: the darker vermilion, 4.9:1 */
 .stat-list .k { font-size: var(--micro); letter-spacing: .1em; text-transform: uppercase; color: var(--fg-2); border: 0; padding-bottom: .2rem; }
 /* one set of columns for the whole table, so each value sits under its heading */
 @supports (grid-template-columns: subgrid) {
@@ -327,9 +350,9 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .also { margin-top: 1.25rem; display: grid; gap: .5rem; font-size: var(--small); line-height: 1.45; max-width: 54ch; }
 .also li { padding-left: 1rem; position: relative; }
 .also li::before { content: ""; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; background: var(--red); }
-.numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.25rem; background: var(--red); color: #fff; --fg: #fff; --fg-2: rgba(255,255,255,.85); padding: clamp(1rem, 2vw, 1.5rem); margin-top: 1.25rem; }
+.numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.25rem; background: var(--red); color: var(--black); --fg: var(--black); --fg-2: var(--black); padding: clamp(1rem, 2vw, 1.5rem); margin-top: 1.25rem; }
 @media (min-width: 600px) { .numbers { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.numbers .n { font: 400 clamp(1.7rem, 3vw, 2.7rem)/1 var(--display); letter-spacing: .01em; }
+.numbers .n { font: 400 clamp(1.7rem, 3vw, 2.7rem)/1 var(--display); letter-spacing: .01em; color: var(--white); } /* 27px and up: white stays */
 .numbers .l { font-size: var(--micro); letter-spacing: .08em; text-transform: uppercase; margin-top: .35rem; line-height: 1.4; }
 .numbers .foot { grid-column: 1 / -1; font-size: var(--micro); letter-spacing: .04em; color: var(--fg-2); text-transform: none; }
 .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin-top: 1.25rem; }
@@ -350,12 +373,12 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .ticket .t small { display: block; font: 400 clamp(1rem, 1.6vw, 1.4rem)/1.15 var(--display); color: var(--fg-2); margin-top: .25rem; letter-spacing: .02em; }
 .ticket p { margin-top: .6rem; font-size: var(--small); color: var(--fg-2); }
 .ticket .tape { left: 28%; top: -14px; transform: rotate(-6deg); width: 120px; height: 28px; }
-.hockey .sticker--num { right: -2%; top: -4%; --rot: 10deg; transform: rotate(var(--rot)); }
+.hockey .sticker--num { right: 4%; top: -4%; --rot: 10deg; transform: rotate(var(--rot)); } /* inside the stack, clear of the rail and its index tab */
 .hockey .stat-line { margin-top: 1rem; font-size: var(--small); }
 .hockey .stat-line b { font: 400 1.05rem/1 var(--display); letter-spacing: .03em; }
 
 /* ---------- 10 Record ---------- */
-.record .sheet__in { align-content: start; padding-top: .75rem; }
+.record .sheet__in { align-content: center; }
 .record .head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 3rem); margin-top: 1.25rem; }
 @media (min-width: 900px) { .cols { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -369,7 +392,7 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 /* ---------- 11 Archive: index cards taped to the sheet ----------
    Each entry is one <li class="entry">; tilt, tape and the reveal order come from here and the script,
    so a copied card needs no extra markup. */
-.archive .sheet__in { align-content: start; padding-top: .75rem; }
+.archive .sheet__in { align-content: center; }
 .archive .head { display: flex; align-items: end; justify-content: space-between; gap: .25rem 2rem; flex-wrap: wrap; }
 .archive .head .kicker { margin: 0 0 .55rem; max-width: 36ch; }
 .entries { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: clamp(1.25rem, 4.6vh, 3rem) clamp(1rem, 1.8vw, 1.6rem); margin-top: clamp(1.25rem, 5vh, 3.5rem); }
@@ -389,8 +412,30 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .entry__link::after { content: " →"; }
 .entry__link { background: linear-gradient(var(--red), var(--red)) 0 100% / 100% 2px no-repeat; padding-bottom: .3em; transition: background-size 200ms var(--ease-out); }
 @media (hover: hover) and (pointer: fine) { .entry__link:hover { background-size: 100% 4px; } }
-.js .entry { opacity: 0; translate: 0 8px; transition: opacity 420ms var(--ease-out), translate 420ms var(--ease-out); transition-delay: calc(160ms + var(--i, 0) * 50ms); }
+.js .entry { opacity: 0; translate: 0 8px; transition-property: opacity, translate, rotate, transform, box-shadow, filter, z-index; transition-duration: 420ms, 420ms, var(--t-settle), var(--t-settle), var(--t-settle), 300ms, 0s; transition-timing-function: var(--ease-out), var(--ease-out), var(--ease), var(--ease), var(--ease), ease, linear; transition-delay: calc(160ms + var(--i, 0) * 50ms), calc(160ms + var(--i, 0) * 50ms), 0s, 0s, 0s, 0s, var(--t-open); }
 .js .is-in .entry { opacity: 1; translate: none; }
+/* The archive opens like the dim room's experiments, in paper. At rest a card shows its year, kind and
+   title; pointing at it, or tabbing to its link, unfolds the line and the link (grid rows 0fr to 1fr,
+   500ms), the card straightens to 0 degrees and lifts while its tape presses, and the other cards step back
+   to .4 opacity (they dim; nothing blurs). The unfolding part hangs below the card's resting edge, over the
+   gap, so the grid never moves; the card stays in front until it has folded again. The script wraps the
+   line and the link in .entry__fold (only on cards with a link); touch screens, print and pages without the
+   script show every line. */
+.entry__fold { display: grid; grid-template-rows: 1fr; }
+.entry__fold-in { min-height: 0; display: flex; flex-direction: column; }
+.entry::before { transition: scale var(--t-arrow) var(--ease), box-shadow var(--t-arrow) var(--ease); }
+@media screen and (hover: hover) and (pointer: fine) {
+  .js .entry.has-fold { z-index: 1; }
+  .js .entry__fold { position: absolute; z-index: 1; left: 0; right: 0; top: calc(100% - 1px); grid-template-rows: 0fr; padding: 0 1.05rem; background: var(--white); clip-path: inset(0 -60px -60px -60px); transition: grid-template-rows var(--t-open) var(--ease), box-shadow var(--t-open) var(--ease); }
+  .js .entry__fold-in { overflow: hidden; }
+  .js .entry__fold .entry__line { margin-top: 0; }
+  .js .entry__fold .entry__link { margin-bottom: 1rem; }
+  .js .is-in .entry.has-fold:is(:hover, :focus-within) { z-index: 3; rotate: 0deg; transform: translateY(calc(-4px - var(--rise, 0px))); box-shadow: 0 2px 4px rgba(0,0,0,.1), 0 24px 44px rgba(0,0,0,.2); transition-delay: 0s, 0s, 0s, 0s, 0s, 0s, 0s; }
+  .js .entry.has-fold:is(:hover, :focus-within) .entry__fold { grid-template-rows: 1fr; box-shadow: 0 2px 4px rgba(0,0,0,.1), 0 24px 44px rgba(0,0,0,.2); }
+  .js .entry.has-fold:is(:hover, :focus-within)::before { scale: .94; box-shadow: 0 1px 1px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.05); }
+  .entries:has(.entry.has-fold:hover) .entry:not(:hover),
+  .entries:has(.entry.has-fold:focus-within):not(:has(.entry:hover)) .entry:not(:focus-within) { filter: opacity(.4); }
+}
 
 /* ---------- 12 Contact: the poster and the reply, then a deliberate end ----------
    Desktop: the framed LET'S TALK keeps its full size in the left column and the reply (one large email
@@ -401,7 +446,7 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .talk__top { position: relative; display: grid; place-items: center; min-width: 0; padding-top: 1rem; }
 .talk__word { position: relative; text-align: center; font: 400 clamp(4.5rem, 20vw, 13rem)/.86 var(--display); text-transform: uppercase; color: #fff; }
 @media (min-width: 900px) {
-  .talk__main { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); grid-template-rows: minmax(0, 1fr); gap: clamp(2rem, 4.5vw, 4.5rem); padding-right: max(var(--gutter), calc(var(--gutter) + 33px - max(0px, (100vw - var(--max)) / 2))); }
+  .talk__main { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); grid-template-rows: minmax(0, 1fr); gap: clamp(2rem, 4.5vw, 4.5rem); padding-right: max(var(--gutter), calc(max(var(--gutter) + 40px, 70px) - max(0px, (100vw - var(--max)) / 2))); }
   .talk__top { align-self: stretch; justify-items: start; padding-top: 0; }
   /* the poster group runs from the star (left) to the mask (far right): about 3.4 times the type size */
   .talk__word { margin-left: .3em; font-size: clamp(3rem, 14vw, 13rem); }
@@ -412,11 +457,11 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
   .js .talk__word { font-size: clamp(3rem, min(29cqw, 45cqh), 13rem); }
 }
 .talk__word .ac { color: var(--red); }
-.talk__frame { position: absolute; left: -8%; right: -8%; top: -12%; bottom: -12%; width: 116%; height: 124%; overflow: visible; }
+.talk__frame { position: absolute; left: -8%; right: -8%; top: -12%; bottom: -12%; width: 116%; max-width: none; height: 124%; overflow: visible; } /* max-width: none, or the global img, svg rule clamps it to 100% */
 .talk__frame path { fill: none; stroke: #fff; stroke-width: 6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 /* the stickers scale with the type (em), so the composition holds at any size */
 .talk .sticker--mask { right: -64%; bottom: -14%; --rot: -8deg; transform: rotate(var(--rot)); width: .97em; height: auto; }
-.talk .sticker--crown { right: -18%; top: -28%; --rot: 16deg; transform: rotate(var(--rot)); width: .62em; }
+.talk .sticker--crown { right: -44%; top: -22%; --rot: 16deg; transform: rotate(var(--rot)); width: .62em; } /* just clear of the frame's corner */
 .talk .sticker--star { left: -14%; bottom: -8%; width: .33em; }
 .talk .tape { left: 18%; top: -9%; rotate: -28deg; width: .57em; height: .17em; } /* `rotate`, so the reveal's transform does not undo the tilt */
 @media (max-width: 719px) { .talk .sticker--crown, .talk .sticker--star, .talk .tape { display: none; } .talk .sticker--mask { right: -48%; bottom: -18%; width: 76px; } }
@@ -444,7 +489,7 @@ html:not(.js) .rail__label { display: none; } /* without the script it could not
 .talk__foot { position: relative; background: var(--paper); color: var(--black); --fg: var(--black); --fg-2: var(--ink-2); --rule: var(--paper-2); }
 .talk__foot .tear { top: calc(1px - var(--tear)); color: var(--paper); }
 .talk__foot .sheet__in { min-height: 0; padding-block: clamp(.6rem, 1.6vh, 1.1rem) clamp(.9rem, 2.4vh, 1.5rem); }
-@media (max-width: 899px) { .js .talk__foot .sheet__in { padding-bottom: 5rem; } } /* the colophon clears the index button */
+@media (max-width: 899px), (max-height: 539px) { .js .talk__foot .sheet__in { padding-bottom: 5rem; } } /* the colophon clears the pill */
 .end { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
 .end__btn { display: inline-flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 1.15rem 0 .95rem; border: 2px solid var(--black); border-radius: 999px; background: transparent; color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease, translate 160ms var(--ease-out); }
 .end__btn svg { width: 16px; height: 16px; flex: none; }
@@ -467,7 +512,7 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
 
 /* ---------- Small parts shared by the project slides ---------- */
 .hl { display: block; }
-.title__sub { font-size: .4em; line-height: 1; margin-top: .14em; letter-spacing: .01em; }
+.title__sub { font-size: max(.4em, 1.5rem); line-height: 1; margin-top: .14em; letter-spacing: .01em; } /* never under 24px, so vermilion on paper stays large text */
 .card--a { left: 0; top: 3%; width: 62%; }
 .card--b { right: 0; bottom: 3%; width: 46%; }
 .card--img.card--a .card__cap { padding-right: calc(13% + clamp(.75rem, 1.6vw, 1.25rem)); text-wrap: balance; } /* the second card overlaps this corner */
@@ -475,6 +520,34 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
 .card__fig img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
 .card > .tape { right: -18px; top: -12px; width: 104px; height: 28px; transform: rotate(-32deg); }
 .card > .tape--l { right: auto; left: -18px; top: -10px; transform: rotate(32deg); }
+/* ---------- The hover grammar on the project cards ----------
+   The script makes each collage card a link to its sheet's own "Read the analysis" or "See the project"
+   destination (the same href, read from that link) and gives it a round vermilion badge. Pointing at a card:
+   its image settles inside a still frame from 1.06 to 1 (800ms), the card eases from its tilt toward flat
+   and lifts 3px as its shadow deepens, its tape presses down, the badge grows from .8 and its arrow turns
+   from 45 degrees to 0 (450ms), and the caption brightens. The other card steps back to .55 opacity; it
+   dims, it never blurs. Reduced motion keeps the colour and opacity changes only; touch shows the badge. */
+.card__frame { position: relative; overflow: hidden; }
+.card__link { position: absolute; inset: 0; z-index: 5; -webkit-tap-highlight-color: transparent; }
+.card__go { position: absolute; z-index: 6; right: -21px; bottom: -21px; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: var(--red); color: var(--black); box-shadow: 0 0 0 1.5px var(--black), 0 8px 18px rgba(0,0,0,.3); }
+.card--a .card__go { right: auto; left: -21px; } /* centred on the corner: clear of the caption's first letter */
+.card__go svg { width: 20px; height: 20px; }
+.card__cap { transition: color 300ms ease; }
+.js .card.pop { transition-property: opacity, transform, translate, rotate, box-shadow, filter; transition-duration: 320ms, 460ms, var(--t-settle), var(--t-settle), var(--t-settle), 400ms; transition-timing-function: var(--ease-out), var(--ease-out), var(--ease), var(--ease), var(--ease), ease; transition-delay: calc(var(--i, 0) * var(--stagger)), calc(var(--i, 0) * var(--stagger)), 0s, 0s, 0s, 0s; }
+.card > .tape { transition: scale var(--t-arrow) var(--ease), box-shadow var(--t-arrow) var(--ease); }
+.collage:has(.card.is-link:hover) .card:not(:hover) { filter: opacity(.55); } /* steps back: opacity only */
+.card.is-link:hover .card__cap { color: var(--fg); }
+@media screen and (hover: hover) and (pointer: fine) {
+  .card.is-link .card__frame > img { scale: 1.06; transition: scale var(--t-settle) var(--ease); }
+  .card.is-link:hover .card__frame > img { scale: 1; }
+  .js .is-in .card.is-link:hover { translate: 0 -3px; rotate: calc(var(--rot, 0deg) * -.6); box-shadow: 0 28px 54px rgba(0,0,0,.42); }
+  .js .slide--paper.is-in .card.is-link:hover { box-shadow: 0 24px 46px rgba(0,0,0,.3); }
+  .card.is-link:hover > .tape { scale: .96; box-shadow: 0 1px 1px rgba(0,0,0,.2), inset 0 0 0 1px rgba(255,255,255,.08); }
+  .card__go { opacity: 0; scale: .8; transition: opacity var(--t-arrow) var(--ease), scale var(--t-arrow) var(--ease); }
+  .card__go svg { rotate: 45deg; transition: rotate var(--t-arrow) var(--ease); }
+  .card.is-link:hover .card__go { opacity: 1; scale: 1; }
+  .card.is-link:hover .card__go svg { rotate: 0deg; }
+}
 .stack { position: relative; display: grid; gap: 1rem; align-content: center; min-width: 0; }
 .stack .numbers { margin-top: 0; }
 .stack .ticket { margin-top: .75rem; }
@@ -485,7 +558,7 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
 
 /* ---------- Short windows: everything a notch tighter so the sheets still stack ---------- */
 @media (min-width: 900px) and (max-height: 820px) {
-  :root { --title: clamp(2.6rem, 7vw, 6rem); --text: 0.9rem; --tear: 52px; --chrome: 44px; --row: 20px; --tabh: 17px; }
+  :root { --title: clamp(2.6rem, 7vw, 6rem); --text: 0.9rem; --tear: 52px; --chrome: 44px; --tabh: 17px; }
   .sheet__in { padding-block: .5rem .75rem; }
   .kicker, .split__text .kicker { margin-top: .6rem; font-size: .75rem; }
   .lede { margin-top: .5rem; font-size: 1.2rem; }
@@ -537,6 +610,7 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
   .entry__title { margin-top: .5rem; font-size: 1.02rem; }
   .entry__line { margin-top: .3rem; font-size: .75rem; line-height: 1.4; }
   .entry__link { padding-top: .55rem; }
+  @media screen and (hover: hover) and (pointer: fine) { .js .entry__fold { padding: 0 .85rem; } .js .entry__fold .entry__link { margin-bottom: .8rem; } }
 }
 
 /* ---------- Touch screens at desktop widths (tablets in landscape): larger targets ---------- */
@@ -560,6 +634,21 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
   .cover__hint { animation: none; opacity: .8; }
   .tone img, .sticker--hover, .more, .linkrow a, .chrome a { transition: none; }
   .more:hover::after { animation: none; }
+  /* the hover grammar keeps its colour and opacity changes and drops every movement */
+  .card.is-link .card__frame > img { scale: none !important; transition: none; }
+  .js .is-in .card.is-link:hover { translate: none; rotate: none; }
+  .js .card.pop { transition: opacity 200ms ease, filter 200ms ease, box-shadow 200ms ease; }
+  .card.is-link:hover > .tape { scale: none; }
+  .card__go, .card__go svg { scale: none; rotate: none; }
+  .card__go { transition: opacity 200ms ease; }
+  .js .entry { translate: none !important; transition: opacity 200ms ease, filter 200ms ease, box-shadow 200ms ease; }
+  .js .is-in .entry.has-fold:is(:hover, :focus-within) { rotate: var(--tilt, 0deg); transform: translateY(calc(-1 * var(--rise, 0px))); } /* no movement: a card at the foot of its sheet is simply placed higher */
+  .js .entry__fold { transition: none !important; }
+  .js .entry.has-fold:is(:hover, :focus-within)::before { scale: none; }
+  .entry::before { transition: none; }
+  .route::after { clip-path: none; opacity: 0; transition: opacity 200ms ease; }
+  .route:hover::after, .route:focus-visible::after { opacity: 1; }
+  @media (hover: none) { .route::after { opacity: 1; } }
 }
 
 /* ---------- Print: a plain document ---------- */
@@ -574,41 +663,50 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
   .card { position: static; margin-top: 1rem; border: 1px solid #ccc; }
   .collage { aspect-ratio: auto; }
   .cover__title, .title, .talk__word { font-size: 28pt; color: #000; }
+  .panel h3, .numbers .n, .card--red .big { color: #000 !important; }
+  .timeline .yr, .ticket .card__k, .title .ac { color: var(--red-ink) !important; } /* small vermilion on white */
+  .index-tab, .card__go, .card__link, .route::before, .route::after, .find, .cabinet__shut { display: none !important; }
+  .card__frame > img { scale: none !important; }
   .arch { width: 200px; }
   .arch__red { display: none; }
   .arch__cut { position: static; }
   a { text-decoration: none; }
 }
 
-/* ---------- The index: the rail's folder button and the cabinet ----------
-   A compact paper file drawer anchored beside the rail (a bottom panel on phones), after the reference
-   clip: one hairline folder per sheet with a trapezoid tab, black divider tabs per discipline and the
-   drawer front. Each folder is one row tall and the whole row is its target; the rows start on the same
-   line as the rail's dots. A hovered or focused folder pulls its file up out of it, from behind its own
-   front, so the file never covers that folder's tab. Non-modal: the page stays visible and usable. */
+/* ---------- The index: the index tab, the rail's folder button and the cabinet ----------
+   A compact paper file drawer anchored beside the rail (a bottom panel on phones and in very short windows),
+   after the reference clip: one hairline folder per sheet with a trapezoid tab, black divider tabs per
+   discipline and the drawer front. Each folder is one row tall and the whole row is its target; the rows
+   start on the same line as the rail's dots. A hovered or focused folder pulls its file up out of it, from
+   behind its own front, so the file never covers that folder's tab. The file is part of its folder's link:
+   pulled, it can be clicked. Non-modal: the page stays visible and usable. */
 .rail__folder { grid-column: 2; grid-row: 1; justify-self: start; align-self: start; margin-left: -3px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #fff; cursor: pointer; transition: background var(--t-fast) ease, transform var(--t) var(--ease-out); }
 .rail__folder svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 .rail__folder:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .rail__folder[aria-expanded="true"] { background: rgba(255,255,255,.18); }
 html:not(.js) .rail__folder { display: none; }
 @media (hover: hover) and (pointer: fine) { .rail__folder:hover { background: rgba(255,255,255,.18); transform: translateY(-1px); } }
-@media (max-width: 899px) {
-  .rail { top: auto; bottom: 16px; right: 14px; grid-template-columns: 44px; grid-template-rows: 44px; column-gap: 0; padding: 0; }
-  .rail a:first-of-type { grid-row: auto; }
-  .rail a, .rail__label { display: none; }
-  .rail__folder { grid-column: 1; width: 44px; height: 44px; margin-left: 0; border-radius: 50%; background: rgba(255,255,255,.14); }
-  .rail__folder svg { width: 20px; height: 20px; }
-  /* the page's own end has "Open the index"; the floating button steps aside while it is on screen */
-  html.at-end .rail__folder { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity var(--t-fast) ease, visibility 0s linear var(--t-fast); }
-}
 
-.cabinet { --div-up: min(5px, calc(var(--row) - var(--tabh) - 1px)); position: fixed; z-index: 120; right: calc(var(--gutter) + 10px); top: calc(50% - 6 * var(--row) + 3px + var(--cab-shift, 0px)); width: 324px; padding: 12px 12px 10px; background: var(--paper); color: var(--black); border: 1px solid var(--black); border-radius: 3px; box-shadow: 0 2px 6px rgba(0,0,0,.16), 0 24px 52px rgba(0,0,0,.3); }
+/* The index tab: a small paper tab standing on the rail above the folder button, in the drawer front's
+   style (paper, a black hairline, 12px capitals). It is not blended like the rail, so it reads as paper on
+   every sheet, and it says what the rail is for without hovering the screen edge. On phones it becomes the
+   black pill at the bottom centre that also names the current sheet. */
+.index-tab { position: fixed; z-index: 101; right: 6px; top: calc(50% - var(--n) * var(--row) / 2 - 47px); display: inline-flex; align-items: center; height: 24px; padding: 0 6px 0 7px; border: 1px solid var(--black); border-radius: 2px; background: var(--paper); color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,.2), 0 6px 14px rgba(0,0,0,.16); -webkit-tap-highlight-color: transparent; transition: background var(--t-fast) ease, translate var(--t) var(--ease), opacity var(--t) ease; }
+.index-tab__at { display: none; font-weight: 400; }
+.index-tab[aria-expanded="true"] { background: var(--white); }
+.index-tab:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) { .index-tab:hover { background: var(--white); translate: 0 -1px; } }
+
+.cabinet { --div-up: min(5px, calc(var(--row) - var(--tabh) - 1px)); position: fixed; z-index: 120; right: calc(var(--gutter) + 10px); top: calc(50% - var(--n) * var(--row) / 2 + 3px + var(--cab-shift, 0px)); width: 336px; padding: 12px 12px 10px; background: var(--paper); color: var(--black); border: 1px solid var(--black); border-radius: 3px; box-shadow: 0 2px 6px rgba(0,0,0,.16), 0 24px 52px rgba(0,0,0,.3); }
 html:not(.js) .cabinet { display: none; }
+/* without the script, the index links (#cabinet) show it as their target; choosing a folder or Close
+   (#shut, which matches nothing, so the page stays where it is) clears the target and hides it */
+html:not(.js) .cabinet:target { display: block; }
 .js .cabinet { visibility: hidden; opacity: 0; transform: translateX(8px); transition: opacity 150ms ease, transform 200ms var(--ease-out), visibility 0s linear 200ms; }
 .js .cabinet.is-open { visibility: visible; opacity: 1; transform: none; transition: opacity 200ms ease, transform 240ms var(--ease-out), visibility 0s; }
 /* files may rise out of the top and sides; nothing shows below the drawer front */
 .cabinet__stack { position: relative; z-index: 0; clip-path: inset(-100vh -100vw 0 -100vw); }
-.folder, .divider { position: relative; --w: calc(86% + 14% * var(--k) / 11); }
+.folder, .divider { position: relative; --w: calc(86% + 14% * var(--k) / max(1, var(--n) - 1)); }
 .folder { height: var(--row); }
 .divider { height: 0; }
 .folder__btn { position: absolute; inset: 0; z-index: calc(3 * var(--k) + 3); display: block; color: var(--black); text-decoration: none; -webkit-tap-highlight-color: transparent; }
@@ -629,13 +727,15 @@ html:not(.js) .cabinet { display: none; }
 /* dividers are cards standing just behind their first folder, a few px taller, tab on the right */
 .divider__card { position: absolute; z-index: calc(3 * var(--k) + 1); left: calc((100% - var(--w)) / 2); width: var(--w); top: calc(var(--row) - 4px - var(--div-up)); height: calc(var(--row) + 8px); border: 1px solid var(--black); border-bottom: 0; border-radius: 3px 3px 0 0; background: var(--paper); pointer-events: none; }
 .divider__tab { position: absolute; right: 4%; bottom: calc(100% - 1px); height: var(--tabh); padding: 0 11px; display: inline-flex; align-items: center; font-size: var(--micro); font-weight: 700; line-height: 1; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; color: var(--white); background: var(--black); clip-path: polygon(0 100%, 8px 0, calc(100% - 8px) 0, 100% 100%); }
-/* the file: white paper behind its folder's front; pulled, it rises out with a slight tilt and a piece of
-   tape. Its lowest part stays in the folder, below the text, so the folder's tab never covers a word. */
-.file { position: absolute; z-index: calc(3 * var(--k) + 2); left: calc((100% - var(--w)) / 2 + 9px); width: calc(var(--w) - 18px); bottom: -4px; padding: 14px 15px calc(var(--tabh) + 16px); background: var(--white); color: var(--black); box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 14px 32px rgba(0,0,0,.26); transform-origin: 50% 100%; transform: translateY(100%) rotate(var(--tilt, -1.2deg)); visibility: hidden; pointer-events: none; transition: transform 180ms var(--ease-out), visibility 0s linear 180ms; }
+/* the file: white paper inside its folder's link, painted behind the folder's front (z-index -1 inside the
+   link, which stacks at 3k + 3, so a file is in front of every folder behind it); pulled, it rises out with
+   a slight tilt and a piece of tape, and takes the pointer, so a click on it opens its own sheet. Its
+   lowest part stays in the folder, below the text, so the folder's tab never covers a word. */
+.file { position: absolute; z-index: -1; left: calc((100% - var(--w)) / 2 + 9px); width: calc(var(--w) - 18px); bottom: -4px; padding: 14px 15px calc(var(--tabh) + 16px); background: var(--white); color: var(--black); box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 14px 32px rgba(0,0,0,.26); transform-origin: 50% 100%; transform: translateY(100%) rotate(var(--tilt, -1.2deg)); visibility: hidden; pointer-events: none; transition: transform 180ms var(--ease-out), visibility 0s linear 180ms; }
 .folder:nth-child(even) .file { --tilt: 1deg; }
 .folder:nth-child(3n) .file { --tilt: -.6deg; }
 /* one file moves at a time: when another is going back in, this one waits 60ms (set by the script) */
-.folder.is-out .file { transform: rotate(var(--tilt, -1.2deg)); visibility: visible; transition: transform 250ms var(--ease-out) var(--rise-delay, 0ms), visibility 0s linear var(--rise-delay, 0ms); }
+.folder.is-out .file { transform: rotate(var(--tilt, -1.2deg)); visibility: visible; pointer-events: auto; transition: transform 250ms var(--ease-out) var(--rise-delay, 0ms), visibility 0s linear var(--rise-delay, 0ms); }
 .file::before { content: ""; position: absolute; top: -12px; left: 50%; width: 72px; height: 22px; translate: -50% 0; rotate: -3deg; background: linear-gradient(100deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.85) 32%, rgba(255,255,255,.6) 58%, rgba(255,255,255,.8) 100%); box-shadow: 0 1px 3px rgba(0,0,0,.22), inset 0 0 0 1px rgba(0,0,0,.06); clip-path: polygon(2% 0, 98% 3%, 100% 24%, 97% 48%, 100% 78%, 98% 100%, 3% 97%, 0 70%, 2% 42%, 0 16%); }
 .file__rec { font-size: var(--micro); letter-spacing: .14em; line-height: 1.3; text-transform: uppercase; color: var(--ink-2); }
 /* you are here: the current sheet's file says so in its first line (generated, so no other folder's
@@ -646,45 +746,107 @@ html:not(.js) .cabinet { display: none; }
 .file__kicker { margin-top: .45rem; padding-left: .55rem; border-left: 3px solid var(--red); font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.3; text-transform: uppercase; }
 .file__sum { margin-top: .55rem; font-size: var(--small); line-height: 1.42; text-wrap: pretty; }
 .file__go { display: inline-block; margin-top: .65rem; padding-bottom: .2em; border-bottom: 2px solid var(--red); font-size: var(--micro); font-weight: 700; letter-spacing: .14em; line-height: 1.2; text-transform: uppercase; }
-.file__go::after { content: " →"; }
-/* the drawer front */
-.cabinet__front { position: relative; z-index: 100; display: flex; align-items: center; justify-content: space-between; gap: .5rem; height: 40px; margin-top: 6px; padding: 0 4px 0 12px; border: 1px solid var(--black); border-radius: 2px; background: var(--paper); font-size: var(--micro); letter-spacing: .12em; line-height: 1; text-transform: uppercase; white-space: nowrap; color: var(--ink-2); }
-.cabinet__close { display: inline-flex; align-items: center; gap: .45rem; min-height: 32px; padding: 0 .55rem; border: 0; border-radius: 3px; background: none; color: var(--black); font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.file__go::after { content: "→"; display: inline-block; margin-left: .4em; transition: translate var(--t-arrow) var(--ease); }
+@media (hover: hover) and (pointer: fine) { .folder.is-out .folder__btn:hover .file__go::after { translate: 4px 0; } }
+/* Find: a matching folder's file quotes the line that matched, the word marked in vermilion */
+.file__quote { display: none; margin-top: .55rem; padding-left: .55rem; border-left: 3px solid var(--black); font-size: var(--small); line-height: 1.42; text-wrap: pretty; }
+.file__quote mark, .found__q mark { background: linear-gradient(transparent 58%, var(--red) 58%, var(--red) 92%, transparent 92%); color: inherit; font-weight: 700; }
+.cabinet.is-finding .folder.is-match .file__quote { display: block; }
+.cabinet.is-finding .folder.is-match .file__kicker, .cabinet.is-finding .folder.is-match .file__sum { display: none; }
+/* while finding, the folders without a match fade their tabs to the muted ink (still 5.4:1) and the
+   matching ones carry a small vermilion count */
+.cabinet.is-finding .folder:not(.is-match) .folder__tab { color: var(--ink-2); }
+.cabinet.is-finding .folder:not(.is-match) .folder__n { font-weight: 400; }
+.folder__hits { display: none; min-width: 18px; height: 14px; padding: 0 4px; margin-left: .15em; border-radius: 7px; background: var(--black); color: var(--white); font-size: var(--micro); font-weight: 700; line-height: 14px; letter-spacing: 0; text-align: center; }
+.cabinet.is-finding .folder.is-match .folder__hits { display: inline-block; }
+/* where Find went: the line is ringed in vermilion for a moment, then the ring fades (colour only) */
+.is-found { outline: 2px solid var(--red); outline-offset: 6px; animation: found 2.6s ease forwards; }
+@keyframes found { 0%, 65% { outline-color: var(--red); } 100% { outline-color: transparent; } }
+/* the drawer front: the Find slip in its label holder, then the drawer's label and Close */
+.cabinet__front { position: relative; z-index: 100; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 8px; margin-top: 6px; padding: 7px 4px 4px 7px; border: 1px solid var(--black); border-radius: 2px; background: var(--paper); font-size: var(--micro); letter-spacing: .12em; line-height: 1; text-transform: uppercase; white-space: nowrap; color: var(--ink-2); }
+.cabinet__label { padding-left: 4px; overflow: hidden; text-overflow: ellipsis; letter-spacing: .1em; }
+/* the label holder: a black hairline frame with a rivet at each end, a white slip in it, "Find" printed on
+   the slip and the reader's word written after it */
+.find { grid-column: 1 / -1; position: relative; display: flex; align-items: center; gap: 8px; height: 32px; margin: 0 6px 0 3px; padding: 0 6px 0 10px; background: var(--white); border: 1px solid var(--black); border-radius: 1px; box-shadow: inset 0 1px 2px rgba(0,0,0,.12); }
+/* two screws hold the frame to the drawer, one on each end of it */
+.find::before, .find::after { content: ""; position: absolute; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: radial-gradient(circle, var(--ink-2) 0 1px, var(--paper-2) 1.5px); box-shadow: 0 0 0 1px var(--black); }
+.find::before { left: -4px; } .find::after { right: -4px; }
+.find__k { flex: none; font-weight: 700; color: var(--black); cursor: text; }
+.find__in { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--black); font: 400 .875rem/1 var(--sans); letter-spacing: .02em; text-transform: none; caret-color: var(--red); -webkit-appearance: none; appearance: none; }
+.find__in::-webkit-search-cancel-button, .find__in::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+.find__in:focus { outline: none; }
+.find:focus-within { border-color: var(--black); box-shadow: inset 0 1px 2px rgba(0,0,0,.12), 0 0 0 2px var(--red); }
+.find__key { flex: none; margin-right: 4px; padding: .2rem .4rem .15rem; border: 1px solid var(--paper-2); border-radius: 3px; font: inherit; color: var(--ink-2); }
+.find:focus-within .find__key { visibility: hidden; }
+html:not(.js) .find { display: none; }
+.cabinet__close { display: inline-flex; align-items: center; gap: .45rem; min-height: 32px; padding: 0 .55rem; border: 0; border-radius: 3px; background: none; color: var(--black); font: inherit; letter-spacing: inherit; text-transform: inherit; text-decoration: none; cursor: pointer; }
 .cabinet__close kbd { font: inherit; padding: .2rem .35rem .15rem; border: 1px solid var(--paper-2); border-radius: 3px; }
-.cabinet__close:focus-visible { outline: 2px solid var(--red); outline-offset: 0; }
+.cabinet__close:focus-visible, .cabinet__shut:focus-visible { outline: 2px solid var(--red); outline-offset: 0; }
+.cabinet__shut { display: none; align-items: center; min-height: 32px; padding: 0 .55rem; color: var(--black); text-decoration: none; }
+html:not(.js) .cabinet__close { display: none; }
+html:not(.js) .cabinet__shut { display: inline-flex; }
 @media (hover: hover) and (pointer: fine) { .cabinet__close:hover { background: rgba(21,21,21,.06); } }
-@media (pointer: coarse) { .cabinet__close { min-height: 44px; } .cabinet__close kbd { display: none; } } /* a 44px touch target; no key hint on touch screens */
+@media (pointer: coarse) { .cabinet__close, .cabinet__shut { min-height: 44px; } .cabinet__close kbd, .find__key { display: none; } } /* 44px touch targets; no key hints on touch screens */
 /* short windows: tighter files, so even the top folder's file rises inside the window */
 @media (min-width: 900px) and (max-height: 820px) {
   .file { padding: 11px 13px calc(var(--tabh) + 12px); }
   .file__title { margin-top: .3rem; font-size: 1.4rem; }
   .file__kicker { margin-top: .35rem; }
-  .file__sum { margin-top: .4rem; line-height: 1.36; }
+  .file__sum, .file__quote { margin-top: .4rem; line-height: 1.36; }
   .file__go { margin-top: .45rem; }
 }
 .cabinet.is-cramped .file__sum { display: none; } /* very short windows only (set by the script) */
-/* phones: the same cabinet as a bottom panel, rows 44px tall, no files (a tap opens the sheet) */
-@media (max-width: 899px) {
-  .cabinet { --row: 44px; --tabh: 22px; top: auto; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); width: min(440px, calc(100vw - 16px)); max-height: min(80svh, calc(100svh - 24px)); overflow-y: auto; overscroll-behavior: contain; padding: 14px 12px 0; }
+/* Phones (and windows under 540px tall, where the sheets no longer stack and the rail would not fit): the
+   rail gives way to the pill (the index tab restyled), the chrome gets a black strip of its own, and the
+   sheets keep their last lines clear of the pill */
+@media (max-width: 899px), (max-height: 539px) {
+  .rail { display: none; }
+  .index-tab { top: auto; right: auto; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; gap: 0; height: 44px; padding: 0 20px; letter-spacing: .12em; border: 1px solid var(--paper); border-radius: 999px; background: var(--black); color: var(--white); box-shadow: 0 0 0 1px var(--black), 0 10px 24px rgba(0,0,0,.35); }
+  .index-tab[aria-expanded="true"] { background: var(--black); }
+  .js .index-tab__at { display: inline; white-space: pre; }
+  .index-tab:focus-visible { outline-offset: 4px; }
+  html.pill-away .index-tab, html.at-end .index-tab, html.index-open .index-tab { translate: -50% calc(100% + 24px); opacity: 0; pointer-events: none; }
+  .chrome { mix-blend-mode: normal; background: var(--black); transition: translate 300ms var(--ease); }
+  html.bars-away .chrome { translate: 0 -100%; }
+  .js .slide .sheet__in { padding-bottom: calc(clamp(1.25rem, 4vh, 3rem) + 64px); }
+}
+/* the cabinet as a bottom panel (phones, and windows under 540px tall): rows 44px tall, no rising files (a
+   tap opens the sheet), the drawer front with Find and Close kept in reach */
+@media (max-width: 899px), (max-height: 539px) {
+  .cabinet { --row: 44px; --tabh: 22px; top: auto; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px) + var(--kb, 0px)); width: min(440px, calc(100vw - 16px)); max-height: min(80svh, calc(100svh - 24px - var(--kb, 0px))); overflow-y: auto; overscroll-behavior: contain; padding: 14px 12px 0; }
   .js .cabinet { transform: translateY(14px); }
   .js .cabinet.is-open { transform: none; }
   .cabinet .file { display: none; }
   .cabinet__stack { clip-path: none; }
-  .cabinet__front { position: sticky; bottom: 0; height: 52px; margin: 8px -12px 0; padding: 0 4px 0 16px; border-width: 1px 0 0; border-radius: 0; }
-  .cabinet__close { min-height: 44px; padding: 0 .9rem; }
-  .cabinet__close kbd { display: none; }
+  .cabinet__front { position: sticky; bottom: 0; margin: 8px -12px 0; padding: 8px 4px 6px 12px; border-width: 1px 0 0; border-radius: 0; }
+  .find { height: 40px; }
+  .find__in { font-size: 1rem; } /* 16px: no zoom on focus in iOS */
+  .cabinet__close, .cabinet__shut { min-height: 44px; padding: 0 .9rem; }
+  .cabinet__close kbd, .find__key { display: none; }
   .folder__tab, .divider__tab { padding: 0 12px; }
+  /* Find on the panel: only the matching folders stay, each with its file out beside it as a slip that
+     quotes the matching line */
+  .cabinet.is-finding .folder:not(.is-match), .cabinet.is-finding .divider { display: none; }
+  .cabinet.is-finding .folder.is-match { height: auto; margin-bottom: 10px; }
+  .cabinet.is-finding .folder.is-match .folder__btn { position: relative; inset: auto; display: block; padding-top: var(--tabh); }
+  .cabinet.is-finding .folder.is-match .folder__btn::before { display: none; }
+  .cabinet.is-finding .folder.is-match .folder__tab { top: 1px; bottom: auto; left: 10px; }
+  .cabinet.is-finding .folder.is-match .file { display: block; position: relative; left: auto; bottom: auto; width: auto; padding: 9px 12px 10px; border: 1px solid var(--black); box-shadow: none; transform: none; visibility: visible; transition: none; }
+  .cabinet.is-finding .folder.is-match .file::before, .cabinet.is-finding .folder.is-match .file > :not(.file__quote) { display: none; }
+  .cabinet.is-finding .folder.is-match .file__quote { margin-top: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .code__body code::after { animation: none; }
-  .rail__folder, .rail a::before, .rail__label, .folder__tab::before { transition: none; }
+  .rail__folder, .rail a::before, .rail__label, .folder__tab::before, .index-tab, .chrome { transition: none; }
+  .index-tab { transition: opacity 150ms ease; }
+  @media (max-width: 899px), (max-height: 539px) { html.pill-away .index-tab, html.at-end .index-tab, html.index-open .index-tab { translate: -50% 0; } html.bars-away .chrome { translate: none; } }
   .js .cabinet, .js .cabinet.is-open { transform: none; }
   .js .cabinet { transition: opacity 150ms ease, visibility 0s linear 150ms; }
   .js .cabinet.is-open { transition: opacity 150ms ease, visibility 0s; }
   .file, .folder.is-out .file { transform: rotate(var(--tilt, -1.2deg)); }
   .file { opacity: 0; transition: opacity 150ms ease, visibility 0s linear 150ms; }
   .folder.is-out .file { opacity: 1; transition: opacity 150ms ease var(--rise-delay, 0ms), visibility 0s linear var(--rise-delay, 0ms); }
-  .js .entry { translate: none !important; transition: opacity 200ms ease; }
+  .file__go::after { transition: none; }
   .mail, .mail__go, .out a, .out__m svg, .end__btn, .end__up, .entry__link { transition: none; }
 }
 @media print {

@@ -51,7 +51,11 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   letters, the red strip wipe, year, stickers.
 - **Chrome.** Name left, year right, fixed, blended with `difference` so it reads
   on either colour. Arrow keys move one sheet; dots and `#id` links scroll to the
-  sheet's flow position (a plain anchor jump cannot reach a sticky sheet). Tabbing
+  sheet's flow position (a plain anchor jump cannot reach a sticky sheet). A move of
+  one sheet slides it over in 380ms; a longer jump cuts to one screen before the
+  target and slides only the last sheet (cover to hockey travels 900px, not 6300px);
+  any wheel, touch, press or scrolling key takes over, and reduced motion jumps. On
+  phones the chrome has a solid black strip and steps away while you scroll down. Tabbing
   into a sheet brings it to rest, so the sheet above it never covers the focused
   link, and the skip link (and any in-page link taken from the keyboard) moves
   focus to the sheet it lands on.
@@ -61,19 +65,23 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   and fades through each change. The dots are 8px but each sits on an invisible
   cell one row tall that runs on toward the screen edge as far as the gutter
   allows, and the rail's padding and label widen the hover area further. The
-  rows start at `50% - 6 rows + 16px` (`--row`: 22px, 20px in short windows, 28px
-  on touch screens), the same line the cabinet's folders start on, so every dot
-  is level with its own folder. Content keeps 33px clear of the rail and label.
-  Below 900px the rail is only the round index button at the bottom right.
-- **The cabinet (the index).** A compact paper file drawer, 324px wide, anchored
+  rows start at `50% - n/2 rows + 16px` (`--row`: 24px, the WCAG 2.5.8 minimum, 28px
+  on touch screens; `--n` is the number of sheets, written by the script), the same
+  line the cabinet's folders start on, so every dot is level with its own folder.
+  Above the folder button stands the **index tab**: a small paper tab reading
+  "Index", not blended, so the index is visible without hovering the screen edge.
+  Content keeps 40px clear of the rail, label and tab (and 70px of the screen's
+  edge). Below 900px the rail gives way to the pill (see Phones).
+- **The cabinet (the index).** A compact paper file drawer, 336px wide, anchored
   beside the rail and sized to its content: one hairline folder per sheet with a
   trapezoid tab (each whole row is the folder's target), black divider tabs for
   the disciplines standing just behind their first folder, and the drawer front,
-  "Portfolio · 12 sheets", with Close. The current sheet's tab is vermilion.
-  Hovering the rail (dots, label or folder button) opens it after 120ms; it stays
-  open while the pointer is over the rail or the cabinet and closes 300ms after
-  the pointer leaves both. A click on the folder button keeps it open; a second
-  click closes it. Clicking a dot still goes straight to its sheet. It is
+  with the Find slip, "Portfolio · 12 sheets" and Close. The current sheet's tab
+  is vermilion. Hovering the rail (dots, label, folder button or index tab) opens
+  it after 120ms; it stays open while the pointer is over the rail or the cabinet
+  and closes 300ms after the pointer leaves both. A click on the folder button,
+  the index tab or "portfolio" on the cover keeps it open; a second click closes
+  it. Clicking a dot still goes straight to its sheet. It is
   non-modal (`<nav>` with an `aria-expanded` disclosure button, no backdrop, no
   scroll lock, no focus trap): keyboard focus on the folder button opens it too,
   Enter or Space moves focus to the current folder, arrows, Home and End walk the
@@ -81,33 +89,61 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   and returns focus to where it came from, and a press anywhere else closes it.
   With the script the dots leave the tab order, so the rail is one stop and the
   cabinet is the keyboard path. Choosing a folder scrolls to the sheet with the
-  page's own `go(i)` and closes the cabinet. Without the script it is not shown
-  and the dots are plain anchors. It never prints.
+  page's own `go(i)` and closes the cabinet. Without the script the dots are plain
+  anchors and the index links point at `#cabinet`, which shows the cabinet as
+  their target (Close links to `#shut` and hides it). It never prints.
+- **Find.** The drawer front holds a label holder with a white slip: "Find" and the
+  reader's word. `/` opens it from anywhere but a field. It searches the page's own
+  text sheet by sheet (a word matches at the start of a word, accents aside);
+  matching folders keep their ink and show a count, and the best match's file comes
+  out quoting the matching line. Up and Down step through the matches, Enter goes
+  there and rings the line in vermilion for a moment, Escape clears, then closes.
+  On the phone panel only the matching folders stay, each with its quote.
 - **Files.** Hovering a folder, hovering a dot, or focusing a folder pulls that
   folder's file up out of it: white paper with a slight tilt and a piece of tape,
   rising from behind the folder's own front (so its tab is never covered) with
   the record: sheet number ("You are here" on the current one), title in Anton,
   kicker, one line, "Open the sheet". It rises in 250ms ease-out and goes back in
   180ms; when one file replaces another the new one waits 60ms, so one moves at a
-  time. Files are previews (no pointer events): the rows beneath stay hoverable,
-  so moving the pointer up and down scrubs through them. Its lowest part stays in
-  the folder, below the text. In windows too short for the top folder's file, the
-  cabinet moves down just enough (only below 600px tall), and below about 450px
-  the files leave out their summary line. Opened from the
+  time. A pulled file is part of its folder's link: clicking it opens its own
+  sheet. On the way up to it the pointer may cross other folders' exposed edges
+  or other dots; while it is heading for the file (a safe triangle from where it
+  was to the file's corners), those do not swap the file, and if it stops short
+  for 320ms the row it rests on wins. Scrubbing straight up and down the dots stays
+  immediate. Its lowest part stays in the folder, below the text. In windows too
+  short for the top folder's file the cabinet moves down, when the drawer front
+  would fall below the window it moves up, in very short windows the files leave
+  out their summary line, and under 540px tall it becomes the bottom panel (with
+  the pill in place of the rail, as on phones). Opened from the
   keyboard, focus lands on the current folder without a file until the reader
   moves. Reduced motion fades the files and the cabinet.
-- **Phones (below 900px).** The index button opens the same cabinet as a bottom
-  panel (at most 80% of the screen; rows 44px; the drawer front with Close stays
-  in reach at the bottom). A tap on a folder goes straight to its sheet, so every
-  sheet is two taps away: on a touch screen a preview would cost a third tap and
-  the sheet itself is one tap further anyway. Files are not shown there.
+- **Phones (below 900px).** A solid black pill with a paper hairline at the bottom
+  centre reads "Index · 08 Goaltender" (the current sheet) and opens the same
+  cabinet as a bottom panel (at most 80% of the screen; rows 44px; the drawer front
+  with Find and Close stays in reach at the bottom, above the keyboard). A tap on a
+  folder goes straight to its sheet, so every sheet is two taps away: on a touch
+  screen a preview would cost a third tap and the sheet itself is one tap further
+  anyway. Files are not shown there. The pill steps away while you scroll down and
+  comes back on the way up or as soon as you stop; sheets keep 64px at their foot
+  so it never covers their last lines.
+- **The cover's routes.** In the handwritten line, "portfolio" opens the index,
+  "goaltender" goes to the hockey sheet, "researcher" to drug safety and "violist"
+  to music. A vermilion marker stroke lies faintly under each word and draws
+  through in 300ms on hover or focus (drawn already on touch screens).
+- **The hover grammar.** The collage cards on drug safety, the knee exoskeleton and
+  Loquar link where their sheet's own link goes. Pointing at one: the image settles
+  in its still frame from 1.06 to 1 (800ms), the card eases toward flat and lifts
+  3px, its tape presses, a round vermilion badge grows in while its arrow turns
+  from 45 degrees (450ms), the caption brightens, and the other card steps back to
+  .55 opacity. Nothing blurs. See `DESIGN.md`.
 - **The code panel.** The cover's tilted editor types a preset script character by
   character: the aducanumab analysis with the real counts, the Genuvalens
   controller and its five-repetition simulation with the reported results, a
   Loquar scene function and a Daedalus labyrinth rebuild. Hovering pauses it and
   frees the panel to scroll; leaving resumes; on touch screens a tap pauses and a
   second tap resumes. It waits while the cover is covered or the tab is hidden, and
-  stops when the script ends. Reduced motion shows the whole script at once.
+  stops when the script ends. Reduced motion shows the whole script at once. Its
+  text is 12px, the site's floor; the "Scroll" hint below pulses three times and rests.
 - **Details from the deck's tutorial** (GraphiqVibe, "How to create a Graphic Design
   PORTFOLIO in 2025"): the sliced letter in the title, the torn strip with recoloured
   letters, a tilted editor panel (here Leonardo's own analysis and controller
@@ -117,10 +153,14 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
 - **The archive.** Sheet 11: index cards taped to the paper, each one
   `<li class="entry">` with a year (Anton, vermilion), a kind tag, a title in the
   hand face, one line and an optional link to the sheet that describes it. An
-  HTML comment above the list tells Leonardo how to add a card; tilt, tape and the
-  reveal order come from the stylesheet and the script, so a copied card needs
-  nothing else. Four cards a row on desktop, one or two on phones; two columns in
-  print.
+  HTML comment above the list tells Leonardo how to add a card; tilt, tape, the
+  unfolding and the reveal order come from the stylesheet and the script, so a
+  copied card needs nothing else. At rest a card shows its year, kind and title;
+  pointing at it (or tabbing to its link) unfolds its line and link (grid rows 0fr
+  to 1fr, 500ms) below its resting edge, so the grid never moves, while it
+  straightens, lifts and the other cards step back to .4 opacity. Touch screens,
+  print and pages without the script show every line. Four cards a row on desktop,
+  one or two on phones; two columns in print.
 - **The contact sheet.** On desktop the framed LET'S TALK (crown, star, tape and
   mask, all sized in `em` so the group scales as one) keeps the left column at
   full size, sized by container query units to the room it has; the reply stands
@@ -146,10 +186,12 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
 | --- | --- |
 | `index.html` | The page: the rail, the cabinet, twelve sheets and an SVG sprite of torn edges, stickers and the arrow |
 | `assets/css/site.css` | Tokens, the rail and cabinet, sheets, motion, the compact mode for short windows, touch sizes, print |
-| `assets/js/site.js` | Headline wrapping, reveals, geometry, the recede, the rail label, the cabinet and its files, dots and keys |
+| `assets/js/site.js` | Counts from the page, headline wrapping, reveals, geometry, the recede, the rail label and index tab, the cabinet, its files, hover intent and Find, the cards' links, the archive folds, the phone pill, navigation and keys |
 | `files/<slug>/index.html` | The project files: `aducanumab`, `genuvalens`, `loquar`, `ocapex`, `hockey` (the coach one-pager) and `resume` |
 | `assets/css/files.css` | The files' own stylesheet: tokens and faces as in `site.css`, the desk, drawer, paper, sections, figures, the pager, the view transition, print and the hockey one-page print |
 | `assets/js/files.js` | The hockey file's print button, and eager figures before printing (the files work without it) |
+| `DESIGN.md` | The system as built: tokens, type roles, the stack, the cabinet, the hover grammar, the archive, phones, and how to add a sheet, a file or a card |
+| `../tests/v3/check.mjs` | Browser checks: structure and counts, no links into other editions, the 12px floor, contrast, the cabinet, the routes, Find, the pill, console errors |
 | `assets/fonts/` | Anton (OFL, stands in for Impact), Metropolis from the deck package (Unlicense), Permanent Marker (Apache 2.0, stands in for the personal-use Shooting Star) |
 | `assets/img/` | Derivatives copied from v2; the goalie mask stickers rendered from `assets/model/GMask.obj` by `tools/make-mask-sticker.py`; the portrait cutout from `tools/make-cutout.py` (paper edge added in the same pass); the OCAPEX mark redrawn in the site's three colours |
 
@@ -217,13 +259,18 @@ then sections behind black divider tabs, and the previous and next files as two 
   mask model, posterized with a white sticker border.
 - Sheets alternate `slide--dark` and `slide--paper`; each re-points the same role
   tokens. Cards, tickets and the red panel re-point them again inside.
-- Text on vermilion is black (4.5:1); vermilion text on paper or white is used only
-  at 24px and up (the archive years), where 3:1 applies. The folder numbers are
-  black for that reason.
-- The cabinet's z-order is arithmetic: folder `k` sits at `3k + 3`, its file at
-  `3k + 2`, the divider standing just behind it at `3k + 1`, so a file always rises
-  in front of the folders behind it and behind its own folder.
-- To add a sheet: add the section, a dot in the rail (with `data-name`), a folder
-  and its file in the cabinet, and update the counts ("12 sheets", "/ 12") and the
-  `6 * var(--row)` centring if the number of rows changes.
+- Text under 24px on vermilion is black (4.53:1); white stays only on display
+  type (3:1). Vermilion text on paper is used only at 24px and up (the archive
+  years, the OCAPEX subtitle); smaller vermilion on paper or white is `--red-ink`
+  (4.9:1). The folder numbers are black for that reason. Nothing visible is under
+  12px.
+- The cabinet's z-order is arithmetic: folder `k`'s link sits at `3k + 3` with its
+  file inside it at `z-index: -1`, the divider standing just behind it at `3k + 1`,
+  so a file always rises in front of the folders behind it and behind its own
+  folder's front.
+- The counts come from the page: the script writes `--n`, each folder's `--k` and
+  number, each file's "Sheet NN / N", "N sheets" and the archive's "Sheet NN, name"
+  links; the HTML keeps the same values as the fallback without the script.
+- To add a sheet, a file or an archive card, follow the steps in `DESIGN.md`, then
+  run `node tests/v3/check.mjs`.
 - Keep `<meta name="robots" content="noindex">`.
