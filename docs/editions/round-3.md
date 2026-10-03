@@ -589,9 +589,58 @@ A separate skeptic then tried to refute each finding. Of 38 findings, 36 held up
 
 ## 9. Scores
 
-| Balanced weighting | Matrix (before round two) | After round two (gap analyses) | After this round (projected) |
-|---|---:|---:|---:|
-| v3 poster | 74.7 | 80.8 | about 87 to 90 |
-| v5 glass | 72.0 | 74.4 | about 80 to 82; about 85 with the launcher and Archive |
+Re-scored after the review fixes (build `390851e`) by one reviewer, with the matrix's rubric and the same method for both editions:
+- the three audience walks at 1440×900 and 390×844, counting clicks to each target;
+- the first five seconds of each landing page;
+- motion frame by frame;
+- page weight measured cold;
+- the files touched to add a project, an archive item or an experiment.
 
-The projections assume every "Now" item lands as described. They will be replaced by a measured re-score after the adversarial review, done by one reviewer with one rubric for both editions.
+| | Matrix (before round two) | After round two | After round three, measured | Projected |
+|---|---:|---:|---:|---:|
+| v3 poster, balanced | 74.7 | 80.8 | **88.1** | about 87 to 90 |
+| v3 poster, impression-led | 79.6 | | **89.5** | |
+| v5 glass, balanced | 72.0 | 74.4 | **82.6** | about 80 to 82 |
+| v5 glass, impression-led | 73.6 | | **82.3** | |
+
+| Criterion (balanced weight) | v3 | v5 |
+|---|:-:|:-:|
+| Animation and motion (10) | 4.5 | 4.5 |
+| UI/UX and visual craft (10) | 4 | 4.5 |
+| Creativity and originality (10) | 5 | 4.5 |
+| Ease of use and access (12) | 4 | 4 |
+| Organization and wayfinding (12) | 4.5 | 4.5 |
+| Personality: design (6) | 5 | 4 |
+| Personality: personal use (6) | 4.5 | 3.5 |
+| Design potential (8) | 4.5 | 4 |
+| Audience fit (12) | 4.5 | 4 |
+| Phone experience (7) | 4 | 4 |
+| Performance and reach (4) | 4.5 | 3.5 |
+| Maintainability (3) | 3.5 | 3 |
+
+**What the numbers say:**
+- **v3 now leads on use as well as on impression.** Use criteria mean: v3 4.25, v5 4.13. The reason is its first screen: the cover already says who Leonardo is, and its words lead to the sheets. v5's first screen shows only the name, on the first view and on every reload.
+- **v5 gained the most this round,** but its ceiling is the hero gate and Apple's genre. Its single largest gain would be the launcher row with a line of who he is (T34, T27), and letting scrolling or a key proceed (T26): about +3 points.
+- **Some changes did not move the scores the plan expected:**
+  - The Glowtime hero is striking, but it is Apple's own art, and the hero still gates the content.
+  - v3's archive cards open to only one line and a link.
+  - v3's six project files hand-copy their tabs and numbers, which offsets its derived counts.
+
+**Highest-value next steps:**
+- **v3:**
+  - Contact on every view, and the coaches' names and the email on the hockey sheet itself (T4).
+  - Sheet names beside the rail dots at rest on wide screens.
+  - Jumps that land already readable (T13).
+  - A legibility pass on the record and music sheets.
+  - The files' tabs and numbers generated from one list.
+- **v5:**
+  - The hero launcher, a line of who he is, and more ways to proceed (T34, T27, T26).
+  - An archive from a single list (T7).
+  - A phone header that collapses on scroll.
+  - "Write to me" on Work and the project sheets (T4).
+
+**Fixed after the re-score:**
+- Closing a v5 project sheet showed its text and the Work page's text at once, and its toolbar's glass overlapped the parent's. Each now fades only while the other is gone: measured 0 overlapping frames on both paths, against 2 before.
+- v5's one-page hockey print now carries the email address in the header's free corner, at 10 pt, still on one page.
+
+The full report, with the evidence behind every score, is in [`round-3/rescore.md`](round-3/rescore.md).
