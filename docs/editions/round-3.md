@@ -28,6 +28,7 @@ Contents:
 6. [Backlog, in priority order](#6-backlog-in-priority-order)
 7. [Taste questions](#7-taste-questions)
 8. [Corrections to earlier documents](#8-corrections-to-earlier-documents)
+   - [The adversarial review, and what it changed](#8b-the-adversarial-review-and-what-it-changed)
 9. [Scores](#9-scores)
 
 ---
@@ -530,6 +531,61 @@ Each question shows the default this round uses, or my recommendation where noth
 8. **The decision matrix's v5 numbers.** v5's re-scores in the gap analysis (Organization, Creativity, Performance) were given without reasons. Both finalists get one re-score, with the same reviewer and rubric, after this round.
 
 ---
+
+## 8b. The adversarial review, and what it changed
+
+After the build, five reviewers checked both finalists through one lens each:
+- the standing rules;
+- the accessibility floor;
+- layout at 16 sizes against the published version;
+- Leonardo's intent and this plan;
+- deployment under `/Portfolio/`.
+
+A separate skeptic then tried to refute each finding. Of 38 findings, 36 held up; all were fixed except the four noted below.
+
+**Fixed:**
+- **Rules:**
+  - v3's new hockey file had published the three coaches' email addresses, against Leonardo's 2026-09-18 decision (coaches by role only, correspondence via a parent). It now lists names and roles with "Addresses on request.", as v5 does.
+  - v5's "This site" sheet still described the old glass hero; that clause now describes the neon.
+  - The Pages build no longer publishes the notes, design records and image provenance files.
+- **v3:**
+  - Hover intent no longer swaps the pulled file on the way up to it: 25 of 108 test paths before, 0 of 648 after.
+  - Cards and archive cards step back by colour instead of opacity, so dimmed text keeps 4.5:1.
+  - Keyboard focus never lands on a hidden name or pill, and the Index tab is the one keyboard entry to the index.
+  - Touch targets are 44 px.
+  - The files print with nothing under 12 px, and the hockey file still fits one page.
+  - Pager lines show without scripts.
+  - The first key press finishes the typing code panel.
+  - The phone pill rests in the corner.
+  - The routes have a dark halo over the code.
+  - A hovered card comes to the top.
+  - The chrome no longer doubles in the transition.
+  - Back returns to where the reader was.
+  - The drawers no longer depend on `:has()`.
+  - `tests/v3/check.mjs` now loads all six files (94 checks).
+- **v5:**
+  - The hockey profile prints on one page on the CSS path too.
+  - A focused Sections chip scrolls clear of the fades.
+  - Reduced motion no longer slides the tab bubble or names.
+  - Touch targets are 44 px.
+  - The chips show a scrollbar on pointer devices and scroll away in short windows.
+  - The experiment line no longer dips while it opens.
+  - The frame budget times the frames it draws.
+  - The dock no longer jumps when the room gives way.
+  - The pinned row no longer depends on `:has()`.
+- **v5 hero (finding intent-2):** the built neon had no orange, almost no cyan and an indigo ground. It now holds orange and cyan at 10% or more of lit pixels in every sampled frame, on near black. The CSS fallback by day reaches 6.9:1 at the letters' edges.
+
+**Not fixed, by decision:**
+- Two findings did not reproduce: a clipped card title at touch widths of 900 to 945 px, and v3 sheets that stopped stacking.
+- Two were accepted as small:
+  - The weak-device path still downloads the room's code (about 12 KB gzipped).
+  - The CSS neon looks doubled in Chrome versions older than 123, which lack `paint-order` on HTML text.
+
+**Still worth knowing:**
+- **The v3 phone pill** still covers the ends of lines at most resting points on portrait phones. It is out of the middle of the column, but its label is long.
+- **The v3 cover routes** stay 17 to 28 px tappable where the hand line wraps, as before.
+- **v5's chips:** on macOS, overlay scrollbars give no cue at rest.
+- **Untested:** Safari, Firefox and real phones. Chromium was the only browser available.
 
 ## 9. Scores
 
