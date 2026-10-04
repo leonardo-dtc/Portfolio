@@ -324,23 +324,24 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
 
 A glass button in the bottom-right corner (beside the tab bar on phones, as in
 iOS 26; under 360 px, where five labelled tabs take the whole dock, a fill
-button in the window's toolbar) opens a small panel for trying colors: eight
-palettes (Cobalt, Violet, Rose, Ember, Gold, Emerald, Teal, Graphite), a Hue and
-a Vibrance slider, and Auto, Night or Day. A palette turns the whole room, so
-every pane of glass follows, and gives the hero's name its own neon
-(`assets/js/palette.js`); the choice is kept in this browser only
+button in the window's toolbar) opens a small panel for trying colors. On
+desktop its name, "Color style", shows beside it while it is pointed at (after a
+beat) or focused from the keyboard, since the swatch alone does not say what it
+does. The panel has eight palettes (Cobalt, Violet, Rose, Ember, Gold, Emerald,
+Teal, Graphite), a Hue and a Vibrance slider, and Auto, Night or Day. A palette
+turns the whole room, so every pane of glass follows, and gives the hero's name
+its own neon (`assets/js/palette.js`); the choice is kept in this browser only
 (`assets/js/hue.js`). The turn is made in OKLab, where equal angles look equal:
-every colour in the room turns by the same angle of hue and keeps its
-lightness, so a palette looks the same by night and by day (the YIQ turn used
-before made Teal blue by night and green by day, and dark blue went olive on its
-way to Gold). The room is turned through a small table of colours, a 3D texture
-(17 to a side once it rests, 9 while a palette crossfades), so it costs one
-texture read a pixel; Cobalt needs none. The palettes sit at Cobalt 0, Violet
-+28, Rose +92, Ember +136, Gold +170, Emerald -120 and Teal -66 degrees, and
-Graphite is Cobalt at 12% vibrance; each pair is at least 0.066 apart in OKLab
-(Teal and Graphite, the closest). In every palette, by night and by day, every
-line of text over the glass on Home and in the open panel keeps 4.5:1 (lowest
-4.74:1).
+every colour in the room turns by the same angle of hue and keeps its lightness,
+so a palette looks the same by night and by day (the YIQ turn used before made
+Teal blue by night and green by day, and dark blue went olive on its way to
+Gold). The room is turned through a small table of colours, a 3D texture (17 to
+a side once it rests, 9 while a palette crossfades), so it costs one texture
+read a pixel; Cobalt needs none. The palettes sit at Cobalt 0, Violet +28, Rose
++92, Ember +136, Gold +170, Emerald -120 and Teal -66 degrees, and Graphite is
+Cobalt at 12% vibrance; each pair is at least 0.066 apart in OKLab (Teal and
+Graphite, the closest). In every palette, by night and by day, every line of
+text over the glass on Home and in the open panel keeps 4.5:1 (lowest 4.74:1).
 Where the room never started (no WebGL2, reduced transparency, Save-Data, a weak
 device) there is no control and the phone's tab bar is centred alone. That is
 decided once, as the page starts (`html.no-room`): a room that gives way later

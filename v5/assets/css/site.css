@@ -673,6 +673,16 @@ html.no-room .hue, html:not(.js) .hue { display: none; }
 .hue__button:hover { scale: 1.06; }
 .hue__button:active { scale: .94; }
 .hue__button i { width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255, 255, 255, .85), 0 2px 6px rgba(0, 0, 0, .3); }
+/* its name, beside it on desktop while it is pointed at (after a beat, so passing over it shows nothing) or focused from
+   the keyboard, and gone while its panel is open: the swatch alone does not say what the button does. Drawn, not read
+   (the button's own label is "Color style"); near-black glass, so the white keeps 10:1 or more over any room. */
+@media (min-width: 900px) {
+  .hue__button { position: relative; }
+  .hue__button::after { content: "Color style" / ""; position: absolute; right: calc(100% + 10px); top: 50%; padding: 7px 11px; border-radius: 999px; background: rgba(10, 12, 28, .82); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); color: #fff; font: 600 13px/1 var(--font); white-space: nowrap; pointer-events: none; opacity: 0; translate: 4px -50%; transition: opacity .15s, translate .2s var(--ease-out); }
+  .hue__button:hover::after { opacity: 1; translate: 0 -50%; transition-delay: .35s; }
+  .hue__button:focus-visible::after { opacity: 1; translate: 0 -50%; }
+  .hue__button[aria-expanded="true"]::after { opacity: 0; transition-delay: 0s; }
+}
 .hue__panel { position: absolute; right: 0; bottom: 58px; width: 272px; padding: 16px; border-radius: 24px; background: var(--glass-css); -webkit-backdrop-filter: blur(28px) saturate(1.8) brightness(.5); backdrop-filter: blur(28px) saturate(1.8) brightness(.5);   /* dark enough for its labels over a light card */ box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 1px 0 rgba(255, 255, 255, .34), 0 24px 60px rgba(0, 0, 0, .4); transform-origin: 100% 100%; opacity: 0; scale: .98; transition: opacity .2s, scale .3s var(--ease-out); }   /* 98%: under 8px of travel at its far corner */
 .hue__panel.is-open { opacity: 1; scale: 1; }
 .hue__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
