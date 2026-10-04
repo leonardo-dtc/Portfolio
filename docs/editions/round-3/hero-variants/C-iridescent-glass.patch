@@ -1,0 +1,362 @@
+diff --git a/v5/assets/css/site.css b/v5/assets/css/site.css
+index c3fb1cb..ec17d1d 100644
+--- a/v5/assets/css/site.css
++++ b/v5/assets/css/site.css
+@@ -150,8 +150,26 @@ html.gl .glass::after { display: none; }
+ 
+ /* ---------- the hero ---------- */
+ /* The name, heavy and blocky, is a real button: with the room it is transparent text (its layout and the control)
+-   and the room draws it in Liquid Glass; without the room it is the same text in CSS glass with a CSS glow. */
+-.hero { position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; --hero-fs: min(8.2vw, 24svh, 160px); }
++   and the room draws it as glass lit the Glowtime way (iridescent light inside, spectral rims, ghost outlines, a
++   neon bloom behind). Without the room the same look is approximated here: the letters are a slow iridescent
++   gradient with a bright edge, two stroked copies of the name circle slowly behind them as ghost outlines, and a
++   soft multicolour bloom breathes behind the line. Reduced motion holds it still; reduced transparency keeps to
++   plain text with its glow, forced colours to system text. */
++.hero {
++  position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; --hero-fs: min(8.2vw, 24svh, 160px);
++  --hero-iri: linear-gradient(100deg, #86e8ff 0%, #7393ff 15%, #b585ff 30%, #ff74c4 46%, #ffa866 60%, #ff74c4 74%, #b585ff 87%, #7393ff 100%);
++  --hero-edge: rgba(255, 255, 255, .95); --hero-glow-a: rgba(255, 84, 184, .5); --hero-glow-b: rgba(110, 104, 255, .62);
++  --hero-ghost-a: rgba(255, 84, 178, .78); --hero-ghost-b: rgba(64, 196, 255, .72); --hero-pool: rgba(4, 6, 36, .55); --hero-bloom: .85;
++}
++/* by day the room is bright: deeper jewel tones, the light behind as a coloured haze rather than a dark pool */
++@media (prefers-color-scheme: light) { html:not([data-appearance="night"]) .hero {
++  --hero-iri: linear-gradient(100deg, #0a78bd 0%, #2443d2 15%, #5c22c9 30%, #c8157c 46%, #cc4b0e 60%, #c8157c 74%, #5c22c9 87%, #2443d2 100%);
++  --hero-glow-a: rgba(255, 70, 170, .42); --hero-glow-b: rgba(70, 60, 220, .4); --hero-ghost-a: rgba(214, 22, 128, .62); --hero-ghost-b: rgba(14, 130, 214, .62); --hero-pool: transparent; --hero-bloom: .6;
++} }
++html[data-appearance="day"] .hero {
++  --hero-iri: linear-gradient(100deg, #0a78bd 0%, #2443d2 15%, #5c22c9 30%, #c8157c 46%, #cc4b0e 60%, #c8157c 74%, #5c22c9 87%, #2443d2 100%);
++  --hero-glow-a: rgba(255, 70, 170, .42); --hero-glow-b: rgba(70, 60, 220, .4); --hero-ghost-a: rgba(214, 22, 128, .62); --hero-ghost-b: rgba(14, 130, 214, .62); --hero-pool: transparent; --hero-bloom: .6;
++}
+ html.is-hello .hero, html.is-entering .hero { display: block; }
+ .hero__name { position: absolute; left: 50%; top: 45%; translate: -50% -50%; margin: 0; padding: .05em .12em; border: 0; border-radius: .2em; background: none; color: #fff; font: 780 var(--hero-fs)/1 var(--font-name); letter-spacing: -.03em; white-space: nowrap; text-align: center; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
+ .hero__name:focus-visible { outline: 2px solid #fff; outline-offset: 12px; box-shadow: 0 0 0 14px rgba(255, 255, 255, .08); border-radius: .2em; }
+@@ -161,21 +179,57 @@ html.gl .hero__text { color: transparent; }
+ html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s var(--ease-out); }
+ html:not(.gl) .hero__text {
+   color: transparent; -webkit-text-fill-color: transparent;
+-  background: linear-gradient(172deg, rgba(255, 255, 255, .97) 18%, rgba(206, 220, 255, .72) 52%, rgba(255, 255, 255, .9) 88%);
++  background: var(--hero-iri) 30% 0 / 240% 100%;                  /* the light inside drifts along the name, 19 s */
+   -webkit-background-clip: text; background-clip: text;
+-  filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em var(--glow-css, rgba(112, 148, 255, .7))) drop-shadow(0 0 .3em var(--glow-css, rgba(112, 148, 255, .7)));
++  filter: drop-shadow(0 0 .012em var(--hero-edge)) drop-shadow(0 0 .14em var(--hero-glow-a)) drop-shadow(0 0 .34em var(--hero-glow-b));
+   transition: filter .45s var(--ease-out);
++  animation: hero-iri 19s ease-in-out infinite alternate;
++}
++html:not(.gl) .hero__name:hover .hero__text { filter: drop-shadow(0 0 .016em var(--hero-edge)) drop-shadow(0 0 .17em var(--hero-glow-a)) drop-shadow(0 0 .42em var(--hero-glow-b)); }
++@keyframes hero-iri { from { background-position: 0 0; } to { background-position: 100% 0; } }
++/* the ghost outlines: the name again, stroked, each circling a few pixels off the letters (13 s and 17 s) */
++html:not(.gl) .hero__name::before, html:not(.gl) .hero__name::after {
++  content: "Leonardo Carvalho"; position: absolute; inset: 0; z-index: -1; padding: inherit; pointer-events: none;
++  color: transparent; -webkit-text-fill-color: transparent; -webkit-text-stroke: .013em var(--hero-ghost-a);
++  filter: drop-shadow(0 0 .025em var(--hero-ghost-a));
++  --ga: -50deg; --gr: .065em;
++  transform: rotate(var(--ga)) translateX(var(--gr)) rotate(calc(-1 * var(--ga)));
++  opacity: 0; transition: opacity .9s var(--ease-out);
++  animation: hero-ghost 13s linear infinite;
++}
++html:not(.gl) .hero__name::after { -webkit-text-stroke-color: var(--hero-ghost-b); filter: drop-shadow(0 0 .025em var(--hero-ghost-b)); --ga: 140deg; --gr: .085em; animation-duration: 17s; animation-direction: reverse; }
++html:not(.gl) .hero.is-ready .hero__name::before, html:not(.gl) .hero.is-ready .hero__name::after { opacity: .7; }
++html:not(.gl) .hero.is-ready .hero__name:hover::before, html:not(.gl) .hero.is-ready .hero__name:hover::after { opacity: 1; }
++@keyframes hero-ghost { to { transform: rotate(calc(var(--ga) + 360deg)) translateX(var(--gr)) rotate(calc(-1 * var(--ga) - 360deg)); } }
++/* the bloom behind the line, in a dim pool: soft neon that breathes and turns a little (14 s) */
++html:not(.gl) .hero::before {
++  content: ""; position: absolute; left: 50%; top: 45%; width: min(92vw, calc(var(--hero-fs) * 9.6)); height: calc(var(--hero-fs) * 2.6);
++  translate: -50% -50%; border-radius: 50%; pointer-events: none;
++  background:
++    radial-gradient(26% 58% at 20% 50%, rgba(255, 64, 170, .62), transparent),
++    radial-gradient(26% 62% at 44% 42%, rgba(132, 72, 255, .58), transparent),
++    radial-gradient(24% 58% at 66% 58%, rgba(255, 136, 52, .5), transparent),
++    radial-gradient(22% 56% at 84% 46%, rgba(40, 186, 255, .48), transparent),
++    radial-gradient(closest-side, var(--hero-pool), transparent);
++  filter: blur(calc(var(--hero-fs) * .3));
++  opacity: 0; transition: opacity 1.1s var(--ease-out), scale .5s var(--ease-out);
++  animation: hero-bloom 14s ease-in-out infinite alternate;
++}
++html:not(.gl) .hero.is-ready::before { opacity: var(--hero-bloom); }
++html:not(.gl) .hero.is-ready:has(.hero__name:hover)::before { opacity: 1; scale: 1.04; }
++html:not(.gl) .hero.is-ready:has(.hero__name:active)::before { opacity: 1; scale: 1.1; transition-duration: .12s; }
++@keyframes hero-bloom { from { transform: scale(.95, .9); filter: blur(calc(var(--hero-fs) * .3)) hue-rotate(-16deg); } to { transform: scale(1.05, 1.1); filter: blur(calc(var(--hero-fs) * .3)) hue-rotate(20deg); } }
++@media (prefers-reduced-transparency: reduce) {
++  html:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; animation: none; }
++  html:not(.gl) .hero::before, html:not(.gl) .hero__name::before, html:not(.gl) .hero__name::after { display: none; }
+ }
+-html:not(.gl) .hero__name:hover .hero__text { filter: drop-shadow(0 0 .06em rgba(255, 255, 255, .65)) drop-shadow(0 0 .36em var(--glow-css, rgba(112, 148, 255, .7))) drop-shadow(0 0 .36em var(--glow-css, rgba(112, 148, 255, .7))); }
+-/* by day the room is bright: the name is a deeper blue glass, as the room draws it, with the light behind it white */
+-@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background-image: linear-gradient(172deg, rgba(64, 104, 228, .96) 18%, rgba(34, 66, 186, .9) 55%, rgba(72, 116, 236, .96) 88%); } }
+-html[data-appearance="day"]:not(.gl) .hero__text { background-image: linear-gradient(172deg, rgba(64, 104, 228, .96) 18%, rgba(34, 66, 186, .9) 55%, rgba(72, 116, 236, .96) 88%); }
+-@media (prefers-reduced-transparency: reduce) { html:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; } }
+ @media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background: #1f3fae; -webkit-background-clip: text; background-clip: text; } }
+ @media (max-width: 699px) {
+   .hero { --hero-fs: min(18vw, 15svh, 120px); }
+   .hero__name { line-height: .98; }
+   .hero__w { display: block; }
++  html:not(.gl) .hero__name::before, html:not(.gl) .hero__name::after { content: "Leonardo\A Carvalho"; white-space: pre; }
++  html:not(.gl) .hero::before { width: calc(var(--hero-fs) * 6); height: calc(var(--hero-fs) * 3.6); }
+ }
+ .hero__hint { position: absolute; left: 16px; right: 16px; bottom: calc(32px + env(safe-area-inset-bottom)); margin: 0; text-align: center; color: var(--ink-2); font: 500 14px/1.3 var(--font); letter-spacing: .01em; opacity: 0; transition: opacity .5s var(--ease-out) .75s; }
+ .hero__hint span { pointer-events: auto; cursor: pointer; }
+@@ -503,7 +557,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
+   .room { display: none; }
+   .glass { forced-color-adjust: auto; background: Canvas; border: 1px solid CanvasText; }
+ }
+-@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } }
++@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } .hero::before, .hero__name::before, .hero__name::after { display: none !important; } }
+ 
+ /* ---------- print: plain text on white, Letter with half-inch margins ---------- */
+ @page { size: letter; margin: .5in; }
+diff --git a/v5/assets/js/hero.js b/v5/assets/js/hero.js
+index 1d5eb23..38207e7 100644
+--- a/v5/assets/js/hero.js
++++ b/v5/assets/js/hero.js
+@@ -1,8 +1,10 @@
+-// The hero: "Leonardo Carvalho" in Switzer, heavy and blocky, drawn by the room as solid Liquid Glass with a light
+-// behind it. The title is the control: click or tap it (or press Return) and the name glides into the main window's
+-// title slot, turning white, and hands off to the HTML title, which is plain text from then on (Liquid Glass stays
+-// out of the content layer). Without the room (no WebGL2, reduced transparency, forced colours) the same name is HTML
+-// text with a CSS glass treatment and glow, and entering is a fade.
++// The hero: "Leonardo Carvalho" in Switzer, heavy and blocky, drawn by the room as solid Liquid Glass lit the way
++// Apple lit "It's Glowtime": iridescent light swirling slowly inside, spectral rims burning white where the light
++// faces them, faint ghost outlines drifting behind, and a soft neon bloom (the ink in shaders.js). The title is the
++// control: click or tap it (or press Return) and the name glides into the main window's title slot, turning white,
++// and hands off to the HTML title, which is plain text from then on (Liquid Glass stays out of the content layer).
++// Without the room (no WebGL2, reduced transparency, forced colours) the same name is HTML text with a CSS version
++// of the look (site.css), and entering is a fade.
+ //
+ // Layouts are read from the page itself, glyph by glyph: the hero button and the window's title are real text set
+ // by the stylesheet, so the mask is drawn exactly where (and as) the browser sets them, and the glide ends on the
+@@ -82,9 +84,10 @@ export function createHero({ room, windows }) {
+   const ctx = document.createElement('canvas').getContext('2d');
+   const canvas = document.createElement('canvas'), g = canvas.getContext('2d');
+   const letters = document.createElement('canvas'), lg = letters.getContext('2d');
+-  // on: how much shows; white: 0 is glass, 1 the white title; px: the bevel; glow: the light behind (with hover and
++  // on: how much shows; white: 0 is glass, 1 the white title; px: the bevel; margin: the mask's margin round the
++  // letters (the room fits the pool of light behind the name inside it); glow: the light behind (with hover and
+   // press); lean: the glow's lean toward the pointer; light: the highlight on the faces (x, y, radius, strength)
+-  const ink = { on: 0, dim: 0, white: 0, px: 4, glow: 0, lean: [0, 0], light: [0, 0, 1, 0], canvas, dirty: false, xform: [1, 0, 0] };
++  const ink = { on: 0, dim: 0, white: 0, px: 4, margin: 0, glow: 0, lean: [0, 0], light: [0, 0, 1, 0], canvas, dirty: false, xform: [1, 0, 0] };
+   let drawnAt = 0;                                                         // the room's pixel ratio the mask was drawn for
+   function draw(L, withGlow) {
+     const dpr = drawnAt = room.dpr, fs = L.size * dpr, bev = fs * BEVEL, gs = fs * GLOW, b = bounds(L);
+@@ -112,7 +115,7 @@ export function createHero({ room, windows }) {
+     }
+     g.shadowColor = 'transparent';
+     ink.xform = [1, -ox, -oy];
+-    ink.px = bev;
++    ink.px = bev; ink.margin = m;
+     ink.dirty = true;
+     room.kick(.3);
+   }
+@@ -159,7 +162,9 @@ export function createHero({ room, windows }) {
+       const settled = glowS.step(dt);
+       lightFor(H, 1);
+       ink.on = shown;
+-      if (!settled || shown < 1) room.kick(.1);                          // full rate only while the light or the arrival moves
++      // the light inside and behind the name never stops moving, so the room keeps full rate while the hero shows
++      // (under reduced motion it is one still, redrawn only while the hover light settles)
++      if (!reduced.matches || !settled || shown < 1) room.kick(.1);
+     }, 1);
+     if (reduced.matches) shown = 1;
+     else tween(createSpring({ value: 0, response: .8, damping: 1 }), 1, v => { shown = clamp(v, 0, 1); });
+diff --git a/v5/assets/js/room.js b/v5/assets/js/room.js
+index ccfa719..08d302d 100644
+--- a/v5/assets/js/room.js
++++ b/v5/assets/js/room.js
+@@ -100,7 +100,7 @@ export function createRoom(canvas) {
+     const x = ink && ink.xform ? ink.xform : [1, 0, 0];
+     gl.uniform3f(uc.uInkX, x[0], x[1], x[2]);
+     const lean = ink && ink.lean ? ink.lean : [0, 0], hl = ink && ink.light ? ink.light : [0, 0, 1, 0];
+-    gl.uniform4f(uc.uInk1, ink ? (ink.glow || 0) : 0, lean[0], lean[1], 0);
++    gl.uniform4f(uc.uInk1, ink ? (ink.glow || 0) : 0, lean[0], lean[1], ink ? (ink.margin || 0) : 0);
+     gl.uniform4f(uc.uInkL, hl[0], hl[1], hl[2], hl[3]);
+     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+ 
+diff --git a/v5/assets/js/shaders.js b/v5/assets/js/shaders.js
+index a5af120..da6a399 100644
+--- a/v5/assets/js/shaders.js
++++ b/v5/assets/js/shaders.js
+@@ -92,8 +92,8 @@ void main() {
+ // Composite: the room (sharp or defocused), soft shadows under the panels, the glass inside them, the ink.
+ // Panels arrive as inverse homographies (screen device px, y down -> panel px), size, radius, kind, and state.
+ // The ink is the hero's name: a mask (red the letters, green a soft height for their bevel, blue a wide blur of them
+-// for the light behind) placed by uInkX; uInk0 = (shown, dim, white, bevel px), uInk1 = (glow, lean x, lean y, -),
+-// uInkL = the highlight on the glass (centre x, y, radius, strength), all in device px.
++// for the light behind) placed by uInkX; uInk0 = (shown, dim, white, bevel px), uInk1 = (glow, lean x, lean y, the
++// mask's margin round the letters), uInkL = the highlight on the glass (centre x, y, radius, strength), all in device px.
+ export const COMPOSITE = `#version 300 es
+ precision highp float;
+ uniform sampler2D uScene; uniform sampler2D uInk;
+@@ -109,6 +109,34 @@ vec3 hueShift(vec3 c, float a, float k) {
+ }
+ 
+ out vec4 o;
++// ---------- the hero's light (after Apple's Glowtime: neon light on near black) ----------
++// The palette, as light: cyan, electric blue, violet, hot pink, orange. s walks it from 0 to 1.
++vec3 neon(float s) {
++  s = clamp(s, 0.0, 1.0) * 4.0;
++  vec3 c = mix(vec3(0.06, 0.78, 1.00), vec3(0.14, 0.34, 1.00), smoothstep(0.0, 1.0, s));
++  c = mix(c, vec3(0.56, 0.20, 1.00), smoothstep(1.0, 2.0, s));
++  c = mix(c, vec3(1.00, 0.16, 0.60), smoothstep(2.0, 3.0, s));
++  return mix(c, vec3(1.00, 0.50, 0.12), smoothstep(3.0, 4.0, s));
++}
++// a slow, smooth flow over the name (q in ems from its centre, t in seconds): two waves, each bent by the other,
++// on periods of 17 to 27 s, so a point on the name passes through the palette every 10 to 20 s; low in frequency,
++// so a letter holds one or two colours that drift and swirl through it
++float flow(vec2 q, float t) {
++  float a = sin(q.x * 0.55 + t * 0.32 + 1.1 * sin(q.y * 1.10 - t * 0.23));
++  float b = sin(q.y * 1.30 - t * 0.28 + 1.0 * sin(q.x * 0.70 + t * 0.35));
++  return 0.5 + 0.5 * sin(a + b + q.x * 0.30);
++}
++// the colour style's turn without the clamp, for light that can run past 1 before it burns
++vec3 turn(vec3 c) {
++  vec3 yiq = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312) * c;
++  float h = atan(yiq.z, yiq.y + 1e-6) - uColor.x, r = length(yiq.yz) * uColor.y;
++  return max(mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703) * vec3(yiq.x, r * cos(h), r * sin(h)), 0.0);
++}
++// light adds up: past full strength in one channel it spills into the others, so the brightest light burns white
++vec3 burn(vec3 c) { float m = max(c.r, max(c.g, c.b)); return min(mix(c, vec3(m), smoothstep(1.0, 2.6, m) * 0.85), 1.0); }
++// a line of light along a contour of the soft height (0.5 is the letters' edge)
++float ring(float h, float c, float w) { float x = (h - c) / w; return exp(-x * x); }
++
+ float sdRound(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
+ vec3 roomAt(vec2 uv, float lod) {
+   vec2 t = exp2(max(lod, 0.0)) / uRes;
+@@ -177,9 +205,10 @@ void main() {
+     if (under >= 0 && smoothstep(1.5, -0.5, sd) * min(1.0, uState[hit].x * 1.6) < 0.999) col = glassOver(under, lp2, sd2, px, col);
+     col = glassOver(hit, lp, sd, px, col);
+   }
+-  // The name: solid glass letters with a light behind them. The light spills round the letters into the room (blue,
+-  // leaning a few pixels toward the pointer) and shines through their frosted faces; the bevel catches a bright rim
+-  // on the side facing the light, which leans toward the pointer too. Turning white, they become plain white text.
++  // The name: solid glass letters lit the Glowtime way. Behind them, a large soft bloom of neon light in a dim pool,
++  // and three faint ghost outlines of the letters drifting at small offsets, as if traced again by moving light.
++  // Inside them, iridescent light swirls slowly; their rims carry spectral fringes that burn white where the light
++  // is strongest. Everything is turned by the colour style; turning white, they become plain white text.
+   if (uInk0.x > 0.001) {
+     vec2 isz = vec2(textureSize(uInk, 0));
+     vec2 mu = (px * uInkX.x + uInkX.yz) / isz;
+@@ -187,44 +216,90 @@ void main() {
+       // an explicit mip level: inside this branch the GPU has no derivatives to choose one at the mask's edge
+       float lk = max(0.0, log2(max(uInkX.x, 1e-4)));
+       float on = uInk0.x, white = uInk0.z, bev = max(uInk0.w, 1.0);
+-      float cov = textureLod(uInk, mu, lk).r * on;
++      float em = bev / 0.035;                                         // the font size (the bevel is 3.5% of it)
++      float glow = uInk1.x * on * (1.0 - white);                      // arrival, hover lift, press flare; gone in the glide
++      float spread = min(uInk1.x, 1.0) + 0.5 * clamp(uInk1.x - 1.0, 0.0, 1.0);   // the ghosts open out with the light
++      float t = uTime + 41.0;                                         // (held at 41 s under reduced motion: a good still)
++      vec2 mc = (isz * 0.5 - uInkX.yz) / max(uInkX.x, 1e-4);         // the name's centre
++      vec2 q = (px - mc) / em;
++      vec4 m0 = textureLod(uInk, mu, lk);
++      float cov = m0.r * on, hc = m0.g;
+       vec2 lean = uInk1.yz * uInkX.x / isz;
+-      float back = textureLod(uInk, mu - lean, lk).b;                  // the wide light behind
+-      float leak = textureLod(uInk, mu - lean * 0.4, lk + 3.0).r;      // and a tight leak of it right at the edges
+-      vec3 glowC = hueShift(mix(vec3(0.44, 0.58, 1.0), vec3(0.86, 0.93, 1.0), uDay), uColor.x, uColor.y);
+-      float glow = uInk1.x * on * (1.0 - white);
+-      col += glowC * (back * mix(0.5, 0.26, uDay) + leak * mix(0.22, 0.14, uDay)) * glow;
++      float back = textureLod(uInk, mu - lean, lk).b;                 // the wide light behind, leaning to the pointer
++      // the pool: a soft field round the whole name (flat along the line, falling away above and below), gone
++      // before the mask's edge
++      vec2 hs = max(isz * 0.5 / max(uInkX.x, 1e-4) - uInk1.w, vec2(1.0));
++      vec2 pr = (px - mc) / (hs + 0.35 * uInk1.w), me = abs(mu * 2.0 - 1.0);
++      float pool = exp(-(pow(abs(pr.x), 6.0) + pr.y * pr.y) * 1.5) * smoothstep(1.0, 0.7, me.x) * smoothstep(1.0, 0.6, me.y);
++      float breathe = 0.86 + 0.14 * sin(t * 0.785);                   // the light breathes, every 8 s
++      float f = flow(q, t), fb = flow(q * 0.55 + vec2(3.0, 1.0), t * 0.8);
++      // three ghost outlines: the letters' edge read again at small offsets that each circle slowly
++      vec2 to = em * spread * uInkX.x / isz;
++      vec2 o1 = vec2(sin(t * 0.69), cos(t * 0.53 + 1.0)) * 0.05;                 // 9.1 s, 11.9 s
++      vec2 o2 = vec2(cos(t * 0.47 + 2.0), sin(t * 0.61 + 4.0)) * 0.07;           // 13.4 s, 10.3 s
++      vec2 o3 = vec2(sin(t * 0.36 + 4.0), cos(t * 0.42 + 2.5)) * 0.08;           // 17.5 s, 15.0 s
++      float g1 = ring(textureLod(uInk, mu - o1 * to, lk).g, 0.5, 0.12);
++      float g2 = ring(textureLod(uInk, mu - o2 * to, lk).g, 0.5, 0.14);
++      float g3 = ring(textureLod(uInk, mu - o3 * to, lk).g, 0.5, 0.16);
++      float ph = 6.2832 * f;
++      vec3 ghosts = neon(0.5 + 0.5 * sin(ph + t * 0.25)) * g1 * 0.52
++                  + neon(0.5 + 0.5 * sin(ph + 2.1 - t * 0.21)) * g2 * 0.38
++                  + neon(0.5 + 0.5 * sin(ph + 4.2 + t * 0.17)) * g3 * 0.25;
++      // the bright ribbon hugging each letter just outside its edge
++      float hug = ring(hc, 0.3, 0.09) * (1.0 - smoothstep(0.42, 0.55, hc));
++      vec3 bloomC = neon(fb), poolC = neon(0.5 + 0.5 * sin(6.2832 * fb + 1.6));
++      vec3 light = bloomC * back * mix(0.62, 0.46, uDay) * breathe
++                 + poolC * pool * mix(0.13, 0.10, uDay) * breathe
++                 + ghosts * mix(1.0, 0.85, uDay)
++                 + neon(0.5 + 0.5 * sin(ph + 1.1)) * hug * 0.45;
++      // neon wants near black: by night the room dims round the name and the light adds to it. By day the room is
++      // bright, so the light colours it instead, as coloured glass throws coloured shade: the room is multiplied by
++      // the light's hue where it is strong (saturated, never grey), with a little added on top.
++      float dimK = clamp(uInk1.x, 0.0, 1.0) * on * (1.0 - white);
++      col *= 1.0 - dimK * min(0.75, (pool * 0.4 + back * 0.34) * (1.0 - uDay));
++      vec3 Lt = turn(light) * glow;
++      float Lm = max(Lt.r, max(Lt.g, Lt.b));
++      vec3 shade = col * mix(vec3(1.0), Lt / max(Lm, 1e-3) * 0.85, min(Lm, 1.0) * 0.8) + Lt * 0.22;
++      col = burn(mix(col + Lt, shade, uDay));
+       if (cov > 0.003) {
+-        float hc = textureLod(uInk, mu, lk).g;
+         vec2 e = vec2(max(1.0, bev * 0.5) * uInkX.x) / isz;
+         float hx = textureLod(uInk, mu + vec2(e.x, 0.0), lk).g - textureLod(uInk, mu - vec2(e.x, 0.0), lk).g;
+         float hy = textureLod(uInk, mu + vec2(0.0, e.y), lk).g - textureLod(uInk, mu - vec2(0.0, e.y), lk).g;
+         // the moving surface, kept to a shimmer
+-        vec2 q = uv * vec2(uRes.x / uRes.y, 1.0);
+-        vec2 flow = vec2(sin(q.y * 21.0 + uTime * 0.9 + 1.7 * sin(q.x * 9.0 + uTime * 0.5)), cos(q.x * 17.0 - uTime * 0.7 + 1.9 * sin(q.y * 11.0 - uTime * 0.4)));
+-        vec3 n = normalize(vec3(-vec2(hx, hy) * 3.0 + flow * 0.012, 1.0));
++        vec2 sq = uv * vec2(uRes.x / uRes.y, 1.0);
++        vec2 wav = vec2(sin(sq.y * 21.0 + uTime * 0.9 + 1.7 * sin(sq.x * 9.0 + uTime * 0.5)), cos(sq.x * 17.0 - uTime * 0.7 + 1.9 * sin(sq.y * 11.0 - uTime * 0.4)));
++        vec3 n = normalize(vec3(-vec2(hx, hy) * 3.0 + wav * 0.012, 1.0));
+         // the light: from the upper left, leaning gently toward the pointer
+         vec3 L = normalize(vec3(clamp((uLight - px) / uRes.y, -1.0, 1.0) * 0.5 + vec2(-0.42, -0.58), 0.75));
+         vec2 lit = normalize(L.xy + 1e-5), nn = normalize(n.xy + 1e-5);
+         float slope = clamp(1.0 - n.z, 0.0, 1.0);
+-        float edge = exp(-pow((hc - 0.56) / 0.13, 2.0));          // the rim, just inside the letter's edge
+         float facing = max(dot(nn, lit), 0.0), away = max(dot(nn, -lit), 0.0);
+-        // frosted inside: the room behind, bent a little at the bevel and deeply blurred, lit from behind
++        // frosted inside: the room behind, bent a little at the bevel and deeply blurred
+         vec2 spx = px - n.xy * bev * 3.5;
+         vec2 suv = spx / uRes; suv.y = 1.0 - suv.y;
+         vec3 frost = roomAt(suv, max(uLod, uFrostLod));
+-        vec3 g = frost * 1.12 + glowC * (0.24 + 0.5 * back) * uInk1.x + vec3(0.1);
+-        // by day the room behind is bright, so the glass is a deeper blue (as the windows are) and the rims draw on it
+-        vec3 deep = hueShift(vec3(0.13, 0.27, 0.80), uColor.x, uColor.y);
+-        g = mix(g, mix(frost * 0.55, deep, 0.62) + glowC * 0.12 * back * uInk1.x, uDay);
+-        g *= 1.0 - 0.38 * slope * away;                           // the bevel away from the light falls into shade
+-        g += vec3(0.96, 0.98, 1.0) * edge * (0.95 * facing + 0.38 * away + 0.12);   // a bright rim, a fainter one behind
+-        g += vec3(0.96, 0.98, 1.0) * slope * facing * 0.35;
+-        // a soft highlight across the faces, drawn toward the pointer
++        // the iridescent light inside, evened out in brightness so every letter reads alike; by day deeper jewel
++        // tones, so the name stands dark and saturated against the bright room
++        vec3 nf = neon(f);
++        vec3 iri = nf * mix(1.0, 0.5 / max(dot(nf, vec3(0.299, 0.587, 0.114)), 0.05), 0.6);
++        vec3 inner = mix(iri * 0.85 + vec3(0.04, 0.02, 0.08), pow(nf, vec3(1.6)) * 0.6, uDay);
++        inner += ghosts * mix(0.12, 0.08, uDay) + bloomC * back * 0.1;      // the light behind shows through, faintly
++        // the rims: spectral fringes (red outermost, blue innermost) in the colour that walks round each letter,
++        // burning white where they face the light
++        vec3 fr = vec3(ring(hc, 0.51, 0.05), ring(hc, 0.55, 0.05), ring(hc, 0.59, 0.05));
++        float edge = ring(hc, 0.55, 0.07);
++        vec3 rimC = neon(0.5 + 0.5 * sin(atan(nn.y, nn.x) + t * 0.45 + 2.5 * f));
++        vec3 rim = (fr * 0.7 + rimC * edge * 0.9) * (mix(0.3, 0.5, uDay) + 1.7 * facing);
++        float lift = mix(1.0, clamp(uInk1.x, 0.0, 1.8), 1.0 - white);
++        vec3 g = frost * mix(0.2, 0.06, uDay) + turn(inner + rim * lift);
++        g *= 1.0 - 0.34 * slope * away;                           // the bevel away from the light falls into shade
++        g += vec3(0.96, 0.98, 1.0) * slope * facing * 0.3;
++        // a soft highlight across the faces, drawn toward the pointer, and a slow sweep
+         vec2 dl = (px - uInkL.xy) / max(uInkL.z, 1.0);
+         g += vec3(0.95, 0.97, 1.0) * uInkL.w * exp(-dot(dl, dl));
+         float sweep = fract(uTime / 9.0) * 2.6 - 0.8;
+-        g += vec3(1.0) * 0.045 * exp(-pow((uv.x * 0.85 + (1.0 - uv.y) * 0.35 - sweep) * 6.0, 2.0));
++        g += vec3(1.0) * 0.05 * exp(-pow((uv.x * 0.85 + (1.0 - uv.y) * 0.35 - sweep) * 6.0, 2.0));
++        g = burn(g);
+         // as the window's title it is plain white, as the HTML title it hands off to
+         g = mix(g, vec3(1.0), white);
+         g *= 1.0 - 0.5 * uInk0.y;
+diff --git a/v5/index.html b/v5/index.html
+index 6b7bb0f..69063e5 100644
+--- a/v5/index.html
++++ b/v5/index.html
+@@ -11,7 +11,7 @@
+ <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
+ <link rel="stylesheet" href="assets/css/site.css">
+ <link rel="preload" href="assets/fonts/switzer-variable.woff2" as="font" type="font/woff2" crossorigin>
+-<script>(function(d){d.classList.add('js');try{if(d.dataset.page==='home'&&!sessionStorage.getItem('v5:hello')&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting')})(document.documentElement)</script>
++<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType('navigation')[0],re=n?n.type==='reload':performance.navigation&&performance.navigation.type===1;if(d.dataset.page==='home'&&(re||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting')})(document.documentElement)</script>
+ <script type="module" src="assets/js/boot.js"></script>
+ </head>
+ <body>

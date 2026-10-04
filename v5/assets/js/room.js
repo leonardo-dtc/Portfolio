@@ -2,6 +2,13 @@
 // amount of defocus or frost is a texture read); pass 2 composites it with the glass panels and the ink.
 import { onFrame } from './frame.js';
 import { SCENE, COMPOSITE, VERT } from './shaders.js';
+import { lut, turn, neonFor } from './palette.js';
+
+// the glass's tints, by night and by day (prominent glass, then the rest), and the stage, before the colour style turns
+// them: night glass is luminous cobalt, as in the comps; day glass a deeper blue that the shader's legibility cap holds
+// down. The stage is near black, a breath of the room's violet.
+const TINTS = [[.16, .34, 1], [.24, .46, 1], [.15, .20, .90], [.10, .16, .40]];
+const STAGE = [.010, .009, .026];
 
 export function createRoom(canvas) {
   const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' });
@@ -25,16 +32,42 @@ export function createRoom(canvas) {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
   gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   const uniforms = (p, names) => Object.fromEntries(names.map(n => [n, gl.getUniformLocation(p, n)]));
-  const us = uniforms(sceneP, ['uRes', 'uTime', 'uDay', 'uAspect', 'uShift', 'uColor']);
-  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uColor', 'uInk1', 'uInkL', 'uStage']);
+  const us = uniforms(sceneP, ['uRes', 'uTime', 'uDay', 'uAspect', 'uShift', 'uLut', 'uTurn', 'uLutK']);
+  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uInk1', 'uInkL', 'uStage', 'uTint', 'uStageC', 'uNeon', 'uArc']);
 
   const tex = gl.createTexture(), fbo = gl.createFramebuffer(), inkTex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, inkTex);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+  // The colour style (st.color: a hue turn in radians and a vibrance): the room is turned through a table of colours
+  // (palette.js), made again whenever the style changes: 9 to a side while it is moving (a palette crossfading), 17 once
+  // it rests (about 5 ms to make). Cobalt, the room as drawn, needs none.
+  const lutTex = gl.createTexture();
+  const tone = { key: '', n: 0, at: -9, turned: false, tints: new Float32Array(TINTS.flat()), stage: new Float32Array(STAGE) };
+  table(0, 1, 2);                                            // until a style turns it: the identity, two to a side
+  function toneFor([a, k]) {
+    const deg = a * 180 / Math.PI, key = deg.toFixed(2) + ' ' + k.toFixed(4);
+    if (key !== tone.key) {
+      const moving = frames - tone.at <= 2;                  // it changed a frame or two ago too: a crossfade
+      tone.key = key; tone.at = frames;
+      tone.turned = Math.abs(deg) > .005 || Math.abs(k - 1) > 1e-4;
+      tone.tints = new Float32Array(TINTS.flatMap(c => turn(c, deg, k))); tone.stage = new Float32Array(turn(STAGE, deg, k));
+      if (tone.turned) table(deg, k, moving ? 9 : 17);
+    } else if (tone.turned && tone.n < 17 && frames - tone.at > 2) table(deg, k, 17);
+  }
+  function table(deg, k, n) {
+    tone.n = n;
+    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_3D, lutTex);
+    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA16F, n, n, n, 0, gl.RGBA, gl.FLOAT, lut(deg, k, n));
+    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    for (const wrap of [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T, gl.TEXTURE_WRAP_R]) gl.texParameteri(gl.TEXTURE_3D, wrap, gl.CLAMP_TO_EDGE);
+    gl.activeTexture(gl.TEXTURE0);
+  }
   let w = 0, h = 0, maxLod = 6;
   let dpr = Math.min(devicePixelRatio || 1, 1.5);
   // stage: the hero's dark stage (1 while the name shows, 0 the room's own light; by night only, in the shader)
-  const st = { defocus: 0, day: 0, shift: [0, 0], light: [innerWidth * .3, -200], panels: { count: 0 }, ink: null, pointer: [-1e4, -1e4], color: [0, 1], fast: 1.5, stage: 0 };
+  // neon: the hero's colours of light and arc the family they are held in (palette.js, neonFor), set with the colour
+  const cobalt = neonFor(0, 1);
+  const st = { defocus: 0, day: 0, shift: [0, 0], light: [innerWidth * .3, -200], panels: { count: 0 }, ink: null, pointer: [-1e4, -1e4], color: [0, 1], neon: cobalt.list, arc: cobalt.arc, fast: 1.5, stage: 0 };
 
   function size() {
     const nw = Math.max(1, Math.round(innerWidth * dpr)), nh = Math.max(1, Math.round(innerHeight * dpr));
@@ -92,9 +125,12 @@ export function createRoom(canvas) {
     size();
     window.__roomFrames++;
 
+    toneFor(st.color);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.viewport(0, 0, w, h); gl.useProgram(sceneP);
     gl.uniform2f(us.uRes, w, h); gl.uniform1f(us.uTime, clock + 20); gl.uniform1f(us.uDay, st.day);
-    gl.uniform1f(us.uAspect, w / h); gl.uniform2f(us.uShift, st.shift[0], st.shift[1]); gl.uniform2f(us.uColor, st.color[0], st.color[1]);
+    gl.uniform1f(us.uAspect, w / h); gl.uniform2f(us.uShift, st.shift[0], st.shift[1]);
+    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_3D, lutTex); gl.uniform1i(us.uLut, 2); gl.activeTexture(gl.TEXTURE0);
+    gl.uniform1f(us.uTurn, tone.turned ? 1 : 0); gl.uniform2f(us.uLutK, (tone.n - 1) / Math.max(1, tone.n), .5 / Math.max(1, tone.n));
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     gl.bindTexture(gl.TEXTURE_2D, tex); gl.generateMipmap(gl.TEXTURE_2D);
 
@@ -117,7 +153,8 @@ export function createRoom(canvas) {
     gl.uniform1f(uc.uTime, clock); gl.uniform1f(uc.uDay, st.day); gl.uniform1f(uc.uStage, Math.max(0, Math.min(1, st.stage)));
     gl.uniform2f(uc.uLight, st.light[0] * dpr, st.light[1] * dpr);
     gl.uniform2f(uc.uPointer, st.pointer[0] * dpr, st.pointer[1] * dpr);
-    gl.uniform2f(uc.uColor, st.color[0], st.color[1]);
+    gl.uniform3fv(uc.uTint, tone.tints); gl.uniform3fv(uc.uStageC, tone.stage);
+    gl.uniform3fv(uc.uNeon, st.neon); gl.uniform2f(uc.uArc, st.arc[0], st.arc[1]);
     const P = st.panels;
     gl.uniform1i(uc.uCount, P.count || 0);
     if (P.count) { gl.uniformMatrix3fv(uc.uInv, true, P.inv); gl.uniform4fv(uc.uBox, P.box); gl.uniform4fv(uc.uState, P.state); }

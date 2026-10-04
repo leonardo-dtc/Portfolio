@@ -5,7 +5,8 @@ edition (repository root), the editorial edition (`v2/`), the poster edition
 (`v3/`) and the dim-room edition (`v4/`). The editions are separate designs on
 purpose: one will be chosen and the others archived, so **this edition shows,
 embeds or links nothing from the other four**. Static HTML, CSS and vanilla
-JavaScript; no framework, no build step. Every page reads without JavaScript.
+JavaScript, with one library (GSAP and its Flip plugin, self-hosted, for Work's
+grid); no framework, no build step. Every page reads without JavaScript.
 
 ## Preview
 
@@ -190,10 +191,20 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   reduced-motion still has 27% orange and 26% cyan; on two lines at 390 every
   frame was 19% orange or more and 13% cyan or more. By day the light stays
   mostly violet, blue and pink on the violet-blue pool, unchanged to the pixel.
-- **Colour style:** the palettes turn the light a third as far as the room and
-  hold it inside the Glowtime family of hues, so each shifts which colours lead
-  (Gold and Ember warm, Teal and Emerald cool, Graphite silver) and none turns
-  it lime or green.
+- **Colour style:** the name takes the colours of the palette it opens on.
+  Cobalt keeps the Glowtime colours above, to the pixel; every other palette has
+  its own set of fourteen colours of light from its family (Violet: magenta,
+  orchid, purple, violet and periwinkle; Rose: peach, coral, rose, hot pink and
+  magenta; Ember: gold, amber, orange and red with a hot pink end; Gold: lemon,
+  gold, amber, orange and champagne; Emerald: lime, green, emerald, jade, teal
+  and aqua; Teal: mint, aquamarine, turquoise, cyan and azure), and Graphite is
+  Cobalt's set at its vibrance, a silver neon. The day pool takes the palette's
+  deep colour. A custom Hue blends the two palettes either side of it in OKLCH,
+  so no stretch passes through grey. Each set is held inside its own arc of
+  hues, as Cobalt's is held from lime and green. Measured in every palette
+  (`tests/v5/e2e/palettes.mjs`): with the room, by night, 100% of the lit pixels
+  of each coloured palette lie within 75 degrees of its glass's hue, and 89% of
+  Graphite's bright pixels are nearly grey.
 - **Motion:** the light runs on the room's clock and the room draws at full rate
   while the hero shows. On a machine that tripped the room's budget the clock
   stops, so the light holds still until the pointer moves it. Under reduced
@@ -234,8 +245,9 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   round it; by day the name's edge measured 6.9:1 or more
   against the ground just beyond its light at 1440 and 390, and the faces 3.4:1
   or more against the pool round the letters, the reduced-motion still
-  included. Only transform and opacity animate, each on its own layer, and the
-  palettes turn the colours as the shader does. Every copy of the name that
+  included. Only transform and opacity animate, each on its own layer, and each
+  palette gives it the shader's colours (`--neon-*`), its day pool included.
+  Every copy of the name that
   draws the light is hidden from assistive technology, so the name is read
   once, as the button. Reduced motion holds it still; reduced transparency
   gives solid letters (white on the stage, or a deep navy on a soft light halo
@@ -312,11 +324,24 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
 
 A glass button in the bottom-right corner (beside the tab bar on phones, as in
 iOS 26; under 360 px, where five labelled tabs take the whole dock, a fill
-button in the window's toolbar) opens a small panel for trying colors: eight
-palettes (Cobalt, Violet, Rose, Ember, Gold, Emerald, Teal, Graphite), a Hue and
-a Vibrance slider, and Auto, Night or Day. It turns the whole room in the shader,
-so every pane of glass follows, and the hero's neon a third as far, within its
-Glowtime colours; the choice is kept in this browser only (`assets/js/hue.js`).
+button in the window's toolbar) opens a small panel for trying colors. On
+desktop its name, "Color style", shows beside it while it is pointed at (after a
+beat) or focused from the keyboard, since the swatch alone does not say what it
+does. The panel has eight palettes (Cobalt, Violet, Rose, Ember, Gold, Emerald,
+Teal, Graphite), a Hue and a Vibrance slider, and Auto, Night or Day. A palette
+turns the whole room, so every pane of glass follows, and gives the hero's name
+its own neon (`assets/js/palette.js`); the choice is kept in this browser only
+(`assets/js/hue.js`). The turn is made in OKLab, where equal angles look equal:
+every colour in the room turns by the same angle of hue and keeps its lightness,
+so a palette looks the same by night and by day (the YIQ turn used before made
+Teal blue by night and green by day, and dark blue went olive on its way to
+Gold). The room is turned through a small table of colours, a 3D texture (17 to
+a side once it rests, 9 while a palette crossfades), so it costs one texture
+read a pixel; Cobalt needs none. The palettes sit at Cobalt 0, Violet +28, Rose
++92, Ember +136, Gold +170, Emerald -120 and Teal -66 degrees, and Graphite is
+Cobalt at 12% vibrance; each pair is at least 0.066 apart in OKLab (Teal and
+Graphite, the closest). In every palette, by night and by day, every line of
+text over the glass on Home and in the open panel keeps 4.5:1 (lowest 4.74:1).
 Where the room never started (no WebGL2, reduced transparency, Save-Data, a weak
 device) there is no control and the phone's tab bar is centred alone. That is
 decided once, as the page starts (`html.no-room`): a room that gives way later
@@ -401,6 +426,8 @@ side window and the toolbar), so a new item touches a few files by hand. In orde
 | `assets/js/nav.js` | Page swaps (the side window kept in place), sheets, history, direct loads of projects, anchor landings and their wash |
 | `assets/js/spy.js` | The Résumé's Sections following the reader (any page with a `.toc` gets it) |
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |
+| `assets/js/palette.js` | The colour styles: the palettes, the turn in OKLab (and the room's table of colours), and each palette's neon for the hero |
+| `assets/js/flip.js`, `assets/vendor/gsap/` | Work's grid reflowing when filtered, with GSAP's Flip (3.15.0, self-hosted, GreenSock's standard no-charge licence; `vendor/gsap/README.md` gives the source and checksums). Loaded only on a page with a grid to filter, once it is idle |
 | `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
 | Kept, unreferenced | The written hello of the first round: `assets/js/hello.js` (the pen timeline and the Enter button), `name.js` and `name-data.js` (Sacramento traced to pen strokes), `assets/img/name.svg` and `name-2.svg` (the name as an SVG, one line and two), and `tools/trace-name/` outside the edition. Nothing imports or links them any more; they stay in case the written name comes back |
 | `DESIGN.md` | The design system, recorded from the built pages |

@@ -6,6 +6,7 @@ import { createHero } from './hero.js';
 import { initNav } from './nav.js';
 import { initHue } from './hue.js';
 import { initSpy } from './spy.js';
+import { prepareFlip, reflow } from './flip.js';
 
 const html = document.documentElement;
 html.classList.add('js');
@@ -58,8 +59,14 @@ document.addEventListener('click', (e) => {
     const cat = f.dataset.filter;
     document.querySelectorAll('[data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === cat)));
     let shown = 0;
-    document.querySelectorAll('[data-cards] .card[data-cat]').forEach(c => { c.hidden = cat !== 'all' && c.dataset.cat !== cat; if (!c.hidden) shown++; });
-    document.querySelectorAll('[data-cards]').forEach(g => g.classList.toggle('cards--3', cat !== 'all'));   // a filtered set runs three across
+    const cards = [...document.querySelectorAll('[data-cards] .card[data-cat]')];
+    // the cards glide to their new places, and what follows the grid moves with them (flip.js; at once without GSAP or
+    // under reduced motion)
+    const after = [...document.querySelectorAll('[data-cards]')].flatMap(g => { const all = [...g.parentElement.children]; return all.slice(all.indexOf(g) + 1); });
+    reflow([...cards, ...after], () => {
+      cards.forEach(c => { c.hidden = cat !== 'all' && c.dataset.cat !== cat; if (!c.hidden) shown++; });
+      document.querySelectorAll('[data-cards]').forEach(g => g.classList.toggle('cards--3', cat !== 'all'));   // a filtered set runs three across
+    });
     const live = document.querySelector('.sr-live');
     if (live) live.textContent = `${shown} ${shown === 1 ? 'project' : 'projects'}`;
     return;
@@ -67,6 +74,10 @@ document.addEventListener('click', (e) => {
   const p = e.target.closest && e.target.closest('[data-print]');
   if (p) { e.preventDefault(); print(); }
 });
+
+// GSAP, for Work's grid, loads once a page with one is idle (flip.js)
+prepareFlip();
+document.addEventListener('v5:navigate', prepareFlip);
 
 // Groton's clock (Home's side window): the time there, refreshed each minute and whenever a page arrives.
 // data-clock="in Groton" reads "9:41 AM in Groton"; an empty data-clock reads "9:41 AM, Eastern time".

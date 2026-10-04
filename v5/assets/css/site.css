@@ -190,7 +190,8 @@ html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s v
 /* Without the room (no WebGL2): the neon after the shader. The hero carries its own copy of the room's still (it lies
    exactly over the page's), so light can be screened onto it. Over it, bottom to top: by night the stage, the whole
    still given way to near black from the first paint (.hero::after), as the room's own stage does; by day a pool that
-   covers the whole name (.hero::before) and a shade hugging every letter (.hero__neon b) in a deep violet-blue;
+   covers the whole name (.hero::before) and a shade hugging every letter (.hero__neon b) in the style's deep colour
+   (a violet-blue for Cobalt);
    two traces of the name (.hero__neon i), each a pair of copies on one slow orbit a few hundredths of an em round
    the letters (13 s and 17 s): a solid orange (or cyan) trace, and over it a copy whose stroke shows a gradient with
    gaps (hot pink and magenta, or electric blue and violet), crossfading in and out, so the colour turns along the name
@@ -201,13 +202,14 @@ html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s v
    button, generated content with empty alt text), so the name is read once, as the button. A trace is the name's
    outline: a stroke under a black fill (paint-order), screened, so the black adds nothing and hides the strokes
    Switzer's overlapping shapes would draw inside the letters. Only transform and opacity animate, each on its own
-   layer. The colours are the shader's, turned by the colour style as the shader turns them (hue.js sets --neon-*).
+   layer. The colours are the shader's, the colour style's own (hue.js sets --neon-* from palette.js).
    Still under reduced motion (the rule there stops every animation), solid under reduced transparency, plain text in
    forced colours. */
 html:not(.gl) .hero {
   background: #0b1138 url("../img/room-night.webp") center / cover no-repeat;
   --n-pink: var(--neon-pink, #ff1f75); --n-orange: var(--neon-orange, #ff660d); --n-violet: var(--neon-violet, #8533ff);
-  --n-blue: var(--neon-blue, #2157ff); --n-cyan: var(--neon-cyan, #14ccff);
+  --n-blue: var(--neon-blue, #2157ff); --n-cyan: var(--neon-cyan, #14ccff); --n-amber: var(--neon-amber, #ff8f14);
+  --n-deep: var(--neon-deep, #180d60);
   /* by night the stage (7% of the still left in it, as in the shader) and no pool or shade, so nothing outlines the
      name: its light lies on the dark */
   --stage: rgba(3, 2, 10, .93); --pool: none; --pool-h: 3.1; --shade: transparent; --shades: none;
@@ -217,11 +219,11 @@ html:not(.gl) .hero {
 html:not(.gl) .hero::after { content: ""; position: absolute; z-index: -3; inset: 0; background: var(--stage); pointer-events: none; }
 html:not(.gl) .hero::before { content: ""; position: absolute; z-index: -2; left: 50%; top: 45%; width: min(100vw, calc(var(--hero-fs) * 11.6)); height: calc(var(--hero-fs) * var(--pool-h)); translate: -50% -50%; background: var(--pool); opacity: 0; transition: opacity .9s var(--ease-out); }
 html:not(.gl) .hero__neon { display: block; }
-/* the shade: by day the room falls to a deep violet-blue right round the letters (by night there is none: the stage
-   is the ground) */
+/* the shade: by day the room falls to the style's deep colour right round the letters (by night there is none: the
+   stage is the ground) */
 .hero__neon b { z-index: -1; pointer-events: none; color: transparent; -webkit-text-fill-color: transparent; text-shadow: var(--shades); opacity: 0; transition: opacity .9s var(--ease-out); }
 .hero.is-ready .hero__neon b { opacity: 1; }
-.hero__neon i { z-index: 1; pointer-events: none; font-style: normal; opacity: 0; color: color-mix(in srgb, var(--n-orange) 75%, #ffb000); -webkit-text-fill-color: #000; -webkit-text-stroke: .07em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .05em currentColor); will-change: transform; transition: opacity .9s var(--ease-out);
+.hero__neon i { z-index: 1; pointer-events: none; font-style: normal; opacity: 0; color: color-mix(in srgb, var(--n-orange) 75%, var(--n-amber)); -webkit-text-fill-color: #000; -webkit-text-stroke: .07em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .05em currentColor); will-change: transform; transition: opacity .9s var(--ease-out);
   --ga: 40deg; --gr: .024em; transform: rotate(var(--ga)) translateX(var(--gr)) rotate(calc(-1 * var(--ga))); }
 .hero__neon i:nth-of-type(2) { color: var(--n-cyan); -webkit-text-stroke-width: .05em; --ga: 220deg; --gr: .022em; }
 .hero__neon b::before, .hero__neon i::before, .hero__neon i::after, .hero__neon::after, html:not(.gl) .hero__name::after { content: "Leonardo Carvalho"; }
@@ -258,11 +260,11 @@ html:not(.gl) .hero.is-ready .hero__name::after { animation: hero-turn 16s ease-
 .hero__neon::after { pointer-events: none; color: rgba(255, 242, 250, .95); -webkit-text-fill-color: #000; -webkit-text-stroke: .02em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .045em var(--edge-glow)); opacity: 0; transition: opacity .9s var(--ease-out); }
 html:not(.gl) .hero.is-ready::before, .hero.is-ready .hero__neon::after { opacity: 1; }
 /* by day the room is bright: the pool under the whole name (solid to 70% of its radius, so the first and last
-   letters sit on it too) and a tight shade round every letter fall to a deep violet-blue, as the shader's day pool
-   does, and the faces are nearly opaque, so the white-hot edge and the faces keep 3:1 or more against the ground
+   letters sit on it too) and a tight shade round every letter fall to the style's deep colour, as the shader's day
+   pool does, and the faces are nearly opaque, so the white-hot edge and the faces keep 3:1 or more against the ground
    right beside them, still or moving (over the pale sky the edge measured 1.7 to 2.6:1, the faces about 1:1) */
-@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, rgba(24, 10, 96, .94) 70%, rgba(24, 10, 96, .6) 88%, rgba(24, 10, 96, 0)); --pool-h: 2.2; --shade: rgba(24, 10, 96, .97); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
-html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, rgba(24, 10, 96, .94) 70%, rgba(24, 10, 96, .6) 88%, rgba(24, 10, 96, 0)); --pool-h: 2.2; --shade: rgba(24, 10, 96, .97); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
+@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, color-mix(in srgb, var(--n-deep) 94%, transparent) 70%, color-mix(in srgb, var(--n-deep) 60%, transparent) 88%, transparent); --pool-h: 2.2; --shade: color-mix(in srgb, var(--n-deep) 97%, transparent); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
+html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, color-mix(in srgb, var(--n-deep) 94%, transparent) 70%, color-mix(in srgb, var(--n-deep) 60%, transparent) 88%, transparent); --pool-h: 2.2; --shade: color-mix(in srgb, var(--n-deep) 97%, transparent); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
 /* reduced transparency: solid letters without the pool, traces or neon: white by night; by day a deep navy on a soft
    light halo, since the day room runs from pale sky to mid blue behind the name (5.4:1 or better against the darker
    parts round the letters, where #1f3fae alone measured 2.4:1) */
@@ -671,6 +673,16 @@ html.no-room .hue, html:not(.js) .hue { display: none; }
 .hue__button:hover { scale: 1.06; }
 .hue__button:active { scale: .94; }
 .hue__button i { width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255, 255, 255, .85), 0 2px 6px rgba(0, 0, 0, .3); }
+/* its name, beside it on desktop while it is pointed at (after a beat, so passing over it shows nothing) or focused from
+   the keyboard, and gone while its panel is open: the swatch alone does not say what the button does. Drawn, not read
+   (the button's own label is "Color style"); near-black glass, so the white keeps 10:1 or more over any room. */
+@media (min-width: 900px) {
+  .hue__button { position: relative; }
+  .hue__button::after { content: "Color style" / ""; position: absolute; right: calc(100% + 10px); top: 50%; padding: 7px 11px; border-radius: 999px; background: rgba(10, 12, 28, .82); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); color: #fff; font: 600 13px/1 var(--font); white-space: nowrap; pointer-events: none; opacity: 0; translate: 4px -50%; transition: opacity .15s, translate .2s var(--ease-out); }
+  .hue__button:hover::after { opacity: 1; translate: 0 -50%; transition-delay: .35s; }
+  .hue__button:focus-visible::after { opacity: 1; translate: 0 -50%; }
+  .hue__button[aria-expanded="true"]::after { opacity: 0; transition-delay: 0s; }
+}
 .hue__panel { position: absolute; right: 0; bottom: 58px; width: 272px; padding: 16px; border-radius: 24px; background: var(--glass-css); -webkit-backdrop-filter: blur(28px) saturate(1.8) brightness(.5); backdrop-filter: blur(28px) saturate(1.8) brightness(.5);   /* dark enough for its labels over a light card */ box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), inset 0 1px 0 rgba(255, 255, 255, .34), 0 24px 60px rgba(0, 0, 0, .4); transform-origin: 100% 100%; opacity: 0; scale: .98; transition: opacity .2s, scale .3s var(--ease-out); }   /* 98%: under 8px of travel at its far corner */
 .hue__panel.is-open { opacity: 1; scale: 1; }
 .hue__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }

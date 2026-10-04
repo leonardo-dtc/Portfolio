@@ -1,36 +1,18 @@
 // The color style control (bottom right): palettes, a hue and vibrance to play with, and Night, Day or Auto.
-// It turns the whole room (and so every pane of glass, and the hero's name and the light behind it) in the shader;
-// the few pieces of CSS glass follow through --glass-css, and the CSS hero's neon through --neon-*. The choice is
-// kept in this browser only.
+// It turns the whole room (and so every pane of glass) and gives the hero's name its neon (palette.js); the few pieces
+// of CSS glass follow through --glass-css, and the CSS hero's neon through --neon-*. The choice is kept in this browser
+// only.
 import { createSpring, tween } from './springs.js';
+import { PRESETS, turn, neonFor } from './palette.js';
 
-const PRESETS = [
-  ['cobalt', 'Cobalt', 0, 1], ['violet', 'Violet', 40, 1], ['rose', 'Rose', 110, .95], ['ember', 'Ember', 150, 1],
-  ['gold', 'Gold', 178, .95], ['emerald', 'Emerald', -80, .9], ['teal', 'Teal', -45, 1], ['graphite', 'Graphite', 0, .12],
-];
 const DEFAULT = { preset: 'cobalt', hue: 0, sat: 1, look: 'auto' };
-// the hero's neon colours, as in shaders.js (N_PINK and the rest)
-const NEON = [['pink', [1, .12, .46]], ['orange', [1, .4, .05]], ['violet', [.52, .2, 1]], ['blue', [.13, .34, 1]], ['cyan', [.08, .8, 1]]];
 const KEY = 'v5:color';
+// the CSS hero's colours (site.css, --neon-*), from the neon's slots (palette.js); its day pool is the deep colour at
+// two thirds (for Cobalt the violet-blue the CSS hero was drawn with)
+const CSS_NEON = [['orange', 0], ['pink', 1], ['violet', 3], ['blue', 4], ['cyan', 5], ['amber', 7], ['deep', 12, .67]];
 
-// the same YIQ turn as the shader, for swatches and CSS glass
-function turn([r, g, b], deg, k) {
-  const y = .299 * r + .587 * g + .114 * b, i = .596 * r - .274 * g - .322 * b, q = .211 * r - .523 * g + .312 * b;
-  const h = Math.atan2(q, i) - deg * Math.PI / 180, c = Math.hypot(i, q) * k;
-  const I = c * Math.cos(h), Q = c * Math.sin(h);
-  return [y + .956 * I + .621 * Q, y - .272 * I - .647 * Q, y - 1.106 * I + 1.703 * Q].map(v => Math.round(Math.min(1, Math.max(0, v)) * 255));
-}
-// the shader's turn for the hero's neon (neonTurn in shaders.js): a third as far as the room, three quarters of the
-// vibrance, and held inside the Glowtime family of hues (orange through pink, violet and blue to cyan)
-function neonTurn([r, g, b], deg, k) {
-  const y = .299 * r + .587 * g + .114 * b, i = .596 * r - .274 * g - .322 * b, q = .211 * r - .523 * g + .312 * b;
-  const T = 2 * Math.PI, d = Math.atan2(q, i + 1e-6) - deg / 3 * Math.PI / 180 - 1.676 + Math.PI;
-  const h = 1.676 + Math.max(-1.745, Math.min(1.745, ((d % T) + T) % T - Math.PI)), c = Math.hypot(i, q) * (.25 + .75 * k);
-  const I = c * Math.cos(h), Q = c * Math.sin(h);
-  return [y + .956 * I + .621 * Q, y - .272 * I - .647 * Q, y - 1.106 * I + 1.703 * Q].map(v => Math.round(Math.min(1, Math.max(0, v)) * 255));
-}
-const rgb = (c, a = 1) => a === 1 ? `rgb(${c.join(',')})` : `rgba(${c.join(',')},${a})`;
-const swatch = (deg, k) => `radial-gradient(circle at 32% 28%, ${rgb(turn([.46, .56, 1], deg, k))}, ${rgb(turn([.10, .22, .80], deg, k))} 48%, ${rgb(turn([.02, .04, .26], deg, k))})`;
+const css = (c, a = 1) => { const v = c.map(x => Math.round(Math.min(1, Math.max(0, x)) * 255)).join(','); return a === 1 ? `rgb(${v})` : `rgba(${v},${a})`; };
+const swatch = (deg, k) => `radial-gradient(circle at 32% 28%, ${css(turn([.46, .56, 1], deg, k))}, ${css(turn([.10, .22, .80], deg, k))} 48%, ${css(turn([.02, .04, .26], deg, k))})`;
 
 export function initHue({ room }) {
   const html = document.documentElement;
@@ -38,11 +20,14 @@ export function initHue({ room }) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let st = { ...DEFAULT };
   try { st = { ...DEFAULT, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch (e) { /* storage blocked: defaults */ }
+  // a palette kept from an earlier visit takes its values as they are now (its hue may have been tuned since)
+  const kept = PRESETS.find(p => p[0] === st.preset);
+  if (kept) st = { ...st, hue: kept[2], sat: kept[3] };
 
   // ---------- markup ----------
   const wrap = document.createElement('div');
   wrap.className = 'hue';
-  const track = Array.from({ length: 13 }, (_, n) => rgb(turn([.10, .22, .80], -180 + n * 30, 1))).join(', ');
+  const track = Array.from({ length: 13 }, (_, n) => css(turn([.10, .22, .80], -180 + n * 30, 1))).join(', ');
   wrap.innerHTML = `
     <div class="hue__panel" id="hue-panel" role="dialog" aria-label="Color style" hidden>
       <div class="hue__head"><h2>Color</h2><button class="hue__reset" type="button">Reset</button></div>
@@ -67,12 +52,12 @@ export function initHue({ room }) {
   const isDay = () => st.look === 'day' || (st.look === 'auto' && light.matches);
   function paint() {
     const h = hue.value, k = Math.max(0, sat.value), d = Math.min(1, Math.max(0, day.value));
-    if (room) room.set({ color: [h * Math.PI / 180, k], day: d });
+    const neon = neonFor(h, k);
+    if (room) room.set({ color: [h * Math.PI / 180, k], day: d, neon: neon.list, arc: neon.arc });
     const base = d > .5 ? [.10, .16, .52] : [.16, .22, .77];
-    html.style.setProperty('--glass-css', rgb(turn(base, h, k), d > .5 ? .5 : .34));
-    // the hero's neon (its CSS version), turned as the shader turns it, so every palette keeps the Glowtime colours
-    // and only shifts which of them lead
-    for (const [n, c] of NEON) html.style.setProperty(`--neon-${n}`, rgb(neonTurn(c, h, k)));
+    html.style.setProperty('--glass-css', css(turn(base, h, k), d > .5 ? .5 : .34));
+    // the hero's neon (its CSS version), the same colours as the shader's
+    for (const [n, i, f = 1] of CSS_NEON) html.style.setProperty(`--neon-${n}`, css(neon.set[i].map(v => v * f)));
     button.querySelector('i').style.background = swatch(h, k);
   }
   function apply(animate) {
