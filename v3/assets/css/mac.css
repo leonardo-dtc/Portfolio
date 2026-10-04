@@ -86,10 +86,10 @@
 .mac__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px 2px; }
 /* by Name: one row a file, its picture small, then its kind and year */
 .mac__grid.is-list { grid-template-columns: 1fr; gap: 0; }
-.mac__grid.is-list .mac__icon { grid-template-columns: 32px minmax(0, 1fr) auto 52px; align-items: center; justify-items: start; gap: 12px; padding: 2px 6px; text-align: left; }
+.mac__grid.is-list .mac__icon { grid-template-columns: 32px minmax(0, 1fr) auto auto; align-items: center; justify-items: start; gap: 12px; padding: 2px 6px; text-align: left; }
 .mac__grid.is-list .mac__pic svg { width: 32px; height: 32px; }
 .mac__grid.is-list .mac__name { text-align: left; -webkit-line-clamp: 1; line-clamp: 1; }
-.mac__grid.is-list .mac__kind, .mac__grid.is-list .mac__year { display: block; }
+.mac__grid.is-list .mac__kind, .mac__grid.is-list .mac__year { display: block; white-space: nowrap; }
 .mac__grid.is-list .mac__icon.is-sel { background: #000; color: #fff; }
 .mac__win--doc { width: min(460px, calc(100% - 40px)); }
 .mac__win--trash { width: min(300px, calc(100% - 40px)); }
