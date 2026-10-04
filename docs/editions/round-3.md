@@ -388,7 +388,7 @@ These are estimates, to be re-scored after the change:
   - **Colour cycle:** the traces take turns on a 16 s cycle sliding along the name.
   - **Arrival and entry:** the traces grow out of the outline as the hero arrives and fold back as it enters.
   - **Day:** the room behind the name falls toward a saturated violet-blue that hugs the letters, instead of a grey smudge.
-  - **Colour styles:** the neon turns a third as far as the room and stays within the Glowtime colours, so Rose and Gold no longer turn it lime.
+  - **Colour styles:** the neon turns a third as far as the room and stays within the Glowtime colours, so Rose and Gold no longer turn it lime. *Replaced on 2026-10-04: each palette now gives the name its own colours (section 10).*
   - **Frame rate:** the room draws at full rate while the hero shows, unless the device is slow.
   - **Without WebGL2:** CSS neon over the room's still image, with screened traces and a white-hot edge. Only transform and opacity animate.
   - **Cost:** seven texture reads per pixel, only inside the name's box.
@@ -471,7 +471,7 @@ Each question shows the default this round uses, or my recommendation where noth
 | | Question | Default or recommendation |
 |---|---|---|
 | T34 | **Apps in v5:** a launcher row on the hero (one step for everyone), a full Home View grid as the front door (one extra step for everyone), or a room inside the site (an Archive)? | Launcher row on the hero, plus the Archive later |
-| T41 | **Glowtime hero:** which of the three variants? | The judges' pick, sent with screenshots |
+| T41 | **Glowtime hero:** which of the three variants? | **Answered (2026-10-04):** B, the built one, in the colours of the selected palette (section 10) |
 | T21 | **v5 tab names on desktop:** shown at rest where they fit, or icon-only until pointed at, as in visionOS? | Shown at rest where they fit; icon-only on narrow desktops |
 | T1 | **Blur on what steps back:** dimming only, or a static blur that arrives once the opening has finished? | Dimming only |
 | T3 | **Which link goes on Elite Prospects, NCSA and emails:** the home page or the hockey page? | The hockey page: coaches skip any hero or cover |
@@ -651,3 +651,59 @@ Re-scored after the review fixes (build `390851e`) by one reviewer, with the mat
 - v5's one-page hockey print now carries the email address in the header's free corner, at 10 pt, still on one page.
 
 The full report, with the evidence behind every score, is in [`round-3/rescore.md`](round-3/rescore.md).
+
+---
+
+## 10. After round three (2026-10-04)
+
+Leonardo: "I like the look of the hero, but I want it to match the colors of the selected color design. Speaking of, make sure the colors options are optimal for users. Remember, GSAP can and should be used if it improves the feel of the portfolios."
+
+### The hero takes the palette's colours (v5)
+
+- **Cobalt is unchanged, to the pixel.** Its fourteen colours of light are the Glowtime set he liked (a unit test holds them).
+- **Every other palette has its own set from its family,** in the same roles: the tube's six colours along the name, three echoes, the halo, the faces and the day pool.
+  - Violet: pink, magenta, orchid, purple, violet, periwinkle.
+  - Rose: peach, coral, rose, hot pink, magenta, lilac.
+  - Ember: gold, amber, orange, vermilion, red, with a hot pink end.
+  - Gold: lemon, gold, amber, orange, copper, champagne.
+  - Emerald: lime, green, emerald, jade, teal, aqua.
+  - Teal: mint, aquamarine, turquoise, cyan, cerulean, azure.
+  - Graphite: Cobalt's set at Graphite's vibrance, a silver neon.
+- **The day pool takes the palette's deep colour** (it was violet-blue under every palette), and so does the CSS hero without WebGL.
+- **A custom hue blends the two palettes either side of it,** in OKLCH, so no colour passes through grey. Choosing a palette while the hero shows sweeps the name through the palettes in between.
+- **Measured** (`tests/v5/e2e/palettes.mjs`): by night, 100% of the lit pixels of each coloured palette's name lie within 75 degrees of hue of its glass; 89% of Graphite's bright pixels are nearly grey; the ground and the stage stay near black in all eight.
+
+### The colour options, audited (v5)
+
+What was wrong:
+- **The palettes turned the room in YIQ,** where one angle does not look like one angle. Teal was petrol blue by night and grass green by day, next to Emerald. Rose was crimson by night and magenta by day. Gold's dark glass went olive.
+
+What changed:
+- **The room now turns in OKLab,** where equal angles look equal. Every colour keeps its lightness, so white text keeps its contrast, and a palette looks the same by night and by day.
+- **It costs no more than before.** The room passes through a small 3D table of colours, one texture read a pixel in the room's own pass. The glass and the stage, which each turned their colour at every pixel, now take it ready-made. Cobalt needs no table at all.
+- **The palettes are re-tuned on the new scale:** Violet +28, Rose +92, Ember +136, Gold +170 (amber gold, out of the olive), Emerald -120, Teal -66 (teal by night and by day). Graphite stays Cobalt at 12% vibrance.
+- **A palette kept from an earlier visit** takes its new values.
+- **The colour button says what it is.** It was a circle showing a swatch. On desktop, "Color style" now shows beside it after a beat of pointing, or at once on keyboard focus, and hides while the panel is open.
+
+Measured:
+- **Told apart:** every pair of palettes is at least 0.066 apart in OKLab (Teal and Graphite, the closest); Cobalt and Violet 0.110.
+- **Legible:** in every palette, by night and by day, every line of text over glass on Home and in the open colour panel keeps 4.5:1 (lowest 4.74:1).
+- **The CSS hero by day:** its edge keeps 5.8:1 or more and its faces 3.1:1 or more against the palette's pool.
+
+Left as it is:
+- **The Hue and Vibrance sliders keep their full range.** A custom hue between Gold and Emerald is olive by nature; it is the visitor's own choice.
+- **Without the room the page's still image stays cobalt.** The CSS glass and Night or Day follow the palette.
+
+### GSAP, where it improves the feel
+
+- **v5, Work's filters: built.** Filtering made the cards jump to their new places and the grid jump from four across to three.
+  - Now GSAP's Flip glides the cards that stay to their new places and sizes, on the site's own spring (critically damped, half a second). What follows the grid slides with them. Leaving cards fade where they were; arriving cards fade in.
+  - Sizes animate as sizes, never as a scale, so the card text is laid out afresh at each step rather than stretched.
+  - GSAP 3.15.0 and Flip are self-hosted in `v5/assets/vendor/gsap/`, under GreenSock's standard no-charge licence. They load only on a page with a grid to filter, once it is idle. Before they load, and under reduced motion, the grid changes at once, as before.
+- **v5, everything else: no.** Windows, sheets, the hero and the palettes already run on the site's own springs. Page swaps are a deliberate crossfade, and the colour panel a short fade. GSAP would only replace them.
+- **v3: no.** Its motion is already CSS on transform and opacity, plus a hand-built 380 ms scroll tween that any wheel or key interrupts:
+  - the cover's lines rise out of clipped boxes and are done by 0.8 s;
+  - sheets slide over each other;
+  - reveals replay as sheets return.
+
+  The headlines are already split into lines, so SplitText would add nothing. A grid reflow like Work's does not exist there. GSAP's core alone would add 28 KB (compressed) and change nothing a visitor can see.
