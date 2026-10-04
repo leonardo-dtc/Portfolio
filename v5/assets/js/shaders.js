@@ -6,17 +6,14 @@ layout(location = 0) in vec2 p;
 void main() { gl_Position = vec4(p, 0.0, 1.0); }`;
 
 // The room: Apple's Liquid Glass wallpaper language (the macOS Tahoe glass wave over out-of-focus forms), cobalt.
-// uDay 0 is Night, 1 is Day. uShift moves the room a little against the pointer.
+// uDay 0 is Night, 1 is Day. uShift moves the room a little against the pointer. The colour style turns it through
+// uLut, a small table of colours (palette.js: a hue turn and a vibrance in OKLab), read where uTurn is 1 (Cobalt is the
+// room as drawn); uLutK places a colour on the table's cells (scale, offset).
 export const SCENE = `#version 300 es
-precision highp float;
-uniform vec2 uRes; uniform float uTime; uniform float uDay; uniform float uAspect; uniform vec2 uShift; uniform vec2 uColor;
+precision highp float; precision highp sampler3D;
+uniform vec2 uRes; uniform float uTime; uniform float uDay; uniform float uAspect; uniform vec2 uShift;
+uniform sampler3D uLut; uniform float uTurn; uniform vec2 uLutK;
 out vec4 o;
-// the color style: a hue rotation (radians) and a saturation scale in YIQ, which keeps each colour's brightness
-vec3 hueShift(vec3 c, float a, float k) {
-  vec3 yiq = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312) * c;
-  float h = atan(yiq.z, yiq.y) - a, r = length(yiq.yz) * k;   // minus: positive angles follow the colour wheel
-  return clamp(mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703) * vec3(yiq.x, r * cos(h), r * sin(h)), 0.0, 1.0);
-}
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 float th(float x) { float e = exp(2.0 * clamp(x, -9.0, 9.0)); return (e - 1.0) / (e + 1.0); }
@@ -84,7 +81,7 @@ void main() {
   float catchLight = 0.45 + 0.55 * smoothstep(0.15 * a, 0.75 * a, p.x);
   col += mix(vec3(0.78, 0.88, 1.0), vec3(0.95, 0.98, 1.0), uDay) * catchLight * (0.85 * exp(-pow(d / (0.85 * px), 2.0)) + 0.16 * exp(-pow(d / (6.0 * px), 2.0)));
   vec2 q = uv - 0.5; col *= 1.0 - 0.18 * dot(q, q) * (1.0 - 0.5 * uDay);
-  col = hueShift(col, uColor.x, uColor.y);
+  if (uTurn > 0.5) col = texture(uLut, clamp(col, 0.0, 1.0) * uLutK.x + uLutK.y).rgb;
   col += (hash(gl_FragCoord.xy + fract(t)) - 0.5) / 255.0;
   o = vec4(col, 1.0);
 }`;
@@ -95,73 +92,65 @@ void main() {
 // The ink is the hero's name: a mask (red the letters, green a soft copy of them whose half level is the outline the
 // neon follows, blue a wide blur of them for the bloom and the day pool) placed by uInkX; uInk0 = (shown, dim, white,
 // the soft copy's sigma), uInk1 = (light, lean x, lean y, font size), uInkL = the hot spot near the pointer (centre x,
-// y, radius, strength), all in device px.
+// y, radius, strength), all in device px. The colour style arrives ready: uTint the glass's tints turned (prominent
+// by night and by day, then the rest), uStageC the stage's colour, uNeon the name's colours of light (palette.js,
+// neonFor) and uArc the family they are held in (the centre and half-width of an arc of YIQ hue angles, radians).
 export const COMPOSITE = `#version 300 es
 precision highp float;
 uniform sampler2D uScene; uniform sampler2D uInk;
 uniform vec2 uRes; uniform float uLod; uniform float uFrostLod; uniform float uTime; uniform float uDay;
 uniform vec2 uLight; uniform vec2 uPointer; uniform int uCount; uniform float uStage;
 uniform mat3 uInv[16]; uniform vec4 uBox[16]; uniform vec4 uState[16];
-uniform vec4 uInk0; uniform vec3 uInkX; uniform vec2 uColor; uniform vec4 uInk1; uniform vec4 uInkL;
-// the color style: a hue rotation (radians) and a saturation scale in YIQ, which keeps each colour's brightness
-vec3 hueShift(vec3 c, float a, float k) {
-  vec3 yiq = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312) * c;
-  float h = atan(yiq.z, yiq.y) - a, r = length(yiq.yz) * k;   // minus: positive angles follow the colour wheel
-  return clamp(mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703) * vec3(yiq.x, r * cos(h), r * sin(h)), 0.0, 1.0);
-}
+uniform vec4 uInk0; uniform vec3 uInkX; uniform vec4 uInk1; uniform vec4 uInkL;
+uniform vec3 uTint[4]; uniform vec3 uStageC; uniform vec3 uNeon[14]; uniform vec2 uArc;
 // ---------- the hero's name in neon light (after Apple's "It's Glowtime") ----------
 const float TAU = 6.2831853;
-// The colour style's turn for the name's light: a third as far as the room's, its vibrance three quarters as strong,
-// and held inside the Glowtime family, the arc of hues from orange through pink, magenta, violet and blue to cyan
-// (YIQ angles -4 to 196 degrees), so a palette shifts which of those colours lead and never turns them lime or green.
-// No clamp of the result, so light can add up; guarded where the light is exactly 0 (the mask's corners, the
-// hand-off), where atan(0, 0) is undefined.
-vec3 neonTurn(vec3 c) {
+// The name's light held inside its colour style's family, the arc uArc (for Cobalt the Glowtime colours, orange through
+// pink, magenta, violet and blue to cyan: YIQ angles -4 to 196 degrees), so where its colours add up they never leave
+// it (Cobalt's orange and cyan never meet as lime or green). No clamp of the result, so light can add up; guarded
+// where the light is exactly 0 (the mask's corners, the hand-off), where atan(0, 0) is undefined.
+vec3 neonHold(vec3 c) {
   vec3 yiq = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312) * c;
-  float h = atan(yiq.z, yiq.y + 1e-6) - uColor.x / 3.0, r = length(yiq.yz) * mix(1.0, uColor.y, 0.75);
-  h = 1.676 + clamp(mod(h - 1.676 + 3.14159265, TAU) - 3.14159265, -1.745, 1.745);
+  float h = atan(yiq.z, yiq.y + 1e-6), r = length(yiq.yz);
+  h = uArc.x + clamp(mod(h - uArc.x + 3.14159265, TAU) - 3.14159265, -uArc.y, uArc.y);
   return mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703) * vec3(yiq.x, r * cos(h), r * sin(h));
 }
 // the moment of the light's cycle the room's clock starts from: the first frame of the arrival, and the one still
 // under reduced motion (where the clock does not run)
 const float T_REST = 31.0;
-// the Glowtime colours, as light
-const vec3 N_ORANGE = vec3(1.00, 0.40, 0.05), N_PINK = vec3(1.00, 0.12, 0.46), N_MAGENTA = vec3(0.88, 0.12, 0.92);
-const vec3 N_VIOLET = vec3(0.52, 0.20, 1.00), N_BLUE = vec3(0.13, 0.34, 1.00), N_CYAN = vec3(0.08, 0.80, 1.00);
-// the main tube's colour along phi: orange (a wide stretch), hot pink, magenta, violet, electric blue, cyan (a wide
-// stretch), and back
+// the main tube's colour along phi, its six colours of light (for Cobalt: orange (a wide stretch), hot pink, magenta,
+// violet, electric blue, cyan (a wide stretch)), and back
 vec3 neonRamp(float phi) {
   float s = 1.0 - abs(fract(phi) * 2.0 - 1.0);
-  vec3 c = mix(N_ORANGE, N_PINK, smoothstep(0.21, 0.31, s));
-  c = mix(c, N_MAGENTA, smoothstep(0.33, 0.43, s));
-  c = mix(c, N_VIOLET, smoothstep(0.44, 0.52, s));
-  c = mix(c, N_BLUE, smoothstep(0.54, 0.62, s));
-  return mix(c, N_CYAN, smoothstep(0.64, 0.74, s));
+  vec3 c = mix(uNeon[0], uNeon[1], smoothstep(0.21, 0.31, s));
+  c = mix(c, uNeon[2], smoothstep(0.33, 0.43, s));
+  c = mix(c, uNeon[3], smoothstep(0.44, 0.52, s));
+  c = mix(c, uNeon[4], smoothstep(0.54, 0.62, s));
+  return mix(c, uNeon[5], smoothstep(0.64, 0.74, s));
 }
-// the halo's colour: only blue, violet and pink, saturated (no cyan or orange to go teal or maroon in the dark)
+// the halo's colour, three of the style's deeper colours (for Cobalt only blue, violet and pink, saturated: no cyan or
+// orange to go teal or maroon in the dark)
 vec3 haloRamp(float phi) {
   float s = 1.0 - abs(fract(phi) * 2.0 - 1.0);
-  return mix(mix(vec3(0.20, 0.30, 1.00), vec3(0.50, 0.16, 1.00), smoothstep(0.0, 0.5, s)), vec3(0.95, 0.14, 0.66), smoothstep(0.55, 1.0, s));
+  return mix(mix(uNeon[8], uNeon[9], smoothstep(0.0, 0.5, s)), uNeon[10], smoothstep(0.55, 1.0, s));
 }
 // a Gaussian-softened edge's level as a distance from it, in its softness (log-odds; + inside)
 float edgeDist(float g) { g = clamp(g, 0.003, 0.997); return log(g / (1.0 - g)) / 1.7; }
 // a bloom round that edge, falling to nothing where the level runs out (about 3.4 softnesses away)
 float bloom(float d, float w) { return exp(-abs(d) / w) * smoothstep(3.3, 2.2, abs(d)); }
-// Three echoes of the outline, each its own colour family (pink to magenta, orange to amber, azure to cyan; violet is
-// the faces' and the halo's). Each: its drift (font sizes in x and y, and their periods in s; a
-// negative period turns the other way), the level it follows (in the outline's softnesses, + inside the letters) and
-// how far and how slowly that breathes, its slot on the colour turns, the wave on which it wanders from its turn (a
-// direction in radians per font size, a period, a phase), and its strength (orange the strongest, so it holds its own
-// against the pinks and burns white where it meets them).
+// Three echoes of the outline, each its own colour family (for Cobalt pink to magenta, orange to amber, azure to
+// cyan; violet is the faces' and the halo's: E_A and E_B, the slots in uNeon each one runs between). Each: its drift
+// (font sizes in x and y, and their periods in s; a negative period turns the other way), the level it follows (in
+// the outline's softnesses, + inside the letters) and how far and how slowly that breathes, its slot on the colour
+// turns, the wave on which it wanders from its turn (a direction in radians per font size, a period, a phase), and
+// its strength (orange the strongest, so it holds its own against the pinks and burns white where it meets them).
 const vec4 E_DRIFT[3] = vec4[3](vec4(0.024, 0.018, 13.0, -16.5), vec4(0.020, 0.024, -17.0, 12.0), vec4(0.026, 0.016, 19.0, -10.5));
 const vec4 E_LEVEL[3] = vec4[3](vec4(1.15, 0.35, 11.0, 1.0), vec4(-1.25, 0.35, 14.5, 2.4), vec4(-0.55, 0.55, 9.5, 4.1));
 const vec4 E_WAVE[3] = vec4[3](vec4(-0.9, 0.7, -15.0, 1.5), vec4(0.6, -1.1, 18.0, 3.0), vec4(-1.2, -0.4, -10.0, 4.5));
 const float E_SLOT[3] = float[3](0.25, 0.5, 0.75), E_GAIN[3] = float[3](0.9, 1.3, 1.05);
-const vec3 E_A[3] = vec3[3](N_PINK, N_ORANGE, vec3(0.11, 0.48, 1.00));
-const vec3 E_B[3] = vec3[3](N_MAGENTA, vec3(1.00, 0.56, 0.08), N_CYAN);
-// The dark stage the name stands on by night: the whole room gives way to near black, a breath of its violet, with
-// 7% of the room left in it, so its shapes are only faintly there
-const vec3 STAGE = vec3(0.010, 0.009, 0.026);
+const int E_A[3] = int[3](1, 0, 6), E_B[3] = int[3](2, 7, 5);
+// The dark stage the name stands on by night: the whole room gives way to near black (uStageC, a breath of its violet
+// turned with the room: room.js), with 7% of the room left in it, so its shapes are only faintly there
 const float STAGE_K = 0.93;
 // how strong the bloom is by night
 const float BLOOM_K = 1.75;
@@ -193,7 +182,7 @@ vec3 glassOver(int i, vec2 lp, float sd, vec2 px, vec3 col) {
   vec3 g = roomAt(suv, frost);
   bool prominent = kind > 2.5;
   // night glass is luminous cobalt, as in the comps; day glass is a deeper blue that the cap below holds down
-  vec3 tint = hueShift(prominent ? mix(vec3(0.16, 0.34, 1.0), vec3(0.24, 0.46, 1.0), uDay) : mix(vec3(0.15, 0.20, 0.90), vec3(0.10, 0.16, 0.40), uDay), uColor.x, uColor.y);
+  vec3 tint = prominent ? mix(uTint[0], uTint[1], uDay) : mix(uTint[2], uTint[3], uDay);
   g = mix(g, tint, (prominent ? 0.46 : kind > 1.5 ? 0.22 : 0.48) * m) * (prominent ? 1.0 + 0.16 * m : 1.0);
   // legibility: whatever the room behind it (the day sky is bright), the glass stays a dark enough ground for white
   // text; the rims and highlights come after this, so the edges keep their light
@@ -241,7 +230,7 @@ void main() {
   // what the room drew, so it reads nothing more; entering, it lifts on the glide's spring as the neon goes out, and
   // the room's light comes up as the window's glass forms. By day there is no stage.
   float stage = uStage * (1.0 - uDay);
-  if (stage > 0.0) col = mix(col, hueShift(STAGE, uColor.x, uColor.y), STAGE_K * stage);
+  if (stage > 0.0) col = mix(col, uStageC, STAGE_K * stage);
   // The name in neon light, after Apple's "It's Glowtime". Each letter's outline is a crisp tube of light locked to
   // the letters' true edge, its colour flowing along the name (orange, hot pink, magenta, violet, electric blue,
   // cyan) with a white-hot core and a hair of red and blue split. Three echoes trace the outline again, each in its
@@ -296,7 +285,7 @@ void main() {
         // the further it strays from the outline (in softnesses), the fainter, so the name never reads double
         float stray = length(off) / max(sig / fs, 1e-3) + 0.5 * abs(lev);
         float up = pow(0.5 + 0.5 * cos(cyc - TAU * E_SLOT[i] + 0.6 * sin(dot(q, W.xy) + TAU * t / W.z + W.w)), 2.0);
-        vec3 c = mix(E_A[i], E_B[i], 0.5 + 0.5 * sin(TAU * t / 19.0 + q.x * 0.5 + float(i) * 1.7));
+        vec3 c = mix(uNeon[E_A[i]], uNeon[E_B[i]], 0.5 + 0.5 * sin(TAU * t / 19.0 + q.x * 0.5 + float(i) * 1.7));
         // (its bloom goes where the field runs out, so nothing is left at the mask's edge)
         light += c * E_GAIN[i] * (exp(-di * di / 0.14) + 0.16 * bloom(di, 0.9) * smoothstep(3.35, 2.6, abs(ei))) * (0.95 + 0.65 * up) * (1.0 - 0.45 * smoothstep(0.6, 2.0, stray)) * grow;
       }
@@ -317,22 +306,21 @@ void main() {
       light += mix(bloomN, haloD, uDay) * (0.88 + 0.12 * sin(TAU * t / 10.0));
       // the faces: translucent light in the tube's colour, deepest away from the edge: crimson where it runs warm (a
       // dim orange face would read brown), violet where it runs cool. By day, violet and brighter, over the day pool
-      vec3 faceC = mix(mix(cT, N_PINK, 0.5 * warm * (1.0 - uDay)), vec3(0.46, 0.32, 1.0), mix(0.75 * cool, 0.75, uDay));
+      vec3 faceC = mix(mix(cT, uNeon[13], 0.5 * warm * (1.0 - uDay)), uNeon[11], mix(0.75 * cool, 0.75, uDay));
       light += faceC * face * mix(0.16 + 0.18 * smoothstep(0.4, 1.6, d), 0.30 + 0.30 * smoothstep(0.4, 1.6, d), uDay);
       // the light leans toward the pointer: the tubes run hotter near it
       vec2 dl = (px - uInkL.xy) / max(uInkL.z, 1.0);
       light *= lit * (1.0 + 3.0 * uInkL.w * exp(-dot(dl, dl)));
       // where light piles up (traces crossing, a press) it spills into every channel and burns toward white; then a
-      // soft tone curve, so the burn rolls off rather than clipping, and the colour style turns it a third as far as
-      // the room, so every palette keeps the Glowtime family and only shifts its emphasis
+      // soft tone curve, so the burn rolls off rather than clipping, held in the style's family
       float hot = max(max(light.r, light.g), light.b);
       light += vec3(max(hot - 1.8, 0.0) * 0.9);
-      vec3 L = max(neonTurn(1.0 - exp(-light)), 0.0);
+      vec3 L = max(neonHold(1.0 - exp(-light)), 0.0);
       // the ground under the light: by night the stage (above), which the bright light outshines (where it runs
       // strong the stage's faint cobalt goes from under it, so it cannot tint the neon's colours toward blue); by day,
       // where the room is bright, it falls about 80% toward a saturated violet-blue that follows the halo, hugging
       // the letters, tied to the same light term
-      vec3 deepD = clamp(neonTurn(mix(vec3(0.14, 0.08, 0.56), haloC * 0.42, 0.4)), 0.0, 1.0);
+      vec3 deepD = clamp(neonHold(mix(uNeon[12], haloC * 0.42, 0.4)), 0.0, 1.0);
       float poolD = smoothstep(0.0, 0.24, m.b) * 0.82 * uDay;
       float outshone = (1.0 - uDay) * smoothstep(0.25, 0.85, max(max(L.r, L.g), L.b));
       vec3 ground = mix(col, deepD, poolD * calm) * (1.0 - 0.2 * face * calm) * (1.0 - outshone);
