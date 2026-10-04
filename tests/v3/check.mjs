@@ -1,0 +1,586 @@
+// Browser checks for the v3 poster edition (one page of twelve sheets, and the six project files in v3/files/).
+//
+//   python3 tools/serve.py 8778          # in another terminal, from the repository root
+//   node tests/v3/check.mjs              # BASE=http://127.0.0.1:8802/v3/ node tests/v3/check.mjs for another server
+//
+// It finds Playwright through PLAYWRIGHT_MODULE (the path of its index.mjs) or the usual package names, and runs
+// Chromium. Each check prints "ok" or "FAIL"; any FAIL sets the exit code to 1.
+//
+//   1. structure   the sections, the rail's dots and the cabinet's folders match in number and order, and the
+//                  counts the script writes (--n, "Sheet NN / N", folder numbers, "N sheets") agree with them
+//   2. editions    no link, image or stylesheet points into another edition of the portfolio (the deck, every
+//                  file, site.css and files.css)
+//   3. 12px        no visible text under 12px (at rest, with the cabinet open, at desktop and phone widths; every
+//                  file on screen and in print, the printed link addresses included)
+//   4. contrast    the pairs fixed in round three pass (4.5:1, or 3:1 for large text), and a sweep of every text
+//                  element over a solid background finds nothing under its threshold
+//   4b. step back  pointing at a collage card or an archive card (or tabbing to one) steps the others back by
+//                  colour: no text is dimmed by opacity and every text still meets its threshold; the card
+//                  pointed at comes to the top
+//   5. cabinet     hovering a dot opens the cabinet; moving the mouse up to the pulled file and clicking it
+//                  lands on that file's own sheet
+//   5b. intent     diagonal paths from a dot up to its file keep that file out (V3_AIM=full runs all 108 paths);
+//                  scrubbing straight down the dots stays immediate
+//   6. routes      the cover's words go where they say; Find, the targets and the pill do their jobs
+//   6b. keyboard   tabbing out of the cabinet closes it; while Find filters, the current tab stays readable
+//   6c. keyboard   the walk from the top (the Index tab is the one way in); focus never rests on a hidden chrome
+//                  name or pill; the first key press finishes the code panel; 44px touch targets
+//   7. files       the hockey file prints on one Letter page; pager lines show without the script; the narrow
+//                  drawer shows one tab; the chrome text sits where the deck's does; Back returns to where the
+//                  reader was
+//   8. console     no errors on any load (with and without the script, reduced motion, phone, every file)
+
+const BASE = process.env.BASE || 'http://127.0.0.1:8778/v3/';
+async function loadPlaywright() {
+  const tries = [process.env.PLAYWRIGHT_MODULE, 'playwright', 'playwright-core', '/opt/node22/lib/node_modules/playwright/index.mjs'].filter(Boolean);
+  for (const t of tries) { try { return await import(t); } catch (e) { /* next */ } }
+  throw new Error('Playwright not found: set PLAYWRIGHT_MODULE to the path of its index.mjs');
+}
+const { chromium } = await loadPlaywright();
+
+let failures = 0;
+function check(cond, msg, detail) {
+  if (cond) console.log('ok   ' + msg);
+  else { failures++; console.log('FAIL ' + msg + (detail ? '\n       ' + [].concat(detail).join('\n       ') : '')); }
+}
+const errors = [];
+const browser = await chromium.launch();
+/* the project files, v3/files/<slug>/: when you add a file, add its slug here */
+const FILES = ['aducanumab', 'genuvalens', 'loquar', 'ocapex', 'hockey', 'resume'];
+async function open({ width = 1440, height = 900, js = true, reduced = false, touch = false, path = '' } = {}) {
+  const ctx = await browser.newContext({ viewport: { width, height }, javaScriptEnabled: js, reducedMotion: reduced ? 'reduce' : 'no-preference', ...(touch ? { hasTouch: true, isMobile: true } : {}) });
+  const page = await ctx.newPage();
+  const tag = `${path || '/'} ${width}x${height}${js ? '' : ' no-js'}${reduced ? ' reduced' : ''}`;
+  page.on('console', m => { if (m.type() === 'error') errors.push(`${tag}: ${m.text()}`); });
+  page.on('pageerror', e => errors.push(`${tag}: ${e.message}`));
+  await page.goto(new URL(path, BASE).href, { waitUntil: 'load' });
+  await page.waitForTimeout(js ? 1200 : 300);
+  return page;
+}
+
+/* ---------- in-page helpers (passed as strings so they run in the page) ---------- */
+const HELPERS = `
+  window.__v3 = {
+    parse(c) { const m = c && c.match(/rgba?\\(([^)]+)\\)/); if (!m) return null; const p = m[1].split(/[\\s,\\/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; },
+    lum(c) { const f = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); },
+    over(top, bottom) { const a = top.a; return { r: top.r * a + bottom.r * (1 - a), g: top.g * a + bottom.g * (1 - a), b: top.b * a + bottom.b * (1 - a), a: 1 }; },
+    /* the solid colour behind an element: the first opaque background up the tree, with any translucent ones
+       on the way laid over it; null where a picture, a blend mode or a gradient makes it unknowable */
+    bg(el, pseudo) {
+      const layers = [], r0 = el.getBoundingClientRect(), cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
+      if (pseudo) { const c = this.parse(getComputedStyle(el, pseudo).backgroundColor); if (c && c.a > 0) { layers.push(c); } }
+      for (let e = pseudo ? el.parentElement : el; e && !(layers.length && layers[layers.length - 1].a >= 1); e = e.parentElement) {
+        const cs = getComputedStyle(e);
+        if (e !== el) { const r = e.getBoundingClientRect(); if (r.width && (cx < r.left || cx > r.right || cy < r.top || cy > r.bottom) && e !== document.body && e !== document.documentElement) continue; }
+        if (cs.mixBlendMode !== 'normal') return null;
+        if (cs.backgroundImage !== 'none' && e !== document.body && e !== document.documentElement && !/\\.sheet$|sheet /.test(e.className)) return null;
+        const c = this.parse(cs.backgroundColor);
+        if (c && c.a > 0) { layers.push(c); if (c.a >= 1) break; }
+      }
+      let col = { r: 21, g: 21, b: 21, a: 1 };
+      for (let i = layers.length - 1; i >= 0; i--) col = this.over(layers[i], col);
+      return col;
+    },
+    ratio(fg, bg) { const a = this.lum(fg), b = this.lum(bg); return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05); },
+    pair(el, pseudo) {
+      const cs = getComputedStyle(el), bg = this.bg(el, pseudo);
+      if (!bg) return null;
+      const fg = this.over(this.parse(cs.color), bg);
+      const size = parseFloat(cs.fontSize), bold = parseInt(cs.fontWeight, 10) >= 700;
+      const large = size >= 24 || (bold && size >= 18.66);
+      return { ratio: Math.round(this.ratio(fg, bg) * 100) / 100, need: large ? 3 : 4.5, size, fg: cs.color, bg: 'rgb(' + [bg.r, bg.g, bg.b].map(Math.round).join(', ') + ')' };
+    },
+    shown(el) {
+      if (!el.isConnected || el.closest('.sr-only')) return false;
+      if (el.checkVisibility && !el.checkVisibility({ visibilityProperty: true })) return false;
+      /* text squashed by a transform on its way in or out (a bar scaling up, say) is not being read yet */
+      const r = el.getBoundingClientRect(); return r.width > 0 && r.height >= parseFloat(getComputedStyle(el).fontSize) * 0.5;
+    },
+    /* every element that holds its own visible text */
+    texts() {
+      const out = [];
+      const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = w.nextNode(); n; n = w.nextNode()) {
+        if (!n.data.trim()) continue;
+        const el = n.parentElement;
+        if (!el || /^(SCRIPT|STYLE|TITLE)$/.test(el.tagName) || out.includes(el) || !this.shown(el)) continue;
+        out.push(el);
+      }
+      return out;
+    },
+    /* the rendered size of text: CSS font size, scaled by the SVG viewBox where it sits in an SVG */
+    px(el) {
+      const fs = parseFloat(getComputedStyle(el).fontSize);
+      const svg = el.closest('svg');
+      if (svg && el.getScreenCTM) { const m = el.getScreenCTM(); return fs * Math.hypot(m.a, m.b); }
+      return fs;
+    },
+    /* how much an element's own opacity and its ancestors' (opacity and filter: opacity()) let through */
+    eff(el) { let a = 1; for (let e = el; e && e !== document.body; e = e.parentElement) { const cs = getComputedStyle(e); a *= +cs.opacity; const m = cs.filter.match(/opacity\\(([\\d.]+)\\)/); if (m) a *= +m[1]; } return a; },
+    name(el) { return el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\\s+/).join('.') : '') + ' "' + el.textContent.trim().replace(/\\s+/g, ' ').slice(0, 40) + '"'; },
+  };`;
+async function helpers(page) { await page.evaluate(HELPERS); }
+
+/* ---------- 1. structure ---------- */
+{
+  const page = await open();
+  const s = await page.evaluate(() => {
+    const sections = [...document.querySelectorAll('.deck > section.slide')].map(x => '#' + x.id);
+    const dots = [...document.querySelectorAll('.rail > a[href^="#"]')].map(a => a.getAttribute('href'));
+    const folders = [...document.querySelectorAll('.cabinet .folder .folder__btn')].map(a => a.getAttribute('href'));
+    const n = sections.length;
+    const pad = i => (i < 9 ? '0' : '') + (i + 1);
+    const recs = [...document.querySelectorAll('.cabinet .folder')].map(f => f.querySelector('.file__rec').textContent.replace(/\s+/g, ' ').trim());
+    const nums = [...document.querySelectorAll('.cabinet .folder__n')].map(x => x.textContent.trim());
+    const ks = [...document.querySelectorAll('.cabinet .folder')].map(f => getComputedStyle(f).getPropertyValue('--k').trim());
+    return {
+      sections, dots, folders, n,
+      cssN: getComputedStyle(document.documentElement).getPropertyValue('--n').trim(),
+      recsOk: recs.every((r, i) => r.endsWith(pad(i) + ' / ' + n)), recs,
+      numsOk: nums.every((x, i) => x === pad(i)), ksOk: ks.every((k, i) => +k === i),
+      label: document.querySelector('[data-cabinet-label]').textContent,
+      archive: [...document.querySelectorAll('.entry__link[href^="#"]')].map(a => [a.getAttribute('href'), a.textContent.trim()]),
+      names: Object.fromEntries([...document.querySelectorAll('.deck > section.slide')].map((x, i) => ['#' + x.id, pad(i)])),
+    };
+  });
+  check(s.sections.length > 0 && s.sections.length === s.dots.length && s.dots.length === s.folders.length, `sections, dots and folders match in number (${s.sections.length}, ${s.dots.length}, ${s.folders.length})`);
+  check(s.sections.every((id, i) => s.dots[i] === id && s.folders[i] === id), 'sections, dots and folders match in order', s.sections.map((id, i) => `${id} ${s.dots[i]} ${s.folders[i]}`).filter(l => new Set(l.split(' ')).size > 1));
+  check(+s.cssN === s.n, `--n is the number of sheets (${s.cssN})`);
+  check(s.recsOk, '"Sheet NN / N" on every file is written from the sections', s.recs);
+  check(s.numsOk && s.ksOk, 'folder numbers and --k follow the folders');
+  check(s.label.endsWith(s.n + ' sheets'), `the drawer says "${s.label}"`);
+  check(s.archive.every(([h, t]) => !/^Sheet/.test(t) || t.startsWith('Sheet ' + s.names[h] + ',')), 'archive links that name a sheet name the right number', s.archive.map(x => x.join(' ')));
+  await page.context().close();
+}
+
+/* ---------- 2. no link or source into another edition ---------- */
+{
+  const page = await open();
+  await page.hover('.rail a[href="#loquar"]'); await page.waitForTimeout(400); /* the cards' links exist by now */
+  const base = new URL(BASE);
+  const urls = await page.evaluate(() => {
+    const out = [];
+    document.querySelectorAll('a[href], link[href], img[src], img[srcset], source[srcset], script[src], use[href]').forEach(el => {
+      ['href', 'src'].forEach(k => { const v = el.getAttribute(k); if (v) out.push({ el: el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.split(' ')[0] : ''), v, abs: new URL(v, location.href).href }); });
+      const ss = el.getAttribute('srcset'); if (ss) ss.split(',').forEach(part => { const v = part.trim().split(/\s+/)[0]; out.push({ el: 'srcset', v, abs: new URL(v, location.href).href }); });
+    });
+    return out;
+  });
+  const dir = base.pathname.replace(/[^/]*$/, '');      /* /v3/ or /Portfolio/v3/ */
+  const bad = urls.filter(u => { const x = new URL(u.abs); return x.origin === base.origin && !x.pathname.startsWith(dir); });
+  check(bad.length === 0, `no link or source leaves ${dir} for another edition (${urls.length} checked)`, bad.map(u => `${u.el} ${u.v}`));
+  for (const sheet of ['assets/css/site.css', 'assets/css/files.css']) {
+    const css = await (await page.request.get(new URL(sheet, BASE).href)).text();
+    const cssBad = [...css.matchAll(/url\(([^)]+)\)/g)].map(m => m[1].replace(/['"]/g, '')).filter(u => !u.startsWith('data:') && new URL(u, new URL(sheet, BASE)).pathname.indexOf(dir) !== 0);
+    check(cssBad.length === 0, `${sheet} loads nothing from another edition`, cssBad);
+  }
+  await page.context().close();
+  /* every project file: its links, images, stylesheet and script stay in the edition, and it asks for nothing
+     from another origin */
+  for (const slug of FILES) {
+    const fp = await open({ path: `files/${slug}/` });
+    const furls = await fp.evaluate(() => {
+      const out = [];
+      document.querySelectorAll('a[href], link[href], img[src], img[srcset], source[srcset], script[src], use[href]').forEach(el => {
+        ['href', 'src'].forEach(k => { const v = el.getAttribute(k); if (v) out.push({ el: el.tagName.toLowerCase(), v, abs: new URL(v, location.href).href }); });
+        const ss = el.getAttribute('srcset'); if (ss) ss.split(',').forEach(part => { const v = part.trim().split(/\s+/)[0]; out.push({ el: 'srcset', v, abs: new URL(v, location.href).href }); });
+      });
+      return { out, loaded: performance.getEntriesByType('resource').map(r => r.name), robots: (document.querySelector('meta[name="robots"]') || {}).content };
+    });
+    const fbad = furls.out.filter(u => { const x = new URL(u.abs); return x.origin === base.origin && !x.pathname.startsWith(dir); });
+    const foreign = furls.loaded.filter(u => new URL(u).origin !== base.origin);
+    check(fbad.length === 0 && foreign.length === 0 && furls.robots === 'noindex', `files/${slug}/: nothing leaves ${dir}, nothing from another origin, noindex (${furls.out.length} checked)`, [...fbad.map(u => `${u.el} ${u.v}`), ...foreign]);
+    await fp.context().close();
+  }
+}
+
+/* ---------- 3. no visible text under 12px ---------- */
+for (const [w, h, touch] of [[1440, 900, false], [1024, 620, false], [390, 844, true], [320, 640, true]]) {
+  const page = await open({ width: w, height: h, touch });
+  await helpers(page);
+  const scan = () => page.evaluate(() => window.__v3.texts().map(el => ({ name: window.__v3.name(el), px: Math.round(window.__v3.px(el) * 10) / 10 })).filter(x => x.px < 11.95));
+  const small = await scan();
+  /* and with the cabinet open (its folders, the drawer front, a pulled file) */
+  await page.evaluate(() => document.querySelector('.index-tab').click());
+  await page.waitForTimeout(400);
+  if (!touch) { await page.hover('.cabinet .folder__btn[href="#hockey"]'); await page.waitForTimeout(500); }
+  const small2 = await scan();
+  check(small.length + small2.length === 0, `no visible text under 12px at ${w}x${h} (page and open cabinet)`, [...small, ...small2].map(x => `${x.px}px ${x.name}`));
+  await page.context().close();
+}
+
+/* the files: on screen at desktop and phone widths, and in print, where 1rem is 12pt and nothing (not even a
+   printed link address) goes under 9pt (12px) */
+for (const slug of FILES) {
+  const small = [];
+  for (const [w, h, touch] of [[1440, 900, false], [390, 844, true]]) {
+    const fp = await open({ width: w, height: h, touch, path: `files/${slug}/` });
+    await helpers(fp);
+    small.push(...(await fp.evaluate(() => window.__v3.texts().map(el => ({ name: window.__v3.name(el), px: Math.round(window.__v3.px(el) * 10) / 10 })).filter(x => x.px < 11.95))).map(x => `${w}: ${x.px}px ${x.name}`));
+    if (!touch) {
+      await fp.emulateMedia({ media: 'print' });
+      const pr = await fp.evaluate(() => {
+        const t = window.__v3.texts().map(el => ({ name: window.__v3.name(el), px: Math.round(parseFloat(getComputedStyle(el).fontSize) * 10) / 10 })).filter(x => x.px < 11.95);
+        const addr = [...document.querySelectorAll('a[href^="http"]')].filter(a => a.checkVisibility()).map(a => ({ name: 'address after ' + a.textContent.trim().slice(0, 30), cs: getComputedStyle(a, '::after') })).filter(x => x.cs.content !== 'none' && x.cs.content !== 'normal').map(x => ({ name: x.name, px: Math.round(parseFloat(x.cs.fontSize) * 10) / 10 })).filter(x => x.px < 11.95);
+        return [...t, ...addr];
+      });
+      small.push(...pr.map(x => `print: ${x.px}px ${x.name}`));
+    }
+    await fp.context().close();
+  }
+  check(small.length === 0, `files/${slug}/: no visible text under 12px (1440, 390, and in print)`, small.slice(0, 12));
+}
+
+/* ---------- 4. contrast ---------- */
+{
+  const page = await open();
+  await helpers(page);
+  const PAIRS = [
+    ['.skip', 'skip link (black on vermilion)'],
+    ['.panel li', 'skills list on vermilion'], ['.panel p:not(.micro)', 'skills paragraphs on vermilion'], ['.panel .micro', 'skills small print on vermilion'],
+    ['.numbers .l', 'OCAPEX number labels'], ['.numbers .foot', 'OCAPEX footnote'], ['.card--red .small', 'the 486 card line'],
+    ['.panel h3', 'skills headings (display, white)'], ['.numbers .n', 'OCAPEX numbers (display, white)'], ['.card--red .big', '486 (display, white)'],
+    ['.stat-list .ac', 'Genuvalens adaptive results on paper'], ['#ocapex .title__sub', 'OCAPEX subtitle on paper'],
+    ['.code__body', 'code panel text'], ['.code__bar b', 'code panel file name'],
+    ['.folder.is-current .folder__tab', 'current folder tab (black on vermilion)', '::before'], ['.find__k', 'Find label'], ['.cabinet__label', 'drawer label'],
+    ['.entry__year', 'archive years (24px)'], ['.ticket .card__k', 'ticket kicker (vermilion on black)'], ['.timeline .yr', 'hockey years (vermilion on black)'],
+  ];
+  const res = await page.evaluate(PAIRS => PAIRS.map(([sel, what, pseudo]) => {
+    const els = [...document.querySelectorAll(sel)];
+    if (!els.length) return { sel, what, missing: true };
+    const ps = els.map(el => window.__v3.pair(el, pseudo)).filter(Boolean);
+    const worst = ps.sort((a, b) => (a.ratio / a.need) - (b.ratio / b.need))[0];
+    return { sel, what, ...worst };
+  }), PAIRS);
+  for (const r of res) check(!r.missing && r.ratio >= r.need, `${r.what}: ${r.ratio}:1 (needs ${r.need}, ${r.size}px)`, r.missing ? 'not found' : `${r.fg} on ${r.bg}`);
+  /* code keywords and comments, coloured spans inside the panel */
+  await page.waitForFunction(() => document.querySelector('.code__body .k') && document.querySelector('.code__body .c') && document.querySelector('.code__body .n'), null, { timeout: 20000 }).catch(() => {});
+  const code = await page.evaluate(() => ['.code__body .k', '.code__body .c', '.code__body .n'].map(s => { const el = document.querySelector(s); return el ? { s, ...window.__v3.pair(el) } : { s, missing: true }; }));
+  for (const c of code) check(!c.missing && c.ratio >= 4.5, `code panel ${c.s}: ${c.ratio}:1`);
+  /* vermilion text that appears on hover over paper */
+  await page.evaluate(() => { const el = document.querySelector('#exoskeleton .more'); window.scrollTo(0, document.getElementById('exoskeleton').getBoundingClientRect().top + scrollY); return !!el; });
+  await page.waitForTimeout(900);
+  await page.hover('#exoskeleton .more');
+  await page.waitForTimeout(250);
+  const more = await page.evaluate(() => window.__v3.pair(document.querySelector('#exoskeleton .more')));
+  check(more && more.ratio >= 4.5, `"Read the report" on hover, on paper: ${more && more.ratio}:1`);
+  /* the sweep: every text element over a solid colour, at rest */
+  const sweep = await page.evaluate(() => window.__v3.texts().map(el => ({ el: window.__v3.name(el), p: window.__v3.pair(el) })).filter(x => x.p && x.p.ratio < x.p.need).map(x => `${x.p.ratio}:1 < ${x.p.need} ${x.el} (${x.p.fg} on ${x.p.bg})`));
+  check(sweep.length === 0, 'contrast sweep at 1440x900: every text over a solid colour meets its threshold', sweep);
+  await page.context().close();
+  /* phones: the vermilion subtitle on paper stays large */
+  const ph = await open({ width: 390, height: 844, touch: true });
+  await helpers(ph);
+  const sub = await ph.evaluate(() => window.__v3.pair(document.querySelector('#ocapex .title__sub')));
+  check(sub && sub.size >= 24 && sub.ratio >= sub.need, `OCAPEX subtitle on a phone: ${sub && sub.size}px, ${sub && sub.ratio}:1`);
+  const sweep2 = await ph.evaluate(() => window.__v3.texts().map(el => ({ el: window.__v3.name(el), p: window.__v3.pair(el) })).filter(x => x.p && x.p.ratio < x.p.need).map(x => `${x.p.ratio}:1 < ${x.p.need} ${x.el} (${x.p.fg} on ${x.p.bg})`));
+  check(sweep2.length === 0, 'contrast sweep at 390x844', sweep2);
+  await ph.context().close();
+}
+
+/* ---------- 4b. the step back: by colour, so dimmed text keeps its contrast ---------- */
+{
+  const page = await open();
+  await helpers(page);
+  const goSheet = async id => { await page.evaluate(id => document.querySelector(`.rail a[href="#${id}"]`).click(), id); await page.mouse.move(700, 120); await page.waitForTimeout(1300); };
+  /* every text in a root: not dimmed by opacity, and over its solid colour at its threshold */
+  const audit = sel => page.evaluate(sel => window.__v3.texts().filter(el => document.querySelector(sel).contains(el)).map(el => ({ el: window.__v3.name(el), eff: window.__v3.eff(el), p: window.__v3.pair(el) })).filter(x => x.eff < 0.99 || (x.p && x.p.ratio < x.p.need)).map(x => `${x.el}: opacity ${x.eff.toFixed(2)}${x.p ? `, ${x.p.ratio}:1 (needs ${x.p.need}, ${x.p.fg} on ${x.p.bg})` : ''}`), sel);
+  /* a point on the card that the card itself takes (the other card may cover part of it) */
+  const pointIn = sel => page.evaluate(sel => { const c = document.querySelector(sel), r = c.getBoundingClientRect(); for (const fy of [.5, .3, .7, .2, .8]) for (const fx of [.5, .3, .7, .2, .8]) { const x = r.left + r.width * fx, y = r.top + r.height * fy, e = document.elementFromPoint(x, y); if (e && c.contains(e)) return [x, y]; } return null; }, sel);
+  const bad = [], tops = [];
+  for (const id of ['research', 'exoskeleton', 'loquar']) {
+    await goSheet(id);
+    for (const k of ['a', 'b']) {
+      const pt = await pointIn(`#${id} .card--${k}`);
+      await page.mouse.move(pt[0], pt[1], { steps: 4 }); await page.waitForTimeout(1000);
+      bad.push(...(await audit(`#${id} .collage`)).map(x => `${id}, card--${k} pointed at: ${x}`));
+      /* where the two cards overlap, the one pointed at is on top */
+      const top = await page.evaluate(([id, k]) => { const a = document.querySelector(`#${id} .card--a`).getBoundingClientRect(), b = document.querySelector(`#${id} .card--b`).getBoundingClientRect(); const l = Math.max(a.left, b.left), t = Math.max(a.top, b.top), r = Math.min(a.right, b.right), btm = Math.min(a.bottom, b.bottom); if (l >= r || t >= btm) return null; const e = document.elementFromPoint((l + r) / 2, (t + btm) / 2), c = e && e.closest('.card'); return c ? (c.classList.contains('card--' + k) ? 'ok' : `card--${k} pointed at, the other card on top`) : 'nothing'; }, [id, k]);
+      if (top !== null) tops.push(`${id}: ${top}`);
+    }
+    /* from the second card back to the first, crossing the paper on the way: the first comes to the top at once,
+       not after the second card's 800ms drop */
+    const ptA = await pointIn(`#${id} .card--a`);
+    const off = await page.evaluate(id => { const r = document.querySelector(`#${id} .collage`).getBoundingClientRect(); return [r.left + 4, r.bottom + 30]; }, id);
+    await page.mouse.move(off[0], off[1], { steps: 3 }); await page.waitForTimeout(150);
+    await page.mouse.move(ptA[0], ptA[1], { steps: 3 }); await page.waitForTimeout(200);
+    const back = await page.evaluate(id => { const a = document.querySelector(`#${id} .card--a`).getBoundingClientRect(), b = document.querySelector(`#${id} .card--b`).getBoundingClientRect(); const l = Math.max(a.left, b.left), t = Math.max(a.top, b.top), r = Math.min(a.right, b.right), btm = Math.min(a.bottom, b.bottom); if (l >= r || t >= btm) return null; const e = document.elementFromPoint((l + r) / 2, (t + btm) / 2), c = e && e.closest('.card'); return c && c.classList.contains('card--a') ? 'ok' : 'card--a pointed at again, card--b still on top 200ms later'; }, id);
+    if (back !== null) tops.push(`${id} (back to card--a): ${back}`);
+    await page.mouse.move(700, 120); await page.waitForTimeout(900);
+  }
+  await goSheet('archive');
+  const n = await page.evaluate(() => document.querySelectorAll('#archive .entry').length);
+  for (const i of [0, Math.floor(n / 2), n - 1]) {
+    const pt = await page.evaluate(i => { const r = document.querySelectorAll('#archive .entry')[i].getBoundingClientRect(); return [r.left + r.width / 2, r.top + 30]; }, i);
+    await page.mouse.move(pt[0], pt[1], { steps: 3 }); await page.waitForTimeout(1000);
+    bad.push(...(await audit('#archive .entries')).map(x => `archive, card ${i + 1} pointed at: ${x}`));
+  }
+  check(bad.length === 0, 'pointing at a collage or archive card steps the others back by colour: no text dimmed by opacity, every text at its threshold', bad.slice(0, 12));
+  check(tops.length > 0 && tops.every(t => /: ok$/.test(t)), `the card pointed at comes to the top (${tops.length} overlaps)`, tops);
+  /* the keyboard's way: tabbing to an archive card's link */
+  await page.mouse.move(700, 120); await page.waitForTimeout(600);
+  await page.evaluate(() => { const links = document.querySelectorAll('#archive .entry__link'); links[0].focus(); });
+  await page.keyboard.press('Tab'); await page.waitForTimeout(1500);
+  const kb = await audit('#archive .entries');
+  const focusedIn = await page.evaluate(() => !!document.activeElement.closest('#archive .entry'));
+  check(focusedIn && kb.length === 0, 'tabbing to an archive card steps the others back by colour too', kb.slice(0, 8));
+  await page.context().close();
+}
+
+/* ---------- 5. the cabinet: hover opens it, the pulled file takes the click ---------- */
+for (const [w, h] of [[1440, 900], [1024, 620]]) {
+  const page = await open({ width: w, height: h });
+  const box = sel => page.evaluate(s => { const r = document.querySelector(s).getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, h: r.height, w: r.width }; }, sel);
+  const dot = await box('.rail a[href="#hockey"]');
+  await page.mouse.move(dot.cx, dot.cy, { steps: 5 });
+  await page.waitForTimeout(450);
+  const opened = await page.evaluate(() => ({ open: document.getElementById('cabinet').classList.contains('is-open'), out: (document.querySelector('.folder.is-out .folder__btn') || {}).hash }));
+  check(opened.open && opened.out === '#hockey', `${w}x${h}: hovering the hockey dot opens the cabinet with the hockey file out`, JSON.stringify(opened));
+  /* reach for "Open the sheet" the way a hand does: up and to the left at about 45 degrees, then across */
+  const go = await box('#file-hockey .file__go');
+  const path = [[dot.cx - (dot.cy - go.cy), go.cy], [go.cx, go.cy]];
+  let from = [dot.cx, dot.cy];
+  for (const pt of path) {
+    const n = Math.max(6, Math.round(Math.hypot(pt[0] - from[0], pt[1] - from[1]) / 6));
+    for (let k = 1; k <= n; k++) { await page.mouse.move(from[0] + (pt[0] - from[0]) * k / n, from[1] + (pt[1] - from[1]) * k / n); await page.waitForTimeout(8); }
+    from = pt;
+  }
+  await page.mouse.down(); await page.mouse.up();
+  await page.waitForTimeout(1200);
+  const landed = await page.evaluate(() => ({ current: document.querySelector('.rail a[aria-current="true"]').getAttribute('href'), hash: location.hash, y: Math.round(scrollY) }));
+  check(landed.current === '#hockey', `${w}x${h}: a click on the pulled file lands on its own sheet`, JSON.stringify(landed));
+  /* target sizes: every dot and folder row is at least 24px tall (WCAG 2.5.8) */
+  await page.mouse.move(dot.cx, dot.cy, { steps: 3 }); await page.waitForTimeout(450);
+  const sizes = await page.evaluate(() => ({ dots: [...document.querySelectorAll('.rail > a')].map(a => a.getBoundingClientRect()), rows: [...document.querySelectorAll('.cabinet .folder__btn')].map(a => a.getBoundingClientRect()), cab: document.getElementById('cabinet').getBoundingClientRect(), vh: innerHeight }));
+  const tooSmall = [...sizes.dots, ...sizes.rows].filter(r => r.height < 23.99 || r.width < 23.99);
+  check(tooSmall.length === 0, `${w}x${h}: dots and folder rows are at least 24px (dots ${Math.round(sizes.dots[0].width)}x${Math.round(sizes.dots[0].height)}, rows ${Math.round(sizes.rows[0].width)}x${Math.round(sizes.rows[0].height)})`);
+  check(sizes.cab.top >= 0 && sizes.cab.bottom <= sizes.vh, `${w}x${h}: the cabinet fits the window (${Math.round(sizes.cab.top)} to ${Math.round(sizes.cab.bottom)} of ${sizes.vh})`);
+  const aligned = await page.evaluate(() => { const d = [...document.querySelectorAll('.rail > a')].map(a => a.getBoundingClientRect()); const f = [...document.querySelectorAll('.cabinet .folder__btn')].map(a => a.getBoundingClientRect()); return d.map((r, i) => Math.round(Math.abs((r.top + r.bottom) / 2 - (f[i].top + f[i].bottom) / 2))); });
+  check(Math.max(...aligned) <= 2, `${w}x${h}: each dot is level with its folder (largest offset ${Math.max(...aligned)}px)`);
+  await page.context().close();
+}
+
+/* ---------- 5b. hover intent: from a dot up and left to its pulled file, the file stays out ----------
+   Mouse moves at a hand's pace (CDP events 8 or 16 ms apart, 12 or 30 of them) from the centre of a dot to the
+   middle of its file, 5, 10 or 20% of the way down it. Crossing the other folders' edges and dots on the way
+   must not swap the file, and the point reached must be that file (so a click opens its sheet).
+   V3_AIM=full runs every dot below the cabinet's top: 9 dots, 108 paths. */
+{
+  const page = await open();
+  const client = await page.context().newCDPSession(page);
+  const mv = (x, y) => client.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+  const FULL = process.env.V3_AIM === 'full';
+  const names = FULL ? ['Viola & violin', 'The record', 'OCAPEX', 'Contact', 'Goaltender', 'Loquar', 'Drug safety', 'About me', 'Archive'] : ['Viola & violin', 'The record', 'OCAPEX'];
+  const out = () => page.evaluate(() => { const f = document.querySelector('.folder.is-out .folder__btn'); return f ? f.getAttribute('href') : null; });
+  const wrong = []; let n = 0;
+  for (const name of names) for (const ms of FULL ? [8, 16] : [16]) for (const steps of FULL ? [12, 30] : [12]) for (const frac of [0.05, 0.1, 0.2]) {
+    await mv(700, 800); await page.waitForTimeout(900);
+    const dot = await page.$eval(`.rail a[data-name="${name}"]`, a => { const r = a.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+    await mv(dot[0], dot[1]); await page.waitForTimeout(700);
+    const before = await out();
+    const fb = await page.evaluate(() => { const f = document.querySelector('.folder.is-out .file'); if (!f) return null; const r = f.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom]; });
+    n++;
+    if (!fb) { wrong.push(`${name}: no file out`); continue; }
+    const tx = (fb[0] + fb[2]) / 2, ty = fb[1] + (fb[3] - fb[1]) * frac;
+    for (let i = 1; i <= steps; i++) { await mv(dot[0] + (tx - dot[0]) * i / steps, dot[1] + (ty - dot[1]) * i / steps); await new Promise(r => setTimeout(r, ms)); }
+    await page.waitForTimeout(500);
+    const after = await out();
+    const under = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y), a = e && e.closest('.folder__btn'); return a ? a.getAttribute('href') : null; }, [tx, ty]);
+    if (after !== before || under !== before) wrong.push(`${name}, ${steps} moves ${ms}ms apart, ${frac * 100}% down: ${before} became ${after} (under the pointer ${under})`);
+  }
+  check(wrong.length === 0, `hover intent: ${n - wrong.length} of ${n} diagonal paths from a dot up to its file keep that file out`, wrong);
+  /* scrubbing: straight down from one dot to the next, a short rest brings the next file out */
+  await mv(700, 800); await page.waitForTimeout(900);
+  const d1 = await page.$eval('.rail a[data-name="Loquar"]', a => { const r = a.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+  const d2 = await page.$eval('.rail a[data-name="OCAPEX"]', a => { const r = a.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+  await mv(d1[0], d1[1]); await page.waitForTimeout(700);
+  for (let i = 1; i <= 4; i++) { await mv(d1[0], d1[1] + (d2[1] - d1[1]) * i / 4); await new Promise(r => setTimeout(r, 16)); }
+  await page.waitForTimeout(150);
+  const scrub = await out();
+  check(scrub === '#ocapex', `scrubbing straight down the dots stays immediate (150ms after reaching OCAPEX: ${scrub})`);
+  await page.context().close();
+}
+
+/* ---------- 6. routes, Find, the pill, no script ---------- */
+{
+  const page = await open();
+  const routes = await page.evaluate(() => [...document.querySelectorAll('.cover__hand a')].map(a => {
+    const r = a.getBoundingClientRect(), pts = [[0.5, 0.5], [0.5, 0.78], [0.15, 0.6], [0.85, 0.4]].map(([fx, fy]) => [r.left + r.width * fx, r.top + r.height * fy]);
+    const miss = pts.map(([x, y]) => { const e = document.elementFromPoint(x, y); return e && (e === a || a.contains(e)) ? null : (e ? e.tagName + '.' + e.className : 'nothing') + ' at ' + Math.round(x) + ',' + Math.round(y); }).filter(Boolean);
+    return { text: a.textContent, href: a.getAttribute('href'), opens: a.hasAttribute('data-index-open'), reachable: !miss.length, miss };
+  }));
+  const want = { portfolio: '#cabinet', goaltender: '#hockey', researcher: '#research', violist: '#music' };
+  check(routes.length === 4 && routes.every(r => want[r.text] === r.href), 'the cover\'s words are links: ' + routes.map(r => r.text + ' ' + r.href).join(', '));
+  check(routes.every(r => r.reachable), 'nothing covers the cover\'s words (the whole word takes the pointer)', routes.filter(r => !r.reachable).map(r => r.text + ': ' + r.miss.join('; ')));
+  await page.click('.route[href="#hockey"]');
+  await page.waitForTimeout(1200);
+  check(await page.evaluate(() => document.querySelector('.rail a[aria-current="true"]').getAttribute('href')) === '#hockey', '"goaltender" goes to the hockey sheet');
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' })); await page.waitForTimeout(600);
+  await page.click('.route[href="#cabinet"]'); await page.waitForTimeout(400);
+  check(await page.evaluate(() => document.getElementById('cabinet').classList.contains('is-open')), '"portfolio" opens the cabinet');
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  await page.keyboard.press('/'); await page.waitForTimeout(300);
+  await page.keyboard.type('Carnegie'); await page.waitForTimeout(300);
+  const found = await page.evaluate(() => ({ focus: document.activeElement.id, match: [...document.querySelectorAll('.folder.is-match .folder__btn')].map(a => a.hash), quote: (document.querySelector('.folder.is-out .file__quote') || {}).textContent }));
+  check(found.focus === 'find' && found.match.includes('#music') && /Carnegie/.test(found.quote || ''), '"/" opens Find; "Carnegie" finds the music sheet and quotes the line', JSON.stringify(found));
+  await page.keyboard.press('Enter'); await page.waitForTimeout(1200);
+  check(await page.evaluate(() => document.querySelector('.rail a[aria-current="true"]').getAttribute('href')) === '#music', 'Enter goes to the match');
+  const tab = await page.evaluate(() => { const r = document.querySelector('.index-tab').getBoundingClientRect(); return { h: r.height, fs: getComputedStyle(document.querySelector('.index-tab')).fontSize, text: document.querySelector('.index-tab__k').textContent }; });
+  check(tab.h >= 24 && parseFloat(tab.fs) >= 12 && tab.text === 'Index', `the rail carries an "Index" tab (${tab.h}px tall, ${tab.fs})`);
+  await page.context().close();
+
+  const ph = await open({ width: 390, height: 844, touch: true });
+  const pillAt = p => p.evaluate(() => { const t = document.querySelector('.index-tab'), r = t.getBoundingClientRect(); return { text: t.innerText.replace(/\s+/g, ' ').trim().toLowerCase(), right: Math.round(innerWidth - r.right), bottom: Math.round(innerHeight - r.bottom), w: Math.round(r.width), h: r.height, bg: getComputedStyle(t).backgroundColor }; });
+  const pill = await pillAt(ph);
+  check(pill.text === 'index · 01 cover' && pill.right === 12 && pill.bottom === 14 && pill.h >= 44 && pill.bg === 'rgb(21, 21, 21)', `phones: a black pill rests at the bottom right (12px in, 14px up) and reads "${pill.text}" (${pill.w}x${pill.h})`, JSON.stringify(pill));
+  await ph.tap('.index-tab'); await ph.waitForTimeout(400);
+  check(await ph.evaluate(() => document.getElementById('cabinet').classList.contains('is-open')), 'phones: the pill opens the bottom panel');
+  await ph.context().close();
+  const ls = await open({ width: 844, height: 390, touch: true });
+  const pill2 = await pillAt(ls);
+  check(pill2.text === 'index · 01' && pill2.right === 12 && pill2.w <= 130, `windows under 540px tall: the pill names the number only, "${pill2.text}" (${pill2.w}px wide)`, JSON.stringify(pill2));
+  await ls.context().close();
+
+  const nojs = await open({ js: false });
+  const nj = await nojs.evaluate(() => ({ dots: [...document.querySelectorAll('.rail > a')].every(a => a.tabIndex === 0 || !a.hasAttribute('tabindex')), cabinet: getComputedStyle(document.getElementById('cabinet')).display }));
+  await nojs.click('.index-tab'); await nojs.waitForTimeout(200);
+  const shown = await nojs.evaluate(() => getComputedStyle(document.getElementById('cabinet')).display);
+  check(nj.dots && nj.cabinet === 'none' && shown !== 'none', 'without the script the dots are plain links and the Index tab shows the cabinet as its target');
+  await nojs.context().close();
+
+  const rm = await open({ reduced: true });
+  await rm.evaluate(() => document.querySelector('.rail a[href="#loquar"]').click()); await rm.waitForTimeout(300);
+  const card = await rm.$('#loquar .card--a'); const b = await card.boundingBox();
+  const t0 = await rm.evaluate(() => getComputedStyle(document.querySelector('#loquar .card--a')).transform);
+  await rm.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 3 }); await rm.waitForTimeout(300);
+  const t1 = await rm.evaluate(() => { const c = document.querySelector('#loquar .card--a'), s = getComputedStyle(c), o = document.querySelector('#loquar .card--b'); return { transform: s.transform, translate: s.translate, rotate: s.rotate, img: getComputedStyle(c.querySelector('img')).scale, otherImg: getComputedStyle(o.querySelector('img')).opacity, otherCard: getComputedStyle(o).opacity + ' ' + getComputedStyle(o).filter }; });
+  check(t0 === t1.transform && t1.translate === 'none' && t1.rotate === 'none' && (t1.img === 'none' || t1.img === '1') && +t1.otherImg < 1 && t1.otherCard === '1 none', 'reduced motion: a card hover moves nothing; the other card steps back by colour and its picture fades', JSON.stringify(t1));
+  await rm.context().close();
+}
+
+/* ---------- 6b. keyboard: tabbing out of the cabinet closes it; Find keeps the current tab readable ---------- */
+{
+  const page = await open();
+  await helpers(page);
+  await page.focus('.index-tab'); await page.keyboard.press('Enter'); await page.waitForTimeout(300);
+  const opened = await page.evaluate(() => document.getElementById('cabinet').classList.contains('is-open'));
+  await page.focus('.cabinet__close'); await page.keyboard.press('Tab'); await page.waitForTimeout(250);
+  const out = await page.evaluate(() => ({ open: document.getElementById('cabinet').classList.contains('is-open'), at: document.activeElement.textContent.trim() }));
+  check(opened && !out.open, `keyboard: Enter on the Index tab opens the cabinet, and tabbing on out of it (to "${out.at}") closes it`, JSON.stringify({ opened, ...out }));
+  await page.keyboard.press('/'); await page.waitForTimeout(250);
+  await page.keyboard.type('Carnegie'); await page.waitForTimeout(300);
+  const cur = await page.evaluate(() => { const t = document.querySelector('.folder.is-current:not(.is-match) .folder__tab'); return t ? window.__v3.pair(t, '::before') : null; });
+  check(cur && cur.ratio >= 4.5, `Find: the current sheet's vermilion tab stays readable while other sheets match (${cur && cur.ratio}:1)`, cur && `${cur.fg} on ${cur.bg}`);
+  await page.context().close();
+}
+
+/* ---------- 6c. keyboard: the walk, focus that is always on screen, the code panel; touch targets ---------- */
+{
+  /* the Index tab is the one way into the index: the folder button is out of the tab order, so focus never
+     opens the cabinet on its way to the cover's routes */
+  const page = await open();
+  const walk = [];
+  for (let k = 0; k < 7; k++) { await page.keyboard.press('Tab'); await page.waitForTimeout(60); walk.push(await page.evaluate(() => document.activeElement.textContent.trim().replace(/\s+/g, ' '))); }
+  const cab = await page.evaluate(() => document.getElementById('cabinet').classList.contains('is-open'));
+  const want = ['Skip to content', 'Leonardo Carvalho', 'Index · 01 Cover', 'portfolio', 'goaltender', 'researcher', 'violist'];
+  check(!cab && want.every((t, i) => walk[i] === t), `keyboard: the walk from the top is skip, name, Index, then the cover's routes (and the cabinet stays shut)`, walk.join(' | '));
+  /* the code panel: a keyboard has no hover to pause it, so the first key press finishes it at once */
+  const typed = await page.evaluate(() => ({ len: document.querySelector('[data-code-out]').textContent.length, done: document.querySelector('[data-code]').classList.contains('is-done') }));
+  await page.waitForTimeout(1200);
+  const later = await page.evaluate(() => document.querySelector('[data-code-out]').textContent.length);
+  await page.context().close();
+  const rm = await open({ reduced: true });
+  const full = await rm.evaluate(() => document.querySelector('[data-code-out]').textContent.length);
+  await rm.context().close();
+  check(typed.done && typed.len === full && later === full, `keyboard: the first key press finishes the code panel (${typed.len} of ${full} characters, nothing typed after)`, JSON.stringify({ typed, later, full }));
+
+  /* narrow windows: the chrome's strip and the pill step away while scrolling down, but come back while they
+     hold keyboard focus */
+  const ph = await open({ width: 720, height: 800 });
+  await ph.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight / 2, behavior: 'instant' }));
+  await ph.waitForTimeout(400);
+  const away = await ph.evaluate(() => document.documentElement.classList.contains('bars-away'));
+  await ph.keyboard.press('Tab'); await ph.keyboard.press('Tab'); await ph.waitForTimeout(450);
+  const name = await ph.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(); return { text: a.textContent.trim(), top: Math.round(r.top), bottom: Math.round(r.bottom) }; });
+  await ph.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+  await ph.waitForTimeout(900);
+  const atEnd = await ph.evaluate(() => document.documentElement.className);
+  await ph.keyboard.press('Tab'); await ph.waitForTimeout(450);
+  const pill = await ph.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(), cs = getComputedStyle(a); return { cls: a.className, top: Math.round(r.top), bottom: Math.round(r.bottom), opacity: +cs.opacity, vh: innerHeight }; });
+  check(away && name.text === 'Leonardo Carvalho' && name.top >= 0, `narrow windows: the chrome's name comes back while it has focus (top ${name.top}px)`, JSON.stringify(name));
+  check(/at-end/.test(atEnd) && pill.cls === 'index-tab' && pill.opacity === 1 && pill.top >= 0 && pill.bottom <= pill.vh, `narrow windows: at the foot, the Index pill comes back while it has focus (opacity ${pill.opacity}, ${pill.top} to ${pill.bottom} of ${pill.vh})`, JSON.stringify({ atEnd, pill }));
+  await ph.context().close();
+
+  /* touch screens: the routes and the chrome's name are 44px tall targets, and the whole height takes the tap
+     (measured along the word's own height: the hand line is tilted 3 degrees) */
+  const tp = await open({ width: 390, height: 844, touch: true });
+  const tt = await tp.evaluate(() => [...document.querySelectorAll('.route'), document.querySelector('.chrome a')].filter(a => a.getClientRects().length && a.checkVisibility()).map(a => {
+    const r = a.getClientRects()[0], cx = r.left + r.width / 2, cy = r.top + r.height / 2, h = a.offsetHeight;
+    const hit = y => { const e = document.elementFromPoint(cx, y); return !!e && (e === a || a.contains(e)); };
+    return { t: a.textContent.trim(), h, ends: hit(cy - h / 2 + 2) && hit(cy + h / 2 - 2) };
+  }));
+  check(tt.length >= 4 && tt.every(x => x.h >= 44 && x.ends), `touch: the cover's routes and the chrome's name take 44px (${tt.map(x => x.t + ' ' + x.h).join(', ')})`, JSON.stringify(tt));
+  await tp.context().close();
+}
+
+/* ---------- 7. the files ---------- */
+{
+  /* the coach one-pager prints on one Letter page */
+  const hk = await open({ path: 'files/hockey/' });
+  const pdf = await hk.pdf({ format: 'Letter' });
+  const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+  check(pages === 1, `files/hockey/ prints on one Letter page (${pages})`);
+  await hk.context().close();
+
+  /* without the script every pager line shows (a hover reveal needs a resting twin) */
+  const nj = await open({ path: 'files/hockey/', js: false });
+  const lines = await nj.evaluate(() => [...document.querySelectorAll('.pager__d > span')].map(s => ({ o: +getComputedStyle(s).opacity, h: Math.round(s.getBoundingClientRect().height) })));
+  check(lines.length === 2 && lines.every(l => l.o === 1 && l.h >= 12), `files without the script: the pager's lines show (${lines.map(l => l.h + 'px').join(', ')})`, JSON.stringify(lines));
+  await nj.context().close();
+
+  /* phones: the drawer shows only the current tab (a class, not :has()), the page never scrolls sideways, and
+     the back, link-row and contact links and the chrome's name are 44px targets */
+  const narrow = [];
+  for (const slug of FILES) {
+    const fp = await open({ width: 390, height: 844, touch: true, path: `files/${slug}/` });
+    const r = await fp.evaluate(() => ({
+      tabs: [...document.querySelectorAll('.drawer li')].filter(li => li.getBoundingClientRect().width > 0).length,
+      wide: document.documentElement.scrollWidth - innerWidth,
+      small: [...document.querySelectorAll('.back, .linkrow a, .contacts a, .chrome a')].filter(a => a.checkVisibility()).map(a => [a.textContent.trim().slice(0, 24), Math.round(a.getBoundingClientRect().height)]).filter(x => x[1] < 44),
+    }));
+    if (r.tabs !== 1 || r.wide > 0 || r.small.length) narrow.push(`${slug}: ${JSON.stringify(r)}`);
+    await fp.context().close();
+  }
+  check(narrow.length === 0, 'files at 390: one drawer tab, no sideways scroll, 44px touch targets', narrow);
+
+  /* the chrome's text sits where the deck's does, so it does not show double while the page changes */
+  const off = [];
+  for (const [w, h] of [[1440, 900], [1280, 800], [1024, 620]]) {
+    const at = async path => { const p = await open({ width: w, height: h, path }); const y = await p.evaluate(() => { const a = document.querySelector('.chrome a'), rg = document.createRange(); rg.selectNodeContents(a); const r = rg.getBoundingClientRect(); return Math.round((r.top + r.bottom) / 2 * 10) / 10; }); await p.context().close(); return y; };
+    const deck = await at(''), file = await at('files/aducanumab/');
+    if (Math.abs(deck - file) > 1) off.push(`${w}x${h}: deck ${deck}, file ${file}`);
+  }
+  check(off.length === 0, 'the chrome\'s name sits at the same height on the deck and in a file (1440x900, 1280x800, 1024x620)', off);
+
+  /* Back from a file lands where the reader was, not on the sheet in the old #hash */
+  const bp = await open({ path: '#research' });
+  const y0 = await bp.evaluate(() => { window.scrollTo({ top: 7 * innerHeight, behavior: 'instant' }); return Math.round(scrollY); });
+  await bp.waitForTimeout(500);
+  await bp.goto(new URL('files/hockey/', BASE).href, { waitUntil: 'load' }); await bp.waitForTimeout(300);
+  await bp.goBack({ waitUntil: 'load' }); await bp.waitForTimeout(1200);
+  const back = await bp.evaluate(() => ({ y: Math.round(scrollY), hash: location.hash, type: (performance.getEntriesByType('navigation')[0] || {}).type }));
+  check(Math.abs(back.y - y0) < 50, `Back from a file returns to where the reader was (${y0} -> ${back.y}, ${back.type}, hash ${back.hash})`, JSON.stringify(back));
+  await bp.context().close();
+  const hp = await open({ path: '#hockey' });
+  check(await hp.evaluate(() => document.querySelector('.rail a[aria-current="true"]').getAttribute('href')) === '#hockey', 'a fresh load of #hockey still lands on the hockey sheet');
+  await hp.context().close();
+  /* and the files load without errors with the script off */
+  for (const slug of FILES) { const fp = await open({ path: `files/${slug}/`, js: false }); await fp.context().close(); }
+}
+
+/* ---------- 8. console ---------- */
+check(errors.length === 0, 'no console errors', errors);
+
+await browser.close();
+console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');
+process.exitCode = failures ? 1 : 0;

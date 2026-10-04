@@ -1,0 +1,543 @@
+/* Leonardo Carvalho · v3 poster edition · the project files.
+   A file is what the cabinet holds: pulled out, it lies on the black desk as a paper document with a torn
+   top edge, its vermilion tab standing among the tabs of the other files in the drawer. Inside: the title in
+   Anton, a fact strip, a stamp for the stage, sections behind black divider tabs, figures taped down as
+   prints, and the previous and next files at the end. Same tokens, faces and textures as the deck
+   (site.css); none of the deck's sheet rules apply here, so this sheet stands on its own.
+
+   Hover grammar (carried over as behaviour, rebuilt in paper): content moves inside a still frame on one
+   long ease-out, cubic-bezier(.22, 1, .36, 1). Cards settle flat from their tilt and lift 3px over 800ms;
+   the corner arrow grows from .8 and turns from 45 degrees over 450ms; a file card's line unfolds
+   (grid rows 0fr to 1fr, 500ms) while the other card steps back by dimming. Nothing blurs, nothing tilts
+   toward the pointer. Reduced motion keeps colour and opacity only. */
+
+/* ---------- Fonts (self-hosted; the same files the deck uses) ---------- */
+@font-face { font-family: 'Anton'; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/anton-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Anton'; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/anton-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Metropolis'; font-style: normal; font-weight: 300; font-display: swap; src: url(../fonts/metropolis-light.woff2) format('woff2'); }
+@font-face { font-family: 'Metropolis'; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/metropolis-regular.woff2) format('woff2'); }
+@font-face { font-family: 'Metropolis'; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/metropolis-bold.woff2) format('woff2'); }
+
+/* ---------- Tokens (the deck's, from site.css) ---------- */
+:root {
+  --black: #151515;
+  --paper: #E9E5E5;
+  --red: #EA3D2E;
+  --white: #FFFFFF;
+  --paper-2: #D5D0CF;       /* rules on paper */
+  --ink-2: #5E5A5A;         /* muted on paper 5.4:1, on white 6.8:1, on the well 4.8:1 */
+  --stage-2: #B1ADAB;       /* muted on black, 8.2:1 */
+  --well: #DDD8D7;
+  --display: 'Anton', Impact, 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --sans: 'Metropolis', 'Gotham', 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --text: clamp(1rem, .96rem + .18vw, 1.0625rem);
+  --small: .875rem;
+  --micro: .75rem;          /* 12px: nothing is set smaller */
+  --gutter: clamp(16px, 2.6vw, 36px);
+  --desk: clamp(8px, 2.6vw, 36px);      /* black desk visible beside the paper */
+  --pad: clamp(20px, 5.2vw, 72px);      /* inside the paper */
+  --indent: 0px;                        /* the binding margin sections sit behind, set wide below */
+  --chrome: 52px;
+  --tear: 40px;
+  --max: 1120px;
+  /* the creamy curve and its clocks */
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --t-settle: 800ms;
+  --t-arrow: 450ms;
+  --t-open: 500ms;
+  --t-step: 400ms;
+  --t-fast: 150ms;
+  /* the deck's grain, with its strength baked in, laid over the paper */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .056 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --tear-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2800' height='72' viewBox='0 0 2800 72'%3E%3Cpath d='M0,72 L0,39.6 L0,39.6 L20,38.4 L40,35.1 L60,36.3 L80,28.6 L100,33.1 L120,22.7 L140,33 L160,28.4 L180,21.1 L200,22 L220,35.4 L240,28 L260,30 L280,30.9 L300,31.7 L320,39.4 L340,38.8 L360,33.6 L380,47.8 L400,36.2 L420,36.5 L440,50.2 L460,42.8 L480,43.2 L500,31.5 L520,39 L540,29.5 L560,38.7 L580,27.1 L600,39.3 L620,24.8 L640,26.6 L660,28.8 L680,26.7 L700,23.2 L720,21 L740,27.3 L760,28.6 L780,23.4 L800,27.5 L820,33.1 L840,26.2 L860,29.2 L880,28.5 L900,37.3 L920,40.3 L940,41.3 L960,44.5 L980,51.8 L1000,45.8 L1020,56 L1040,50.5 L1060,61.2 L1080,62.7 L1100,59.4 L1120,68 L1140,55.6 L1160,55.5 L1180,58.9 L1200,52.8 L1220,50.2 L1240,54.6 L1260,53.6 L1280,55.5 L1300,42.9 L1320,54.1 L1340,43.9 L1360,39.6 L1380,47.5 L1400,43.8 L1420,42.3 L1440,50.4 L1460,43.3 L1480,35.4 L1500,41.4 L1520,40.2 L1540,38.2 L1560,47.2 L1580,48.3 L1600,50.1 L1620,45.8 L1640,53.3 L1660,48.2 L1680,54.1 L1700,51.4 L1720,50.7 L1740,44.2 L1760,54.3 L1780,49.9 L1800,48.4 L1820,43 L1840,36.5 L1860,33.5 L1880,36.4 L1900,36.5 L1920,32.8 L1940,35 L1960,28.6 L1980,20.3 L2000,24.3 L2020,25.5 L2040,21.5 L2060,17.9 L2080,23.3 L2100,17 L2120,16.6 L2140,19.6 L2160,25.1 L2180,27.9 L2200,20.4 L2220,23.7 L2240,27.6 L2260,30.9 L2280,37.3 L2300,41.2 L2320,55 L2340,40.2 L2360,51.8 L2380,56.1 L2400,40.2 L2420,38.6 L2440,43.7 L2460,46.3 L2480,49.7 L2500,40 L2520,49.8 L2540,44.6 L2560,38.4 L2580,42.5 L2600,40.6 L2620,37.1 L2640,42.5 L2660,42.4 L2680,32.5 L2700,38.5 L2720,35.9 L2740,42.7 L2760,44.5 L2780,42.3 L2800,44.8 L2800,72 Z'/%3E%3C/svg%3E");
+  --tear-end: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2800' height='72' viewBox='0 0 2800 72'%3E%3Cpath d='M0,72 L0,38.5 L0,38.5 L20,35.7 L40,34.9 L60,32.5 L80,38.9 L100,36.4 L120,37 L140,42.9 L160,40.5 L180,33.9 L200,38.4 L220,34.8 L240,26.2 L260,26.9 L280,23.1 L300,44.4 L320,20.9 L340,21.6 L360,27.8 L380,21.5 L400,27.3 L420,30.4 L440,23.7 L460,27.4 L480,41.1 L500,44.4 L520,28.5 L540,50.1 L560,33.4 L580,41.5 L600,44.6 L620,47.9 L640,47.1 L660,54.4 L680,54.4 L700,50.2 L720,68 L740,57.5 L760,55.7 L780,54.2 L800,61.9 L820,61.3 L840,58.6 L860,51.3 L880,57.4 L900,59.3 L920,45.9 L940,62.1 L960,47.4 L980,49.4 L1000,50.3 L1020,47.6 L1040,46.2 L1060,35.9 L1080,41.9 L1100,41.9 L1120,35.1 L1140,34.8 L1160,35.4 L1180,46.9 L1200,37.5 L1220,39.6 L1240,46.7 L1260,41.6 L1280,59.8 L1300,48.8 L1320,47.7 L1340,53.9 L1360,42.4 L1380,46.1 L1400,62.4 L1420,52 L1440,42.2 L1460,38.3 L1480,45.3 L1500,43.5 L1520,36.7 L1540,36.3 L1560,28 L1580,29 L1600,23.2 L1620,25.9 L1640,20 L1660,17.1 L1680,15.4 L1700,23 L1720,32.8 L1740,13.7 L1760,15.3 L1780,24.1 L1800,17.1 L1820,19.1 L1840,22.2 L1860,26.6 L1880,29 L1900,24.8 L1920,33.8 L1940,34.8 L1960,38.9 L1980,50.5 L2000,40.2 L2020,41 L2040,48.1 L2060,41.6 L2080,50.8 L2100,41.5 L2120,54 L2140,40.8 L2160,49.5 L2180,54.7 L2200,58.1 L2220,45.8 L2240,39.4 L2260,42.2 L2280,42.9 L2300,34.7 L2320,34.8 L2340,36.4 L2360,42.1 L2380,43 L2400,41.3 L2420,44.6 L2440,46.6 L2460,48.1 L2480,40 L2500,50.5 L2520,54.7 L2540,54.9 L2560,56 L2580,67.4 L2600,53.1 L2620,63.4 L2640,60.3 L2660,66.1 L2680,56.9 L2700,60.4 L2720,59.8 L2740,54.9 L2760,53.8 L2780,57.3 L2800,50.5 L2800,72 Z'/%3E%3C/svg%3E");
+}
+@media (min-width: 1024px) { :root { --indent: clamp(0px, 7vw, 7.5rem); } }
+@media (min-width: 900px) and (max-height: 820px) { :root { --chrome: 44px; } } /* as site.css: the chrome text stays put across the page change */
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--black); color-scheme: dark; -webkit-text-size-adjust: 100%; }
+body { margin: 0; font: 400 var(--text)/1.6 var(--sans); background: var(--black); color: var(--white); overflow-x: clip; -webkit-font-smoothing: antialiased; }
+img, svg { display: block; max-width: 100%; }
+h1, h2, h3, p, ul, ol, dl, dd, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+b, strong { font-weight: 700; }
+cite { font-style: italic; }
+:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* black on vermilion, 4.5:1 */
+.skip { position: absolute; top: 8px; left: 8px; z-index: 50; background: var(--red); color: var(--black); padding: .7rem 1rem; font: 700 var(--small)/1 var(--sans); letter-spacing: .08em; text-decoration: none; transform: translateY(-200%); }
+.skip:focus { transform: none; outline: 2px solid var(--white); outline-offset: 2px; }
+.file:focus { outline: none; } /* the file takes focus only as the skip link's target */
+
+/* ---------- Chrome: name left, year right, as on the deck ---------- */
+.chrome { display: flex; align-items: center; justify-content: space-between; height: var(--chrome); padding-inline: var(--gutter); font-size: .8125rem; letter-spacing: .12em; text-transform: uppercase; color: var(--white); }
+.chrome a { text-decoration: none; padding-block: .6rem; }
+.chrome a:focus-visible { outline-color: var(--white); }
+@media (hover: hover) and (pointer: fine) { .chrome a { transition: letter-spacing var(--t-arrow) var(--ease); } .chrome a:hover { letter-spacing: .16em; } }
+
+/* ---------- The desk and the drawer ----------
+   The drawer is the row of tabs the file stands in: the current file's tab is vermilion and taller, the
+   others are paper tabs a step lower, each one a link. Every tab runs on down behind the paper by the
+   height of the torn edge, so where the tear dips the tab shows through it and nowhere floats. */
+.desk { position: relative; padding: clamp(10px, 2.4vh, 28px) var(--desk) clamp(48px, 9vh, 104px); }
+.drawer, .file { max-width: var(--max); margin-inline: auto; }
+.drawer { position: relative; z-index: 1; view-transition-name: drawer; }
+.drawer ol { display: flex; align-items: flex-end; gap: 4px; padding-left: clamp(10px, 3vw, 44px); }
+.drawer li { display: flex; }
+.drawer a { --th: 30px; position: relative; display: block; height: calc(var(--th) + var(--tear)); padding: 0 16px; background: var(--paper-2); color: var(--black); font-size: var(--micro); line-height: 1; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; text-decoration: none; clip-path: polygon(0 100%, 9px 0, calc(100% - 9px) 0, 100% 100%); }
+.drawer a > span { display: block; height: var(--th); line-height: var(--th); }
+.drawer b { font-weight: 700; }
+.drawer a[aria-current="page"] { --th: 40px; padding: 0 22px; background: var(--red); font-size: .8125rem; font-weight: 700; letter-spacing: .14em; clip-path: polygon(0 100%, 12px 0, calc(100% - 12px) 0, 100% 100%); }
+.drawer a:focus-visible { outline: none; background: var(--white); box-shadow: inset 0 3px 0 var(--black); }
+.drawer a[aria-current="page"]:focus-visible { background: var(--red); box-shadow: inset 0 3px 0 var(--black); }
+/* the label is underlined too, so focus does not rest on a change of paper alone */
+.drawer a:focus-visible > span, .toc a:focus-visible { text-decoration: underline 2px; text-underline-offset: 4px; }
+@media (hover: hover) and (pointer: fine) {
+  .drawer a:not([aria-current]) { transition: translate var(--t-arrow) var(--ease), background var(--t-fast) ease; }
+  .drawer a:not([aria-current]):hover { translate: 0 -4px; background: var(--paper); }
+}
+/* the drawer narrows: the other files keep only their numbers, then step out of the row (phones page with
+   the cards at the end of each file instead) */
+@media (max-width: 1079px) { .drawer .n-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+@media (max-width: 599px) { .drawer li:not(.is-current) { display: none; } } /* the current tab's li carries .is-current, so this needs no :has() */
+
+/* ---------- The file: paper with a torn top and a torn foot ---------- */
+.file { position: relative; z-index: 2; padding: clamp(20px, 3vw, 36px) var(--pad) clamp(48px, 7vw, 88px); background: var(--grain) 0 0 / 220px 220px, var(--paper); color: var(--black); box-shadow: 0 34px 70px rgba(0,0,0,.5); }
+.file::before, .file::after { content: ""; position: absolute; left: 0; right: 0; height: var(--tear); background: var(--grain) 0 0 / 220px 220px, var(--paper); pointer-events: none; -webkit-mask: var(--tear-top) 50% 100% / auto 100% no-repeat; mask: var(--tear-top) 50% 100% / auto 100% no-repeat; }
+.file::before { bottom: calc(100% - 1px); }
+.file::after { top: calc(100% - 1px); transform: scaleY(-1); -webkit-mask-image: var(--tear-end); mask-image: var(--tear-end); filter: drop-shadow(0 -10px 12px rgba(0,0,0,.25)); }
+
+/* the bar at the top of the paper: the way back to the sheet, and on the hockey file the print button */
+.file__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.5rem; }
+.back { display: inline-flex; align-items: center; gap: .6rem; min-height: 32px; padding: .35rem 0 .3rem; border-bottom: 2px solid var(--red); color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; }
+.back svg { width: 16px; height: 16px; flex: none; rotate: 180deg; }
+@media (hover: hover) and (pointer: fine) {
+  .back svg { transition: translate var(--t-arrow) var(--ease); }
+  .back:hover svg { translate: -4px 0; }
+  .back { transition: border-color var(--t-fast) ease; }
+  .back:hover { border-bottom-color: var(--black); }
+}
+
+/* ---------- The head: title, line, stamp, facts, note, the sections' tabs ---------- */
+.file__head { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: clamp(1.75rem, 5.2vw, 4.5rem); }
+.file__title { font: 400 clamp(3.25rem, 11vw, 8.75rem)/.88 var(--display); letter-spacing: -.005em; text-transform: uppercase; text-wrap: balance; overflow-wrap: break-word; }
+.file__title--long { font-size: clamp(2.1rem, 1.1rem + 3.4vw, 4.4rem); line-height: .94; max-width: 32ch; }
+.file__title--name { font-size: clamp(3rem, 9vw, 7.5rem); }
+.file__sub { margin-top: clamp(.9rem, 2vw, 1.4rem); max-width: 42ch; font-weight: 300; font-size: clamp(1.15rem, 1rem + .8vw, 1.6rem); line-height: 1.3; text-wrap: pretty; }
+.file__sub b { font-weight: 700; }
+.file__meta { margin-top: .9rem; font-weight: 700; font-size: .8125rem; letter-spacing: .12em; line-height: 1.5; text-transform: uppercase; text-wrap: balance; }
+/* the stamp: the stage, inked in vermilion (24px and up, so 3:1 applies). It sits at the top right of the
+   paper, level with the way back; below 900px, where its tilted foot would come down onto the title, it
+   follows the title instead. */
+.stamp { position: absolute; z-index: 1; top: clamp(14px, 1.6vw, 22px); right: var(--pad); padding: .32em .55em .26em; max-width: 16em; border: 3px solid var(--red); outline: 1.5px solid var(--red); outline-offset: -8px; color: var(--red); font: 400 1.5rem/1.05 var(--display); letter-spacing: .05em; text-align: center; text-transform: uppercase; text-wrap: balance; rotate: -5deg; transform-origin: 100% 0; }
+@media (max-width: 899px) {
+  .stamp { position: relative; top: auto; right: auto; justify-self: start; margin: 1.6rem 0 .25rem 4px; font-size: 1.5rem; rotate: -3deg; }
+}
+
+/* the fact strip, moved from the editorial pages: a thick rule, then ruled cells */
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); margin-top: clamp(1.75rem, 4vw, 2.75rem); border-top: 3px solid var(--black); }
+.facts > div { min-width: 0; padding: .7rem 1.1rem .9rem 0; box-shadow: inset -1px 0 var(--paper-2), inset 0 -1px var(--paper-2); }
+.facts dt { font-size: var(--micro); font-weight: 700; letter-spacing: .14em; line-height: 1.3; text-transform: uppercase; color: var(--ink-2); }
+.facts dd { margin-top: .35rem; font-size: var(--small); line-height: 1.45; text-wrap: pretty; }
+.facts dd + dd { margin-top: .1rem; }
+.facts a { text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: .2em; }
+.facts .big { font: 400 clamp(1.6rem, 2.6vw, 2.25rem)/1 var(--display); letter-spacing: .01em; margin-top: .4rem; }
+.facts .s { font-size: var(--micro); color: var(--ink-2); letter-spacing: .04em; }
+
+/* the note that travels with the facts: a white card taped to the file */
+.note { position: relative; justify-self: start; max-width: 64ch; margin-top: clamp(1.75rem, 4vw, 2.5rem); padding: 1.15rem 1.35rem 1.2rem; background: var(--white); font-size: .9375rem; line-height: 1.55; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 12px 26px rgba(0,0,0,.12); rotate: -.5deg; }
+.note::before, .fig__frame::before, .slab::before, .pager a::before { content: ""; position: absolute; top: -12px; left: 22px; width: 92px; height: 24px; rotate: -4deg; pointer-events: none; background: linear-gradient(100deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.85) 32%, rgba(255,255,255,.6) 58%, rgba(255,255,255,.8) 100%); box-shadow: 0 1px 3px rgba(0,0,0,.18), inset 0 0 0 1px rgba(0,0,0,.05); clip-path: polygon(2% 0, 98% 3%, 100% 24%, 97% 48%, 100% 78%, 98% 100%, 3% 97%, 0 70%, 2% 42%, 0 16%); }
+.note b:first-child { margin-right: .2em; }
+
+/* the sections' own tabs: hairline folder tabs, as in the cabinet; the whole tab is the link */
+.toc { margin-top: clamp(1.75rem, 4vw, 2.5rem); }
+.toc ol { display: flex; flex-wrap: wrap; gap: 8px 4px; }
+.toc a { position: relative; display: inline-flex; align-items: center; gap: .55em; height: 30px; padding: 0 15px; background: var(--black); color: var(--black); font-size: var(--micro); line-height: 1; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; text-decoration: none; clip-path: polygon(0 100%, 9px 0, calc(100% - 9px) 0, 100% 100%); isolation: isolate; }
+.toc a::before { content: ""; position: absolute; inset: 1px 1px 0; z-index: -1; background: var(--paper); clip-path: polygon(0 100%, 8px 0, calc(100% - 8px) 0, 100% 100%); transition: background 300ms var(--ease); }
+.toc a > span:first-child { font-weight: 700; }
+.toc a:focus-visible { outline: none; }
+.toc a:focus-visible::before { inset: 2px 2px 0; background: var(--white); }
+@media (hover: hover) and (pointer: fine) { .toc a:hover::before { background: var(--white); } }
+
+/* ---------- Sections behind black divider tabs ---------- */
+.sec { margin-top: clamp(3rem, 7vw, 5rem); scroll-margin-top: 1.5rem; }
+.sec__tab { display: flex; margin-bottom: clamp(1.25rem, 3vw, 2rem); border-bottom: 3px solid var(--black); font-weight: 400; }
+.sec__tab > span { display: inline-flex; align-items: center; gap: .75rem; padding: .62rem 1.6rem .42rem 1.15rem; background: var(--black); color: var(--white); font: 400 clamp(1.35rem, 1.1rem + .9vw, 1.9rem)/1 var(--display); letter-spacing: .03em; text-transform: uppercase; clip-path: polygon(0 100%, 12px 0, calc(100% - 12px) 0, 100% 100%); }
+.sec__n { font: 700 .8125rem/1 var(--sans); letter-spacing: .08em; color: var(--red); } /* vermilion on black, 4.5:1 */
+.sec > :not(.sec__tab) { margin-left: var(--indent); }
+.sec > .figgrid > .fig, .sec > .figgrid > figure { margin-left: 0; }
+
+/* reading */
+.prose { max-width: 68ch; }
+.prose > * + * { margin-top: 1em; }
+.prose p, .prose li { text-wrap: pretty; }
+.prose .abstract { font-size: 1.125em; line-height: 1.55; }
+.prose a, .entry a, .contacts a, .linkrow a { text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: .2em; }
+@media (hover: hover) and (pointer: fine) {
+  .prose a, .entry a, .contacts a, .linkrow a { transition: text-decoration-thickness 300ms var(--ease), text-decoration-color var(--t-fast) ease; }
+  .prose a:hover, .entry a:hover, .linkrow a:hover { text-decoration-thickness: 4px; }
+}
+.prose ol.steps { counter-reset: n; display: grid; gap: 1.1rem; }
+.prose ol.steps > li { position: relative; padding-left: 2.75rem; }
+.prose ol.steps > li::before { counter-increment: n; content: counter(n); position: absolute; left: 0; top: -.15em; font: 400 1.6rem/1 var(--display); color: var(--red); } /* 25.6px: large text */
+.small { font-size: var(--small); line-height: 1.5; }
+.muted { color: var(--ink-2); }
+.refs { counter-reset: r; display: grid; gap: .7rem; font-size: var(--small); line-height: 1.5; }
+.refs li { position: relative; padding-left: 2.25rem; overflow-wrap: anywhere; }
+.refs li::before { counter-increment: r; content: counter(r); position: absolute; left: 0; top: .05em; font: 400 1rem/1.3 var(--display); }
+
+/* ---------- Figures: prints taped to the file, charts on white cards ---------- */
+.fig { margin-top: clamp(1.75rem, 4vw, 2.75rem); max-width: 60rem; }
+.fig--narrow { max-width: 40rem; }
+.fig--lead { max-width: none; margin-top: clamp(2.25rem, 5vw, 3.5rem); }
+.fig--lead:has(> .ph) { max-width: 40rem; } /* an empty slot should not outweigh the file */
+.fig__frame { position: relative; padding: clamp(8px, 1.1vw, 14px); background: var(--white); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 14px 30px rgba(0,0,0,.14); }
+.fig__frame::before { left: auto; right: 26px; rotate: 5deg; z-index: 1; }
+.fig__frame img { width: 100%; height: auto; }
+.fig figcaption { margin-top: .85rem; max-width: 72ch; font-size: var(--small); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.fig figcaption b { color: var(--black); }
+.figgrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 clamp(1.25rem, 3vw, 2.5rem); max-width: 60rem; }
+@media (min-width: 760px) { .figgrid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.figgrid > .fig { max-width: none; }
+/* screenshots settle inside their still frame (product files only; research figures never crop) */
+.shot { overflow: hidden; }
+.shot img { scale: 1.05; transition: scale var(--t-settle) var(--ease); }
+@media (hover: hover) and (pointer: fine) { .fig:hover .shot img { scale: 1; } }
+@media (hover: none), (pointer: coarse) { .shot img { scale: 1; } }
+
+/* charts, redrawn in the deck's language: black bars, the subject in vermilion, Anton values */
+.chart { padding: clamp(1rem, 2.4vw, 1.75rem) clamp(1rem, 2.4vw, 1.75rem) clamp(.9rem, 2vw, 1.4rem); }
+.vbars { display: grid; gap: .65rem; padding-top: 1.9rem; }
+.vbars__plot { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: end; gap: clamp(6px, 3%, 1.75rem); height: var(--h, 220px); border-bottom: 2px solid var(--black); background: repeating-linear-gradient(to top, var(--paper-2) 0 1px, transparent 1px calc(100% / var(--lines, 4))); }
+.vbar { position: relative; height: calc(var(--v) / var(--max) * 100%); min-height: 2px; background: var(--black); }
+.vbar--ac { background: var(--red); }
+.vbar b { position: absolute; bottom: 100%; left: 50%; translate: -50% 0; padding-bottom: .3rem; font: 400 clamp(.95rem, .85rem + .5vw, 1.35rem)/1 var(--display); letter-spacing: .02em; white-space: nowrap; color: var(--black); }
+.vbars__labels { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: clamp(6px, 3%, 1.75rem); font-size: var(--micro); letter-spacing: .06em; text-align: center; text-transform: uppercase; color: var(--ink-2); }
+.vbars__labels span { min-width: 0; overflow-wrap: anywhere; }
+.vpair { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-items: end; height: 100%; }
+.vbars--pairs .vbar b { font-size: clamp(.8rem, .7rem + .4vw, 1rem); }
+.legend { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; margin-top: .25rem; font-size: var(--micro); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.legend span::before { content: ""; display: inline-block; width: .85em; height: .85em; margin-right: .5em; vertical-align: -.08em; background: var(--sw, var(--black)); }
+.hbars { display: grid; gap: .55rem; }
+.hbars__row { display: grid; grid-template-columns: minmax(8rem, 15rem) minmax(0, 1fr); gap: .9rem; align-items: center; font-size: .8125rem; line-height: 1.3; }
+.hbars__label { overflow-wrap: anywhere; }
+.hbars__row--ac .hbars__label { font-weight: 700; }
+.hbars__bar { position: relative; height: 1.15rem; min-width: 2px; width: calc(var(--v) / var(--max) * (100% - 3rem)); background: var(--black); }
+.hbars__bar--ac { background: var(--red); }
+.hbars__bar b { position: absolute; left: 100%; top: 50%; translate: 0 -50%; padding-left: .5rem; font: 400 1.05rem/1 var(--display); letter-spacing: .02em; }
+@media (max-width: 519px) { .hbars__row { grid-template-columns: minmax(0, 1fr); gap: .25rem; } .hbars__bar { height: .95rem; } }
+.vbars, .vbars__plot, .vbar, .hbars__bar, .legend span::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* tables: a data sheet on white */
+.tbl-wrap { position: relative; max-width: 60rem; margin-top: clamp(1.75rem, 4vw, 2.75rem); padding: clamp(1rem, 2.4vw, 1.6rem); background: var(--white); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 14px 30px rgba(0,0,0,.12); overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: var(--small); line-height: 1.4; font-variant-numeric: tabular-nums; }
+.tbl caption { padding-bottom: .8rem; text-align: left; font-size: var(--small); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.tbl caption b { color: var(--black); }
+.tbl th, .tbl td { padding: .6rem .9rem .6rem 0; border-bottom: 1px solid var(--paper-2); text-align: left; vertical-align: top; }
+.tbl thead th { font-size: var(--micro); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); border-bottom: 2px solid var(--black); }
+.tbl tbody th { font-weight: 700; }
+.tbl .num { text-align: right; padding-right: 0; white-space: nowrap; }
+.tbl thead .num { white-space: normal; }
+@media (max-width: 639px) {
+  .tbl--stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tbl--stack, .tbl--stack tbody, .tbl--stack tr, .tbl--stack caption { display: block; }
+  .tbl--stack tr { padding: .65rem 0; border-bottom: 1px solid var(--paper-2); }
+  .tbl--stack th[scope="row"] { display: block; padding: 0 0 .3rem; border: 0; }
+  .tbl--stack td { display: flex; justify-content: space-between; gap: 1rem; padding: .15rem 0; border: 0; text-align: right; white-space: normal; }
+  .tbl--stack td::before { content: attr(data-k); font-size: var(--micro); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); text-align: left; }
+}
+
+/* placeholders: an empty print in photo corners, labelled with what will fill it */
+.ph { position: relative; display: grid; align-content: end; aspect-ratio: var(--ar, 3 / 2); padding: .9rem 1rem; background: linear-gradient(135deg, var(--black) 50%, transparent 0) 0 0 / 22px 22px no-repeat, linear-gradient(225deg, var(--black) 50%, transparent 0) 100% 0 / 22px 22px no-repeat, linear-gradient(45deg, var(--black) 50%, transparent 0) 0 100% / 22px 22px no-repeat, linear-gradient(315deg, var(--black) 50%, transparent 0) 100% 100% / 22px 22px no-repeat, var(--well); box-shadow: inset 0 0 0 1px var(--paper-2); color: var(--ink-2); font-size: var(--micro); letter-spacing: .08em; line-height: 1.5; text-transform: uppercase; }
+.ph span { max-width: 30ch; }
+.ph--45 { --ar: 4 / 5; } .ph--32 { --ar: 3 / 2; } .ph--1610 { --ar: 16 / 10; } .ph--169 { --ar: 16 / 9; }
+
+/* numbers on a vermilion slab, taped down (black on vermilion, 4.5:1) */
+.slab { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: 1.4rem 1.5rem; max-width: 60rem; padding: clamp(1.4rem, 3vw, 2.1rem); background: var(--red); color: var(--black); box-shadow: 0 14px 30px rgba(0,0,0,.18); rotate: -.6deg; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.slab::before { left: auto; right: 30px; }
+.slab > div { display: grid; gap: .35rem; align-content: start; }
+.slab .v { font: 400 clamp(2rem, 1.6rem + 1.8vw, 3.1rem)/1 var(--display); letter-spacing: .01em; }
+.slab .k { font-size: var(--micro); font-weight: 700; letter-spacing: .1em; line-height: 1.35; text-transform: uppercase; }
+
+/* ---------- The pager: the files on either side ----------
+   Two index cards. At rest: which file and its name. Hovered or focused, a card settles flat and lifts,
+   its arrow grows in and turns, its line unfolds, and the other card steps back. */
+.pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.25rem, 3vw, 2.5rem); margin-top: clamp(4rem, 9vw, 6.5rem); }
+.pager a { --tilt: -1deg; --a: 0deg; position: relative; display: grid; align-content: start; gap: .5rem; min-height: 8rem; padding: 1.35rem 4.25rem 1.5rem 1.4rem; background: var(--white); color: var(--black); text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 12px 26px rgba(0,0,0,.13); rotate: var(--tilt); }
+.pager a[rel="next"] { --tilt: .8deg; grid-column: 2; }
+.pager a[rel="prev"] { --a: 180deg; }
+.pager a::before { left: 50%; translate: -50% 0; }
+.pager__k { font-size: var(--micro); font-weight: 700; letter-spacing: .14em; line-height: 1.3; text-transform: uppercase; color: var(--ink-2); }
+.pager__t { font: 400 clamp(1.75rem, 1.4rem + 1.4vw, 2.6rem)/.95 var(--display); text-transform: uppercase; }
+.pager__d { display: grid; grid-template-rows: 1fr; }
+.pager__d > span { min-height: 0; overflow: hidden; font-size: var(--small); line-height: 1.45; color: var(--ink-2); }
+.pager__go { position: absolute; right: 1.1rem; bottom: 1.1rem; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--black); color: var(--white); }
+.pager__go svg { width: 16px; height: 16px; rotate: var(--a); }
+.pager a:focus-visible { outline: 2px solid var(--black); outline-offset: 4px; }
+@media (hover: hover) and (pointer: fine) {
+  /* room for the line to unfold into, so opening a card never pushes the end of the file down */
+  .pager a { min-height: 9.5rem; }
+  @media (max-width: 799px) { .pager a { min-height: 11.25rem; } } /* the longer lines wrap to two here */
+  .pager a { transition: rotate var(--t-settle) var(--ease), translate var(--t-settle) var(--ease), box-shadow var(--t-settle) var(--ease), background-color var(--t-step) var(--ease), color var(--t-step) var(--ease); }
+  /* the line folds away only with the script, so without it every line shows (a resting twin) */
+  html.js .pager__d { grid-template-rows: 0fr; transition: grid-template-rows var(--t-open) var(--ease); }
+  html.js .pager__d > span { opacity: 0; translate: 0 -6px; transition: opacity 350ms ease, translate var(--t-open) var(--ease); }
+  .pager__go { opacity: 0; scale: .8; transition: opacity var(--t-arrow) var(--ease), scale var(--t-arrow) var(--ease); }
+  .pager__go svg { rotate: calc(var(--a) - 45deg); transition: rotate var(--t-arrow) var(--ease); }
+  .pager a:is(:hover, :focus-visible) { rotate: 0deg; translate: 0 -3px; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 20px 36px rgba(0,0,0,.17); }
+  html.js .pager a:is(:hover, :focus-visible) .pager__d { grid-template-rows: 1fr; }
+  html.js .pager a:is(:hover, :focus-visible) .pager__d > span { opacity: 1; translate: none; }
+  .pager a:is(:hover, :focus-visible) .pager__go { opacity: 1; scale: 1; }
+  .pager a:is(:hover, :focus-visible) .pager__go svg { rotate: var(--a); }
+  /* the other card steps back by dimming its ink and paper (colour, not opacity, so its text keeps 4.5:1) */
+  .pager:has(a:hover) a:not(:hover), .pager:has(a:focus-visible):not(:has(a:hover)) a:not(:focus-visible) { background-color: #F3F1F1; color: var(--ink-2); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 14px rgba(0,0,0,.08); }
+}
+.file__end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; margin-top: clamp(2.25rem, 5vw, 3.25rem); padding-top: 1.1rem; border-top: 1px solid var(--paper-2); }
+.file__end .colophon { font-size: var(--micro); letter-spacing: .08em; line-height: 1.5; text-transform: uppercase; color: var(--ink-2); }
+@media (max-width: 599px) {
+  .pager { grid-template-columns: minmax(0, 1fr); }
+  .pager a[rel="next"] { grid-column: 1; }
+}
+
+/* ---------- The résumé ---------- */
+.entry { display: grid; grid-template-columns: minmax(0, 1fr); gap: .3rem 2rem; max-width: 60rem; padding: 1.1rem 0 1.2rem; border-top: 1px solid var(--paper-2); scroll-margin-top: 1.5rem; }
+.entry:first-of-type { border-top: 0; padding-top: 0; }
+@media (min-width: 760px) { .entry { grid-template-columns: 10.5rem minmax(0, 1fr); } .entry > :not(.entry__when) { grid-column: 2; } .entry__when { grid-row: 1 / span 3; } }
+.entry__when { padding-top: .2rem; font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.4; text-transform: uppercase; color: var(--ink-2); }
+.entry__what { font: 400 clamp(1.3rem, 1.1rem + .6vw, 1.6rem)/1.05 var(--display); letter-spacing: .01em; text-transform: uppercase; text-wrap: balance; }
+.entry__where { font-size: var(--small); font-weight: 700; line-height: 1.45; text-wrap: pretty; }
+.entry__body { max-width: 68ch; margin-top: .35rem; font-size: .9375rem; line-height: 1.6; }
+.entry__body > * + * { margin-top: .6em; }
+.entry__body ul { display: grid; gap: .35rem; }
+.entry__body li { position: relative; padding-left: 1.1rem; }
+.entry__body li::before { content: ""; position: absolute; left: 0; top: .62em; width: 6px; height: 6px; background: var(--red); }
+.dl-btn[hidden] { display: none; }
+.cv .sec > :not(.sec__tab) { margin-left: 0; }
+.dl:has(> [hidden]) { display: none; }
+
+/* ---------- The hockey one-pager ---------- */
+.print-btn { display: inline-flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 1.2rem 0 1rem; border: 2px solid var(--black); border-radius: 999px; background: transparent; color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+.print-btn svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+.print-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) { .print-btn { transition: background 300ms var(--ease), color 300ms var(--ease); } .print-btn:hover { background: var(--black); color: var(--white); } }
+html:not(.js) .print-btn { display: none; } /* printing from the button needs the script; the browser's own print still works */
+.hk .file__bar { justify-content: flex-start; }
+/* the print button shares the bar, so below 1100px the stamp joins the head instead */
+@media (max-width: 1099px) { .hk .stamp { position: relative; top: auto; right: auto; justify-self: start; margin: 1.5rem 0 .25rem 4px; rotate: -3deg; } }
+.nw { white-space: nowrap; }
+.hk-id { position: relative; padding-right: clamp(72px, 12vw, 150px); }
+.num-badge { position: absolute; right: clamp(0px, 2vw, 28px); top: 50%; translate: 0 -40%; width: clamp(60px, 7.5vw, 96px); rotate: 10deg; filter: drop-shadow(0 4px 8px rgba(0,0,0,.18)); }
+.hk .file__sub { max-width: 46ch; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; margin-top: clamp(1.75rem, 4vw, 2.75rem); }
+@media (min-width: 600px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .tiles--6 { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.tile { padding: .8rem .95rem .9rem; background: var(--white); }
+.tile .k { font-size: var(--micro); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.tile .v { margin-top: .3rem; font: 400 clamp(1.6rem, 1.3rem + 1.3vw, 2.4rem)/1 var(--display); letter-spacing: .01em; }
+.tile .s { margin-top: .3rem; font-size: var(--micro); line-height: 1.35; color: var(--ink-2); }
+.tiles[hidden] { display: none; }
+.hk-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 clamp(2rem, 5vw, 4.5rem); }
+@media (min-width: 1024px) { .hk-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.hk .sec { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+.hk .sec > :not(.sec__tab) { margin-left: 0; }
+.hk .sec__tab > span { font-size: clamp(1.2rem, 1rem + .7vw, 1.55rem); }
+.stat-line { font: 400 clamp(1.5rem, 1.15rem + 1.5vw, 2.35rem)/1.15 var(--display); letter-spacing: .02em; }
+.stat-line .cap { display: block; margin-top: .55rem; font: 400 var(--small)/1.5 var(--sans); letter-spacing: 0; color: var(--ink-2); }
+/* the notes that follow a stat line, a row of tiles or the timeline keep a little air from them */
+.hk .stat-line + .prose, .hk .acad-note, .hk .hist-note { margin-top: 1.1rem; }
+.hk .prose { font-size: .9375rem; }
+.hk .prose > * + * { margin-top: .8em; }
+.film { position: relative; margin-top: clamp(1.75rem, 4vw, 2.5rem); }
+.contacts { display: grid; border-top: 2px solid var(--black); }
+.contacts li { display: grid; grid-template-columns: minmax(0, 1fr); gap: .15rem 1rem; padding: .75rem 0 .8rem; border-bottom: 1px solid var(--paper-2); }
+@media (min-width: 600px) { .contacts li { grid-template-columns: 11rem minmax(0, 1fr); align-items: baseline; } }
+.contacts .role { font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.35; text-transform: uppercase; color: var(--ink-2); }
+.contacts .who { display: grid; gap: .15rem; justify-items: start; }
+.contacts .name { font: 400 1.35rem/1.1 var(--display); letter-spacing: .01em; text-transform: uppercase; }
+.contacts a { font-size: var(--small); overflow-wrap: anywhere; }
+.contacts-note { margin-top: .75rem; }
+@media (hover: hover) and (pointer: fine) {
+  .contacts .name, .contacts a { transition: color var(--t-step) var(--ease), text-decoration-color var(--t-step) var(--ease); }
+  .contacts:has(a:hover) li:not(:has(a:hover)) :is(.name, a) { color: var(--ink-2); text-decoration-color: var(--paper-2); } /* the other two step back, keeping 4.5:1 */
+}
+.linkrow { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-top: 1.1rem; font-size: var(--small); font-weight: 700; }
+.linkrow a { display: inline-block; padding-block: .3rem; }
+.timeline { display: grid; border-top: 2px solid var(--black); }
+.timeline li { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: .1rem 1rem; padding: .6rem 0 .65rem; border-bottom: 1px solid var(--paper-2); font-size: var(--small); line-height: 1.45; }
+.timeline .yr { font: 400 1.05rem/1.3 var(--display); letter-spacing: .03em; }
+.timeline .team { display: block; font-weight: 700; }
+.timeline .where { display: block; color: var(--ink-2); }
+.strip { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+@media (min-width: 600px) { .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.strip h3 { font: 400 1.3rem/1.1 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.strip .meta { margin-top: .3rem; font-size: var(--micro); font-weight: 700; letter-spacing: .1em; line-height: 1.4; text-transform: uppercase; color: var(--ink-2); }
+.strip p:not(.meta) { margin-top: .45rem; font-size: var(--small); line-height: 1.5; }
+
+/* ---------- Page changes: the file rises out of the cabinet ----------
+   Where the browser has cross-document view transitions, the page it came from stays put while the desk comes
+   up over it and dims it (160ms); then the file (and its drawer, coming from the deck) rises 40px into place,
+   starting 100ms in, so the file hardly ever fades in over the text of the page beneath. Going from file to
+   file, the old file sinks 16px and is gone in 110ms before the new one rises, and the drawer holds still: it
+   does not travel, even when the old file was scrolled far down; only its current tab changes. No blur,
+   nothing scales.
+   Elsewhere the link simply navigates. The way back to the deck is in site.css ("files: view transition"). */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: none; }
+::view-transition-new(root) { animation: vt-fade-in 160ms ease both; }
+::view-transition-new(file-04), ::view-transition-new(file-05), ::view-transition-new(file-06),
+::view-transition-new(file-07), ::view-transition-new(file-08), ::view-transition-new(file-10),
+::view-transition-new(drawer):only-child { animation: vt-fade-in 160ms ease 100ms both, vt-rise 300ms var(--ease) 100ms both; }
+::view-transition-old(file-04), ::view-transition-old(file-05), ::view-transition-old(file-06),
+::view-transition-old(file-07), ::view-transition-old(file-08), ::view-transition-old(file-10) { animation: vt-fade-out 110ms ease-in both, vt-sink 110ms ease-in both; }
+/* from file to file the drawer neither travels nor crossfades two rows of labels: its current tab changes at once */
+::view-transition-group(drawer) { animation: none; }
+::view-transition-old(drawer) { animation: none; opacity: 0; }
+::view-transition-new(drawer) { animation: none; }
+@keyframes vt-fade-in { from { opacity: 0; } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-rise { from { transform: translateY(40px); } }
+@keyframes vt-sink { to { transform: translateY(16px); } }
+
+/* ---------- Reduced motion: colour and opacity only ---------- */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-new(*), ::view-transition-old(*) { animation-name: vt-fade-in !important; animation-duration: 200ms !important; }
+  ::view-transition-old(*) { animation-name: vt-fade-out !important; }
+  ::view-transition-old(root) { animation: none !important; }
+  ::view-transition-group(*) { animation-duration: 0s !important; }
+  ::view-transition-old(drawer) { opacity: 1; animation-fill-mode: both !important; } /* a plain crossfade here (opacity stays animatable) */
+  ::view-transition-new(drawer) { animation-fill-mode: both !important; }
+  .drawer a, .back svg, .chrome a, .pager a, .pager__go, .pager__go svg, .shot img { transition: none !important; }
+  .drawer a:hover { translate: none !important; }
+  .back:hover svg { translate: none !important; }
+  .chrome a:hover { letter-spacing: .12em !important; }
+  .shot img { scale: 1 !important; }
+  /* cards keep their tilt and only fade: the line is always shown, the arrow appears without growing */
+  .pager a:is(:hover, :focus-visible) { rotate: var(--tilt) !important; translate: none !important; }
+  .pager__d { grid-template-rows: 1fr !important; }
+  .pager__d > span { opacity: 1 !important; translate: none !important; }
+  .pager__go { scale: 1 !important; transition: opacity 150ms ease !important; }
+  .pager__go svg { rotate: var(--a) !important; }
+}
+/* touch screens: nothing waits for a hover */
+@media (hover: none), (pointer: coarse) {
+  .toc a, .drawer a { min-height: 44px; }
+  .toc a { height: 40px; }
+}
+/* touch screens: the contact, link-row and back links and the chrome's name take 44px; the type does not change
+   (screen only: a page printed from a phone keeps its print layout) */
+@media screen and (pointer: coarse) {
+  .contacts a, .linkrow a, .back { display: inline-flex; align-items: center; min-height: 44px; }
+  .chrome a { display: inline-flex; align-items: center; min-height: 44px; }
+}
+
+/* ---------- Print: the file as a plain document ----------
+   No desk, no torn edges, no tape or shadows; black tabs become outlines; addresses of outside links are
+   printed after them. The hockey file has its own one-page layout below. */
+@media print {
+  @page { size: letter; margin: 12mm; }
+  :root { --text: 10.5pt; --indent: 0px; }
+  html { font-size: 16px; } /* 1rem = 12pt, so every rem size in the file scales to paper together and the 12px floor (--micro) prints at 9pt */
+  html, body { background: #fff !important; color: #000; }
+  html { color-scheme: light; } /* a dark scheme paints the page margins black when background graphics are on */
+  body { font-size: 10.5pt; line-height: 1.45; }
+  .skip, .drawer, .file__bar, .toc, .pager, .print-btn, .file__end .back { display: none !important; }
+  .chrome { height: auto; padding: 0 0 6mm; color: #000; font-size: 9pt; }
+  .desk { padding: 0; }
+  .file { max-width: none; padding: 0; background: #fff !important; box-shadow: none; }
+  .file::before, .file::after, .note::before, .fig__frame::before, .slab::before { display: none !important; }
+  .file__title { font-size: 30pt; }
+  .file__title--long { font-size: 22pt; max-width: none; }
+  .file__sub { font-size: 13pt; }
+  .stamp { position: static; justify-self: start; rotate: none; margin: 3mm 0 0; padding: .2em .45em; border-width: 1.5px; outline: none; color: #000; border-color: #000; font-size: 12pt; } /* with the bar left out, a stamp at the top right would sit on the title */
+  .facts { border-top-width: 2px; }
+  .facts > div { box-shadow: inset -1px 0 #ccc, inset 0 -1px #ccc; break-inside: avoid; }
+  .note { rotate: none; box-shadow: none; border: 1px solid #999; max-width: none; }
+  .sec { margin-top: 7mm; break-inside: auto; }
+  .sec__tab { border-bottom-width: 1.5px; margin-bottom: 3mm; break-after: avoid; }
+  .sec__tab > span { padding: 0 0 1.5mm; background: none; color: #000; clip-path: none; font-size: 15pt; }
+  .sec__n { color: #000; }
+  .fig, .tbl-wrap, .entry, .tiles, .slab, .figgrid > * { break-inside: avoid; }
+  .fig__frame, .tbl-wrap { padding: 0; box-shadow: none; }
+  .figgrid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 6mm; }
+  .fig, .figgrid { max-width: none; margin-top: 5mm; }
+  .fig--narrow { max-width: 60%; }
+  .tbl-wrap { overflow: visible; }
+  .slab { rotate: none; box-shadow: none; }
+  .ph { display: none; }
+  figure:has(> .ph) { display: none; } /* no caption left behind for a picture that does not exist yet */
+  .shot img { scale: 1; }
+  .prose a, .facts a, .linkrow a, .contacts a, .entry a { text-decoration: none; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: max(.85em, 9pt); font-weight: 400; color: #333; overflow-wrap: anywhere; } /* 9pt: the 12px floor on paper */
+  .refs a[href^="https://doi.org"]::after { content: none; }
+  .file__end { border: 0; margin-top: 6mm; padding: 0; }
+  .muted, .fig figcaption, .tbl caption, .facts dt, .entry__when { color: #333; }
+  .entry { grid-template-columns: 30mm minmax(0, 1fr); gap: .5mm 4mm; max-width: none; padding: 2.2mm 0 2.6mm; }
+  .entry > :not(.entry__when) { grid-column: 2; }
+  .entry__when { grid-row: 1 / span 3; padding-top: .6mm; }
+  .entry__what { font-size: 12pt; }
+  .entry__body { margin-top: 1mm; font-size: 9.5pt; line-height: 1.45; }
+  .entry__body li::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .prose, .entry__body { max-width: none; }
+}
+
+/* ---------- Print: the hockey one-pager ----------
+   One Letter page: the head across the top, the measurables in one row, then two columns (stats, how I play,
+   academics; contacts and links, team history, prep, crew and soccer). Checked with page.pdf at Letter size. */
+@media print {
+  body:has(.hk) .chrome { display: none; }
+  .hk { font-size: 9pt; line-height: 1.25; } /* nothing on the one-pager prints under 9pt (12px) */
+  .hk .file__head { margin-top: 0; padding-bottom: 2.2mm; border-bottom: 1.5px solid #000; }
+  .hk .file__title { font-size: 25pt; line-height: 1; }
+  .hk-id { padding-right: 0; }
+  .hk .file__sub { max-width: none; margin-top: 1.4mm; font-size: 9.5pt; line-height: 1.3; }
+  .hk .file__meta { margin-top: 1mm; font-size: 9pt; letter-spacing: .08em; }
+  .hk .stamp { position: absolute; top: 1mm; right: 0; margin: 0; rotate: none; font-size: 9.5pt; letter-spacing: .06em; }
+  .hk .num-badge { display: none; }
+  .hk .note.film { margin-top: 2mm; padding: 0; border: 0; font-size: 9pt; line-height: 1.25; }
+  .hk .sec { margin-top: 2.6mm; }
+  .hk .sec__tab { margin-bottom: 1.4mm; border-bottom-width: 1px; }
+  .hk .sec__tab > span { padding: 0 0 .7mm; font-size: 10pt; letter-spacing: .04em; }
+  .hk .tiles { margin-top: 0; gap: 1px; background: #bbb; border: 1px solid #bbb; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .hk .tiles--6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .hk .tiles--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hk .tile { padding: 1mm 1.8mm 1.2mm; background: #fff; }
+  .hk .tile .k, .hk .tile .s { font-size: 9pt; letter-spacing: .02em; }
+  .hk .tile .v { margin-top: .4mm; font-size: 13pt; }
+  .hk .tile .s { margin-top: .3mm; }
+  .hk-cols { grid-template-columns: minmax(0, 9fr) minmax(0, 11fr); gap: 0 6mm; } /* the contacts and team history column takes the wider share */
+  .hk .prose { font-size: 9pt; max-width: none; }
+  .hk .prose > * + * { margin-top: .45em; }
+  .hk .stat-line { font-size: 11.5pt; line-height: 1.2; }
+  .hk .stat-line .cap { margin-top: .6mm; font-size: 9pt; line-height: 1.25; color: #333; }
+  .hk .stat-line + .prose { margin-top: 1.2mm; }
+  .hk .acad-note { margin-top: 1.4mm; }
+  /* one line per coach: the names line up after the longest role (subgrid) */
+  .hk .contacts { grid-template-columns: max-content minmax(0, 1fr); column-gap: 3mm; border-top-width: 1px; }
+  .hk .contacts li { grid-column: 1 / -1; grid-template-columns: subgrid; gap: 0 3mm; padding: .9mm 0; border-color: #ddd; }
+  .hk .contacts .role { font-size: 9pt; letter-spacing: .04em; color: #333; }
+  .hk .contacts .who { gap: 0 2mm; }
+  .hk .contacts .name { font-size: 9.5pt; }
+  .hk .contacts a { font-size: 9pt; }
+  .hk .contacts-note { margin-top: 1mm; font-size: 9pt; line-height: 1.25; }
+  .hk .linkrow { display: grid; gap: .4mm; margin-top: 1.6mm; font-size: 9pt; }
+  .hk .linkrow a { padding: 0; }
+  .hk .linkrow a[href^="http"]::after { font-size: 9pt; }
+  .hk .timeline { border-top-width: 1px; }
+  .hk .timeline li { grid-template-columns: 21mm minmax(0, 1fr); gap: 0 2mm; padding: .7mm 0; font-size: 9pt; line-height: 1.25; border-color: #ddd; }
+  .hk .timeline .yr { font-size: 9pt; line-height: 1.25; white-space: nowrap; }
+  .hk .timeline .team { display: inline; }
+  .hk .timeline .where { display: inline; color: #333; font-size: 9pt; }
+  .hk .timeline .where::before { content: " · "; }
+  .hk .hist-note { margin-top: 1.4mm; }
+  .hk .hist-note p { font-size: 9pt; line-height: 1.25; }
+  .hk .strip { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 3mm; } /* the longer crew note gets the wider share */
+  .hk .strip h3 { font-size: 9pt; }
+  .hk .strip .meta { margin-top: .4mm; font-size: 9pt; letter-spacing: .05em; color: #333; }
+  .hk .strip p:not(.meta) { margin-top: .6mm; font-size: 9pt; line-height: 1.25; }
+  .hk .sec, .hk .tiles, .hk .timeline li, .hk .contacts li { break-inside: avoid; }
+  .hk .file__end { display: none; } /* the head already carries the name, the school and the date */
+}
+

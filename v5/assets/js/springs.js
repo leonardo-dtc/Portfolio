@@ -5,7 +5,7 @@ export function createSpring({ value = 0, target = value, response = .5, damping
   const s = { value, target, velocity: 0, response, damping };
   s.step = (dt) => {
     const w = 2 * Math.PI / s.response, k = w * w, c = 2 * s.damping * w;
-    const t = Math.min(dt, .064), n = Math.max(1, Math.ceil(t / .004)), h = t / n;
+    const t = Math.min(dt, .12), n = Math.max(1, Math.ceil(t / .004)), h = t / n;   // up to 120 ms of real time, in 4 ms substeps
     for (let i = 0; i < n; i++) {
       s.velocity += (-k * (s.value - s.target) - c * s.velocity) * h;
       s.value += s.velocity * h;

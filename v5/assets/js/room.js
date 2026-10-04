@@ -26,14 +26,15 @@ export function createRoom(canvas) {
   gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   const uniforms = (p, names) => Object.fromEntries(names.map(n => [n, gl.getUniformLocation(p, n)]));
   const us = uniforms(sceneP, ['uRes', 'uTime', 'uDay', 'uAspect', 'uShift', 'uColor']);
-  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uColor', 'uInk1', 'uInkL']);
+  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uColor', 'uInk1', 'uInkL', 'uStage']);
 
   const tex = gl.createTexture(), fbo = gl.createFramebuffer(), inkTex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, inkTex);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
   let w = 0, h = 0, maxLod = 6;
   let dpr = Math.min(devicePixelRatio || 1, 1.5);
-  const st = { defocus: 0, day: 0, shift: [0, 0], light: [innerWidth * .3, -200], panels: { count: 0 }, ink: null, pointer: [-1e4, -1e4], color: [0, 1], fast: 1.5 };
+  // stage: the hero's dark stage (1 while the name shows, 0 the room's own light; by night only, in the shader)
+  const st = { defocus: 0, day: 0, shift: [0, 0], light: [innerWidth * .3, -200], panels: { count: 0 }, ink: null, pointer: [-1e4, -1e4], color: [0, 1], fast: 1.5, stage: 0 };
 
   function size() {
     const nw = Math.max(1, Math.round(innerWidth * dpr)), nh = Math.max(1, Math.round(innerHeight * dpr));
@@ -53,10 +54,34 @@ export function createRoom(canvas) {
   }
 
   let frames = 0, counted = 0, acc = 0, slow = false, clock = 0, lost = false, panelSum = 0;
+  let drew = false, after = 0, acc1 = 0;                  // both looks time the tick that follows a drawn one; the second, at 1x
   const still = matchMedia('(prefers-reduced-motion: reduce)');
+  const note = (event, ms) => { api.log.push({ at: Math.round(performance.now()), event, ms: Math.round(ms * 10) / 10 }); };
   window.__roomFrames = 0;
   const off = onFrame((dt) => {
     if (document.hidden || lost) return;
+    // budget, first look: over the first 90 frames the room draws, a machine averaging over 22 ms drops to 1x and stops
+    // the room's own motion. Each drawn frame is timed by the tick that follows it, which carries its cost (while
+    // only the room drifts it draws every other tick, so a drawn tick's own time is the cheap tick before it). Each
+    // counts up to 50 ms, so a few long frames while the page loads cannot trip it alone.
+    if (drew && counted < 90) {
+      counted++; acc += Math.min(dt, .05);
+      if (counted === 90 && acc / 90 > .022) { slow = true; note('1x', acc / 90 * 1000); if (dpr > 1) { dpr = 1; w = h = 0; } }
+    }
+    // budget, second look: once the room has dropped to 1x, the next 30 frames it draws (after 5 to settle) are timed;
+    // still under about 27 fps on average (over 37 ms), it gives way to the still, the CSS glass path a lost context
+    // takes. A device held to 30 fps to save power (a phone in Low Power Mode, a laptop's energy saver) runs at 33 ms
+    // a frame by design, so it keeps the room at 1x rather than losing it a few seconds in.
+    if (slow && drew && after < 35) {
+      after++;
+      if (after > 5) acc1 += Math.min(dt, .1);
+      if (after === 35) {
+        const avg = acc1 / 30, weak = avg > 1 / 27;
+        note(weak ? 'still' : 'kept', avg * 1000);
+        if (weak) { giveWay('slow'); return; }
+      }
+    }
+    drew = false;
     if (api.source) api.setPanels(api.source());          // where the glass is now, after this frame's motion
     frames++;
     const idle = st.fast <= 0;
@@ -89,7 +114,7 @@ export function createRoom(canvas) {
     gl.uniform2f(uc.uRes, w, h);
     gl.uniform1f(uc.uLod, Math.max(0, st.defocus) * maxLod);
     gl.uniform1f(uc.uFrostLod, Math.log2(Math.max(4, 26 * dpr)));
-    gl.uniform1f(uc.uTime, clock); gl.uniform1f(uc.uDay, st.day);
+    gl.uniform1f(uc.uTime, clock); gl.uniform1f(uc.uDay, st.day); gl.uniform1f(uc.uStage, Math.max(0, Math.min(1, st.stage)));
     gl.uniform2f(uc.uLight, st.light[0] * dpr, st.light[1] * dpr);
     gl.uniform2f(uc.uPointer, st.pointer[0] * dpr, st.pointer[1] * dpr);
     gl.uniform2f(uc.uColor, st.color[0], st.color[1]);
@@ -100,19 +125,33 @@ export function createRoom(canvas) {
     const x = ink && ink.xform ? ink.xform : [1, 0, 0];
     gl.uniform3f(uc.uInkX, x[0], x[1], x[2]);
     const lean = ink && ink.lean ? ink.lean : [0, 0], hl = ink && ink.light ? ink.light : [0, 0, 1, 0];
-    gl.uniform4f(uc.uInk1, ink ? (ink.glow || 0) : 0, lean[0], lean[1], 0);
+    gl.uniform4f(uc.uInk1, ink ? (ink.glow || 0) : 0, lean[0], lean[1], ink ? (ink.fs || 0) : 0);
     gl.uniform4f(uc.uInkL, hl[0], hl[1], hl[2], hl[3]);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-    // budget: over the first 90 frames, a machine averaging over 22 ms drops to 1x and stops the room's own motion
-    if (counted < 90) { counted++; acc += dt; if (counted === 90 && acc / 90 > .022) { slow = true; if (dpr > 1) { dpr = 1; w = h = 0; } } }
+    drew = true;
   }, 2);                                                   // last in the frame: everything that moves has moved
 
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); lost = true; api.onlost && api.onlost(); });
+  // The room stops for good: its context was lost, or it was too slow even at 1x. The page carries on in CSS glass
+  // over the still (boot.js), and the context is released so the GPU gets its memory back.
+  function giveWay(why) {
+    if (lost) return;
+    lost = true;
+    off();
+    if (why !== 'lost') {
+      console.info(`v5: the room drew its frames in ${api.log[api.log.length - 1].ms} ms at 1x, so the page uses the still`);
+      const lose = gl.getExtension('WEBGL_lose_context');
+      if (lose) lose.loseContext();
+    }
+    api.onlost && api.onlost(why);
+  }
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); giveWay('lost'); });
 
   const api = {
+    log: [],                                             // what the budget decided, and when: { at, event, ms }
+    get gaveWay() { return lost; },
     get dpr() { return dpr; },
     get lod() { return maxLod; },
+    get slow() { return slow; },                         // the budget tripped: 1x, and the room's own motion stopped
     set(o) { Object.assign(st, o); st.fast = Math.max(st.fast, .5); },
     source: null,                                        // () => panels, read each frame just before drawing
     // panels arrive every frame; only a change in them wakes the room to full rate

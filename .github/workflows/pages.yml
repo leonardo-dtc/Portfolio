@@ -30,6 +30,8 @@ jobs:
         run: |
           mkdir _site
           cp -R index.html low-detail.html assets v2 v3 v4 v5 _site/
+          # Notes, design records and image provenance sidecars stay in the repository, not on the site.
+          find _site \( -name '*.md' -o -name '.impeccable' -o -name '*.webp.json' -o -name '*.avif.json' -o -name '*.svg.json' \) -prune -exec rm -rf {} +
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

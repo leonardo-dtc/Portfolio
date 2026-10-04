@@ -29,3 +29,12 @@ test('a long frame does not explode', () => {
   s.step(2);
   assert.ok(Number.isFinite(s.value) && Math.abs(s.value) < 3);
 });
+test('a long frame integrates its real time, up to 120 ms', () => {
+  const make = () => createSpring({ value: 0, target: 1, response: .5, damping: 1 });
+  const a = make(), b = make(), c = make();
+  a.step(.12);
+  for (let i = 0; i < 30; i++) b.step(.004);
+  c.step(.5);                                            // a tab coming back: no more than 120 ms at once
+  assert.ok(Math.abs(a.value - b.value) < 1e-9, `${a.value} vs ${b.value}`);
+  assert.ok(Math.abs(c.value - a.value) < 1e-9);
+});

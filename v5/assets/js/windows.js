@@ -12,7 +12,7 @@ export function createWindows({ room }) {
   const html = document.documentElement;
   const space = document.querySelector('[data-space]');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const qDesk = matchMedia('(min-width: 1360px)'), qPhone = matchMedia('(max-width: 899px)');
+  const qDesk = matchMedia('(min-width: 1360px)'), qPhone = matchMedia('(max-width: 899px)'), qShort = matchMedia('(max-height: 520px)');
   const $main = () => document.getElementById('main');
   const $sheet = () => document.querySelector('section.sheet:not(.is-closing)');
   const $front = () => $sheet() || $main();
@@ -32,15 +32,52 @@ export function createWindows({ room }) {
     const body = main.querySelector('.win__body');
     const asides = [...document.querySelectorAll('aside.side')].sort((a, b) => (a.dataset.side === 'left' ? -1 : 1));
     if (mode === 'desktop') {
-      asides.forEach(a => a.classList.remove('side--inline'));
+      asides.forEach(a => { a.classList.remove('side--inline'); gather(a); });
       const out = asides.filter(a => a.parentElement !== space);
       if (out.length) main.after(...asides);
     } else if (body) {
-      asides.forEach(a => { a.classList.add('side--inline'); a.style.transform = ''; if (a.parentElement !== body) body.append(a); });
+      asides.forEach(a => { a.classList.add('side--inline'); a.style.transform = ''; inline(a, main, body); });
     }
+    // a row pinned between the head and the body takes a grid row of its own (a class, not :has(), for older browsers)
+    main.classList.toggle('has-pin', !!main.querySelector(':scope > .side__part--pin'));
     placeBubble(true);
     scrollable();
   }
+  // Below 1360px the side window's content sits inside the main window, placed by its role. data-inline on the
+  // aside gives one place for all of it, or one per part, in order: "start" before the main content (Hockey's
+  // Measurables and coach contacts, About's portrait), "end" after it (Home's This fall, Work's In progress), "pin"
+  // a row of chips pinned between the window's head and its body (the Résumé's Sections); in a window under 520px
+  // tall that row leads the body instead and scrolls away with it. The aside goes where its first start or end part
+  // goes; a part placed elsewhere is lifted out of it, and goes home at 1360px and wider.
+  const liftedOf = a => [...document.querySelectorAll('.side__part--lifted')].filter(p => p._home && p._home.aside === a);
+  function partsOf(a) {                                   // every part, in the aside or lifted out of it, in order
+    const inside = [...a.querySelectorAll(':scope > .side__part')];
+    inside.forEach((p, i) => { if (!p._home) p._home = { aside: a, index: i }; });
+    return [...inside, ...liftedOf(a)].sort((x, y) => x._home.index - y._home.index);
+  }
+  function putBack(p) {
+    const a = p._home.aside;
+    p.classList.remove('side__part--lifted', 'side__part--pin');
+    a.insertBefore(p, a.querySelectorAll(':scope > .side__part')[p._home.index] || null);
+  }
+  function inline(a, main, body) {
+    const words = (a.dataset.inline || 'end').split(/\s+/);
+    const places = partsOf(a).map(p => [p, words[Math.min(p._home.index, words.length - 1)]]);
+    const own = (places.find(([, w]) => w !== 'pin') || [null, words.find(w => w !== 'pin') || 'end'])[1];
+    if (own === 'start') { if (a.parentElement !== body) body.prepend(a); }
+    else if (a.parentElement !== body) body.append(a);
+    for (const [p, w] of places) {
+      if (w === own) { if (p.parentElement !== a) putBack(p); continue; }
+      p.classList.add('side__part--lifted');
+      p.classList.toggle('side__part--pin', w === 'pin');
+      if (w === 'pin') {
+        if (qShort.matches) { if (p.parentElement !== body) body.prepend(p); }
+        else if (p.parentElement !== main) body.before(p);
+      }
+      else if (p.parentElement !== body) { if (w === 'start') body.prepend(p); else body.append(p); }
+    }
+  }
+  function gather(a) { liftedOf(a).sort((x, y) => x._home.index - y._home.index).forEach(putBack); }
   // A floating side window taller than its room scrolls; it becomes a tab stop then, so the keyboard can scroll it
   // in every browser (some make scrollers focusable on their own, some do not).
   function scrollable() {
@@ -50,7 +87,7 @@ export function createWindows({ room }) {
       else if (!over && a.getAttribute('tabindex') === '0') a.removeAttribute('tabindex');
     }
   }
-  qDesk.addEventListener('change', layout); qPhone.addEventListener('change', layout);
+  qDesk.addEventListener('change', layout); qPhone.addEventListener('change', layout); qShort.addEventListener('change', layout);
   let sized = 0;
   addEventListener('resize', () => { placeBubble(true); cancelAnimationFrame(sized); sized = requestAnimationFrame(scrollable); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(scrollable);
@@ -136,10 +173,15 @@ export function createWindows({ room }) {
     return `scale(${(.985 + .015 * v).toFixed(4)})`;
   }
   function kindOf(el) { return el.matches('aside.side') ? (el.classList.contains('side--inline') ? 'inline' : 'side') : el.matches('.tabs, .toolbar, .grab') ? 'ornament' : 'window'; }
+  // A sheet and its toolbar show only over the part of their move where the parent's are gone (the parent's text is
+  // out by a quarter of the way back, its toolbar by two fifths), so opening or closing, two texts or two toolbars
+  // never show at once; everything else fades over the first 70% of its move.
+  const lead = el => el.matches('section.sheet') ? .25 : el.matches('.toolbar--sheet') ? .4 : 0;
   function setIn(el, v, from) {
     el.glass = el.glass || { m: 0, dim: 0 };
-    el.glass.m = clamp(v, 0, 1);
-    el.style.opacity = clamp(v * 1.4, 0, 1).toFixed(3);
+    const lo = lead(el), o = clamp((v - lo) * 1.4 / (1 - lo), 0, 1);
+    el.glass.m = el.matches('.toolbar--sheet') ? o : clamp(v, 0, 1);   // the toolbar's glass too: one capsule at a time
+    el.style.opacity = o.toFixed(3);
     if (from !== 'inline') el.style.transform = frameOf(el, v, from);
   }
   function settle(el) { el.style.opacity = ''; el.style.transform = ''; if (el.glass) el.glass.m = 1; if (el._spring) el._spring.snap(1); }
@@ -249,6 +291,12 @@ export function createWindows({ room }) {
   const scroller = () => $front() && $front().querySelector('.win__body');
   const inHero = () => html.classList.contains('is-hello');            // the windows are hidden behind the hero
   addEventListener('wheel', (e) => {
+    // over the Résumé's pinned row of chips, which only scrolls sideways, a vertical wheel still scrolls the record
+    // (in a short window the row is inside the record, which the wheel scrolls on its own)
+    if (!inHero() && e.target.closest && e.target.closest('#main > .side__part--pin') && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      const b = scroller(); if (b) b.scrollBy({ top: e.deltaY, left: 0 });
+      return;
+    }
     if (inHero() || (e.target.closest && e.target.closest('.win, .side, .sheet, .tabs, .toolbar'))) return;
     const b = scroller(); if (b) b.scrollBy({ top: e.deltaY, left: 0 });
   }, { passive: true });

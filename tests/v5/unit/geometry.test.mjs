@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { rectToQuad, invert3, applyH } from '../../../v5/assets/js/geometry.js';
+import { rectToQuad, invert3, applyH, mul3 } from '../../../v5/assets/js/geometry.js';
 
 const near = (a, b, e = 1e-6) => assert.ok(Math.abs(a - b) < e, `${a} vs ${b}`);
 
@@ -25,4 +25,14 @@ test('the inverse of a scale-and-shift maps screen back to panel pixels', () => 
   const inv = invert3(rectToQuad(100, 50, [[20, 30], [220, 30], [220, 130], [20, 130]]));
   const [u, v] = applyH(inv, 120, 80);
   near(u, 50); near(v, 25);
+});
+test('a scrolled panel: corners read s pixels up its plane, shifted back down, give the panel in place', () => {
+  // the true map of a 300x600 panel in perspective, and where its probes land once its contents scroll by s
+  const truth = rectToQuad(300, 600, [[1000, 60], [1300, 40], [1300, 820], [1000, 790]]), s = 177;
+  const read = [[0, -s], [300, -s], [300, 600 - s], [0, 600 - s]].map(([u, v]) => applyH(truth, u, v));
+  const fixed = mul3(rectToQuad(300, 600, read), [1, 0, 0, 0, 1, s, 0, 0, 1]);   // as panels.js does
+  [[0, 0], [300, 0], [300, 600], [0, 600], [150, 321]].forEach(([u, v]) => {
+    const [x, y] = applyH(fixed, u, v), [X, Y] = applyH(truth, u, v);
+    near(x, X, 1e-6); near(y, Y, 1e-6);
+  });
 });

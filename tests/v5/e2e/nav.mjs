@@ -20,8 +20,9 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   check(await page.getAttribute('nav.tabs a[data-tab="work"]', 'aria-current') === 'page', 'Work tab is current');
   check(await page.evaluate(() => document.title.startsWith('Work')), 'the document title follows');
   // one side window, the same element as Home's: it stays where it is and its contents change
-  check(await page.waitForFunction(() => document.querySelectorAll('aside.side').length === 1 && document.querySelector('aside.side') === window.__side && !!document.getElementById('progress-h') && !!document.getElementById('exp-h'), null, { timeout: 2500 }).then(() => true, () => false), 'Work’s In progress and Experiments fill the same side window');
-  check(await page.evaluate(() => { const a = document.querySelector('aside.side'); return a.getAttribute('aria-labelledby') === 'progress-h exp-h' && a.querySelectorAll(':scope > .probe').length === 4 && !a.style.transform; }), 'the side window keeps its probes and its place, and takes the new labels');
+  // (round three: Work's Experiments moved out of the side window into the main window, under the cards)
+  check(await page.waitForFunction(() => document.querySelectorAll('aside.side').length === 1 && document.querySelector('aside.side') === window.__side && !!document.querySelector('aside.side #progress-h') && !!document.querySelector('#main #exp-h'), null, { timeout: 2500 }).then(() => true, () => false), 'Work’s In progress fills the same side window; its Experiments sit in the main window');
+  check(await page.evaluate(() => { const a = document.querySelector('aside.side'); return a.getAttribute('aria-labelledby') === 'progress-h' && a.querySelectorAll(':scope > .probe').length === 4 && !a.style.transform; }), 'the side window keeps its probes and its place, and takes the new labels');
   check(await page.evaluate(() => new URL(document.querySelector('nav.tabs a[data-tab="home"]').href).pathname === '/v5/'), 'tab links still resolve after the address changed');
 
   await page.click('a[href$="loquar/"]');
@@ -120,6 +121,49 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   check(r.bars === 1, `quick tab clicks leave one toolbar (${r.bars})`);
   check(r.sides === 1, `quick tab clicks leave one side window (${r.sides})`);
   check(r.path === '/v5/hockey/' && r.tab === 'hockey' && r.title.startsWith('Leonardo Carvalho, goaltender') && r.side, 'the last click wins: Hockey, with its tab, title and side window');
+  check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+  await browser.close();
+}
+{
+  // the Résumé's Sections follow the reader, and landing on an entry lights it (without WebGL, so timing is real)
+  const { browser, page, errors } = await open({ noGL: true });
+  const current = () => page.evaluate(() => [...document.querySelectorAll('.toc a[aria-current="true"]')].map(a => a.textContent).join('|'));
+  await page.goto(BASE + '?nohello', { waitUntil: 'load' });
+  await settle(page, 600);
+  await page.click('a.row[href$="resume/#carnegie"]');
+  await page.waitForFunction(() => document.documentElement.dataset.page === 'resume' && document.getElementById('carnegie'), null, { timeout: 4000 });
+  // polled rather than after a fixed wait: V5_SLOW stretches fixed waits, and a stretched one outlasts the 1.2 s wash
+  check(await page.waitForFunction(() => getComputedStyle(document.getElementById('carnegie')).animationName === 'landed', null, { timeout: 1000, polling: 30 }).then(() => true, () => false), 'landing on résumé/#carnegie lights the entry');
+  check(await page.waitForFunction(() => [...document.querySelectorAll('.toc a[aria-current="true"]')].map(a => a.textContent).join('|') === 'Music', null, { timeout: 1000, polling: 30 }).then(() => true, () => false), 'and Sections marks Music');
+  await page.waitForTimeout(1500);
+  check(await page.evaluate(() => !document.getElementById('carnegie').classList.contains('is-landed')), 'the wash is gone after 1.2 s');
+  await page.evaluate(() => { const b = document.querySelector('#main .win__body'), s = document.getElementById('athletics').closest('section'); b.scrollTop += s.getBoundingClientRect().top - b.getBoundingClientRect().top + 20; });
+  await page.waitForTimeout(300);
+  check(await current() === 'Athletics', 'scrolling to Athletics marks it');
+  await page.click('.toc a[href$="#honors"]');
+  check(await current() === 'Honors', 'a jump from Sections marks its target at once');
+  await page.waitForTimeout(1200);
+  check(await current() === 'Honors', 'and keeps it once the scroll arrives');
+  check(errors.length === 0, 'no console errors ' + errors.join(' | '));
+  await browser.close();
+}
+{
+  // phones and laptops: a page change places the new side window by its role (windows.refresh after the swap)
+  const { browser, page, errors } = await open({ width: 390, height: 844, noGL: true });
+  await page.goto(BASE + 'work/', { waitUntil: 'load' });
+  await settle(page, 600);
+  await page.click('nav.tabs a[data-tab="hockey"]');
+  await page.waitForURL('**/v5/hockey/');
+  await settle(page);
+  check(await page.evaluate(() => document.querySelector('#main .win__body').firstElementChild.matches('aside.side[data-inline="start"]') && !!document.getElementById('measure-h')), 'phone: after the swap, Hockey’s Measurables lead the window');
+  await page.click('nav.tabs a[data-tab="resume"]');
+  await page.waitForURL('**/v5/resume/');
+  await settle(page);
+  check(await page.evaluate(() => !!document.querySelector('#main > .side__part--pin .toc') && document.querySelector('#main .win__body').lastElementChild.matches('aside.side') && document.querySelectorAll('aside.side').length === 1), 'phone: the Résumé’s Sections are pinned and its Contact closes the page');
+  await page.click('nav.tabs a[data-tab="home"]');
+  await page.waitForURL(u => u.pathname === '/v5/');
+  await settle(page);
+  check(await page.evaluate(() => !document.querySelector('.side__part--pin') && document.querySelector('#main .win__body').lastElementChild.matches('aside.side')), 'phone: back on Home, nothing is pinned and This fall closes the page');
   check(errors.length === 0, 'no console errors ' + errors.join(' | '));
   await browser.close();
 }

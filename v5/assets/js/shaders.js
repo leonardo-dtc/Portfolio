@@ -89,16 +89,18 @@ void main() {
   o = vec4(col, 1.0);
 }`;
 
-// Composite: the room (sharp or defocused), soft shadows under the panels, the glass inside them, the ink.
+// Composite: the room (sharp or defocused), soft shadows under the panels, the glass inside them, the stage, the ink.
 // Panels arrive as inverse homographies (screen device px, y down -> panel px), size, radius, kind, and state.
-// The ink is the hero's name: a mask (red the letters, green a soft height for their bevel, blue a wide blur of them
-// for the light behind) placed by uInkX; uInk0 = (shown, dim, white, bevel px), uInk1 = (glow, lean x, lean y, -),
-// uInkL = the highlight on the glass (centre x, y, radius, strength), all in device px.
+// uStage is the hero's dark stage (1 while the name shows, lifting as it enters; by night only).
+// The ink is the hero's name: a mask (red the letters, green a soft copy of them whose half level is the outline the
+// neon follows, blue a wide blur of them for the bloom and the day pool) placed by uInkX; uInk0 = (shown, dim, white,
+// the soft copy's sigma), uInk1 = (light, lean x, lean y, font size), uInkL = the hot spot near the pointer (centre x,
+// y, radius, strength), all in device px.
 export const COMPOSITE = `#version 300 es
 precision highp float;
 uniform sampler2D uScene; uniform sampler2D uInk;
 uniform vec2 uRes; uniform float uLod; uniform float uFrostLod; uniform float uTime; uniform float uDay;
-uniform vec2 uLight; uniform vec2 uPointer; uniform int uCount;
+uniform vec2 uLight; uniform vec2 uPointer; uniform int uCount; uniform float uStage;
 uniform mat3 uInv[16]; uniform vec4 uBox[16]; uniform vec4 uState[16];
 uniform vec4 uInk0; uniform vec3 uInkX; uniform vec2 uColor; uniform vec4 uInk1; uniform vec4 uInkL;
 // the color style: a hue rotation (radians) and a saturation scale in YIQ, which keeps each colour's brightness
@@ -107,8 +109,65 @@ vec3 hueShift(vec3 c, float a, float k) {
   float h = atan(yiq.z, yiq.y) - a, r = length(yiq.yz) * k;   // minus: positive angles follow the colour wheel
   return clamp(mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703) * vec3(yiq.x, r * cos(h), r * sin(h)), 0.0, 1.0);
 }
+// ---------- the hero's name in neon light (after Apple's "It's Glowtime") ----------
+const float TAU = 6.2831853;
+// The colour style's turn for the name's light: a third as far as the room's, its vibrance three quarters as strong,
+// and held inside the Glowtime family, the arc of hues from orange through pink, magenta, violet and blue to cyan
+// (YIQ angles -4 to 196 degrees), so a palette shifts which of those colours lead and never turns them lime or green.
+// No clamp of the result, so light can add up; guarded where the light is exactly 0 (the mask's corners, the
+// hand-off), where atan(0, 0) is undefined.
+vec3 neonTurn(vec3 c) {
+  vec3 yiq = mat3(0.299, 0.596, 0.211, 0.587, -0.274, -0.523, 0.114, -0.322, 0.312) * c;
+  float h = atan(yiq.z, yiq.y + 1e-6) - uColor.x / 3.0, r = length(yiq.yz) * mix(1.0, uColor.y, 0.75);
+  h = 1.676 + clamp(mod(h - 1.676 + 3.14159265, TAU) - 3.14159265, -1.745, 1.745);
+  return mat3(1.0, 1.0, 1.0, 0.956, -0.272, -1.106, 0.621, -0.647, 1.703) * vec3(yiq.x, r * cos(h), r * sin(h));
+}
+// the moment of the light's cycle the room's clock starts from: the first frame of the arrival, and the one still
+// under reduced motion (where the clock does not run)
+const float T_REST = 31.0;
+// the Glowtime colours, as light
+const vec3 N_ORANGE = vec3(1.00, 0.40, 0.05), N_PINK = vec3(1.00, 0.12, 0.46), N_MAGENTA = vec3(0.88, 0.12, 0.92);
+const vec3 N_VIOLET = vec3(0.52, 0.20, 1.00), N_BLUE = vec3(0.13, 0.34, 1.00), N_CYAN = vec3(0.08, 0.80, 1.00);
+// the main tube's colour along phi: orange (a wide stretch), hot pink, magenta, violet, electric blue, cyan (a wide
+// stretch), and back
+vec3 neonRamp(float phi) {
+  float s = 1.0 - abs(fract(phi) * 2.0 - 1.0);
+  vec3 c = mix(N_ORANGE, N_PINK, smoothstep(0.21, 0.31, s));
+  c = mix(c, N_MAGENTA, smoothstep(0.33, 0.43, s));
+  c = mix(c, N_VIOLET, smoothstep(0.44, 0.52, s));
+  c = mix(c, N_BLUE, smoothstep(0.54, 0.62, s));
+  return mix(c, N_CYAN, smoothstep(0.64, 0.74, s));
+}
+// the halo's colour: only blue, violet and pink, saturated (no cyan or orange to go teal or maroon in the dark)
+vec3 haloRamp(float phi) {
+  float s = 1.0 - abs(fract(phi) * 2.0 - 1.0);
+  return mix(mix(vec3(0.20, 0.30, 1.00), vec3(0.50, 0.16, 1.00), smoothstep(0.0, 0.5, s)), vec3(0.95, 0.14, 0.66), smoothstep(0.55, 1.0, s));
+}
+// a Gaussian-softened edge's level as a distance from it, in its softness (log-odds; + inside)
+float edgeDist(float g) { g = clamp(g, 0.003, 0.997); return log(g / (1.0 - g)) / 1.7; }
+// a bloom round that edge, falling to nothing where the level runs out (about 3.4 softnesses away)
+float bloom(float d, float w) { return exp(-abs(d) / w) * smoothstep(3.3, 2.2, abs(d)); }
+// Three echoes of the outline, each its own colour family (pink to magenta, orange to amber, azure to cyan; violet is
+// the faces' and the halo's). Each: its drift (font sizes in x and y, and their periods in s; a
+// negative period turns the other way), the level it follows (in the outline's softnesses, + inside the letters) and
+// how far and how slowly that breathes, its slot on the colour turns, the wave on which it wanders from its turn (a
+// direction in radians per font size, a period, a phase), and its strength (orange the strongest, so it holds its own
+// against the pinks and burns white where it meets them).
+const vec4 E_DRIFT[3] = vec4[3](vec4(0.024, 0.018, 13.0, -16.5), vec4(0.020, 0.024, -17.0, 12.0), vec4(0.026, 0.016, 19.0, -10.5));
+const vec4 E_LEVEL[3] = vec4[3](vec4(1.15, 0.35, 11.0, 1.0), vec4(-1.25, 0.35, 14.5, 2.4), vec4(-0.55, 0.55, 9.5, 4.1));
+const vec4 E_WAVE[3] = vec4[3](vec4(-0.9, 0.7, -15.0, 1.5), vec4(0.6, -1.1, 18.0, 3.0), vec4(-1.2, -0.4, -10.0, 4.5));
+const float E_SLOT[3] = float[3](0.25, 0.5, 0.75), E_GAIN[3] = float[3](0.9, 1.3, 1.05);
+const vec3 E_A[3] = vec3[3](N_PINK, N_ORANGE, vec3(0.11, 0.48, 1.00));
+const vec3 E_B[3] = vec3[3](N_MAGENTA, vec3(1.00, 0.56, 0.08), N_CYAN);
+// The dark stage the name stands on by night: the whole room gives way to near black, a breath of its violet, with
+// 7% of the room left in it, so its shapes are only faintly there
+const vec3 STAGE = vec3(0.010, 0.009, 0.026);
+const float STAGE_K = 0.93;
+// how strong the bloom is by night
+const float BLOOM_K = 1.75;
 
 out vec4 o;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 float sdRound(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
 vec3 roomAt(vec2 uv, float lod) {
   vec2 t = exp2(max(lod, 0.0)) / uRes;
@@ -177,60 +236,112 @@ void main() {
     if (under >= 0 && smoothstep(1.5, -0.5, sd) * min(1.0, uState[hit].x * 1.6) < 0.999) col = glassOver(under, lp2, sd2, px, col);
     col = glassOver(hit, lp, sd, px, col);
   }
-  // The name: solid glass letters with a light behind them. The light spills round the letters into the room (blue,
-  // leaning a few pixels toward the pointer) and shines through their frosted faces; the bevel catches a bright rim
-  // on the side facing the light, which leans toward the pointer too. Turning white, they become plain white text.
+  // The stage, by night: while the hero shows, the whole room (and any glass in it) gives way to near black, so no
+  // edge or shape outlines the name anywhere and its light blooms into the dark, as in the Glowtime art. A mix of
+  // what the room drew, so it reads nothing more; entering, it lifts on the glide's spring as the neon goes out, and
+  // the room's light comes up as the window's glass forms. By day there is no stage.
+  float stage = uStage * (1.0 - uDay);
+  if (stage > 0.0) col = mix(col, hueShift(STAGE, uColor.x, uColor.y), STAGE_K * stage);
+  // The name in neon light, after Apple's "It's Glowtime". Each letter's outline is a crisp tube of light locked to
+  // the letters' true edge, its colour flowing along the name (orange, hot pink, magenta, violet, electric blue,
+  // cyan) with a white-hot core and a hair of red and blue split. Three echoes trace the outline again, each in its
+  // own colour family, drifting a little and following a level just inside or outside the edge, so they cross the
+  // tube and add up toward white where they meet. The faces are translucent light in the tube's colour (violet where
+  // it runs cool), and behind it all the halo, leaning toward the pointer: by night the bloom, the light spreading
+  // into the dark stage (each stretch's own colour close to the letters, blue, violet and pink further out); by day
+  // an aura over a deep violet-blue pool. The traces take turns being brightest (a cycle in 16 s sliding along the
+  // name) and wander on their own 10 to 19 s waves; the letters never move. The echoes grow out of the outline as the
+  // light arrives and fold back as it goes, and turning white the light goes out and the letters become plain white
+  // text. Seven reads of the mask.
   if (uInk0.x > 0.001) {
     vec2 isz = vec2(textureSize(uInk, 0));
-    vec2 mu = (px * uInkX.x + uInkX.yz) / isz;
+    vec2 mp = px * uInkX.x + uInkX.yz;                                   // this pixel in the mask
+    vec2 mu = mp / isz;
     if (mu.x > 0.0 && mu.y > 0.0 && mu.x < 1.0 && mu.y < 1.0) {
       // an explicit mip level: inside this branch the GPU has no derivatives to choose one at the mask's edge
       float lk = max(0.0, log2(max(uInkX.x, 1e-4)));
-      float on = uInk0.x, white = uInk0.z, bev = max(uInk0.w, 1.0);
-      float cov = textureLod(uInk, mu, lk).r * on;
-      vec2 lean = uInk1.yz * uInkX.x / isz;
-      float back = textureLod(uInk, mu - lean, lk).b;                  // the wide light behind
-      float leak = textureLod(uInk, mu - lean * 0.4, lk + 3.0).r;      // and a tight leak of it right at the edges
-      vec3 glowC = hueShift(mix(vec3(0.44, 0.58, 1.0), vec3(0.86, 0.93, 1.0), uDay), uColor.x, uColor.y);
-      float glow = uInk1.x * on * (1.0 - white);
-      col += glowC * (back * mix(0.5, 0.26, uDay) + leak * mix(0.22, 0.14, uDay)) * glow;
-      if (cov > 0.003) {
-        float hc = textureLod(uInk, mu, lk).g;
-        vec2 e = vec2(max(1.0, bev * 0.5) * uInkX.x) / isz;
-        float hx = textureLod(uInk, mu + vec2(e.x, 0.0), lk).g - textureLod(uInk, mu - vec2(e.x, 0.0), lk).g;
-        float hy = textureLod(uInk, mu + vec2(0.0, e.y), lk).g - textureLod(uInk, mu - vec2(0.0, e.y), lk).g;
-        // the moving surface, kept to a shimmer
-        vec2 q = uv * vec2(uRes.x / uRes.y, 1.0);
-        vec2 flow = vec2(sin(q.y * 21.0 + uTime * 0.9 + 1.7 * sin(q.x * 9.0 + uTime * 0.5)), cos(q.x * 17.0 - uTime * 0.7 + 1.9 * sin(q.y * 11.0 - uTime * 0.4)));
-        vec3 n = normalize(vec3(-vec2(hx, hy) * 3.0 + flow * 0.012, 1.0));
-        // the light: from the upper left, leaning gently toward the pointer
-        vec3 L = normalize(vec3(clamp((uLight - px) / uRes.y, -1.0, 1.0) * 0.5 + vec2(-0.42, -0.58), 0.75));
-        vec2 lit = normalize(L.xy + 1e-5), nn = normalize(n.xy + 1e-5);
-        float slope = clamp(1.0 - n.z, 0.0, 1.0);
-        float edge = exp(-pow((hc - 0.56) / 0.13, 2.0));          // the rim, just inside the letter's edge
-        float facing = max(dot(nn, lit), 0.0), away = max(dot(nn, -lit), 0.0);
-        // frosted inside: the room behind, bent a little at the bevel and deeply blurred, lit from behind
-        vec2 spx = px - n.xy * bev * 3.5;
-        vec2 suv = spx / uRes; suv.y = 1.0 - suv.y;
-        vec3 frost = roomAt(suv, max(uLod, uFrostLod));
-        vec3 g = frost * 1.12 + glowC * (0.24 + 0.5 * back) * uInk1.x + vec3(0.1);
-        // by day the room behind is bright, so the glass is a deeper blue (as the windows are) and the rims draw on it
-        vec3 deep = hueShift(vec3(0.13, 0.27, 0.80), uColor.x, uColor.y);
-        g = mix(g, mix(frost * 0.55, deep, 0.62) + glowC * 0.12 * back * uInk1.x, uDay);
-        g *= 1.0 - 0.38 * slope * away;                           // the bevel away from the light falls into shade
-        g += vec3(0.96, 0.98, 1.0) * edge * (0.95 * facing + 0.38 * away + 0.12);   // a bright rim, a fainter one behind
-        g += vec3(0.96, 0.98, 1.0) * slope * facing * 0.35;
-        // a soft highlight across the faces, drawn toward the pointer
-        vec2 dl = (px - uInkL.xy) / max(uInkL.z, 1.0);
-        g += vec3(0.95, 0.97, 1.0) * uInkL.w * exp(-dot(dl, dl));
-        float sweep = fract(uTime / 9.0) * 2.6 - 0.8;
-        g += vec3(1.0) * 0.045 * exp(-pow((uv.x * 0.85 + (1.0 - uv.y) * 0.35 - sweep) * 6.0, 2.0));
-        // as the window's title it is plain white, as the HTML title it hands off to
-        g = mix(g, vec3(1.0), white);
-        g *= 1.0 - 0.5 * uInk0.y;
-        col = mix(col, g, cov);
+      float on = uInk0.x, white = uInk0.z, sig = max(uInk0.w, 0.75);    // sig: the outline's softness, mask px
+      float fs = max(uInk1.w, 8.0);                                        // the font size, mask px
+      float lit = uInk1.x * on * (1.0 - white);                            // arrival, hover lift, press flare; out as it whitens
+      float calm = min(lit, 1.0);
+      float t = uTime + T_REST;                                            // the room's clock (still under reduced motion)
+      vec4 m = textureLod(uInk, mu, lk);                                   // read 1: letters, outline field, wide blur
+      // the outline is where the soft copy crosses one half; its log-odds is about the distance from it, in sig
+      float d = edgeDist(m.g);
+      vec2 nrm = normalize(vec2(textureLod(uInk, mu + vec2(sig / isz.x, 0.0), lk).g, textureLod(uInk, mu + vec2(0.0, sig / isz.y), lk).g) - m.g + 1e-6);   // reads 2, 3
+      // the colour, in font sizes from the name's centre: bands drifting along the name (a cycle in 14 s) through a
+      // slow warp (15 and 19 s)
+      vec2 q = (mp - 0.5 * isz) / fs;
+      vec2 wq = q + 0.30 * vec2(sin(q.y * 1.9 + t * 0.42), sin(q.x * 0.8 - t * 0.33));
+      float phi = 0.21 * wq.x - 0.28 * wq.y - t / 14.0;
+      vec3 cT = neonRamp(phi);
+      // the turns: a slow brightness cycle sliding along the name, a quarter of it apart for each trace, each wandering
+      // from its turn on its own wave
+      float cyc = q.x * 1.25 + q.y * 0.5 - TAU * t / 16.0;
+      float up0 = pow(0.5 + 0.5 * cos(cyc + 0.6 * sin(dot(q, vec2(1.1, 0.6)) + TAU * t / 12.0)), 2.0);
+      // the tube, its red and blue a hair apart (the split turns round in 16 s), and its white-hot core
+      vec3 dc = vec3(d) + vec3(0.24, 0.0, -0.24) * dot(nrm, vec2(cos(t * 0.39), sin(t * 0.39)));
+      vec3 tube = dc * dc / 0.9;
+      float face = clamp(d * sig + 0.5, 0.0, 1.0);                       // inside the letters (antialiased)
+      vec3 light = cT * exp(-tube * tube) * (0.85 + 0.5 * up0);
+      light += vec3(1.0, 0.95, 0.97) * exp(-d * d / 0.03) * (0.04 + 0.24 * up0);
+      light += cT * bloom(d, 1.3) * 0.45 * (1.0 - face);
+      // the echoes (reads 4 to 6): their drift and level grow out of the outline with the light, and fold back into it
+      float grow = calm;
+      for (int i = 0; i < 3; i++) {
+        vec4 D = E_DRIFT[i], V = E_LEVEL[i], W = E_WAVE[i];
+        vec2 off = vec2(D.x * sin(TAU * t / D.z + V.w), D.y * cos(TAU * t / D.w + V.w * 1.618)) * grow;
+        float lev = (V.x + V.y * sin(TAU * t / V.z + V.w * 2.3)) * grow;
+        float ei = edgeDist(textureLod(uInk, (mp + off * fs) / isz, lk).g), di = ei - lev;
+        // the further it strays from the outline (in softnesses), the fainter, so the name never reads double
+        float stray = length(off) / max(sig / fs, 1e-3) + 0.5 * abs(lev);
+        float up = pow(0.5 + 0.5 * cos(cyc - TAU * E_SLOT[i] + 0.6 * sin(dot(q, W.xy) + TAU * t / W.z + W.w)), 2.0);
+        vec3 c = mix(E_A[i], E_B[i], 0.5 + 0.5 * sin(TAU * t / 19.0 + q.x * 0.5 + float(i) * 1.7));
+        // (its bloom goes where the field runs out, so nothing is left at the mask's edge)
+        light += c * E_GAIN[i] * (exp(-di * di / 0.14) + 0.16 * bloom(di, 0.9) * smoothstep(3.35, 2.6, abs(ei))) * (0.95 + 0.65 * up) * (1.0 - 0.45 * smoothstep(0.6, 2.0, stray)) * grow;
       }
+      // the halo (read 7): the wide blur, leaning toward the pointer, breathing over 10 s. By night it is the bloom,
+      // the light spreading into the dark stage round the letters: it starts where the tube's own glow ends (two
+      // softnesses out), so it adds nothing to the tube or the faces and the tube's colours count as they were, and
+      // close to the letters it is the tube's colour, so an orange or cyan stretch glows in its colour (a blue or
+      // violet bloom there read salmon), turning to blue, violet and pink further out. It eases off near the letters
+      // (b / (1 + 5b)), so it falls into the dark without a step, and is gone just before the blur runs out, so the
+      // mask's box never shows. By day, blue, violet and pink at half strength over the pool. The violet in the faces
+      // falls away where the tube runs warm (orange, hot pink) or icy (cyan)
+      float warm = smoothstep(0.0, 0.3, cT.r - cT.b), icy = smoothstep(0.3, 0.6, cT.g - cT.r);
+      float cool = (1.0 - warm) * (1.0 - 0.7 * icy);
+      float back = textureLod(uInk, mu - uInk1.yz * uInkX.x / isz, lk).b;
+      vec3 haloC = haloRamp(phi * 0.7 + 0.15);
+      vec3 bloomN = mix(haloC, cT, smoothstep(0.05, 0.3, back)) * max(back - 0.004, 0.0) / (1.0 + 5.0 * back) * BLOOM_K * smoothstep(0.5, 2.5, -d);
+      vec3 haloD = haloC * back * (0.3 + back) * 0.5 * (1.0 - 0.6 * face);
+      light += mix(bloomN, haloD, uDay) * (0.88 + 0.12 * sin(TAU * t / 10.0));
+      // the faces: translucent light in the tube's colour, deepest away from the edge: crimson where it runs warm (a
+      // dim orange face would read brown), violet where it runs cool. By day, violet and brighter, over the day pool
+      vec3 faceC = mix(mix(cT, N_PINK, 0.5 * warm * (1.0 - uDay)), vec3(0.46, 0.32, 1.0), mix(0.75 * cool, 0.75, uDay));
+      light += faceC * face * mix(0.16 + 0.18 * smoothstep(0.4, 1.6, d), 0.30 + 0.30 * smoothstep(0.4, 1.6, d), uDay);
+      // the light leans toward the pointer: the tubes run hotter near it
+      vec2 dl = (px - uInkL.xy) / max(uInkL.z, 1.0);
+      light *= lit * (1.0 + 3.0 * uInkL.w * exp(-dot(dl, dl)));
+      // where light piles up (traces crossing, a press) it spills into every channel and burns toward white; then a
+      // soft tone curve, so the burn rolls off rather than clipping, and the colour style turns it a third as far as
+      // the room, so every palette keeps the Glowtime family and only shifts its emphasis
+      float hot = max(max(light.r, light.g), light.b);
+      light += vec3(max(hot - 1.8, 0.0) * 0.9);
+      vec3 L = max(neonTurn(1.0 - exp(-light)), 0.0);
+      // the ground under the light: by night the stage (above), which the bright light outshines (where it runs
+      // strong the stage's faint cobalt goes from under it, so it cannot tint the neon's colours toward blue); by day,
+      // where the room is bright, it falls about 80% toward a saturated violet-blue that follows the halo, hugging
+      // the letters, tied to the same light term
+      vec3 deepD = clamp(neonTurn(mix(vec3(0.14, 0.08, 0.56), haloC * 0.42, 0.4)), 0.0, 1.0);
+      float poolD = smoothstep(0.0, 0.24, m.b) * 0.82 * uDay;
+      float outshone = (1.0 - uDay) * smoothstep(0.25, 0.85, max(max(L.r, L.g), L.b));
+      vec3 ground = mix(col, deepD, poolD * calm) * (1.0 - 0.2 * face * calm) * (1.0 - outshone);
+      vec3 neon = clamp(ground + L, 0.0, 1.0) * (1.0 - 0.5 * uInk0.y);
+      // as the window's title it is plain white, as the HTML title it hands off to
+      col = mix(neon, mix(col, vec3(1.0), m.r * on), 1.0 - (1.0 - white) * (1.0 - white));
     }
   }
+  // the stage and the bloom are long, dark gradients: dithered, so they fall without bands
+  if (stage > 0.0) col += stage * (hash(gl_FragCoord.xy + fract(uTime)) - 0.5) / 255.0;
   o = vec4(col, 1.0);
 }`;
