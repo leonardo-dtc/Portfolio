@@ -400,7 +400,7 @@ These are estimates, to be re-scored after the change:
     - **By day** there is no stage; the violet aura stays as it was.
     - **Without WebGL2** the hero's copy of the room's still darkens the same way.
 
-  Screenshots of all three went to Leonardo; he can still pick A or C (T41).
+  Screenshots of all three went to Leonardo; he can still pick A or C (T41). Both are kept as patches, with the comparison sheet, in [`round-3/hero-variants/`](round-3/hero-variants/README.md).
 
 ---
 
