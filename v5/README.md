@@ -5,7 +5,8 @@ edition (repository root), the editorial edition (`v2/`), the poster edition
 (`v3/`) and the dim-room edition (`v4/`). The editions are separate designs on
 purpose: one will be chosen and the others archived, so **this edition shows,
 embeds or links nothing from the other four**. Static HTML, CSS and vanilla
-JavaScript; no framework, no build step. Every page reads without JavaScript.
+JavaScript, with one library (GSAP and its Flip plugin, self-hosted, for Work's
+grid); no framework, no build step. Every page reads without JavaScript.
 
 ## Preview
 
@@ -424,6 +425,8 @@ side window and the toolbar), so a new item touches a few files by hand. In orde
 | `assets/js/nav.js` | Page swaps (the side window kept in place), sheets, history, direct loads of projects, anchor landings and their wash |
 | `assets/js/spy.js` | The Résumé's Sections following the reader (any page with a `.toc` gets it) |
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |
+| `assets/js/palette.js` | The colour styles: the palettes, the turn in OKLab (and the room's table of colours), and each palette's neon for the hero |
+| `assets/js/flip.js`, `assets/vendor/gsap/` | Work's grid reflowing when filtered, with GSAP's Flip (3.15.0, self-hosted, GreenSock's standard no-charge licence; `vendor/gsap/README.md` gives the source and checksums). Loaded only on a page with a grid to filter, once it is idle |
 | `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
 | Kept, unreferenced | The written hello of the first round: `assets/js/hello.js` (the pen timeline and the Enter button), `name.js` and `name-data.js` (Sacramento traced to pen strokes), `assets/img/name.svg` and `name-2.svg` (the name as an SVG, one line and two), and `tools/trace-name/` outside the edition. Nothing imports or links them any more; they stay in case the written name comes back |
 | `DESIGN.md` | The design system, recorded from the built pages |
