@@ -707,3 +707,59 @@ Left as it is:
   - reveals replay as sheets return.
 
   The headlines are already split into lines, so SplitText would add nothing. A grid reflow like Work's does not exist there. GSAP's core alone would add 28 KB (compressed) and change nothing a visitor can see.
+
+---
+
+## 11. The desktop, revisited (2026-10-04)
+
+Leonardo: "what happened to the desktop setup? did you reject it? For the v3, if it were to be implemented, I was thinking it would be on a macintosh computer or something like that (v5 would remain a modern computer). If you think this isn't the way I should go about this, say so. If you think it's worth a shot, plan it then build it."
+
+**What had happened.** Nothing was rejected outright (section 4).
+- **v5:** the Home View launcher was recommended and mocked up. It was not built because it changes the hero he approved; it waits on T34, T27 and T35.
+- **v3:** a desktop was advised against, as a third metaphor fighting the poster and the cabinet. Its useful pieces went into paper instead: the cover's routes, Find, the files and the archive cards.
+
+**Why a Macintosh changes the answer for v3.**
+- **It is not a generic OS template.** A classic Mac is an object with its own identity, and its one-bit black and white is graphic and print-like.
+- **It sits naturally in the collage,** like the goalie mask or the stickers, taped onto the paper.
+- **It gives each finalist the computer of its world:** v3 the old Mac, v5 the modern one.
+- **Its natural job is the personal archive:** class games, arrangements, team builds.
+
+**Where it goes, and where it does not.**
+- **Not the landing page.** A Mac in front of everything would replace the cover, the edition's strongest screen (it says who he is in the first five seconds), and put a click before all content. On phones the metaphor collapses.
+- **Not a second index.** The cabinet already is the file system he asked for.
+- **The archive sheet.** That is where a desktop of files is worth its space.
+
+**Built** (`v3/assets/js/mac.js`, `v3/assets/css/mac.css`):
+- **The object:** a classic Macintosh drawn in CSS (no logos), taped onto sheet 11.
+- **The screen:** one bit on a two-pixel grid, set in Tiny5 (OFL), a pixel face that lands on that grid.
+  - A menu bar with the poster's star and working File, View and Special menus.
+  - The Archive disk and the Trash.
+  - The Archive window, one file for each card, each with its own pixel picture: a document page with an emblem for its kind (joystick, film, chart, notes, maze, robot, rocket).
+- **A file's window:** the card's year, kind, title, line and link.
+- **The old Mac's behaviours:**
+  - zooming outlines when a window opens;
+  - the striped title bar on the front window only;
+  - windows that drag by their title bars;
+  - the default button's heavy ring;
+  - the screen coming on the first time the sheet arrives.
+- **Built from the existing cards,** so his instructions for adding an archive entry still hold (the comment beside the cards now says how to pick a picture).
+- **Fallbacks:** without the script, in print and in forced colours the cards show instead. Find opens a card's file on the Mac.
+
+**Measured** (`tests/v3/check.mjs`, section 6d; the suite passes all 108 checks):
+- one file for each card, in order;
+- the keyboard: arrows move between files and never change the sheet; Return opens a file, Escape closes it, and the focus goes back to its icon;
+- the menus, the close box, the disk, the Trash and Restart;
+- dragging, never past the screen's left edge;
+- Find;
+- phones at 390 and 320, where windows take the whole screen with no sideways scroll;
+- reduced motion;
+- the fallbacks.
+
+**Not done, and why:**
+- **No sound.** The startup chime would play without asking.
+- **No Apple marks:** no logo or "Welcome to Macintosh". The boot icon is the poster's star badge (a pixel goalie mask read as a skull at 32 dots).
+- **No toys,** such as the old Puzzle desk accessory, unless he wants them.
+- **No new wording.** The screen shows only the cards' own text, plus the interface's names (File, View, Special, Archive, Trash, "8 items").
+
+**v5 stays as it was:** the modern computer's launcher still waits on T34, T27 and T35, because it changes the hero he likes.
+

@@ -14,9 +14,8 @@
 //                  file on screen and in print, the printed link addresses included)
 //   4. contrast    the pairs fixed in round three pass (4.5:1, or 3:1 for large text), and a sweep of every text
 //                  element over a solid background finds nothing under its threshold
-//   4b. step back  pointing at a collage card or an archive card (or tabbing to one) steps the others back by
-//                  colour: no text is dimmed by opacity and every text still meets its threshold; the card
-//                  pointed at comes to the top
+//   4b. step back  pointing at a collage card steps the other back by colour: no text is dimmed by opacity and
+//                  every text still meets its threshold; the card pointed at comes to the top
 //   5. cabinet     hovering a dot opens the cabinet; moving the mouse up to the pulled file and clicking it
 //                  lands on that file's own sheet
 //   5b. intent     diagonal paths from a dot up to its file keep that file out (V3_AIM=full runs all 108 paths);
@@ -25,6 +24,14 @@
 //   6b. keyboard   tabbing out of the cabinet closes it; while Find filters, the current tab stays readable
 //   6c. keyboard   the walk from the top (the Index tab is the one way in); focus never rests on a hidden chrome
 //                  name or pill; the first key press finishes the code panel; 44px touch targets
+//   6d. the Mac    the archive's cards become the files on a classic Macintosh (one file a card, in order);
+//                  the screen comes on when the sheet arrives; a click or Return opens a file's window, in front,
+//                  with the focus, and Escape closes it, the focus back on its icon; arrows move between files
+//                  and never change the sheet; View, by Name lists them; File, Open and Close Window, the close
+//                  box, the Archive disk, the Trash and Special, Restart work; the title bar drags its window and
+//                  never off the screen's left edge; Find opens a card's file; at 390 and 320 every window takes
+//                  the whole screen and nothing scrolls sideways; under reduced motion no outline zooms; without
+//                  the script, in print and in forced colours the cards show instead
 //   7. files       the hockey file prints on one Letter page; pager lines show without the script; the narrow
 //                  drawer shows one tab; the chrome text sits where the deck's does; Back returns to where the
 //                  reader was
@@ -308,22 +315,8 @@ for (const slug of FILES) {
     if (back !== null) tops.push(`${id} (back to card--a): ${back}`);
     await page.mouse.move(700, 120); await page.waitForTimeout(900);
   }
-  await goSheet('archive');
-  const n = await page.evaluate(() => document.querySelectorAll('#archive .entry').length);
-  for (const i of [0, Math.floor(n / 2), n - 1]) {
-    const pt = await page.evaluate(i => { const r = document.querySelectorAll('#archive .entry')[i].getBoundingClientRect(); return [r.left + r.width / 2, r.top + 30]; }, i);
-    await page.mouse.move(pt[0], pt[1], { steps: 3 }); await page.waitForTimeout(1000);
-    bad.push(...(await audit('#archive .entries')).map(x => `archive, card ${i + 1} pointed at: ${x}`));
-  }
-  check(bad.length === 0, 'pointing at a collage or archive card steps the others back by colour: no text dimmed by opacity, every text at its threshold', bad.slice(0, 12));
+  check(bad.length === 0, 'pointing at a collage card steps the other back by colour: no text dimmed by opacity, every text at its threshold', bad.slice(0, 12));
   check(tops.length > 0 && tops.every(t => /: ok$/.test(t)), `the card pointed at comes to the top (${tops.length} overlaps)`, tops);
-  /* the keyboard's way: tabbing to an archive card's link */
-  await page.mouse.move(700, 120); await page.waitForTimeout(600);
-  await page.evaluate(() => { const links = document.querySelectorAll('#archive .entry__link'); links[0].focus(); });
-  await page.keyboard.press('Tab'); await page.waitForTimeout(1500);
-  const kb = await audit('#archive .entries');
-  const focusedIn = await page.evaluate(() => !!document.activeElement.closest('#archive .entry'));
-  check(focusedIn && kb.length === 0, 'tabbing to an archive card steps the others back by colour too', kb.slice(0, 8));
   await page.context().close();
 }
 
@@ -521,6 +514,90 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   }));
   check(tt.length >= 4 && tt.every(x => x.h >= 44 && x.ends), `touch: the cover's routes and the chrome's name take 44px (${tt.map(x => x.t + ' ' + x.h).join(', ')})`, JSON.stringify(tt));
   await tp.context().close();
+}
+
+/* ---------- 6d. the archive's Macintosh (assets/js/mac.js) ---------- */
+{
+  const page = await open({ path: '#archive' });
+  await page.waitForTimeout(1600);
+  const s0 = await page.evaluate(() => {
+    const m = window.__v3mac, cards = [...document.querySelectorAll('#archive .entries > .entry')];
+    return { n: cards.length, files: m ? m.files.map(f => f.title) : [], titles: cards.map(c => c.querySelector('.entry__title').textContent.replace(/\s+/g, ' ').trim()), on: document.querySelector('.mac__screen').className, cards: getComputedStyle(document.querySelector('#archive .entries')).display, wins: m.windows.map(w => w.querySelector('.mac__title').textContent) };
+  });
+  check(s0.n > 0 && s0.files.join('|') === s0.titles.join('|'), `one file on the Mac for each archive card, in order (${s0.files.length} of ${s0.n})`);
+  check(/is-on/.test(s0.on) && s0.cards === 'none' && s0.wins.join() === 'Archive', `the screen is on once the sheet arrives, the Archive window open, the cards given way (${s0.on}; ${s0.wins.join()})`);
+  const st = () => page.evaluate(() => ({ active: document.activeElement && (document.activeElement.getAttribute('aria-label') || document.activeElement.textContent.trim().slice(0, 40)), doc: !!document.activeElement.closest('.mac__win--doc'), wins: window.__v3mac.windows.map(w => w.querySelector('.mac__title').textContent), cur: document.querySelector('.rail a[aria-current]')?.getAttribute('href') }));
+  /* right, then down a row: from the first file to the one under the second */
+  const expect = await page.evaluate(() => { const f = window.__v3mac.files, top = f[0].icon.offsetTop, cols = f.filter(x => x.icon.offsetTop === top).length; f[0].icon.focus(); return f[Math.min(f.length - 1, 1 + cols)].icon.getAttribute('aria-label'); });
+  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowDown');
+  let s = await st();
+  check(s.active === expect && s.cur === '#archive', `arrows move between files and the deck stays on the sheet (${s.active}; ${s.cur})`);
+  const want = s.active;
+  await page.keyboard.press('Enter'); await page.waitForTimeout(500);
+  s = await st();
+  check(s.wins.length === 2 && s.doc && want.startsWith(s.wins[1]), `Return opens the file in front, with the focus (${s.wins.join(' | ')})`);
+  await page.keyboard.press('Escape'); await page.waitForTimeout(400);
+  s = await st();
+  check(s.wins.length === 1 && s.active === want, `Escape closes it and the focus goes back to its icon (${s.active})`);
+  await page.click('.mac__mt >> text=View'); await page.click('.mac__mi[data-act="names"]');
+  const list = await page.evaluate(() => { const r = window.__v3mac.files.map(f => f.icon.getBoundingClientRect()); return document.querySelector('.mac__grid').classList.contains('is-list') && r.every((x, i) => !i || x.top > r[i - 1].top); });
+  await page.click('.mac__mt >> text=View'); await page.click('.mac__mi[data-act="icons"]');
+  check(list, 'View, by Name lists the files, one row a file; by Icon goes back');
+  const last = await page.evaluate(() => { const f = window.__v3mac.files, l = f[f.length - 1]; l.icon.focus(); return l.title; });
+  await page.click('.mac__mt >> text=File'); await page.click('.mac__mi[data-act="open"]'); await page.waitForTimeout(500);
+  const opened = (await st()).wins;
+  await page.click('.mac__mt >> text=File'); await page.click('.mac__mi[data-act="close"]'); await page.waitForTimeout(400);
+  check(opened[opened.length - 1] === last && (await st()).wins.length === 1, `File, Open opens the chosen file and Close Window closes it (${opened.join(' | ')})`);
+  const bar = await page.evaluate(() => { const r = document.querySelector('.mac__win--finder .mac__bar').getBoundingClientRect(); return [r.left + r.width * .7, r.top + r.height / 2]; });
+  await page.mouse.move(bar[0], bar[1]); await page.mouse.down(); await page.mouse.move(bar[0] - 400, bar[1] + 40, { steps: 6 }); await page.mouse.up();
+  const pos = await page.evaluate(() => { const w = document.querySelector('.mac__win--finder'); return [w.offsetLeft, w.offsetTop]; });
+  check(pos[0] === 0 && pos[1] > 14, `the title bar drags its window, never past the screen's left edge (${pos})`);
+  await page.click('.mac__win--finder .mac__close'); await page.waitForTimeout(400);
+  const closed = (await st()).wins.length;
+  await page.click('.mac__icon--desk >> nth=0'); await page.waitForTimeout(500);
+  const disk = (await st()).wins.join();
+  await page.click('.mac__icon--desk >> nth=1'); await page.waitForTimeout(500);
+  const bin = (await st()).wins.join();
+  check(closed === 0 && disk === 'Archive' && /Trash/.test(bin), `the close box shuts the Archive window, the disk opens it again, and the Trash opens (${disk}; ${bin})`);
+  await page.keyboard.press('Escape');
+  await page.click('.mac__mt >> text=Special'); await page.click('.mac__mi[data-act="restart"]'); await page.waitForTimeout(200);
+  const boot = await page.evaluate(() => document.querySelector('.mac__screen').className);
+  await page.waitForTimeout(1300);
+  check(/is-booting/.test(boot) && (await st()).wins.join() === 'Archive', `Special, Restart brings the screen on again, the Archive window alone (${boot})`);
+  /* Find, from the cover: a card's words open its file on the Mac */
+  const word = await page.evaluate(() => { const t = window.__v3mac.files[window.__v3mac.files.length - 1].kind; return t; });
+  await page.evaluate(() => document.querySelector('.rail a[href="#cover"]').click()); await page.waitForTimeout(1200);
+  await page.keyboard.press('/'); await page.waitForTimeout(400); await page.keyboard.type(word); await page.waitForTimeout(500); await page.keyboard.press('Enter'); await page.waitForTimeout(1800);
+  s = await st();
+  check(s.cur === '#archive' && s.wins.length === 2, `Find "${word}" lands on the archive and opens the file (${s.wins.join(' | ')})`);
+  await page.context().close();
+}
+for (const [w, h] of [[390, 844], [320, 700]]) {
+  const page = await open({ width: w, height: h, touch: true, path: '#archive' });
+  await page.evaluate(() => document.querySelector('.mac').scrollIntoView({ block: 'center' })); await page.waitForTimeout(1600);
+  await page.tap('.mac__icon--file >> nth=1'); await page.waitForTimeout(600);
+  const r = await page.evaluate(() => { const d = document.querySelector('.mac__desk').getBoundingClientRect(), w = window.__v3mac.windows.pop().getBoundingClientRect(); return { fill: w.width >= d.width - 16 && w.height >= d.height - 16, side: document.documentElement.scrollWidth > innerWidth }; });
+  check(r.fill && !r.side, `${w}x${h}: a file's window takes the whole screen, nothing scrolls sideways`);
+  await page.context().close();
+}
+{
+  const page = await open({ reduced: true, path: '#archive' });
+  const r = await page.evaluate(() => { window.__v3mac.open(window.__v3mac.files[0]); return { on: document.querySelector('.mac__screen').className, z: document.querySelectorAll('.mac__zoom').length }; });
+  check(/is-on/.test(r.on) && r.z === 0, `reduced motion: the screen is on from the first frame and no outline zooms (${r.on}, ${r.z})`);
+  await page.context().close();
+}
+{
+  const page = await open({ js: false, path: '#archive' });
+  const nojs = await page.evaluate(() => ({ mac: !!document.querySelector('.mac'), cards: getComputedStyle(document.querySelector('#archive .entries')).display }));
+  await page.context().close();
+  const pp = await open({ path: '#archive' }); await pp.emulateMedia({ media: 'print' });
+  const print = await pp.evaluate(() => ({ mac: getComputedStyle(document.querySelector('.mac')).display, cards: getComputedStyle(document.querySelector('#archive .entries')).display }));
+  await pp.context().close();
+  const fc = await browser.newContext({ viewport: { width: 1440, height: 900 }, forcedColors: 'active' }), fp = await fc.newPage();
+  await fp.goto(new URL('#archive', BASE).href); await fp.waitForTimeout(1200);
+  const forced = await fp.evaluate(() => ({ mac: getComputedStyle(document.querySelector('.mac')).display, cards: getComputedStyle(document.querySelector('#archive .entries')).display }));
+  await fc.close();
+  check(!nojs.mac && nojs.cards !== 'none' && print.mac === 'none' && print.cards !== 'none' && forced.mac === 'none' && forced.cards !== 'none', `the cards show instead without the script, in print and in forced colours (${JSON.stringify({ nojs, print, forced })})`);
 }
 
 /* ---------- 7. the files ---------- */

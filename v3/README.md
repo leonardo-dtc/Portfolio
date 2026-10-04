@@ -29,7 +29,7 @@ Then open `http://127.0.0.1:8778/v3/`.
 | `hockey` | Goaltender: measurables, stats, team history | `v2/hockey/` |
 | `music` | Viola and violin, Carnegie Hall ticket, honors | `v2/resume/#music`, `#music-honors` |
 | `record` | Education, honors, service and leadership | `v2/resume/` |
-| `archive` | A personal archive: index cards for smaller work, each linked to the sheet that describes it | v4 and v5 experiments lists, `v2/resume/#projects`, `#robotics`, `#amora` |
+| `archive` | A personal archive on a classic Macintosh: each index card is a file on its desktop, opened in its own window and linked to the sheet that describes it | v4 and v5 experiments lists, `v2/resume/#projects`, `#robotics`, `#amora` |
 | `contact` | Let's talk: the framed poster, the email slab, the three profiles, the end strip | `v2/` footer, v4 and v5 contact sections |
 
 Every fact and caveat comes from the v2 pages and `CONTENT-REVIEW.md`. Copy is
@@ -172,7 +172,36 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   code, typing itself), the profile cutout with a paper edge on a rounded
   red shape with text on a path, the crown, the star, tape on
   every overlapped image, and the end page reusing the mask, crown and star.
-- **The archive.** Sheet 11: index cards taped to the paper, each one
+- **The archive's Macintosh.** Sheet 11 is Leonardo's own computer: a classic
+  Macintosh taped onto the paper (drawn in CSS, no logos), its one-bit screen
+  holding the archive as files. The menu bar has the poster's star, then File
+  (Open, Close Window), View (by Icon, by Name) and Special (Restart). The Archive
+  disk and the Trash sit down the desk's right side. The Archive window holds one
+  file for each card, its picture chosen by the card's kind. A click or Return
+  opens a file's window: the year and kind, the title set large, its one line, and
+  the card's link drawn as the old default button. Windows open with the old
+  zooming outlines, come to the front when pressed, drag by their striped title
+  bars (never past the screen's left edge) and close with their close boxes or
+  Escape, the focus going back to the file. Arrow keys move between files and
+  never change the sheet. The first time the sheet arrives, the screen comes on:
+  the poster's star badge on the grey desk, then the menu bar and the Archive
+  window, about a second; Special, Restart does it again. On phones it is the
+  compact Mac, every window taking the whole screen.
+  - **The drawing:** a two-pixel grid. Every line is 2px, every picture 32 dots
+    at 2px, the desk the old 50% grey of alternate dots, in Tiny5 (OFL), a pixel
+    face that lands on that grid at 16px and 24px. The Mac stands square (only its
+    tape is askew), because a turned screen would resample its dots and soften its
+    text.
+  - **Fallbacks:** the cards stay the page's own text. Without the script, in
+    print and in forced colours the cards below show instead, and Find opens a
+    card's file on the Mac.
+  - **Size:** on desktop the case is sized from the window's height, so the sheet
+    still stacks. On a short window the Mac keeps a usable 600px and this one sheet
+    scrolls.
+  - **Why not the whole site on a Mac:** a Mac as the landing page would have
+    replaced the cover, the edition's strongest screen, and put a click before
+    everything.
+- **The archive cards** (without the script, in print and in forced colours). Sheet 11: index cards taped to the paper, each one
   `<li class="entry">` with a year (Anton, vermilion), a kind tag, a title in the
   hand face, one line and an optional link to the sheet that describes it. An
   HTML comment above the list tells Leonardo how to add a card; tilt, tape, the
@@ -215,9 +244,10 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
 | `files/<slug>/index.html` | The project files: `aducanumab`, `genuvalens`, `loquar`, `ocapex`, `hockey` (the coach one-pager) and `resume` |
 | `assets/css/files.css` | The files' own stylesheet: tokens and faces as in `site.css`, the desk, drawer, paper, sections, figures, the pager, the view transition, print and the hockey one-page print |
 | `assets/js/files.js` | The hockey file's print button, and eager figures before printing (the files work without it) |
+| `assets/js/mac.js`, `assets/css/mac.css` | The archive's Macintosh: the case, the one-bit screen, the menus, the windows and the files, built from the archive's cards |
 | `DESIGN.md` | The system as built: tokens, type roles, the stack, the cabinet, the hover grammar, the archive, phones, and how to add a sheet, a file or a card |
 | `../tests/v3/check.mjs` | Browser checks: structure and counts, no links into other editions (the deck, the six files and both stylesheets), the 12px floor (the files on screen and in print too), contrast at rest and while a card steps back, the cabinet and its hover intent, the routes, Find, the pill, the keyboard walk, touch targets, the hockey file on one Letter page, Back from a file, console errors with and without the script |
-| `assets/fonts/` | Anton (OFL, stands in for Impact), Metropolis from the deck package (Unlicense), Permanent Marker (Apache 2.0, stands in for the personal-use Shooting Star) |
+| `assets/fonts/` | Anton (OFL, stands in for Impact), Metropolis from the deck package (Unlicense), Permanent Marker (Apache 2.0, stands in for the personal-use Shooting Star), Tiny5 (OFL, `OFL-tiny5.txt`; the Mac's screen) |
 | `assets/img/` | Derivatives copied from v2; the goalie mask stickers rendered from `assets/model/GMask.obj` by `tools/make-mask-sticker.py`; the portrait cutout from `tools/make-cutout.py` (paper edge added in the same pass); the OCAPEX mark redrawn in the site's three colours |
 
 ## Project files
