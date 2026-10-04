@@ -383,7 +383,7 @@ These are estimates, to be re-scored after the change:
 
   **B won unanimously and is built** (`v5/assets/js/hero.js`, the ink section of `shaders.js`). Its weak points were fixed with ideas from the other two:
   - **The tube:** one crisp band of light on the letters' true edge, with a white-hot core and a hair of red/blue split. The letters' visible edge never moves.
-  - **The echoes:** three thin traces of the outline, one per colour family (pink to magenta, orange, blue to cyan). Each drifts 2 to 2.6% of the font size over 10.5 to 19 s and breathes in and out of the edge, so it crosses the tube. Where light piles up it burns toward white.
+  - **The echoes:** three thin traces of the outline, one per colour family (pink to magenta, orange, blue to cyan). Each drifts 1.6 to 2.6% of the font size over 10.5 to 19 s and breathes in and out of the edge, so it crosses the tube. Where light piles up it burns toward white.
   - **No doubled name:** each trace fades as it strays.
   - **Colour cycle:** the traces take turns on a 16 s cycle sliding along the name.
   - **Arrival and entry:** the traces grow out of the outline as the hero arrives and fold back as it enters.
@@ -392,6 +392,13 @@ These are estimates, to be re-scored after the change:
   - **Frame rate:** the room draws at full rate while the hero shows, unless the device is slow.
   - **Without WebGL2:** CSS neon over the room's still image, with screened traces and a white-hot edge. Only transform and opacity animate.
   - **Cost:** seven texture reads per pixel, only inside the name's box.
+
+  **After the review, two refinements:**
+  - **The colours of the reference.** The first build measured 0% orange and under 1% cyan on an indigo ground. The neon now holds orange and cyan at 10% or more of its lit pixels in every sampled frame, with pink, magenta and white-hot crossings.
+  - **A dark stage by night.** The near-black pool first hugged the name, so on the cobalt room it read as a black slab. Now the whole room gives way to near black while the hero shows (mean luminance about 0.002 outside the name, with no edge anywhere), and the light blooms into it in the tube's own colours, as in the Glowtime art.
+    - **Entering:** the room's light comes up on the glide's own spring as the name turns white, so the window's glass forms in a lit room: no flash, gone by about half a second.
+    - **By day** there is no stage; the violet aura stays as it was.
+    - **Without WebGL2** the hero's copy of the room's still darkens the same way.
 
   Screenshots of all three went to Leonardo; he can still pick A or C (T41).
 
