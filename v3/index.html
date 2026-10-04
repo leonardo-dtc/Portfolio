@@ -12,6 +12,7 @@
 <link rel="preload" href="assets/fonts/anton-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/metropolis-regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/mac.css">
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
@@ -584,8 +585,11 @@
               address, add rel="noopener", and end the link text with "(leaves the site)". If there is nothing
               to link, delete the whole <a class="entry__link"> line.
            4. Never link to another edition of this portfolio.
-           At rest a card shows its year, kind and title; pointing at it (or tabbing to its link) unfolds the
-           one line and the link while the other cards step back. A card without a link always shows its line.
+           On screen the cards are the files on the Macintosh above them (assets/js/mac.js): a new card is a new
+           file, its picture chosen by its kind; add data-icon="games" (or film, chart, notes, maze, robot,
+           rocket, text) to the <li> to choose another. The cards themselves show without the script, in print
+           and in forced colours. There, at rest a card shows its year, kind and title; pointing at it (or
+           tabbing to its link) unfolds the one line and the link while the other cards step back. A card without a link always shows its line.
            On touch screens, in print and without the script every line is shown.
            The tilt, the tape, the unfolding, the order of the reveal and the layout come from the stylesheet
            and the script, so a new card looks and behaves like the others without any extra markup. If the
@@ -722,5 +726,6 @@
 </svg>
 
 <script src="assets/js/site.js" defer></script>
+<script src="assets/js/mac.js" defer></script>
 </body>
 </html>

@@ -651,11 +651,18 @@
   /* go to a match: its sheet, then the line itself, ringed in vermilion for a moment */
   function goFound(r, kb) {
     var el = r.hits[0].el, target = el.closest('.entry, li, .tile, .card, .ticket') || el;
+    /* an archive card found here is a file on the archive's Macintosh (mac.js): the Mac takes the landing and
+       opens the file's window itself */
+    var found = { target: target, handled: false };
+    d.dispatchEvent(new CustomEvent('v3:find', { detail: found }));
+    target = found.target;
     closeCabinet(false);
     go(r.i, false, target);
     if (history.replaceState) history.replaceState(null, '', r.i === 0 ? location.pathname : '#' + slides[r.i].id);
-    target.classList.remove('is-found'); void target.offsetWidth; target.classList.add('is-found');
-    setTimeout(function () { target.classList.remove('is-found'); }, 2700);
+    if (!found.handled) {
+      target.classList.remove('is-found'); void target.offsetWidth; target.classList.add('is-found');
+      setTimeout(function () { target.classList.remove('is-found'); }, 2700);
+    }
     if (kb) { slides[r.i].setAttribute('tabindex', '-1'); slides[r.i].focus({ preventScroll: true }); }
   }
 

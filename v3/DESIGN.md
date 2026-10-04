@@ -195,7 +195,44 @@ with 12px of vertical padding, which moves no line (the stroke is offset to stay
 
 ## The archive
 
-Index cards taped to the paper, four across on desktop. At rest a card shows its year (Anton, vermilion,
+**On screen, with the script: a classic Macintosh** (`assets/js/mac.js`, `assets/css/mac.css`). The case:
+platinum (`#EFEADF` to `#D9D2C1`), the screen set in a recess, a floppy slot and a vermilion badge on the chin,
+two strips of tape. It stands square; only the tape is askew. It is sized from the window's height on desktop
+(`min(860px, max(600px, 1.6 × (100svh − 460px) + 64px))`) so the sheet still stacks, and is the compact
+Mac on phones (the screen 7:10).
+
+The screen is one-bit on a two-pixel grid:
+- every line is 2px and every picture 32 dots at 2px;
+- the desk is the old 50% grey of alternate dots;
+- the face is Tiny5 at 16px (24px for a file's title), the sizes where it lands on that grid.
+
+What is on the screen:
+- **The menu bar:** the poster's star, File (Open, Close Window), View (by Icon, by Name) and Special
+  (Restart). Each title is a button that opens its list; arrows move through it and Escape closes it.
+- **The desk:** the Archive disk and the Trash down its right side.
+- **The Archive window:** one file for each card, its picture chosen by the card's kind (games, music
+  video, statistics, arrangement, game design, robotics, rocketry; `data-icon` on the card names one), its
+  title clamped to two lines (one row a file by Name).
+- **A file's window:** the year and kind, the title at 24px, the one line, and the card's link drawn as the
+  old default button.
+
+Windows:
+- The front window alone has the striped title bar.
+- A window comes to the front when pressed. It drags by its title bar with a mouse or pen, its left edge and
+  title bar staying on the screen; on a screen under 520px wide it takes the whole desk and stays put.
+- Opening draws four zooming outlines (180ms, inverting what is under them). Closing draws them back to the
+  file's icon, and the focus returns there.
+
+Opening a file:
+- One click or Return opens it, as on a phone; the old Mac wanted two.
+- Arrow keys move between files, and while the focus is on the Mac they never change the sheet.
+
+The screen coming on, the first time the sheet arrives: the poster's star badge on the grey desk (600ms),
+then the menu bar and the Archive window zooming open from the disk. Special, Restart does it again.
+
+Reduced motion: no outlines and no coming on; the screen is on from the first frame.
+
+**Without the script, in print and in forced colours: the cards.** Index cards taped to the paper, four across on desktop. At rest a card shows its year (Anton, vermilion,
 24px), its kind (a black tag) and its title (the hand face). Pointing at a card, or tabbing to its link,
 unfolds its line and link (grid rows 0fr to 1fr, 500ms), straightens the card to 0 degrees and lifts it
 4px while its tape presses (800ms), and steps the other cards back by colour, with no blur: `#F3F1F1`
@@ -242,7 +279,10 @@ Each sheet keeps 64px more space at its foot, so the pill never covers its last 
 **An archive card.** Copy one `<li class="entry">` in `#archive` and change its year, kind, title and line.
 The link is optional; for a sheet on this page write `<a class="entry__link" href="#record">Sheet 10, The
 record</a>` and the script rewrites the number and name from the sheet. Tilt, tape, the unfolding, the
-reveal order and Find all follow without other markup.
+reveal order and Find all follow without other markup. The card is also a file on the Mac, with nothing
+more to do: its kind picks its picture (games, music video, statistics, arrangement, game design, robotics,
+rocketry; anything else is a page of text), or add `data-icon="maze"` (games, film, chart, notes, maze,
+robot, rocket, text) to the `<li>` to choose one.
 
 **A file's wording.** Each folder's file is inside its link (`.folder__btn > .file`): edit its title,
 kicker and one line. Leave the "Sheet NN / N" line as it is; the script writes it.

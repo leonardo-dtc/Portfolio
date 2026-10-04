@@ -1,0 +1,138 @@
+/* v3 poster · the Macintosh (assets/js/mac.js): the archive's cards as the desktop of a classic Macintosh, taped
+   onto the sheet. The case is drawn here; the screen is one-bit, black and white, on a two-pixel grid: every line
+   is 2px, every icon 32 dots at 2px, the desk the old 50% grey of alternate dots. The screen's face is Tiny5 (OFL,
+   assets/fonts/OFL-tiny5.txt), which lands on that grid at 16px and 24px. Without the script, in print and in forced colours the cards show
+   instead (the script only builds the Mac, and only these rules hide the cards). */
+@font-face { font-family: 'Tiny5'; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/tiny5-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@media screen {
+  .archive.has-mac .entries { display: none; }
+}
+
+/* ---------- the case: platinum, its screen set in a recess, the floppy slot and a vermilion badge on the chin;
+   taped onto the paper. It stands square (only the tape is askew): turned, the screen's dots would be resampled
+   and its text softened ---------- */
+.mac { --bez: 22px; --chin: 64px; position: relative; width: min(100%, 860px); margin: clamp(1rem, 3.6vh, 2.25rem) auto 0; }
+@media (min-width: 900px) and (min-height: 600px) {
+  /* the whole sheet stays within the screen, so it still stacks (the case's height follows from its width); on a
+     short screen the Mac keeps a usable size, and this one sheet scrolls instead of stacking */
+  .mac { width: min(100%, 860px, max(600px, calc(1.6 * (100svh - 460px) + 64px))); }
+}
+.mac__case { position: relative; z-index: 1; padding: var(--bez) var(--bez) 0; border-radius: 18px 18px 22px 22px; background: linear-gradient(180deg, #EFEADF 0%, #E4DED0 46%, #D9D2C1 100%); box-shadow: inset 0 2px 0 rgba(255,255,255,.7), inset 0 -3px 0 rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.12), 0 18px 34px rgba(0,0,0,.2); }
+.mac__bezel { padding: 10px; border-radius: 14px; background: linear-gradient(180deg, #C9C1AD, #DAD3C2); box-shadow: inset 0 3px 6px rgba(0,0,0,.25), inset 0 -1px 0 rgba(255,255,255,.6); }
+.mac__chin { position: relative; height: var(--chin); }
+.mac__slot { position: absolute; right: 9%; top: 42%; width: 30%; height: 9px; border-radius: 5px; background: #2A2724; box-shadow: inset 0 2px 2px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.7); }
+.mac__badge { position: absolute; left: 7%; top: 36%; width: 18px; height: 18px; border-radius: 3px; background: var(--red); box-shadow: inset 0 0 0 2px rgba(0,0,0,.12); }
+.mac__tape { z-index: 2; width: 128px; height: 32px; }
+.mac__tape--a { left: -34px; top: -10px; rotate: -34deg; }
+.mac__tape--b { right: -30px; top: -8px; rotate: 30deg; }
+
+/* ---------- the screen ---------- */
+.mac__screen { position: relative; display: flex; flex-direction: column; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 10px; background: #000; color: #000; font: 400 16px/18px 'Tiny5', 'Courier New', monospace; letter-spacing: 0; -webkit-font-smoothing: none; text-rendering: optimizeSpeed; user-select: none; -webkit-user-select: none; }
+.mac__screen.is-off > * { visibility: hidden; }
+.mac__screen svg { display: block; }
+.px-ink { fill: #000; }
+.px-paper { fill: #fff; }
+:where(.mac__screen button) { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.mac__screen :focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+/* the menu bar: the poster's star, then File, View and Special; a menu opens below its title, inverted */
+.mac__menubar { position: relative; z-index: 200; flex: none; display: flex; align-items: center; height: 32px; padding: 0 10px; background: #fff; border-bottom: 2px solid #000; }
+.mac__mark { margin: 0 10px 0 4px; }
+.mac__menu { position: relative; }
+.mac__mt { height: 30px; padding: 0 12px; }
+.mac__mt:hover, .mac__mt[aria-expanded="true"] { background: #000; color: #fff; }
+.mac__mp { position: absolute; left: 0; top: 30px; min-width: 188px; padding: 2px 0; background: #fff; border: 2px solid #000; box-shadow: 2px 2px 0 #000; }
+.mac__mp[hidden] { display: none; }
+.mac__mi { display: flex; align-items: center; gap: 6px; width: 100%; height: 30px; padding: 0 16px 0 8px; text-align: left; white-space: nowrap; }
+.mac__mi:not(:disabled):hover, .mac__mi:not(:disabled):focus-visible { background: #000; color: #fff; outline: 0; }
+.mac__mi:disabled { color: #767676; cursor: default; }
+.mac__tick { width: 16px; visibility: hidden; }
+.mac__mi[aria-pressed="true"] .mac__tick { visibility: visible; }
+.mac__mi:not(:disabled):hover .px-ink, .mac__mi:focus-visible .px-ink { fill: #fff; }
+
+/* the desk: the old grey of alternate dots, the disk and the Trash down its right side */
+.mac__desk { position: relative; flex: 1; min-height: 0; overflow: hidden; container-type: size; background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 4px 4px; }
+.mac__deskicons { position: absolute; right: 12px; top: 12px; bottom: 12px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
+
+/* an icon: its picture and its name on white; chosen, both turn over (black for white) */
+.mac__icon { display: grid; justify-items: center; align-content: start; gap: 4px; min-width: 0; padding: 4px 2px; }
+.mac__pic { display: block; }
+.mac__name { max-width: 100%; padding: 0 4px; background: #fff; text-align: center; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.mac__icon--desk .mac__name { max-width: 96px; }
+.mac__kind, .mac__year { display: none; }
+.mac__icon.is-sel .px-ink { fill: #fff; }
+.mac__icon.is-sel .px-paper { fill: #000; }
+.mac__icon.is-sel .mac__name { background: #000; color: #fff; }
+
+/* a window: a white sheet with a black edge and a one-dot shadow; the front window's title bar is striped, its
+   title on a white gap and its close box on the left */
+.mac__win { position: absolute; z-index: 10; display: flex; flex-direction: column; width: min(540px, calc(100% - 150px)); max-height: calc(100% - 20px); background: #fff; border: 2px solid #000; box-shadow: 2px 2px 0 #000; }
+.mac__win[hidden] { display: none; }
+.mac__win:focus { outline: 0; }
+.mac__win:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.mac__bar { position: relative; flex: none; display: flex; align-items: center; justify-content: center; height: 38px; padding: 0 48px; border-bottom: 2px solid #000; touch-action: none; }
+.mac__win.is-front > .mac__bar { background: repeating-linear-gradient(180deg, #000 0 2px, #fff 2px 4px) 4px 8px / calc(100% - 8px) 22px no-repeat; }
+@media (hover: hover) and (pointer: fine) { .mac__win.is-front > .mac__bar { cursor: move; } }
+.mac__title { margin: 0; padding: 0 12px; min-width: 0; background: #fff; font: inherit; letter-spacing: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mac__close { position: absolute; left: 14px; top: 7px; width: 24px; height: 24px; background: #fff; border: 2px solid #000; box-shadow: 0 0 0 2px #fff; }
+.mac__close:hover, .mac__close:active { background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 4px 4px; }
+.mac__info { flex: none; margin: 0; padding: 8px 14px 6px; border-bottom: 6px double #000; }
+.mac__body { min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-color: #fff #000; }
+.mac__body::-webkit-scrollbar { width: 16px; height: 16px; }
+.mac__body::-webkit-scrollbar-track { background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 4px 4px; border-left: 2px solid #000; }
+.mac__body::-webkit-scrollbar-thumb { background: #fff; border: 2px solid #000; }
+.mac__body--finder { padding: 10px 8px; }
+.mac__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px 2px; }
+/* by Name: one row a file, its picture small, then its kind and year */
+.mac__grid.is-list { grid-template-columns: 1fr; gap: 0; }
+.mac__grid.is-list .mac__icon { grid-template-columns: 32px minmax(0, 1fr) auto 52px; align-items: center; justify-items: start; gap: 12px; padding: 2px 6px; text-align: left; }
+.mac__grid.is-list .mac__pic svg { width: 32px; height: 32px; }
+.mac__grid.is-list .mac__name { text-align: left; -webkit-line-clamp: 1; line-clamp: 1; }
+.mac__grid.is-list .mac__kind, .mac__grid.is-list .mac__year { display: block; }
+.mac__grid.is-list .mac__icon.is-sel { background: #000; color: #fff; }
+.mac__win--doc { width: min(460px, calc(100% - 40px)); }
+.mac__win--trash { width: min(300px, calc(100% - 40px)); }
+.mac__body--trash { height: 120px; }
+.mac__body--doc { padding: 14px 18px 18px; user-select: text; -webkit-user-select: text; }   /* a file's words can be copied */
+.mac__meta { margin: 0 0 10px; }
+.mac__head { margin: 0 0 10px; font-size: 24px; line-height: 27px; }
+.mac__line { margin: 0; font-size: 16px; line-height: 22px; }
+/* the card's link, drawn as the old default button: rounded, with a heavy ring */
+.mac__go { display: inline-block; margin: 16px 0 4px 4px; padding: 6px 14px; border: 2px solid #000; border-radius: 12px; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000; background: #fff; color: #000; text-decoration: none; }
+.mac__go:hover, .mac__go:active { background: #000; color: #fff; }
+.mac__win.is-found { outline: 4px solid var(--red); outline-offset: 4px; }
+
+/* the zooming outlines, drawn as the old screens drew them: inverting whatever is under them */
+.mac__zoom { position: absolute; z-index: 300; border: 2px solid #fff; mix-blend-mode: difference; pointer-events: none; }
+
+/* the screen coming on: the grey desk and the star badge, then the menu bar and the windows */
+.mac__boot { position: absolute; inset: 0; z-index: 250; display: none; place-items: center; }
+.mac__screen.is-booting .mac__boot { display: grid; }
+.mac__screen.is-booting .mac__menubar { background: repeating-conic-gradient(#000 0 25%, #fff 0 50%) 0 0 / 4px 4px; border-bottom-color: transparent; }
+.mac__screen.is-booting .mac__menubar > *, .mac__screen.is-booting .mac__deskicons, .mac__screen.is-booting .mac__win { visibility: hidden; }
+
+/* a narrow screen (a phone, a short window): every window takes the whole desk and stays put */
+@container (max-width: 519px) {
+  .mac__win { left: 6px !important; top: 6px !important; right: 6px; bottom: 6px; width: auto; max-height: none; }
+  .mac__grid { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+  .mac__deskicons { right: 6px; top: 8px; bottom: 8px; }
+}
+@media (max-width: 899px), (max-height: 599px) {
+  .mac { --bez: 14px; --chin: 48px; width: min(100%, 560px); }
+  .mac__screen { aspect-ratio: 7 / 10; }
+  .mac__tape { width: 96px; height: 26px; }
+}
+@media (min-width: 560px) and (max-width: 899px) { .mac__screen { aspect-ratio: 4 / 3.4; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .mac__zoom, .mac__boot { display: none !important; }
+}
+/* forced colours and print: the cards, not the Mac */
+@media (forced-colors: active) {
+  .archive.has-mac .entries { display: grid; }
+  .mac { display: none; }
+}
+@media print {
+  .mac { display: none; }
+}
