@@ -37,11 +37,13 @@ const want = {};
   await page.waitForFunction(() => window.gsap && window.Flip, null, { timeout: 8000 });
   await page.waitForTimeout(800);
   const before = await boxes(page);
-  // on the way: every card that moves is seen between where it was and where it goes (sampled each frame for 1.2 s)
+  // on the way: every card that moves is seen between where it was and where it goes, sampled each frame with GSAP's
+  // clock at a tenth (the .6 s move takes 6 s, so a machine drawing a few frames a second still sees it on its way)
   const seen = await page.evaluate(() => new Promise(res => {
     const cards = [...document.querySelectorAll('[data-cards] .card[data-cat]')], out = [], t0 = performance.now();
+    window.gsap.globalTimeline.timeScale(.1);
     [...document.querySelectorAll('button[data-filter="build"]')].find(b => b.offsetParent).click();
-    (function f() { out.push(cards.map(c => { const r = c.getBoundingClientRect(); return { href: c.getAttribute('href'), x: r.left, w: r.width }; })); if (performance.now() - t0 < 1200) requestAnimationFrame(f); else res(out); })();
+    (function f() { out.push(cards.map(c => { const r = c.getBoundingClientRect(); return { href: c.getAttribute('href'), x: r.left, w: r.width }; })); if (performance.now() - t0 < 6500) requestAnimationFrame(f); else { window.gsap.globalTimeline.timeScale(1); res(out); } })();
   }));
   await page.waitForTimeout(600);
   const after = await boxes(page);
