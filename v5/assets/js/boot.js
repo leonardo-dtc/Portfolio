@@ -99,10 +99,43 @@ tick();
 setInterval(tick, 15000);
 document.addEventListener('v5:navigate', tick);
 
+// Phones: a window's header folds to one line of its title once its contents scroll, as iOS folds a large title, so
+// the reading space grows; back at the top it unfolds. Two thresholds (folds past 48px, unfolds under 8px) keep it
+// from flickering at one edge, and a new page in the window starts unfolded. It folds only where the contents are
+// long enough to stay past the second threshold once the header has given its height to them: a page barely longer
+// than its window would otherwise fold, lose the length it scrolled by, and unfold at once. While the header
+// changes (.28s, site.css) the window is not read again; it is read once when the change is done.
+const phone = matchMedia('(max-width: 899px)');
+const FOLDED = 44;                                                    // a folded header is 45 to 66px tall: never more gain than this
+let foldQuiet = 0, foldAgain = 0;
+function fold(body) {
+  const win = body.closest('.win'); if (!win) return;
+  const y = body.scrollTop, folded = win.classList.contains('is-folded');
+  if (!folded && y > 48) {
+    const head = win.querySelector(':scope > .win__head');
+    const gain = head ? Math.max(0, head.offsetHeight - FOLDED) : 0;
+    if (body.scrollHeight - body.clientHeight - gain < 64) return;
+    win.classList.add('is-folded');
+  } else if (folded && y < 8) win.classList.remove('is-folded');
+  else return;
+  foldQuiet = performance.now() + 340;
+  clearTimeout(foldAgain);
+  foldAgain = setTimeout(() => { if (phone.matches && body.isConnected) fold(body); }, 360);
+}
+document.addEventListener('scroll', (e) => {
+  const body = e.target;
+  if (!phone.matches || !(body instanceof Element) || !body.matches('.win__body') || performance.now() < foldQuiet) return;
+  fold(body);
+}, { capture: true, passive: true });
+document.addEventListener('v5:navigate', () => document.querySelectorAll('.win.is-folded').forEach(w => { const b = w.querySelector('.win__body'); if (!b || b.scrollTop < 8) w.classList.remove('is-folded'); }));
+
 nav = initNav({ windows });
 window.__nav = nav;
 
 // the Résumé's Sections follow the reader
 initSpy();
+
+// everything has started: the head script's way out (a page left hidden if this never runs) stands down
+html.classList.add('booted');
 
 export { room, windows, hero, nav };

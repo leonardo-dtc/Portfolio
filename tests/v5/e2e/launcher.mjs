@@ -109,17 +109,18 @@ const fresh = async (opts = {}, q = '') => { const o = await open(opts); await o
   await browser.close();
 }
 {
-  // the toggles: from the address, the console and the attribute; each changes the hero while it shows; kept in this
-  // browser; a value a toggle does not take is refused; reset returns the defaults
+  // the toggles: from the address (for that visit only), the console and the attribute (kept in this browser); each
+  // changes the hero while it shows; a value a toggle does not take is refused; reset returns the defaults
   const { browser, page, errors } = await fresh({}, '?toggles=launcher:widgets,heroContent:c');
   let st = await page.evaluate(() => ({ ...document.documentElement.dataset, kept: localStorage.getItem('v5:toggles'), lineShown: getComputedStyle(document.querySelector('.hero__line')).display !== 'none', grid: getComputedStyle(document.querySelector('.apps')).display }));
   check(st.launcher === 'widgets' && st.heroContent === 'apps' && !st.lineShown && st.grid === 'grid', `the address sets toggles, a letter included (T27 c is ${st.heroContent}; the apps as ${st.launcher})`);
-  check(JSON.parse(st.kept || '{}').launcher === 'widgets', 'and they are kept in this browser');
+  check(!JSON.parse(st.kept || '{}').launcher, 'for that visit only: a link with ?toggles= is not kept in this browser', st.kept);
   const y0 = await page.evaluate(() => document.querySelector('.hero__name').getBoundingClientRect().top);
   await page.evaluate(() => { window.toggles.heroContent = 'name'; });
   await page.waitForTimeout(300);
   st = await page.evaluate(() => ({ below: getComputedStyle(document.querySelector('.hero__below')).display, top: document.querySelector('.hero__name').getBoundingClientRect().top, y: getComputedStyle(document.querySelector('.hero')).getPropertyValue('--name-y') }));
   check(st.below === 'none' && st.top > y0 + 20 && st.y === '', `toggles.heroContent = 'name' leaves only the name, back in its own place (${y0.toFixed(0)} to ${st.top.toFixed(0)})`);
+  check(JSON.parse(await page.evaluate(() => localStorage.getItem('v5:toggles')) || '{}').heroContent === 'name', 'a change from the console is kept in this browser');
   await page.evaluate(() => { window.toggles.T39 = 'c'; window.toggles.heroContent = 'both'; });
   await page.waitForTimeout(300);
   st = await page.evaluate(() => { const a = document.querySelector('.apps').getBoundingClientRect(); return { launcher: document.documentElement.dataset.launcher, right: innerWidth - a.right, top: a.top, pos: getComputedStyle(document.querySelector('.apps')).position }; });

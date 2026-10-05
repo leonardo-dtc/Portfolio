@@ -90,7 +90,16 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   title and date; pointing at one, or focusing it, unfolds its line (500 ms), raises a
   Fill 2 wash and steps the other titles back to Ink 2. The list takes the line into the space
   below it, so nothing after it moves. Touch, phones, reduced motion, scripts off and
-  print show every line.
+  print show every line. Each row opens its entry on the archive's sheet.
+- **The archive (2026-10-05).** The experiments come from one list in
+  `tools/v5-chrome.mjs` (`ARCHIVE`), newest first: Home shows the newest four, Work
+  all seven, and a sheet over Work, `work/archive/`, holds every entry in full: its
+  year and kind, its title in the rows' italic, its line, a paragraph or two, its
+  details in a Fill box, and a button to where the rest of it lives (the résumé's
+  entry, or the Daedalus sheet). The Experiments heading on Home and Work carries
+  "Archive" to the sheet. A row opens the sheet already at its entry (it does not
+  jump once the sheet has arrived), and the entry takes the landing wash, as a
+  résumé entry does. Every fact is the site's own; what is not on file is left out.
 - **Side windows hold what fits.** Work's Experiments moved into the main window
   under the cards, so its side window is In progress alone; Hockey's side window no
   longer shows the Elite Prospects and NCSA rows (the toolbar carries both; they still
@@ -275,7 +284,12 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
 - **The line (T27):** "Goaltender at Groton School, Class of 2028.", the home
   page's own first words. `hero.js` (`arrange()`) places the name and what is
   under it as one group, a little below the middle as in the launcher mock;
-  the name never sits lower than its own place, 45%.
+  the name never sits lower than its own place, 45%. By day the line stands on
+  a capsule that darkens the room behind it (9.9:1 on a phone, where the soft
+  halo alone gave 3:1).
+- **Small screens:** every launcher keeps clear of the name, the hint and the
+  screen's edges, from 320×568 to 1920×1080 and held sideways (DESIGN.md, Under
+  the name). Held sideways, a phone sets the name on one line.
 - **Getting past it (T26):** a click or a tap on the title, Return, a scroll that
   adds up to a deliberate move (40 px; a nudge does not), a swipe up of 48 px,
   Down, Page Down or Space.
@@ -308,7 +322,7 @@ only (`localStorage`, `v5:toggles`), so visitors always see the defaults.
     `toggles.T39 = 'b'` sets one (T27 and T39 take the decision page's
     letters);
   - `toggles.reset()` forgets them all.
-- **In the address:** `?toggles=launcher:widgets,heroName:glass`.
+- **In the address:** `?toggles=launcher:widgets,heroName:glass`, for that visit only (a link never changes what a browser shows next time).
 - **In the Elements panel:** edit the attribute on `<html>`. A value a toggle
   does not take goes back, with a note in the console.
 - **While the hero shows,** a change takes effect at once. Reload the home page
@@ -409,8 +423,9 @@ they look, as do the All work and Résumé links.
 
 | Path | Page | Copy source |
 | --- | --- | --- |
-| `index.html` | Home: the hero, then the name as the title, the introduction, work cards, experiments, the record as five first-person leads over dated rows, contact. Side window: This fall, with Groton's live time | `v4/index.html` (copy only) |
-| `work/` | All seven projects as cards, filtered by the toolbar (All, Research, Build, Music, Community), then the experiments (the same list as Home's). Side window: In progress | new, from the project pages |
+| `index.html` | Home: the hero, then the name as the title, the introduction, work cards, the four newest experiments, the record as five first-person leads over dated rows, contact. Side window: This fall, with Groton's live time | `v4/index.html` (copy only) |
+| `work/` | All seven projects as cards, filtered by the toolbar (All, Research, Build, Music, Community), then the experiments (all seven; Home shows the newest four). Side window: In progress | new, from the project pages |
+| `work/archive/` | The archive: every experiment in full, newest first, each with its paragraphs, details and a link to the rest | `tools/v5-chrome.mjs` (`ARCHIVE`), from the résumé, the Daedalus sheet and the about page |
 | `hockey/` | Recruiting profile: stats with the sample size, how I play, academic snapshot, team history. Side window: Measurables, then Coach contacts. Prints on one Letter sheet | `v4/hockey/` |
 | `about/` | The essay, the facts and Now, fall 2026. Side window: the portrait and From, then Interests | `v4/about/` |
 | `resume/` | The full record with an anchor on every entry. Side window: Sections (jumps within the window and follows the reader), then Contact | `v4/resume/` |
@@ -459,13 +474,13 @@ In order:
    land on it.
 7. Tests: add `'work/<slug>/'` to `PAGES` in `tests/v5/e2e/lib.mjs`.
 
-**An experiment** (a small thing with no sheet of its own):
-
-1. A Résumé entry with an `id` for it to land on, or an existing one
-   (`#class-projects`, `#amora`, `#robotics`).
-2. A row in Home's Experiments (`index.html`) and a line in Work's Experiments
-   (`work/index.html`), each linking to `../resume/#<id>` (from Work) or
-   `resume/#<id>` (from Home), in the lowercase italic voice the others use.
+**An experiment** (a small thing with no sheet of its own): add it to `ARCHIVE`
+in `tools/v5-chrome.mjs`, where it belongs by date (newest first): its `id` (the
+archive sheet's anchor), year, kind, title, the one line the rows show, its
+paragraphs, its details and a link to where the rest of it lives (a Résumé entry
+with an `id`, or a sheet). Then run `node tools/v5-chrome.mjs`: it writes the rows
+on Home (the newest four) and Work, and the entry on `work/archive/`. Facts only
+from the site's own pages; leave out what is not on file.
 
 **Then run** the unit tests and the browser checks against the preview server:
 `pages` (every page loads, noindex, no overflow, no third-party requests),
@@ -478,7 +493,7 @@ In order:
 | --- | --- |
 | `assets/css/site.css` | The one stylesheet: Switzer's `@font-face`, tokens, the room, windows and ornaments, CSS glass, the hero, content components, sheets, layouts, preferences, print |
 | `assets/fonts/` | `switzer-variable.woff2` (Switzer, Indian Type Foundry, via Fontshare; weights 100 to 900) and its licence, `FFL-switzer.txt` (the ITF Free Font License allows self-hosting and wordmarks). The name only; everything else is the system face |
-| `assets/js/boot.js` | Entry: starts the room, the windows, the hero and navigation; the Work filters, print buttons and Groton's clock |
+| `assets/js/boot.js` | Entry: starts the room, the windows, the hero and navigation; the Work filters, print buttons, Groton's clock and the phone header's fold. Last, it marks the page `booted`: a page the scripts never finished (a file that failed to load, an error, a browser without modules) is put back to the page without scripts by the head script at `DOMContentLoaded`, rather than left hidden behind the hero |
 | `assets/js/room.js`, `shaders.js` | The WebGL2 room: scene, composite, glass panels, the hero's dark stage and the ink (its name in neon light); frame budget |
 | `assets/js/panels.js`, `geometry.js` | Where the glass is: element boxes and projected corners into inverse homographies |
 | `assets/js/windows.js` | Layout modes, the side window, tab bar, materialising, sheets, the window bar, the pointer's light and the room's lean, hover and press light, scrolling from anywhere |
@@ -488,9 +503,9 @@ In order:
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |
 | `assets/js/palette.js` | The colour styles: the palettes, the turn in OKLab (and the room's table of colours), and each palette's neon for the hero |
 | `assets/js/toggles.js` | The design toggles for the developer tools (above): `window.toggles`, the address, the attribute on `<html>` |
-| `../tools/v5-chrome.mjs` | Writes the tab bar, the head script, the hero's apps and the headers' Write to me into every page from one list |
+| `../tools/v5-chrome.mjs` | Writes the tab bar, the head script, the hero's apps, the headers' Write to me, each window body's name (a region called by the page's name), and the archive (the Experiments rows on Home and Work, and the archive sheet's entries) into every page from its lists |
 | `assets/js/flip.js`, `assets/vendor/gsap/` | Work's grid reflowing when filtered, with GSAP's Flip (3.15.0, self-hosted, GreenSock's standard no-charge licence; `vendor/gsap/README.md` gives the source and checksums). Loaded only on a page with a grid to filter, once it is idle |
-| `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
+| `assets/img/` | The portrait (a 320px and a 600px square, AVIF and WebP, cut from `assets/img/portrait.jpg` at the same 608px crop), Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
 | Kept, unreferenced | The written hello of the first round: `assets/js/hello.js` (the pen timeline and the Enter button), `name.js` and `name-data.js` (Sacramento traced to pen strokes), `assets/img/name.svg` and `name-2.svg` (the name as an SVG, one line and two), and `tools/trace-name/` outside the edition. Nothing imports or links them any more; they stay in case the written name comes back |
 | `DESIGN.md` | The design system, recorded from the built pages |
 
@@ -504,7 +519,7 @@ above) and `tools/room-stills.mjs` regenerate the written name and the stills,
 ```sh
 node --test tests/v5/unit/*.test.mjs
 node tools/v5-chrome.mjs --check
-node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), launcher (its apps and the toggles), neon (its colour), nav, modes, contrast, keys, palettes, filters, perf, audit
+node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), launcher (its apps and the toggles), neon (its colour), nav, modes, contrast, keys, palettes, filters, perf, audit, fixes (the October 2026 bug audit's 21 findings, kept fixed)
 node tests/v5/e2e/capture.mjs # screenshots of every page at five widths into .impeccable/review/v5/
 ```
 

@@ -72,10 +72,11 @@ cite { font-style: italic; }
 .skip:focus { transform: none; outline: 2px solid var(--white); outline-offset: 2px; }
 .file:focus { outline: none; } /* the file takes focus only as the skip link's target */
 
-/* ---------- Chrome: name left, year right, as on the deck ---------- */
+/* ---------- Chrome: name left, Email and the year right, as on the deck ---------- */
 .chrome { display: flex; align-items: center; justify-content: space-between; height: var(--chrome); padding-inline: var(--gutter); font-size: .8125rem; letter-spacing: .12em; text-transform: uppercase; color: var(--white); }
 .chrome a { text-decoration: none; padding-block: .6rem; }
 .chrome a:focus-visible { outline-color: var(--white); }
+.chrome__end { display: inline-flex; align-items: center; gap: clamp(1rem, 2.4vw, 2rem); } /* a way to write from every file, as from every sheet (T4) */
 @media (hover: hover) and (pointer: fine) { .chrome a { transition: letter-spacing var(--t-arrow) var(--ease); } .chrome a:hover { letter-spacing: .16em; } }
 
 /* ---------- The desk and the drawer ----------
@@ -341,6 +342,14 @@ html:not(.js) .print-btn { display: none; } /* printing from the button needs th
 .tiles[hidden] { display: none; }
 .hk-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 clamp(2rem, 5vw, 4.5rem); }
 @media (min-width: 1024px) { .hk-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+/* in one column (phones and tablets) a coach reads the season, then who to contact, before how I play and the rest:
+   the two columns' sections take that order. (How I play and the academic snapshot hold no links, so the order of
+   the links and of the Tab key is the order on screen.) Print keeps its own two columns. */
+@media screen and (max-width: 1023px) {
+  .hk-cols { display: flex; flex-direction: column; }
+  .hk-col { display: contents; }
+  #stats { order: 1; } #coaches { order: 2; } #game { order: 3; } #academics { order: 4; } #schedule { order: 5; } #history { order: 6; } #other-sports { order: 7; }
+}
 .hk .sec { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
 .hk .sec > :not(.sec__tab) { margin-left: 0; }
 .hk .sec__tab > span { font-size: clamp(1.2rem, 1rem + .7vw, 1.55rem); }

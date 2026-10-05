@@ -933,3 +933,109 @@ The hero's toggles change the hero while it shows. Reload the home page to see t
   - wrong values refused, and reset;
   - the contact sheet's words 4 px or more inside their line at six sizes, in each wording and in the collage;
   - the desk at nine sizes, from 1920x1080 to 320x640: clear of the name, of each other, the tag, the rail and the hint; a pick-up on hover; a click into the file.
+
+---
+
+## 13. The archive's information, a clearer Mac, the index, and bugs (2026-10-05)
+
+Leonardo: "Let the items in the archive actually have information on them, as that is where personal ideas are. Also, I don't want a super rudimentary Macintosh design, make it slightly more comprehensible but still clean and stylistic. Polish the folder organization/index in v3. Bug fix both sites. Use previously established concerns and notes regarding organization and design to work on v3 and v5."
+
+### The archive, with its information
+
+**Where the facts come from.** A fact sheet went through every source in the repository (the v2 pages and `CONTENT-REVIEW.md` first, then v1, then the later editions, the history and the notes) for the seven items. For four of them the record is one résumé sentence or less; nothing names the song in the music video, the ten sports or the five categories, the arrangements' scoring, Daedalus's endings or teammates, the robots, or the rocketry year and role. So each item now carries everything the site knows, and nothing more:
+
+| Item | Year | What its file holds | Sources |
+|---|---|---|---|
+| a labyrinth that changes while you are in it | Now | Daedalus's premise, the cooperation at its core, the design document written first (two endings, show rather than tell), the team (three people as Gompurkle), the part (main builder), Roblox, the status (design stage, working toward an alpha, no gameplay to show) | `v2/work/daedalus/`, `v2/resume/` |
+| Vivaldi's Summer, arranged for Amora | 2026 to now | Amora (four classmates from Select Chamber Music who kept playing), each player arranging one season, his Summer, viola, in progress, Amora's Dvořák performances, Mendelssohn next | `v2/resume/#amora`, `v2/about/`, v1 |
+| The Phantom of the Opera, for string quartet | 2026 | Arranged for string quartet, finished, before Summer | `v2/resume/#amora` |
+| a cover with its own music video | 2025 to 2026 | A produced cover with its own music video as the AP Calculus BC final, at Groton | `v2/resume/#class-projects` |
+| ten sports, one composite index | 2025 to 2026 | A composite index ranking ten sports across five categories, for AP Statistics, at Groton | `v2/resume/#class-projects` |
+| FRC and FTC robots, in Java | 2023 to 2025 | Programmer in Java on both Wyld Stallyns teams (FRC 5472, FTC 16759 Untamed), basic mechanical work on both, electrical on FTC, the FRC team at the state championship; VEX in Python in 2021, Java from 2023 | `v2/resume/#robotics`, v1 |
+| an American Rocketry Challenge entry | 2021 to 2025 | Contributed to the team's entry; the team did not qualify for nationals | `v2/resume/#robotics`, `CONTENT-REVIEW.md` |
+
+**Corrected to the sources.** Three things the cards said came from the v4 build, not from the record:
+- the class projects' year: "2026" is now the résumé's "2025 to 2026";
+- the robotics years: the card said "2021 to 2025", but its title is the Java robots, and Java came with FTC and FRC in 2023; it now says "2023 to 2025", and its file keeps VEX in Python in 2021 as "Earlier" (the v5 audit caught this; Home's "Robotics and rocketry" row keeps the résumé's 2021 to 2025, which covers both);
+- the Phantom line: "An arrangement for four classmates" is not in any source (it joined the Amora sentence to the Phantom one); it is now "Arranged for string quartet, before Summer".
+
+The Phantom's year (2026) and the rocketry entry's (2021 to 2025) are the dates of the résumé entries they sit in; neither has a date of its own on file. Both are for Leonardo to confirm.
+
+**What the files could still hold, when Leonardo has it** (also in the comment above v3's cards): the song and the making of the music video; the ten sports, the five categories and a chart of the index; a page of each arrangement; the years of the Phantom arrangement and of the rocketry entry; what he programmed on the robots, and photos. Candidates for new entries, from the record: VEX in Python (2021, now inside the robots' file), the voice lessons and open mics at Groton, the "Portfolio 2025" Illustrator deck v3 grew from (made from a tutorial). Not added without his word.
+
+**v3.** Each card (`<li class="entry">`) gains its file, `<div class="entry__more">`: a paragraph or two and a list of details. The Mac shows it as a page; the wall of cards opens it on paper; without the script, in print and in forced colours every card shows it.
+
+**v5** had no archive: its Experiments were the same seven lines, kept twice by hand. Now one list in `tools/v5-chrome.mjs` (`ARCHIVE`) writes the rows on Home (the newest four) and Work (all seven) and a sheet over Work, `work/archive/`, with every entry in full. Each row opens the sheet at its entry, and the Experiments heading carries "Archive".
+
+### The Macintosh, clearer (v3)
+
+The one-bit System 1 screen gave way to the Platinum desktop of the mid-nineties, drawn in the poster's colours:
+- **Readable:** the site's Metropolis for every word, nothing under 13px (Tiny5 is no longer loaded).
+- **An archive that reads as one:** the Archive window lists the files with their kind and year, newest first, with "Click a file to open it" in its header. A column's heading sorts by it; View shows icons instead; typing a name's first letters goes to it.
+- **A file is a page:** the year and kind, the title, the line, the paragraphs and details, the link as the old default button; its zoom box fills the screen for reading.
+- **Still an object of its world:** grey bevelled windows with ruled title bars, the poster's black desk, deep vermilion for what is chosen, shaded pictures drawn on 32 dots, the star badge coming on.
+- **Phones:** each file's kind and year under its name; every window takes the whole screen.
+
+### The index (v3)
+
+- **Names at rest beside the rail** on screens 1880px wide and more, clear of every sheet by 54px or more (the re-score's second improvement).
+- **Find searches the six project files too**, fetched on the first search; a sheet found only in its file shows "In its file" and opens the file at the words. Find now reads only what shows (not the hidden desk), finds each sheet by its name, reads curly apostrophes and primes as straight ones, and rings a visible title where a match has no place of its own.
+- **The files from one list:** `tools/v3-files.mjs` writes each file's title, chrome, drawer, links back, pager and view transition name from the deck, with Email in the chrome; a unit test holds it. (The files keep their sheets' numbers, so the drawer still goes 08, 10: the music sheet has no file. A music file would close the gap, if Leonardo wants one.)
+- **Long jumps land readable:** the sheet a jump cuts to is shown already read; it is only passed (T13 keeps entrances for arriving).
+- **The phone pill** shows only the number under 360px wide; **Space** on the Index tab (and the other links that open the index) opens it, as on a button.
+
+### The re-score's other notes
+
+- **v3, the hockey sheet:** the coaches by name and role with how to write (addresses stay unpublished, as Leonardo decided on 2026-09-18), and the season's line in the display face. On phones the hockey file reaches the coach contacts in 1.8 screens instead of 3.
+- **v3, legibility:** the record's columns and the music sheet's lists at 14px where the sheet holds them (windows 700px tall and more).
+- **v3, copy:** the Loquar sheet and the résumé file no longer count "three editions".
+- **v3, the code panel:** its binomial test now counts the cases with known sex (234 of 443), and the simulation steps at 0.01 s, as the files say.
+- **v5, phones:** a window's header folds to one line of its title once its contents scroll, as iOS folds a large title; on Hockey the reading space grows from 567 to 779px of an 844px phone.
+- **v5, sheets opened at an entry** arrive already there, rather than jumping once open.
+- **Both, the design toggles:** `?toggles=` in an address applies to that visit only; the console and the Elements panel still keep theirs in the browser.
+
+### Bugs fixed
+
+Two audits went through each edition before this round's changes were final: every page and toggle, at phone, tablet and desktop sizes, with and without WebGL, by keyboard, in print and in forced colours. Each finding was reproduced on the current build before it was fixed, and each fix has a check that repeats it: v3's in section 7c of `tests/v3/check.mjs`, v5's in `tests/v5/e2e/fixes.mjs` (one numbered check per finding below).
+
+**v3** (17 findings):
+- **The Mac skipped by Tab:** before its screen came on, Tab from sheet 10 passed over the whole Mac. The desk's black now covers the screen instead of hiding what is on it, and focus coming in turns the screen on at once.
+- **Find on a first visit:** the Archive window coming on covered the file Find had opened; Find now opens it once the screen is on.
+- **Find's reading:** it read hidden text (the desk while the cover is a poster), could not find a sheet by its own name, missed curly apostrophes and primes, gave a match read only by screen readers no visible ring, and could rank a match in a file above one on a sheet. All five fixed.
+- **Long jumps:** the sheet a jump cut to could show blank or half revealed; it now shows already read.
+- **Print:** the research chart's bars lost their colours, the clean contact sheet's words printed small with the slab's shadow, the cover's words with their halo, and lazy pictures could print empty. All fixed; the tools print as outlined tiles.
+- **Short windows:** the Mac's windows sat past the screen's foot, and a short desktop window lost the desktop's screen.
+- **The desk toggle** lost "2026" under the name on tablets and phones.
+- **The phone pill** crowded a 320px screen (it shows only the number under 360px), and **Space** on the Index tab did nothing (it opens the index, as on a button).
+- **The code panel** tested all 486 cases where the files count the 443 with known sex (234 of them female), and stepped its simulation at 0.005 s where the files say 0.01 s. Both now as the files say.
+- **Copy:** the Loquar sheet and the résumé file counted "three editions".
+- **`?toggles=` in a link** kept its toggles for every later visit; it now applies to that visit only.
+
+**v5** (21 findings, most severe first):
+
+| # | What was wrong | What changed |
+|---|---|---|
+| 1 | Phones: once the header folded, the window's contents grew wider than the window and were cut off on the right (by up to 140px at 320px) | The window's column is bounded (`minmax(0, 1fr)`), so the folded title takes its ellipsis |
+| 2 | Printing from a phone after scrolling printed the folded header: the Résumé lost its name and email line | The fold applies on screens only |
+| 3 | Resizing across 1360px with a sheet open left the side window inert and dimmed for good, or live behind the sheet | The layout carries the side window's step back with it when it moves in or out of the main window |
+| 4 | The folding header flickered endlessly on pages barely longer than their window (40 flips in 4 s at 768 by 1006) | It folds only where the contents stay scrolled once the header has given them its height, and is not read again while it changes |
+| 5 | The keys stopped scrolling after any page change, sheet or hero entry (focus was on the title, above the part that scrolls) | The keys scroll the front window from its title too |
+| 6 | A sheet's pager could not be reached with Tab | The pager follows the sheet in the page, as on screen |
+| 7 | By day the hero's line measured 3.0:1 over the pale room on phones | It stands on a capsule that darkens what is behind it: 9.9:1 (7.7:1 at its brightest) on a 390 phone with WebGL; the apps' names take a deeper halo (4.75:1 or more) |
+| 8 | Forced colours hid every current or chosen state (the pressed filter, the current tab and section) and the Résumé's bullets | They are outlined in the system's highlight; the bullets are drawn in its text colour |
+| 9 | Closing a sheet loaded on its own dropped focus to the page | Focus goes to the window under it |
+| 10 | "Skip to content" did nothing while a sheet was open | It goes to the sheet's title |
+| 11 | If `boot.js` failed to load, Home was a blank dark screen | `boot.js` marks the page booted; a page not booted by `DOMContentLoaded` drops back to the page without scripts |
+| 12 | Changing page, the old and new toolbars overlapped for a moment | A leaving toolbar is gone before the next arrives |
+| 13 | Phones: a page arriving in a folded window slid down about 55px as its header unfolded | It arrives unfolded at once |
+| 14 | The launchers kept for the design toggles collided with the name or the hint, or left the screen, at some sizes (as did the default icons on a 320 by 568 phone and in phone landscape) | Three icons a row at 320px; shorter covers and glyph-and-name widgets on short phones; one row of apps and a one-line name held sideways; the desktop's icons along the top wherever the right edge would crowd the name. Every launcher was checked clear at 19 sizes |
+| 15 | The About portrait was soft on 2× and 3× screens (one 320px file) | A 600px pair (AVIF and WebP) made from the same source and crop, chosen by the browser |
+| 16 | The color button grew on hover even under reduced motion | Only where motion is allowed |
+| 17 | The color panel stayed open after focus moved past it | It closes when focus lands anywhere else |
+| 18 | Opening a sheet, the page title and the screen-reader announcement came about 1.3 s late | Both come as it starts to open |
+| 19 | Every window body was a tab stop with no role or name | Each is a region named for its page, written by `tools/v5-chrome.mjs` |
+| 20 | Without WebGL on phones, the parent window's rim showed through an open sheet | The parent fades out behind it |
+| 21 | Facts that disagreed between pages | Hockey gave "Born 2009. South Florida" (About says Beijing): now "Born 2009" and "Hometown South Florida". Home's principal violist row said "2025 to now" (the Résumé: principal from 2026-27): now "2026 to now". The Java robots said "2021 to 2025": now "2023 to 2025", both editions |
+
+Left as they are, for Leonardo: FreeCode's "more than 40 students" across four sessions next to classes of "six to ten" fits only if several classes ran per session (the audit could not confirm either way); and v5's Experiments rows set every title in lower case, acronyms included ("frc and ftc robots, in java"), which is the rows' style rather than an error.
+

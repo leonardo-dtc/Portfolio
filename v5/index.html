@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/css/site.css">
 <link rel="preload" href="assets/fonts/switzer-variable.woff2" as="font" type="font/woff2" crossorigin>
-<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting')})(document.documentElement)</script>
+<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
 <script type="module" src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -48,7 +48,7 @@
       <h1 class="name" tabindex="-1"><span class="name__w">Leonardo</span> <span class="name__w">Carvalho</span></h1>
       <picture class="avatar"><source srcset="assets/img/leonardo-square-320.avif" type="image/avif"><img src="assets/img/leonardo-square-320.webp" width="60" height="60" alt="Leonardo, in a suit for the school photo"></picture>
     </header>
-    <div class="win__body" data-scroll tabindex="0">
+    <div class="win__body" data-scroll tabindex="0" role="region" aria-label="Home">
       <p class="lede"><b>Goaltender at Groton School, Class of 2028.</b> Outside the rink I do research on drug safety and rehabilitation, run a student music nonprofit and build software with friends.</p>
 
       <section class="section" id="work" aria-labelledby="work-h">
@@ -77,19 +77,17 @@
       </section>
 
       <section class="section" id="experiments" aria-labelledby="exp-h">
-        <div class="section__head"><h2 id="exp-h">Experiments</h2></div>
+        <div class="section__head"><h2 id="exp-h">Experiments</h2><a class="more" href="work/archive/">Archive</a></div>
         <p class="note section__sub">The smaller things, made for a class, a quartet or the fun of it.</p>
-        <!-- Experiments: the same list on Home and on Work (v5/work/index.html); add one by copying an <li> into both -->
+        <!-- Experiments: written by tools/v5-chrome.mjs from its ARCHIVE list (Home shows the newest four, Work all of them, and
+             the archive sheet, work/archive/, every entry in full). Add one there and run node tools/v5-chrome.mjs. -->
         <ul class="rows exp">
           <!-- Left out, as Leonardo chose on 2026-10-05 (T6: leave the class games out); the résumé keeps them as coursework.
-          <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>snake, minesweeper and a dinosaur runner</em><small>Rebuilt from scratch in Python and Java, AP Computer Science</small></span><span class="row__m">2026</span></a></li> -->
-          <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>a cover with its own music video</em><small>A Calculus BC final</small></span><span class="row__m">2026</span></a></li>
-          <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>ten sports, one composite index</em><small>Five categories, AP Statistics</small></span><span class="row__m">2026</span></a></li>
-          <li><a class="row" href="resume/#amora" data-hover><span class="row__t"><em>vivaldi’s summer, arranged for amora</em><small>One season per player; mine is Summer</small></span><span class="row__m">2026</span></a></li>
-          <li><a class="row" href="resume/#amora" data-hover><span class="row__t"><em>the phantom of the opera, for string quartet</em><small>An arrangement for four classmates</small></span><span class="row__m">2026</span></a></li>
-          <li><a class="row" href="work/daedalus/" data-hover><span class="row__t"><em>a labyrinth that changes while you are in it</em><small>Daedalus, a design document with two endings, in development</small></span><span class="row__m">Now</span></a></li>
-          <li><a class="row" href="resume/#robotics" data-hover><span class="row__t"><em>frc and ftc robots, in java</em><small>Programmer on both teams; the FRC team reached the state championship</small></span><span class="row__m">2021 to 2025</span></a></li>
-          <li><a class="row" href="resume/#robotics" data-hover><span class="row__t"><em>an american rocketry challenge entry</em><small>The team did not qualify for nationals</small></span><span class="row__m">2025</span></a></li>
+          <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>snake, minesweeper and a dinosaur runner</em><small>Rebuilt from scratch in Python and Java, AP Computer Science</small></span><span class="row__m">2025 to 2026</span></a></li> -->
+          <li><a class="row" href="work/archive/#labyrinth" data-hover><span class="row__t"><em>a labyrinth that changes while you are in it</em><small>Daedalus, a cooperative survival-horror game for two to six players, in development</small></span><span class="row__m">Now</span></a></li>
+          <li><a class="row" href="work/archive/#summer" data-hover><span class="row__t"><em>vivaldi’s summer, arranged for amora</em><small>Each of us arranges one season of The Four Seasons; mine is Summer</small></span><span class="row__m">2026 to now</span></a></li>
+          <li><a class="row" href="work/archive/#phantom" data-hover><span class="row__t"><em>the phantom of the opera, for string quartet</em><small>Arranged for string quartet, before Summer</small></span><span class="row__m">2026</span></a></li>
+          <li><a class="row" href="work/archive/#music-video" data-hover><span class="row__t"><em>a cover with its own music video</em><small>A produced cover, as a Calculus BC final</small></span><span class="row__m">2025 to 2026</span></a></li>
         </ul>
       </section>
 
@@ -107,7 +105,7 @@
         <div class="group">
           <p class="lead">On the viola, the part I like is being inside a story and telling it from my own perspective.</p>
           <ul class="rows">
-            <li><a class="row" href="resume/#orchestra" data-hover><span class="row__t">Groton School Chamber Orchestra, principal violist</span><span class="row__m">2025 to now</span></a></li>
+            <li><a class="row" href="resume/#orchestra" data-hover><span class="row__t">Groton School Chamber Orchestra, principal violist</span><span class="row__m">2026 to now</span></a></li>
             <li><a class="row" href="resume/#carnegie" data-hover><span class="row__t">Carnegie Hall, Weill Recital Hall, violin</span><span class="row__m">November 2025</span></a></li>
             <li><a class="row" href="resume/#amora" data-hover><span class="row__t">Amora string quartet, viola</span><span class="row__m">2026 to now</span></a></li>
             <li><a class="row" href="resume/#competitions" data-hover><span class="row__t">Competitions and festivals</span><span class="row__m">2019 to 2025</span></a></li>

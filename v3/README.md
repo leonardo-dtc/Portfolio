@@ -26,10 +26,10 @@ Then open `http://127.0.0.1:8778/v3/`.
 | `exoskeleton` | Knee exoskeleton: Genuvalens, sketch and results | `v2/work/genuvalens/` |
 | `loquar` | Loquar, plus Daedalus and this site | `v2/work/loquar/`, `v2/resume/#projects` |
 | `ocapex` | OCAPEX numbers and FreeCode Juniors | `v2/work/ocapex/`, `v2/resume/#freecode` |
-| `hockey` | Goaltender: measurables, stats, team history | `v2/hockey/` |
+| `hockey` | Goaltender: measurables, the season's line in the display face, team history, the coaches by name and role with how to write | `v2/hockey/` |
 | `music` | Viola and violin, Carnegie Hall ticket, honors | `v2/resume/#music`, `#music-honors` |
 | `record` | Education, honors, service and leadership | `v2/resume/` |
-| `archive` | A personal archive on a classic Macintosh: each index card is a file on its desktop, opened in its own window and linked to the sheet that describes it | v4 and v5 experiments lists, `v2/resume/#projects`, `#robotics`, `#amora` |
+| `archive` | A personal archive on a Macintosh: each index card is a file, listed with its kind and year and opened as a page holding the card's whole text and a link to the sheet that describes it | `v2/resume/#class-projects`, `#robotics`, `#amora`, `#music`, `v2/work/daedalus/`, v1's robotics line |
 | `contact` | Let's talk, clean: the framed words, the email slab, the three profiles, a plain end | `v2/` footer, v4 and v5 contact sections |
 
 Every fact and caveat comes from the v2 pages and `CONTENT-REVIEW.md`. Copy is
@@ -56,17 +56,17 @@ only (`localStorage`, `v3:toggles`), so visitors always see the defaults.
   - `toggles.cover = 'desk'`, `toggles.set('cover', 'desk')` or
     `toggles.T40 = 'desk'` sets one;
   - `toggles.reset()` forgets them all.
-- **In the address:** `?toggles=archive:cards,cover:desk`.
+- **In the address:** `?toggles=archive:cards,cover:desk`, for that visit only (a link never changes what a browser shows next time).
 - **In the Elements panel:** edit the attribute on `<html>`. A value a toggle
   does not take goes back, with a note in the console.
 
 **If the Mac is picked (T17), the rest of the site does not have to change.**
 - It stays one object on one sheet, as the mask and the code panel are, and the
   deck stays paper.
-- Its pixel face, Tiny5, stays inside its screen.
+- Its screen uses the site's own Metropolis, nothing on it under 13px.
 - It adds no navigation: the index's Find opens its files.
-- Print, scripts off and forced colours show the cards.
-- Its cost is about 12 KB compressed and a 9 KB font, for this sheet only.
+- Print, scripts off and forced colours show the cards, each with its whole file.
+- Its cost is about 15 KB compressed (script and style), for this sheet only.
 
 What could tie it in further: a small Mac on the desk cover that opens the
 archive. What would not: the project files opening as Mac windows, or a menu bar
@@ -91,6 +91,8 @@ for the deck. Either makes two systems for the same files.
   sheet's flow position (a plain anchor jump cannot reach a sticky sheet). A move of
   one sheet slides it over in 380ms; a longer jump cuts to one screen before the
   target and slides only the last sheet (cover to hockey travels 900px, not 6300px);
+  the sheet it cuts to is shown already read, since it is only passed (its entrance is
+  for arriving), never blank or half revealed;
   any wheel, touch, press or scrolling key takes over, and reduced motion jumps. Coming
   back with the browser's Back or Forward (from a file, say) does not jump to the old `#id`:
   the browser puts the reader back where they were. On
@@ -103,7 +105,10 @@ for the deck. Either makes two systems for the same files.
 - **The rail.** On the right, blended with `difference` like the chrome: the
   folder button, one dot per sheet and, running down beside the dots, the
   current sheet's number and name ("04 Drug safety"), which follows the reader
-  and fades through each change. The dots are 8px but each sits on an invisible
+  and fades through each change. On screens 1880px wide and more, where the
+  margin holds them clear of every sheet (by 54px or more), every sheet's name
+  sits beside its dot at rest instead, the current one in bold, so the
+  destinations are labelled without hovering. The dots are 8px but each sits on an invisible
   cell one row tall that runs on toward the screen edge as far as the gutter
   allows, and the rail's padding and label widen the hover area further. The
   rows start at `50% - n/2 rows + 16px` (`--row`: 24px, the WCAG 2.5.8 minimum, 28px
@@ -139,7 +144,12 @@ for the deck. Either makes two systems for the same files.
   their target (Close links to `#shut` and hides it). It never prints.
 - **Find.** The drawer front holds a label holder with a white slip: "Find" and the
   reader's word. `/` opens it from anywhere but a field. It searches the page's own
-  text sheet by sheet (a word matches at the start of a word, accents aside);
+  text sheet by sheet, only what shows (not the desk while the cover is a poster),
+  and each sheet's name; a word matches at the start of a word, accents aside, and
+  the page's curly apostrophes and primes read as the keyboard's ("let's" finds LET'S,
+  5'11 finds 5′11″). It searches the six project files too: their text is fetched
+  on the first search, and a sheet found only in its file shows "In its file" and
+  opens the file at the words (a text fragment the browser scrolls to and marks);
   matching folders keep their ink and show a count, and the best match's file comes
   out quoting the matching line. Up and Down step through the matches, Enter goes
   there and rings the line in vermilion for a moment, Escape clears, then closes.
@@ -166,8 +176,8 @@ for the deck. Either makes two systems for the same files.
   moves. Reduced motion fades the files and the cabinet.
 - **Phones (below 900px).** A solid black pill with a paper hairline rests at the
   bottom right, 12px from the edge, out of the middle of the reading column, and
-  reads "Index · 08 Goaltender" (the current sheet; in windows under 540px tall only
-  the number, "Index · 08") and opens the same
+  reads "Index · 08 Goaltender" (the current sheet; in windows under 540px tall or
+  under 360px wide only the number, "Index · 08") and opens the same
   cabinet as a bottom panel (at most 80% of the screen; rows 44px; the drawer front
   with Find and Close stays in reach at the bottom, above the keyboard). A tap on a
   folder goes straight to its sheet, so every sheet is two taps away: on a touch
@@ -209,49 +219,66 @@ for the deck. Either makes two systems for the same files.
   code, typing itself), the profile cutout with a paper edge on a rounded
   red shape with text on a path, the crown, the star, tape on
   every overlapped image, and the end page reusing the mask, crown and star.
-- **The archive's Macintosh.** Sheet 11 is Leonardo's own computer: a classic
-  Macintosh taped onto the paper (drawn in CSS, no logos), its one-bit screen
-  holding the archive as files. The menu bar has the poster's star, then File
-  (Open, Close Window), View (by Icon, by Name) and Special (Restart). The Archive
-  disk and the Trash sit down the desk's right side. The Archive window holds one
-  file for each card, its picture chosen by the card's kind. A click or Return
-  opens a file's window: the year and kind, the title set large, its one line, and
-  the card's link drawn as the old default button. Windows open with the old
-  zooming outlines, come to the front when pressed, drag by their striped title
-  bars (never past the screen's left edge) and close with their close boxes or
-  Escape, the focus going back to the file. Arrow keys move between files and
-  never change the sheet. The first time the sheet arrives, the screen comes on:
-  the poster's star badge on the grey desk, then the menu bar and the Archive
-  window, about a second; Special, Restart does it again. On phones it is the
-  compact Mac, every window taking the whole screen.
-  - **The drawing:** a two-pixel grid. Every line is 2px, every picture 32 dots
-    at 2px, the desk the old 50% grey of alternate dots, in Tiny5 (OFL), a pixel
-    face that lands on that grid at 16px and 24px. The Mac stands square (only its
-    tape is askew), because a turned screen would resample its dots and soften its
-    text.
-  - **Fallbacks:** the cards stay the page's own text. Without the script, in
-    print and in forced colours the cards below show instead, and Find opens a
-    card's file on the Mac.
-  - **Size:** on desktop the case is sized from the window's height, so the sheet
-    still stacks. On a short window the Mac keeps a usable 600px and this one sheet
-    scrolls.
-  - **Why not the whole site on a Mac:** a Mac as the landing page would have
-    replaced the cover, the edition's strongest screen, and put a click before
-    everything.
-- **The archive cards** (without the script, in print and in forced colours). Sheet 11: index cards taped to the paper, each one
-  `<li class="entry">` with a year (Anton, vermilion), a kind tag, a title in the
-  hand face, one line and an optional link to the sheet that describes it. An
-  HTML comment above the list tells Leonardo how to add a card; tilt, tape, the
-  unfolding and the reveal order come from the stylesheet and the script, so a
-  copied card needs nothing else. At rest a card shows its year, kind and title;
-  pointing at it (or tabbing to its link) unfolds its line and link (grid rows 0fr
-  to 1fr, 500ms) below its resting edge, so the grid never moves (a card the row
-  has stretched unfolds from just under its own title), while it straightens,
-  lifts and the other cards step back by colour, not opacity: a greyer paper
-  (`#F3F1F1`), the muted ink (6.05:1) and a muted kind tag (white on it 6.8:1); the
-  24px vermilion years keep 3.59:1. Touch screens,
-  print and pages without the script show every line. Four cards a row on desktop,
-  one or two on phones; two columns in print.
+- **The archive's Macintosh (2026-10-05, second pass).** Sheet 11 is Leonardo's own computer: a Macintosh taped
+  onto the paper (drawn in CSS, no logos), its screen the Platinum desktop of the mid-nineties drawn in the
+  poster's colours. Leonardo found the first, one-bit System 1 screen too rudimentary and asked for it "slightly
+  more comprehensible but still clean and stylistic".
+  - **The screen:** grey bevelled windows (white along the top and left of a raised edge, grey along the bottom
+    and right) with ruled title bars, the poster's black for the desk under a fine grid of dots, deep vermilion
+    (`#B92B1C`, white on it 5.9:1) for the chosen file and the open menu, and the site's own Metropolis for every
+    word: menus and titles 14px bold, lists 14px, a file's page 15 to 22px, nothing under 13px. The pictures are
+    drawn on a grid of 32 dots, as the old icons were, now shaded in greys with a vermilion detail each: a page
+    with its corner folded and its emblem (a screen with a play mark, bars, notes, a maze, a robot, a rocket,
+    lines of text), the drive and the Trash.
+  - **The menu bar:** the poster's star in vermilion, then File (Open, Close Window), View (as Icons, as List;
+    by Name, by Kind, by Year) and Special (Restart). With a menu open, pointing at another title opens that one.
+  - **The Archive window:** "7 items" and "Click a file to open it" (Tap on touch screens) in its header, then a
+    list: a row a file, its picture, name, kind and year. It is sorted by Year, newest first, the order the cards
+    stand in; a column's heading sorts by it (names A to Z, years newest first) and the same heading again turns
+    it round. Up and Down move along the list, Home and End jump, typing a name's first letters goes to it, and
+    one click or Return opens the file (as on a phone; the old Mac wanted two). View, as Icons shows the files as
+    pictures in a grid instead.
+  - **A file's window** is a page of plain type: the year and kind in small vermilion capitals, the title, the
+    card's line, then the card's paragraphs and its list of details, copied as they are, and the card's link drawn
+    as the old default button (rounded, with a heavy ring). Its zoom box (or a double click on its title bar) fills
+    the screen with it, for reading, and puts it back.
+  - **Windows** open with the old zooming outlines (dotted, inverting what is under them), come to the front when
+    pressed, drag by their title bars (never past the screen's left edge) and close with their close boxes or
+    Escape, the focus going back to the file. Arrow keys belong to the Mac while it has the focus; they never
+    change the sheet.
+  - **Coming on:** the first time the sheet arrives, the star badge on the desk with a bar filling under it
+    (700ms), then the menu bar and the Archive window; Special, Restart does it again. Until then the desk's black
+    covers the screen, but what is under it stays in the Tab order: the focus coming in (Tab from the sheet before,
+    say) turns the screen on at once with the Archive window. Find going to a file waits for the screen to be on,
+    so the Archive window coming on never covers the file it opened.
+  - **Sizes:** on desktop the case is sized from the window's height, so the sheet still stacks; a screen under
+    700px wide gives the names the kind column's room. A window under 600px tall keeps the desktop's screen at
+    640px and this one sheet scrolls. Phones and tablets have a taller screen; there every window takes the whole
+    desk, and the list puts each file's kind and year under its name, with Name, Kind and Year as a row of buttons
+    that sort it.
+  - **Fallbacks:** the cards stay the page's own text. Without the script, in print and in forced colours the
+    cards below show instead, each with its whole file.
+  - **Why not the whole site on a Mac:** a Mac as the landing page would have replaced the cover, the edition's
+    strongest screen, and put a click before everything.
+- **The archive cards** (the wall of cards, by design toggle; and without the script, in print and in forced
+  colours). Sheet 11: index cards taped to the paper, each one `<li class="entry">` with a year (Anton,
+  vermilion), a kind tag, a title in the hand face, its one line, its file (`<div class="entry__more">`: a
+  paragraph or two and a list of details) and an optional link to the sheet that describes it. An HTML comment
+  above the list tells Leonardo how to add a card; tilt, tape and the reveal order come from the stylesheet and the
+  scripts, so a copied card needs nothing else.
+  - **With the script** a card shows its year, kind, title and line; its title is the button that opens the card's
+    file, and the whole card answers to it. The file is a sheet of paper over the dimmed deck (a native `<dialog>`):
+    a vermilion tab with the year and kind, the title in the hand face, the line, the paragraphs and details, the
+    link, and Close in its top right corner. Escape, Close or a press outside put it away, and the focus goes back
+    to the card. Find going to a card rings it and opens its file once the deck has landed.
+  - **Pointing at a card** straightens and lifts it while its tape presses, and the other cards step back by colour,
+    not opacity: a greyer paper (`#F3F1F1`), the muted ink (6.05:1) and a muted kind tag (white on it 6.8:1); the
+    24px vermilion years keep 3.59:1.
+  - **Without the script, in print and in forced colours** every card shows its whole file under its line. Four
+    cards a row on desktop, one or two on phones; two columns in print.
+  - **The facts** come from the site's own pages only (the résumé, the Daedalus page, the music sheet, v1's
+    robotics line); what is not on file is left out, and the comment above the list names what the files could
+    still hold when Leonardo has it.
 - **The contact sheet, clean (T18, 2026-10-05).** Leonardo found it "not great"
   and asked for it very clean, with the text inside its lines.
   - **Left column:** the framed words alone, in a calmer hand-drawn frame,
@@ -303,15 +330,17 @@ for the deck. Either makes two systems for the same files.
 | --- | --- |
 | `index.html` | The page: the rail, the cabinet, twelve sheets and an SVG sprite of torn edges, stickers and the arrow |
 | `assets/css/site.css` | Tokens, the rail and cabinet, sheets, motion, the compact mode for short windows, touch sizes, print |
-| `assets/js/site.js` | Counts from the page, headline wrapping, reveals, geometry, the recede, the rail label and index tab, the cabinet, its files, hover intent and Find, the cards' links, the archive folds, the phone pill, navigation and keys |
+| `assets/js/site.js` | Counts from the page, headline wrapping, reveals, geometry, the recede, the rail label and index tab, the cabinet, its files, hover intent and Find (the deck and the six project files), the cards' links, the archive cards' files, the phone pill, navigation and keys |
 | `files/<slug>/index.html` | The project files: `aducanumab`, `genuvalens`, `loquar`, `ocapex`, `hockey` (the coach one-pager) and `resume` |
 | `assets/css/files.css` | The files' own stylesheet: tokens and faces as in `site.css`, the desk, drawer, paper, sections, figures, the pager, the view transition, print and the hockey one-page print |
 | `assets/js/files.js` | The hockey file's print button, and eager figures before printing (the files work without it) |
 | `assets/js/toggles.js` | The design toggles for the developer tools (above): `window.toggles`, the address, the attribute on `<html>`, and the contact sheet's words |
-| `assets/js/mac.js`, `assets/css/mac.css` | The archive's Macintosh: the case, the one-bit screen, the menus, the windows and the files, built from the archive's cards |
+| `assets/js/mac.js`, `assets/css/mac.css` | The archive's Macintosh: the case, the Platinum screen, the menus, the list and its sorting, the windows and the files, built from the archive's cards |
 | `DESIGN.md` | The system as built: tokens, type roles, the stack, the cabinet, the hover grammar, the archive, phones, and how to add a sheet, a file or a card |
+| `../tools/v3-files.mjs` | Writes each project file's title, chrome, drawer, links back, pager and view transition name from the deck (`--check` names a file that drifts) |
+| `../tests/v3/unit/files.test.mjs` | Runs that check, and checks the numbers, the pager and Email in every file's chrome (`node --test tests/v3/unit/*.test.mjs`) |
 | `../tests/v3/check.mjs` | Browser checks: structure and counts, no links into other editions (the deck, the six files and both stylesheets), the 12px floor (the files on screen and in print too), contrast at rest and while a card steps back, the cabinet and its hover intent, the routes, Find, the pill, the keyboard walk, touch targets, the hockey file on one Letter page, Back from a file, console errors with and without the script |
-| `assets/fonts/` | Anton (OFL, stands in for Impact), Metropolis from the deck package (Unlicense), Permanent Marker (Apache 2.0, stands in for the personal-use Shooting Star), Tiny5 (OFL, `OFL-tiny5.txt`; the Mac's screen) |
+| `assets/fonts/` | Anton (OFL, stands in for Impact), Metropolis from the deck package (Unlicense), Permanent Marker (Apache 2.0, stands in for the personal-use Shooting Star). Tiny5 (OFL, `OFL-tiny5.txt`), the first Mac's pixel face, is no longer loaded; the file stays until Leonardo says otherwise |
 | `assets/img/` | Derivatives copied from v2; the goalie mask stickers rendered from `assets/model/GMask.obj` by `tools/make-mask-sticker.py`; the portrait cutout from `tools/make-cutout.py` (paper edge added in the same pass); the OCAPEX mark redrawn in the site's three colours |
 
 ## Project files
@@ -335,7 +364,11 @@ then sections behind black divider tabs, and the previous and next files as two 
   (the line v5 uses): Leonardo decided on 2026-09-18 that coach addresses are not published and correspondence
   goes through a parent.
 - **Order and numbers**: 04 Drug safety, 05 Knee exoskeleton, 06 Loquar, 07 OCAPEX, 08 Goaltender, 10 The
-  record. Previous and next follow that order; the descriptions on the cards are the cabinet's kickers.
+  record: each file has its sheet's number (09, Viola and violin, has no file). Previous and next follow that
+  order; the descriptions on the cards are the cabinet's kickers. `tools/v3-files.mjs` writes all of it from the
+  deck (a file's number is its sheet's place, its name the sheet's folder, its line that folder's kicker), with
+  the chrome (the name, Email and the year, as on the deck) and the view transition name; run it after changing
+  the deck, and `--check` (run by the unit test) names a file that drifts.
 - **Hover**: the creamy grammar, rebuilt in paper. The cards settle flat from their tilt and lift 3px over
   800ms on `cubic-bezier(.22, 1, .36, 1)`, the arrow grows from .8 and turns from 45 degrees over 450ms, the
   card's line unfolds (grid rows 0fr to 1fr, 500ms) and the other card steps back by dimming its ink and paper
@@ -356,14 +389,15 @@ then sections behind black divider tabs, and the previous and next files as two 
   (`view-transition-name: file-04` and so on, listed in `files.css` and in that `site.css` block). Reduced
   motion keeps crossfades only, with no rise or sink; other browsers simply navigate.
 - **To add a file**: copy the closest file's folder (research: `aducanumab`; product: `loquar`), change its
-  `<title>`, description, tab text, back link (`../../#<sheet id>`), stamp, facts and sections; give its
-  article `view-transition-name: file-NN` and add that name to the two `::view-transition-*(file-..)` lists
-  in `files.css` and to the two in `site.css`'s "files: view transition" block; add its tab to every file's drawer (in order; in
-  its own drawer the tab's `<li>` gets `class="is-current"` and the link `aria-current="page"`) and fix the previous and next
-  cards of its neighbours; then point the sheet's detail link at `files/<slug>/`, add the slug to the `FILES` list at the
-  top of `tests/v3/check.mjs` and run it. Images go in `v3/assets/img/` as derivatives; never link to another edition's
-  files.
-- **The hockey one-pager**: `files/hockey/` puts measurables, the stat line with its sample size, how I play,
+  description, stamp, facts and sections; add it (its folder and its sheet's id) to `FILES` in
+  `tools/v3-files.mjs` in the deck's order and run `node tools/v3-files.mjs`, which writes its title, chrome,
+  drawer, links back and pager, and every other file's drawer and pager; add its `view-transition-name`
+  (`file-NN`) to the two `::view-transition-*(file-..)` lists in `files.css` and to the two in `site.css`'s
+  "files: view transition" block; then point the sheet's detail link at `files/<slug>/`, add the slug to the
+  `FILES` list at the top of `tests/v3/check.mjs` and run it. Images go in `v3/assets/img/` as derivatives; never
+  link to another edition's files.
+- **The hockey one-pager**: on screens in one column (phones and tablets) the season's stats come first after
+  the measurables, then the coach contacts, then how I play and the rest. `files/hockey/` puts measurables, the stat line with its sample size, how I play,
   the academic snapshot, the coach contacts, Elite Prospects and NCSA, team history, prep and camps, and crew
   and soccer on one page. "Print the one-pager" is a real button that calls `print()` (hidden without the
   script and in print). The `@media print` block "Print: the hockey one-pager" in `files.css` lays it out on

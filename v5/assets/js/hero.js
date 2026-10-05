@@ -173,7 +173,10 @@ export function createHero({ room, windows, go }) {
     const shown = below && getComputedStyle(below).display !== 'none' ? below.offsetHeight : 0;
     if (!shown) { hero.style.removeProperty('--name-y'); hero.style.removeProperty('--below-y'); return; }
     const vh = innerHeight, nameH = btn.offsetHeight, gap = clamp(vh * .045, 20, 46), total = nameH + gap + shown;
-    const top = Math.max(vh * .05, Math.min(vh * .53 - total / 2, vh * .45 - nameH / 2, vh - 96 - total));
+    // the desktop's icons, when they run along the top, stand outside the group: the name keeps below them
+    const apps = below.querySelector('.apps'), row = apps && getComputedStyle(apps).position === 'fixed' && apps.getBoundingClientRect();
+    const floor = Math.max(vh * .05, row && row.width > row.height ? row.bottom + 12 : 0);
+    const top = Math.max(floor, Math.min(vh * .53 - total / 2, vh * .45 - nameH / 2, vh - 96 - total));
     hero.style.setProperty('--name-y', `${(top + nameH / 2).toFixed(1)}px`);
     hero.style.setProperty('--below-y', `${(top + nameH + gap).toFixed(1)}px`);
   }
