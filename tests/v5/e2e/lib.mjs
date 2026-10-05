@@ -22,7 +22,7 @@ function stretch(page) {
 }
 
 export const BASE = process.env.V5_BASE || 'http://127.0.0.1:8778/v5/';
-export const PAGES = ['', 'work/', 'hockey/', 'about/', 'resume/', 'work/aducanumab/', 'work/genuvalens/', 'work/loquar/', 'work/daedalus/', 'work/ocapex/', 'work/freecode/', 'work/this-site/'];
+export const PAGES = ['', 'work/', 'hockey/', 'about/', 'resume/', 'work/aducanumab/', 'work/genuvalens/', 'work/loquar/', 'work/daedalus/', 'work/ocapex/', 'work/freecode/', 'work/this-site/', 'work/archive/'];
 
 // noGL: launch without WebGL (the CSS glass fallback); touch: a phone's coarse pointer
 export async function open({ width = 1440, height = 900, js = true, reduced = false, scheme = 'dark', args = [], noGL = false, touch = false } = {}) {

@@ -593,7 +593,7 @@ a.row:focus-visible .row__m { color: #fff; }
 /* The archive (work/archive/, written from tools/v5-chrome.mjs): every entry in full, newest first, each a group of
    its own: the year and kind, the title in the Experiments rows' italic, its line, its paragraphs, its details and
    where the rest of it lives */
-.arc { display: grid; gap: 14px; }
+.arc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 0; padding: 0; list-style: none; }
 .arc > li { padding: 20px 22px 22px; border-radius: var(--r-row); background: var(--fill); scroll-margin-top: 12px; }
 .arc__meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 14px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .arc__kind::before { content: "·"; margin-right: 10px; }
@@ -602,6 +602,7 @@ a.row:focus-visible .row__m { color: #fff; }
 .arc .prose { margin-top: 14px; }
 .arc .facts--box { margin-top: 16px; background: var(--fill); }
 .arc__go { margin-top: 16px; }
+.arc__go .btn { max-width: 100%; white-space: normal; text-align: left; }   /* a long name wraps on a phone rather than leaving the window */
 .cv { display: grid; gap: 10px; }
 .cv > li { padding: 15px 18px; border-radius: var(--r-row); background: var(--fill); }
 .cv__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }

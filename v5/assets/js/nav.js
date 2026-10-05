@@ -329,6 +329,9 @@ export function initNav({ windows }) {
     html.classList.remove('is-booting');
     const h = sheet.querySelector('h1');
     if (h) h.focus({ preventScroll: true });
+    // a sheet loaded at an entry (archive/#robots): its contents moved into the sheet after the browser scrolled, so
+    // land on the entry again, and light it
+    if (location.hash.length > 1) reveal(location.hash, true);
   }
   if (html.dataset.kind === 'sheet') bootSheet();
 

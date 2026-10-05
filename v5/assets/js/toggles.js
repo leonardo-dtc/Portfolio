@@ -7,7 +7,7 @@
 //                       toggles.launcher = 'widgets'    or toggles.set('launcher', 'widgets'), or by its question:
 //                                                       toggles.T39 = 'b' (the letters are the decision page's)
 //                       toggles.reset()                 every one back to its default (or toggles.reset('launcher'))
-//   In the address      ?toggles=launcher:widgets,heroName:glass
+//   In the address      ?toggles=launcher:widgets,heroName:glass (for that visit only)
 //   In Elements         edit the data attribute on <html>
 //
 // The hero's toggles change the hero while it shows; reload the home page to bring it back.
@@ -43,20 +43,22 @@ export function initToggles() {
   const write = (n, v) => { written[n] = v; shown[n] = v; if (html.dataset[n] !== v) html.dataset[n] = v; };
 
   // one toggle to a value: on <html>, kept (a default is forgotten), and told to whoever listens
-  function put(n, v) {
+  function put(n, v, keepIt = true) {
     const was = current(n);
     write(n, v);
-    const kept = stored();
-    if (v === TOGGLES[n].def) delete kept[n]; else kept[n] = v;
-    keep(kept);
+    if (keepIt) {
+      const kept = stored();
+      if (v === TOGGLES[n].def) delete kept[n]; else kept[n] = v;
+      keep(kept);
+    }
     if (v !== was) document.dispatchEvent(new CustomEvent('v5:toggle', { detail: { name: n, value: v, was } }));
   }
-  function set(n, v) {
+  function set(n, v, keepIt = true) {
     const k = nameOf(n);
     if (!k) { console.warn(`toggles: no toggle "${n}". There are: ${Object.keys(TOGGLES).join(', ')}`); return; }
     const t = TOGGLES[k], val = valueOf(t, v);
     if (!val) { console.warn(`toggles: ${k} (${t.q}) takes ${Object.keys(t.values).map(x => `"${x}"`).join(', ')}${t.letters ? `, or the letters ${Object.keys(t.letters).join(', ')}` : ''}`); return; }
-    put(k, val);
+    put(k, val, keepIt);
     return val;
   }
   function list() {
@@ -72,7 +74,8 @@ export function initToggles() {
   const kept = stored();
   for (const k of Object.keys(TOGGLES)) write(k, valueOf(TOGGLES[k], kept[k] || TOGGLES[k].def) || TOGGLES[k].def);
   const asked = new URLSearchParams(location.search).get('toggles');
-  if (asked) for (const pair of asked.split(',')) { const [n, v] = pair.split(':'); if (n && v) set(n, v); }
+  // (for this visit only: a link with ?toggles= never changes what that browser shows next time)
+  if (asked) for (const pair of asked.split(',')) { const [n, v] = pair.split(':'); if (n && v) set(n, v, false); }
 
   // an attribute edited in the Elements panel counts as a change
   // (an edit to a value the toggle does not take goes back to the last good one, with a note of what it takes)
