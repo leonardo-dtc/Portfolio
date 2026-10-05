@@ -144,11 +144,17 @@ export function initNav({ windows }) {
     return s;
   }
   function label(s) { const h = s.querySelector('h1'); if (h) { h.id = 'sheet-title'; s.setAttribute('aria-labelledby', 'sheet-title'); } }
-  async function showSheet(info, token) {
+  // a sheet opened at an entry (archive/#summer) is already there as it arrives, rather than jumping once it has
+  const atEntry = (sheet, url) => {
+    const el = url && url.hash.length > 1 && sheet.querySelector('#' + CSS.escape(decodeURIComponent(url.hash.slice(1))));
+    if (el) el.scrollIntoView({ block: 'start', behavior: 'instant' });
+  };
+  async function showSheet(info, token, url) {
     const open = $sheet();
     if (open) {
       await swapWindow(open, info);
       if (token !== seq) return;
+      atEntry(open, url);
       label(open);
       const bar = document.querySelector('.toolbar--sheet');
       if (bar && info.sheetBar) bar.replaceChildren(...copy(info.sheetBar.children));
@@ -158,6 +164,7 @@ export function initNav({ windows }) {
     const sheet = buildSheet(copy(info.main.children));
     if (info.sheetBar) space.append(document.importNode(info.sheetBar, true));
     const opening = windows.openSheet(sheet);
+    atEntry(sheet, url);
     const h = sheet.querySelector('h1');
     if (h) h.focus({ preventScroll: true });
     await opening;
@@ -200,7 +207,7 @@ export function initNav({ windows }) {
       remember();
       shown = url.pathname;
       let moved = true;
-      if (info.kind === 'sheet') await showSheet(info, token);
+      if (info.kind === 'sheet') await showSheet(info, token, url);
       else moved = await showPage(info, url, token, quiet);
       if (token !== seq) return;
       finish(info, url, moved, !push);
@@ -243,8 +250,9 @@ export function initNav({ windows }) {
   // Landing on an entry lights it with a wash that fades over 1.2s (site.css .is-landed; none under reduced motion),
   // once the scroll has arrived, so it is seen where it ends rather than spent on the way.
   function land(el, smooth) {
-    // only a record entry takes the wash, and only where it can fade (with no animation to end it, the mark would stay)
-    if (reduced.matches || !el.matches('.cv > li')) return;
+    // only a record or archive entry takes the wash, and only where it can fade (with no animation to end it, the mark
+    // would stay)
+    if (reduced.matches || !el.matches('.cv > li, .arc > li')) return;
     const body = el.closest('.win__body');
     const go = () => {
       el.classList.remove('is-landed');

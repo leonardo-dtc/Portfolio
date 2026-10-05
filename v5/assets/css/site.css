@@ -590,6 +590,18 @@ a.row:focus-visible .row__m { color: #fff; }
 .fig figcaption { margin-top: 10px; color: var(--ink-3); font-size: 14px; max-width: 46em; }
 
 /* résumé entries and team histories: visionOS list rows */
+/* The archive (work/archive/, written from tools/v5-chrome.mjs): every entry in full, newest first, each a group of
+   its own: the year and kind, the title in the Experiments rows' italic, its line, its paragraphs, its details and
+   where the rest of it lives */
+.arc { display: grid; gap: 14px; }
+.arc > li { padding: 20px 22px 22px; border-radius: var(--r-row); background: var(--fill); scroll-margin-top: 12px; }
+.arc__meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 14px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.arc__kind::before { content: "·"; margin-right: 10px; }
+.win__body .arc__title { margin-top: 6px; font: italic 550 24px/1.2 var(--font-display); letter-spacing: -.005em; }
+.arc__line { margin-top: 6px; font-size: 17px; color: #fff; max-width: 40em; }
+.arc .prose { margin-top: 14px; }
+.arc .facts--box { margin-top: 16px; background: var(--fill); }
+.arc__go { margin-top: 16px; }
 .cv { display: grid; gap: 10px; }
 .cv > li { padding: 15px 18px; border-radius: var(--r-row); background: var(--fill); }
 .cv__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
@@ -746,8 +758,9 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 /* Sections follow the reader (spy.js): the current entry wears the tab bar's bubble, a Fill 3 capsule */
 .toc a { border-radius: 999px; transition: background-color .25s, color .25s; }
 .toc a[aria-current="true"] { background: var(--fill-3); color: #fff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32); }
-/* landing on an entry (a record row to résumé/#carnegie, say) lights it with a wash that fades over 1.2s */
-.cv > li.is-landed { animation: landed 1.2s cubic-bezier(.22, 1, .36, 1); }
+/* landing on an entry (a record row to résumé/#carnegie, say, or an Experiments row to its entry in the archive)
+   lights it with a wash that fades over 1.2s */
+.cv > li.is-landed, .arc > li.is-landed { animation: landed 1.2s cubic-bezier(.22, 1, .36, 1); }
 @keyframes landed { from { background-color: var(--fill-3); } }
 
 /* ---------- phones and narrow tablets ---------- */
