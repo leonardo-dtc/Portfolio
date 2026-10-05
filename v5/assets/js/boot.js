@@ -99,6 +99,20 @@ tick();
 setInterval(tick, 15000);
 document.addEventListener('v5:navigate', tick);
 
+// Phones: a window's header folds to one line of its title once its contents scroll, as iOS folds a large title, so
+// the reading space grows; back at the top it unfolds. Two thresholds (folds past 48px, unfolds under 8px) keep it
+// from flickering at one edge, and a new page in the window starts unfolded.
+const phone = matchMedia('(max-width: 899px)');
+document.addEventListener('scroll', (e) => {
+  const body = e.target;
+  if (!phone.matches || !(body instanceof Element) || !body.matches('.win__body')) return;
+  const win = body.closest('.win'); if (!win) return;
+  const y = body.scrollTop, folded = win.classList.contains('is-folded');
+  if (!folded && y > 48) win.classList.add('is-folded');
+  else if (folded && y < 8) win.classList.remove('is-folded');
+}, { capture: true, passive: true });
+document.addEventListener('v5:navigate', () => document.querySelectorAll('.win.is-folded').forEach(w => { const b = w.querySelector('.win__body'); if (!b || b.scrollTop < 8) w.classList.remove('is-folded'); }));
+
 nav = initNav({ windows });
 window.__nav = nav;
 

@@ -794,6 +794,22 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .toolbar--inline.filters { margin: 0 0 18px; }
   .tbl--stats th, .tbl--stats td { padding: 10px 6px; }
 }
+/* the header folded (boot.js): one line of the title, smaller, with Write to me beside it and the subtitle gone, once
+   the window's contents scroll */
+@media (max-width: 899px) {
+  .win__head, .close { transition: padding .28s var(--ease-out), top .28s var(--ease-out); }
+  .win__head h1, .win__head .name { transition: font-size .28s var(--ease-out); }
+  .win.is-folded > .win__head { padding-top: 14px; padding-bottom: 8px; flex-wrap: nowrap; align-items: center; }
+  .win.is-folded > .win__head > div { min-width: 0; }
+  .win.is-folded > .win__head h1 { font-size: 21px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .win.is-folded > .win__head .name { font-size: 24px; }
+  .win.is-folded > .win__head .name__w { display: inline; }
+  .win.is-folded > .win__head .sub, .win.is-folded > .win__head .avatar { display: none; }
+  .win.is-folded > .win__head .head__write { margin-top: 0; }
+  .win.is-folded > .close { top: 9px; }
+  .win.is-folded > .home-head { padding-top: 14px; flex-direction: row; align-items: center; }
+}
+@media (max-width: 899px) and (prefers-reduced-motion: reduce) { .win__head, .close, .win__head h1, .win__head .name { transition: none; } }
 @media (max-width: 699px) {
   .win__head .name { font-size: 44px; line-height: 1; }   /* the two-line name, as the hero sets it on phones */
   .name__w { display: block; }
