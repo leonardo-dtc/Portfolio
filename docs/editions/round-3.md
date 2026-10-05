@@ -360,7 +360,7 @@ These are estimates, to be re-scored after the change:
   Run it on the current hero and on the launcher, on desktop and phone. Record the first click and the seconds taken.
 - A five-second test: show each hero for five seconds, then ask what Leonardo does.
 
-**Status:** proposed, not built. The launcher changes his hero spec ("the name plus Click the title to proceed"), so it waits for T34, T27 and T35.
+**Status:** proposed, not built. The launcher changes his hero spec ("the name plus Click the title to proceed"), so it waits for T34, T27 and T35. *Built on 2026-10-05, after his answers (section 12).*
 
 ---
 
@@ -463,6 +463,8 @@ Priority is the balanced weight times the expected gain, divided by effort.
 ---
 
 ## 7. Taste questions
+
+**Answered on 2026-10-05: what each answer did is in section 12.**
 
 Each question shows the default this round uses, or my recommendation where nothing is built yet.
 
@@ -761,5 +763,173 @@ Leonardo: "what happened to the desktop setup? did you reject it? For the v3, if
 - **No toys,** such as the old Puzzle desk accessory, unless he wants them.
 - **No new wording.** The screen shows only the cards' own text, plus the interface's names (File, View, Special, Archive, Trash, "8 items").
 
-**v5 stays as it was:** the modern computer's launcher still waits on T34, T27 and T35, because it changes the hero he likes.
+**v5 stays as it was:** the modern computer's launcher still waits on T34, T27 and T35, because it changes the hero he likes. *Built on 2026-10-05 (section 12).*
 
+
+---
+
+## 12. The decisions (2026-10-05)
+
+Leonardo answered all 41 questions on the decision page, then: "Based on the artifact, make the proposed changes. Add a toggle for any options that might seem ambiguous so I can play around with it in dev tools."
+
+### What each answer did
+
+| | His answer | What changed |
+|---|---|---|
+| T1 | Dim only | Built already; unchanged |
+| T2 | The screen settling in its frame | Built already; unchanged |
+| T3 | The hockey page | Nothing to build. Use `v5/hockey/` (or v3's `files/hockey/`) on Elite Prospects, NCSA and in emails |
+| T4 | Email everywhere | **Built.** v3: Email in the chrome, on every sheet. v5: Write to me in the header of Work and of every project sheet (Home, Hockey, About and Résumé already had it) |
+| T5 | No moving grain | Unchanged |
+| T6 | Leave the games out | **Built.** Out of v5's Experiments (Home and Work), v3's archive (its cards, so its Mac) and the archive's index card. The résumés and v3's record keep them as coursework. Left in the source as comments, not deleted |
+| T7 | "A mix of personal work and small things" | The archive already is that, public; recorded as its scope. No wording change |
+| T8 to T14 | As built | Unchanged |
+| T15 | "I will determine later" | Waits |
+| T16 | "Will figure out after finalized design" | Waits. (The desk, T40, happens to fill the phone cover) |
+| T17 | A toggle between the cards and the Mac, and what the Mac would change | **Toggle** `archive`; the answer below |
+| T18 | Not yet: "very clean", unsure of the wording, the text outside the lines | **Built:** the clean contact sheet, its words inside their frame. **Toggles** `talk` (clean or as it was) and `talkWords` (three wordings) |
+| T19 to T25 | As built | Unchanged |
+| T26 | Also scroll, swipe, Down or Space | **Built** |
+| T27 | A toggle between the options | **Toggle** `heroContent` |
+| T28, T29 | As built | Unchanged |
+| T30 | Delete the hello files | **Not done.** The session's safety check stopped the deletion; it waits for his yes in chat. The files: `v5/assets/js/hello.js`, `name.js`, `name-data.js`, `v5/assets/img/name.svg`, `name-2.svg` (with their `.json` notes) and `tests/v5/unit/name.test.mjs` |
+| T31, T32 | As built | Unchanged |
+| T33 | Generate the tab bar | **Built:** `tools/v5-chrome.mjs` |
+| T34 | The launcher row on the hero | **Built** |
+| T35 | Icons in the colour style, white glyphs | **Built** |
+| T36 | No numbers | **Built** (a test holds it) |
+| T37, T38 | Still windows; no sound or custom cursor | Unchanged |
+| T39 | "Not sure, let's play around" | **Toggle** `launcher` |
+| T40 | A toggle between poster and desk | **Toggle** `cover` |
+| T41 | "the image from the first choice: The launcher row on the hero (mock)" | Read as the mock's look: the glass name in the lit room. **Toggle** `heroName` |
+
+### The design toggles
+
+Each toggle is a data attribute on `<html>`. A change is kept in that browser only, so visitors always see the defaults. Every page's head script sets them before the first paint.
+
+- **In the console:** `toggles` shows each toggle's value, and `toggles.list()` what each is and its choices. `toggles.launcher = 'widgets'` sets one; so does `toggles.set('launcher', 'widgets')`, or the question's ID, as in `toggles.T39 = 'b'` (T27 and T39 take the decision page's letters). `toggles.reset()` returns them all to the defaults.
+- **In the address:** `?toggles=launcher:widgets,heroName:glass`.
+- **In the Elements panel:** edit the attribute on `<html>`. A value a toggle does not take goes back, with a note in the console saying what it takes.
+
+| Edition | Toggle | Question | Default | Choices |
+|---|---|---|---|---|
+| v5 | `heroContent` | T27 | `both` (d) | `name` (a: the name and the hint), `line` (b: plus who I am), `apps` (c: plus the apps), `both` (d) |
+| v5 | `launcher` | T39 | `icons` | `icons` (the mock's round glass icons), `library` (a: tall covers, like Steam's library), `widgets` (b: a dashboard of widgets), `desktop` (c: a Mac desktop down the right edge, after myOS) |
+| v5 | `heroName` | T41 | `neon` | `neon` (the Glowtime neon), `glass` (the launcher mock's glass name) |
+| v3 | `archive` | T17 | `mac` | `mac`, `cards` |
+| v3 | `cover` | T40 | `poster` | `poster`, `desk` |
+| v3 | `talk` | T18 | `clean` | `clean`, `collage` (as round three left it) |
+| v3 | `talkWords` | T18 | `lets-talk` | `lets-talk`, `get-in-touch`, `say-hello` |
+
+**Why these defaults:**
+- `heroContent`: d was the recommendation. It is also the only option that both keeps the launcher (T34) and says who he is.
+- `launcher`: the round icons are the mock he pointed to.
+- `heroName`: neon is the look he approved on 2026-10-04. His T41 note reads as a liking for the mock, so glass is one toggle away.
+- `archive`: the Mac is the newest build.
+- `cover`: the poster was the recommendation.
+- `talk`: clean is his note.
+- `talkWords`: the words stay until the copy pass (the copy freeze holds).
+
+The hero's toggles change the hero while it shows. Reload the home page to see the hero again.
+
+![v5's hero under its toggles, 1440: the four looks of the apps with the neon name, then the glass name with both, the line only, the apps only, and the name alone](round-3/decisions-v5-hero.jpg)
+
+![v3's toggles, 1440: the poster and the desk, the wall of cards, the contact sheet clean, as it was, and in other words](round-3/decisions-v3.jpg)
+
+### v5
+
+- **The launcher (T34, T35, T36).** Under the name, five apps: Work, Hockey, About, Résumé and Write to me. Each is a real link, so they work from the keyboard and without the room.
+  - **Choosing a page's app:** the page goes into the window behind the hero, unseen, with the tab bubble already on its tab. Then the light goes out as its windows arrive, while the app swells and fades. Home is never passed through, and Back returns to Home without the hero.
+  - **Write to me** opens mail, and the hero stays.
+  - **Return** on an app opens it; Return anywhere else enters Home, as before.
+  - **Colour:** the apps take the colour style (`--style`, set by the colour control) with white glyphs.
+  - **No numbers:** no app shows one.
+  - The name and what is under it are placed as one group, a little below the middle, as in the mock. The name never sits lower than its own place.
+- **The apps' looks (T39):**
+  - **icons:** the mock's round glass;
+  - **library:** tall 2:3 covers with the name set large in Switzer, lifting toward you;
+  - **widgets:** glass tiles, each with a glimpse of its page (Work's three pictures, the hockey line, his photo, a drawn page of the résumé, the address);
+  - **desktop:** folders, a document and a mail icon down the right edge, as a Mac lays them out.
+
+  Phones get two rows of three icons, a shelf of covers, a two-column dashboard, or icons across the top.
+- **The line (T27)** is the home page's own first words: "Goaltender at Groton School, Class of 2028."
+- **The glass name (T41)** is the round-two hero, rebuilt on today's palette system:
+  - solid Liquid Glass letters with a light behind them in the colour style, in the lit room, with no stage;
+  - the same glide into the title;
+  - without WebGL, the CSS glass name of that round.
+- **Getting past the hero (T26):** a scroll that adds up to a deliberate move (a nudge of the wheel does not), a swipe up, Down, Page Down or Space. "Click the title to proceed" stays.
+- **Write to me (T4):** a button in the window's header on Work and every project sheet, where it stays in view while the page scrolls.
+- **Generated chrome (T33):** `tools/v5-chrome.mjs` writes, from one list:
+  - the tab bar into all twelve pages;
+  - the head script (now the same everywhere: the inner pages had an older copy without the Night or Day line);
+  - the hero's apps;
+  - Write to me in the headers.
+
+  `node tools/v5-chrome.mjs` rewrites; `--check` names any page that drifts, and a unit test runs it.
+
+### v3
+
+- **The archive (T17):** the Mac, or the wall of cards, by toggle. With the cards, Find lights the card itself.
+
+  **What the Mac would change, if picked:** nothing else has to.
+  - It stays one object on one sheet, as the mask and the code panel are, and the deck stays paper.
+  - Its pixel face, Tiny5, stays inside its screen.
+  - It adds no navigation: the index's Find opens its files, and its windows never become a second index.
+  - Phones show it as a tall screen.
+  - Print, scripts off and forced colours show the cards.
+  - Its cost is about 12 KB compressed (script and style) and a 9 KB font, all for this sheet.
+
+  What could tie it in further, if he wants:
+  - a small Mac on the desk cover that opens the archive;
+  - the archive's kicker saying the files are on the Mac (wording waits).
+
+  What I would not do:
+  - open the project files as Mac windows;
+  - give the deck a menu bar.
+
+  Either one makes two systems for the same files.
+- **The desk (T40).** The poster stays: the name, the hand line and the year. Around them, six objects open the six project files, each named in marker like the hand line's words:
+  - the code panel (Research), its link laid over the panel itself;
+  - the mask (Hockey);
+  - a page of the résumé;
+  - a print of Loquar;
+  - the exoskeleton's lined-paper sketch;
+  - the OCAPEX sticker.
+
+  Pointing at one picks it up: it lifts and straightens, and its marker stroke darkens. On a wide screen the objects lie round the name, clear of its letters, the rail and the tag. On phones and tablets they sit in a grid of three under the name, with a small drawn window standing in for the code panel.
+- **The contact sheet, clean (T18).**
+  - **The problem:** the hand-drawn frame's jitter reached up to 14% into its own box, and the words filled the box. At every size the line ran through the tops of LET'S and touched TALK's feet: "the text going outside of the lines".
+  - **The clean sheet:** a calmer hand-drawn frame (its line wanders 3% across and 7.5% down). It is padded by measured amounts, 0.2 em at the sides and 0.36 em above and below, so every letter stays 4 px or more from the line. A test checks this at six sizes, from 1920 wide to a 320 phone, in all three wordings. The sheet also loses:
+    - the crown, the star, the mask and the tape;
+    - the tape on the address and its tilt;
+    - the torn paper end, which becomes a hairline and outlined buttons on the dark sheet.
+  - **As it was:** `talk = 'collage'` brings back round three's sheet, its frame now wide enough to clear the letters too.
+  - **The words:** LET'S TALK, GET IN TOUCH or SAY HELLO, by toggle. The rest of the sheet's wording waits for the copy pass.
+- **Email (T4)** sits in the chrome beside the year, on every sheet. Narrow windows bring the chrome back while it has focus, as they do for the name.
+- **The games (T6):**
+  - their card is out, so the Mac shows seven files;
+  - the archive's index card no longer promises "games rebuilt in Python and Java": it says "from a music video for a Calculus BC final to FRC and FTC robots", the one wording change this round, made so the index stays true;
+  - the record's class-projects line keeps the games.
+
+### Measured
+
+- **v5** (`tests/v5/e2e/launcher.mjs`, new; the other suites updated):
+  - the apps are links in order, with no numbers;
+  - the colour style turns them;
+  - Tab order;
+  - Return and a click on an app land on its window with the bubble on its tab;
+  - Back returns to Home;
+  - Write to me keeps the hero;
+  - a scroll, Down, Page Down, Space and a swipe up enter, while a nudge and a sideways swipe do not;
+  - the toggles from the address, the console and the attribute, kept in the browser, refused when a value is wrong, reset;
+  - every look fits at 1280x720 and 390x844, clear of the name, the hint and the colour control, with nothing under 12 px;
+  - the glass name without WebGL.
+
+  `tests/v5/unit/chrome.test.mjs` holds the generated chrome.
+- **v3** (`tests/v3/check.mjs`, section 7b):
+  - Email in the chrome, and no games;
+  - the toggles' defaults;
+  - the cards, kept across a reload, and Find on them;
+  - wrong values refused, and reset;
+  - the contact sheet's words 4 px or more inside their line at six sizes, in each wording and in the collage;
+  - the desk at nine sizes, from 1920x1080 to 320x640: clear of the name, of each other, the tag, the rail and the hint; a pick-up on hover; a click into the file.
