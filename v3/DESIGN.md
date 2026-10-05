@@ -193,7 +193,48 @@ each separator stays with the word before it when the line wraps. On touch scree
 with 12px of vertical padding, which moves no line (the stroke is offset to stay under the word). On phones
 "portfolio" is left out (the pill is the index there).
 
+## The cover as a desk (a design toggle, T40)
+
+`html[data-cover="desk"]` (see `README.md`, Design toggles). The poster stays: the name, the hand line, the year
+and the tag. Around them lie six objects, each a link to its project file, each named in the hand face (16px or
+more) with the routes' vermilion marker stroke under the name:
+- the code panel (Research): its link is laid over the panel and under the title, as the panel is, so the
+  panel keeps typing;
+- the goalie mask (Hockey), which takes the place of the title's own mask;
+- a page of the résumé (paper, a vermilion rule, grey lines);
+- a print of Loquar (a white-bordered photo);
+- the exoskeleton's sketch on its torn scrap of lined paper;
+- the OCAPEX sticker.
+
+Each has its own tilt. Pointing at one picks it up over 380ms: it lifts 8px, straightens by 60% and its shadow
+deepens, and its stroke darkens; the code panel lifts with its link. Focus draws a 2px vermilion ring.
+
+**Wide screens (900px and up):** round the name, placed from the name's own block:
+- three down the right of the name (the mask, the page, the print), clear of the rail;
+- the sketch under the code panel, clear of the tag;
+- the sticker under the name, clear of the Scroll hint.
+
+**Phones and tablets:** a grid of three under the name, the code panel standing in as a small drawn window
+(phones do not show the panel). The cover grows to fit them. Print shows the poster.
+
+## The contact sheet (T18)
+
+**Clean (the default since 2026-10-05):**
+- **The words:** LET'S TALK (or GET IN TOUCH, or SAY HELLO, by toggle) in Anton, red over white, inside a
+  calmer hand-drawn frame. Its line wanders about 3% across and 7.5% down its box. The words are padded inside
+  it by 0.2em at the sides and 0.36em above and below, so every letter stays 4px or more from the line at any
+  size.
+- **The size:** the frame, centred in its column, is sized by container query units:
+  `min(84cqw / (width + .52), 100cqh / 2.7)`, where `--ww` is the pair's width in em (1.9, 2.75 or 2.4).
+- **Taken away:** no stickers or tape; the address slab square to the page.
+- **The end:** a hairline over outlined white buttons and the colophon, on the dark sheet.
+
+**Collage (round three's, by toggle):** the crown, the star, the mask and the tape, the slab tilted and taped,
+and the torn paper end. Its old jittery frame now sits at 130% by 152% of the words, so it clears them too.
+
 ## The archive
+
+**The Mac, or the wall of cards, is a design toggle (T17); the Mac is the default.**
 
 **On screen, with the script: a classic Macintosh** (`assets/js/mac.js`, `assets/css/mac.css`). The case:
 platinum (`#EFEADF` to `#D9D2C1`), the screen set in a recess, a floppy slot and a vermilion badge on the chin,

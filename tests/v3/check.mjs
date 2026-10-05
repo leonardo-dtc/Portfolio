@@ -475,8 +475,8 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const walk = [];
   for (let k = 0; k < 7; k++) { await page.keyboard.press('Tab'); await page.waitForTimeout(60); walk.push(await page.evaluate(() => document.activeElement.textContent.trim().replace(/\s+/g, ' '))); }
   const cab = await page.evaluate(() => document.getElementById('cabinet').classList.contains('is-open'));
-  const want = ['Skip to content', 'Leonardo Carvalho', 'Index · 01 Cover', 'portfolio', 'goaltender', 'researcher', 'violist'];
-  check(!cab && want.every((t, i) => walk[i] === t), `keyboard: the walk from the top is skip, name, Index, then the cover's routes (and the cabinet stays shut)`, walk.join(' | '));
+  const want = ['Skip to content', 'Leonardo Carvalho', 'Email', 'Index · 01 Cover', 'portfolio', 'goaltender', 'researcher'];
+  check(!cab && want.every((t, i) => walk[i] === t), `keyboard: the walk from the top is skip, name, Email, Index, then the cover's routes (and the cabinet stays shut)`, walk.join(' | '));
   /* the code panel: a keyboard has no hover to pause it, so the first key press finishes it at once */
   const typed = await page.evaluate(() => ({ len: document.querySelector('[data-code-out]').textContent.length, done: document.querySelector('[data-code]').classList.contains('is-done') }));
   await page.waitForTimeout(1200);
@@ -499,8 +499,11 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   await ph.waitForTimeout(900);
   const atEnd = await ph.evaluate(() => document.documentElement.className);
   await ph.keyboard.press('Tab'); await ph.waitForTimeout(450);
+  const mail = await ph.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(); return { text: a.textContent.trim(), top: Math.round(r.top), bottom: Math.round(r.bottom) }; });
+  await ph.keyboard.press('Tab'); await ph.waitForTimeout(450);
   const pill = await ph.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(), cs = getComputedStyle(a); return { cls: a.className, top: Math.round(r.top), bottom: Math.round(r.bottom), opacity: +cs.opacity, vh: innerHeight }; });
   check(away && name.text === 'Leonardo Carvalho' && name.top >= 0, `narrow windows: the chrome's name comes back while it has focus (top ${name.top}px)`, JSON.stringify(name));
+  check(mail.text === 'Email' && mail.top >= 0, `narrow windows: so does its Email (top ${mail.top}px)`, JSON.stringify(mail));
   check(/at-end/.test(atEnd) && pill.cls === 'index-tab' && pill.opacity === 1 && pill.top >= 0 && pill.bottom <= pill.vh, `narrow windows: at the foot, the Index pill comes back while it has focus (opacity ${pill.opacity}, ${pill.top} to ${pill.bottom} of ${pill.vh})`, JSON.stringify({ atEnd, pill }));
   await ph.context().close();
 
@@ -653,6 +656,137 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
   await hp.context().close();
   /* and the files load without errors with the script off */
   for (const slug of FILES) { const fp = await open({ path: `files/${slug}/`, js: false }); await fp.context().close(); }
+}
+
+/* ---------- 7b. the decisions of 2026-10-05: Email in the chrome (T4), the class games left out (T6), the contact
+   sheet clean with its words inside their frame (T18), and the design toggles (toggles.js): the archive's Mac or its
+   cards (T17), the cover as a poster or a desk (T40), the contact sheet clean or as it was, and its words ---------- */
+{
+  const page = await open();
+  const mail = await page.evaluate(() => { const a = [...document.querySelectorAll('.chrome a')].find(x => /^mailto:/.test(x.getAttribute('href'))); return a && { text: a.textContent.trim(), href: a.getAttribute('href') }; });
+  check(mail && mail.text === 'Email' && mail.href === 'mailto:leonardo.dtc2009@gmail.com', 'T4: the chrome carries Email, so a way to write shows on every sheet', JSON.stringify(mail));
+  const games = await page.evaluate(() => ({ cards: [...document.querySelectorAll('.entries > .entry .entry__title')].map(e => e.textContent), mac: window.__v3mac ? window.__v3mac.files.length : 0, record: /Snake, Minesweeper/.test(document.getElementById('record').textContent), index: document.getElementById('file-archive').textContent }));
+  check(!games.cards.some(t => /snake|minesweeper/i.test(t)) && games.cards.length === 7 && games.mac === 7 && games.record && !/games/i.test(games.index), `T6: no class games in the archive (${games.cards.length} cards, ${games.mac} files on the Mac) or in its index card; The record keeps them as coursework`, JSON.stringify(games));
+  const def = await page.evaluate(() => ({ archive: document.documentElement.dataset.archive, cover: document.documentElement.dataset.cover, talk: document.documentElement.dataset.talk, words: document.documentElement.dataset.talkWords, api: typeof window.toggles, list: typeof window.toggles.list }));
+  check(def.archive === 'mac' && def.cover === 'poster' && def.talk === 'clean' && def.words === 'lets-talk' && def.api === 'object' && def.list === 'function', `the toggles' defaults show on <html>: archive ${def.archive}, cover ${def.cover}, talk ${def.talk}, words ${def.words}`, JSON.stringify(def));
+  // the archive: the Mac by default; the wall of cards from the console, kept across a reload; reset returns the Mac
+  const view = () => page.evaluate(() => { const vis = e => !!e && e.checkVisibility(); return { mac: vis(document.querySelector('.mac')), cards: [...document.querySelectorAll('.entries > .entry')].filter(vis).length }; });
+  const v0 = await view();
+  await page.evaluate(() => { window.toggles.archive = 'cards'; });
+  await page.waitForTimeout(300);
+  const v1 = await view();
+  await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(1200);
+  const v2 = await view(), kept = await page.evaluate(() => localStorage.getItem('v3:toggles'));
+  check(v0.mac && v0.cards === 0 && !v1.mac && v1.cards === 7 && !v2.mac && v2.cards === 7 && /"archive":"cards"/.test(kept), `T17: the Mac by default; toggles.archive = 'cards' shows the wall of cards instead, kept in this browser across a reload`, JSON.stringify({ v0, v1, v2, kept }));
+  // Find with the cards goes to the card itself, not to a window on the Mac
+  await page.evaluate(() => { document.querySelector('[data-index-open]').click(); });
+  await page.waitForTimeout(400);
+  await page.fill('.find input', 'Rocketry'); await page.keyboard.press('Enter');   /* (on the archive's card alone) */
+  await page.waitForTimeout(1600);
+  const found = await page.evaluate(() => ({ card: !!document.querySelector('.entries > .entry.is-found'), files: window.__v3mac.windows.filter(w => !/finder|trash/.test(w.className)).length }));
+  check(found.card && found.files === 0, 'T17: with the cards, Find lights the card itself (no file opens on the hidden Mac)', JSON.stringify(found));
+  const warned = [];
+  page.on('console', m => { if (m.type() === 'warning') warned.push(m.text()); });
+  await page.evaluate(() => { window.toggles.archive = 'drawer'; document.documentElement.setAttribute('data-cover', 'table'); });
+  await page.waitForTimeout(300);
+  const bad = await page.evaluate(() => ({ archive: window.toggles.archive, cover: document.documentElement.dataset.cover }));
+  check(bad.archive === 'cards' && bad.cover === 'poster' && warned.length === 2, `a value a toggle does not take is refused, with a note of what it takes (${warned.length} notes)`, JSON.stringify({ bad, warned }));
+  await page.evaluate(() => window.toggles.reset());
+  const reset = await page.evaluate(() => ({ archive: document.documentElement.dataset.archive, kept: localStorage.getItem('v3:toggles') }));
+  check(reset.archive === 'mac' && reset.kept === null && (await view()).mac, 'toggles.reset() brings the Mac back and forgets every toggle', JSON.stringify(reset));
+  await page.context().close();
+}
+{
+  // T18: the contact sheet, clean: no stickers, tape or torn end; its words inside the drawn frame, every letter at
+  // least 4px from the line, at every size and in each wording; and the collage, as it was, with its frame now clear
+  // of the letters too
+  const out = [];
+  const inside = async (p) => {
+    // the letters' ink, from a picture of the words with the frame and anything taped over them hidden
+    await p.evaluate(() => document.querySelectorAll('.talk__frame, #contact .sticker, #contact .talk__word > .tape').forEach(e => { e.style.visibility = 'hidden'; }));
+    await p.waitForTimeout(100);
+    const wb = await p.evaluate(() => { const r = document.querySelector('.talk__word').getBoundingClientRect(); return { x: Math.max(0, Math.floor(r.left - 60)), y: Math.max(0, Math.floor(r.top - 60)), w: Math.ceil(r.width + 120), h: Math.ceil(r.height + 120) }; });
+    const png = await p.screenshot({ clip: { x: wb.x, y: wb.y, width: wb.w, height: wb.h } });
+    await p.evaluate(() => document.querySelectorAll('.talk__frame, #contact .sticker, #contact .talk__word > .tape').forEach(e => { e.style.visibility = ''; }));
+    return p.evaluate(async ([b64, wb]) => {
+      const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
+      const c = new OffscreenCanvas(img.width, img.height), g = c.getContext('2d'); g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, img.width, img.height).data, k = img.width / wb.w;
+      let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+      for (let y = 0; y < img.height; y++) for (let x = 0; x < img.width; x++) { const i = (y * img.width + x) * 4, r = d[i], gg = d[i + 1], bb = d[i + 2]; if ((r > 200 && gg > 200 && bb > 200) || (r > 170 && gg < 100 && bb < 100)) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } }
+      const ink = { left: wb.x + x0 / k, right: wb.x + (x1 + 1) / k, top: wb.y + y0 / k, bottom: wb.y + (y1 + 1) / k };
+      // the drawn line's inner edge: its points on screen, the innermost of each side
+      const path = [...document.querySelectorAll('.talk__frame path')].find(x => x.checkVisibility());
+      const ctm = path.getScreenCTM(), L = path.getTotalLength(), pts = [];
+      for (let i = 0; i <= 800; i++) { const q = path.getPointAtLength(L * i / 800); pts.push([ctm.a * q.x + ctm.c * q.y + ctm.e, ctm.b * q.x + ctm.d * q.y + ctm.f]); }
+      const xs = pts.map(q => q[0]), ys = pts.map(q => q[1]), X0 = Math.min(...xs), X1 = Math.max(...xs), Y0 = Math.min(...ys), Y1 = Math.max(...ys), W = X1 - X0, H = Y1 - Y0;
+      const mid = (q, a) => a === 'x' ? q[1] > Y0 + H * .1 && q[1] < Y1 - H * .1 : q[0] > X0 + W * .08 && q[0] < X1 - W * .08;
+      const inner = { left: Math.max(...pts.filter(q => q[0] < X0 + W * .25 && mid(q, 'x')).map(q => q[0])), right: Math.min(...pts.filter(q => q[0] > X1 - W * .25 && mid(q, 'x')).map(q => q[0])), top: Math.max(...pts.filter(q => q[1] < Y0 + H * .25 && mid(q, 'y')).map(q => q[1])), bottom: Math.min(...pts.filter(q => q[1] > Y1 - H * .25 && mid(q, 'y')).map(q => q[1])) };
+      const half = parseFloat(getComputedStyle(path).strokeWidth) / 2;
+      const stickers = [...document.querySelectorAll('#contact .sticker, #contact .talk__word > .tape, #contact .talk__foot .tear')].filter(e => e.checkVisibility()).length;
+      return { gap: Math.round((Math.min(ink.left - inner.left, inner.right - ink.right, ink.top - inner.top, inner.bottom - ink.bottom) - half) * 10) / 10, stickers, fs: Math.round(parseFloat(getComputedStyle(document.querySelector('.talk__word')).fontSize)) };
+    }, [png.toString('base64'), wb]);
+  };
+  for (const [w, h] of [[1440, 900], [1280, 720], [1024, 768], [768, 1024], [390, 844], [320, 640]]) {
+    for (const words of ['lets-talk', 'get-in-touch', 'say-hello']) {
+      const p = await open({ width: w, height: h, touch: w < 900, path: `?toggles=talkWords:${words}#contact` });
+      await p.evaluate(() => document.getElementById('contact').scrollIntoView({ behavior: 'instant' }));
+      await p.waitForTimeout(1800);
+      const m = await inside(p);
+      if (!(m.gap >= 4 && m.stickers === 0)) out.push(`${w}x${h} ${words}: ${JSON.stringify(m)}`);
+      await p.context().close();
+    }
+    const c = await open({ width: w, height: h, touch: w < 900, path: '?toggles=talk:collage#contact' });
+    await c.evaluate(() => document.getElementById('contact').scrollIntoView({ behavior: 'instant' }));
+    await c.waitForTimeout(1800);
+    const m = await inside(c);
+    if (!(m.gap >= 4)) out.push(`${w}x${h} collage: ${JSON.stringify(m)}`);
+    await c.context().close();
+  }
+  check(out.length === 0, 'T18: the contact sheet is clean (no stickers, tape or torn end) and its words sit inside their frame, 4px or more from the line, at six sizes and in all three wordings; the collage\'s frame clears its letters too', out);
+}
+{
+  // T40: the cover as a desk. Six objects, each a link to its project file, on screen, clear of the name's letters,
+  // of each other, the tag, the rail and the hint (the code panel's link lies under the name, as the panel does);
+  // on phones a grid of three under the name; pointing at one picks it up; a click opens its file
+  const out = [];
+  for (const [w, h] of [[1440, 900], [1280, 720], [1280, 800], [1536, 864], [1920, 1080], [1024, 768], [768, 1024], [390, 844], [320, 640]]) {
+    const p = await open({ width: w, height: h, touch: w < 900, path: '?toggles=cover:desk' });
+    await p.waitForTimeout(900);
+    const m = await p.evaluate(() => {
+      const box = e => { const r = e.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; };
+      const meet = (a, b, pad = 0) => a.l < b.r + pad && b.l < a.r + pad && a.t < b.b + pad && b.t < a.b + pad;
+      const items = [...document.querySelectorAll('.desk__item')].map(li => { const a = li.querySelector('a'), parts = [...a.children].filter(c => c.checkVisibility()).map(box); return { name: li.className.match(/--(\w+)/)[1], href: a.getAttribute('href'), parts, all: box(a), label: parseFloat(getComputedStyle(li.querySelector('.desk__label')).fontSize) }; });
+      const rg = document.createRange(), letters = [];
+      for (const w of document.querySelectorAll('.cover__title > .name .w')) { rg.selectNodeContents(w); for (const r of rg.getClientRects()) letters.push({ l: r.left, t: r.top + r.height * .12, r: r.right, b: r.bottom - r.height * .1 }); }
+      const others = ['.cover__foot .tag', '.rail', '.cover__hint', '.cover__hand'].map(s => document.querySelector(s)).filter(e => e && e.checkVisibility()).map(box);
+      const vw = innerWidth, vh = innerHeight, bad = [];
+      for (const it of items) {
+        if (it.all.l < 0 || it.all.r > vw || it.all.t < 0 || (vw >= 900 && it.all.b > vh)) bad.push(`${it.name} off screen`);
+        if (it.name !== 'research' && it.parts.some(p => letters.some(L => meet(p, L)))) bad.push(`${it.name} on the name`);
+        if (it.parts.some(p => others.some(o => meet(p, o, 2)))) bad.push(`${it.name} on the tag, rail, hint or hand line`);
+        for (const o of items) if (o !== it && it.name < o.name && it.parts.some(p => o.parts.some(q => meet(p, q)))) bad.push(`${it.name} on ${o.name}`);
+        if (it.label < 16) bad.push(`${it.name}'s label at ${it.label}px`);
+      }
+      return { n: items.length, hrefs: items.map(i => i.href).sort().join(' '), bad, mask: document.querySelector('.cover .sticker--mask').checkVisibility(), wide: document.documentElement.scrollWidth - innerWidth };
+    });
+    if (m.n !== 6 || m.hrefs !== 'files/aducanumab/ files/genuvalens/ files/hockey/ files/loquar/ files/ocapex/ files/resume/' || m.bad.length || m.mask || m.wide > 0) out.push(`${w}x${h}: ${JSON.stringify(m)}`);
+    await p.context().close();
+  }
+  check(out.length === 0, 'T40: the desk lays six objects, each a link to its file, clear of the name, each other, the tag, the rail and the hint, from 1920x1080 to a 320px phone (labels 16px or more, no sideways scroll)', out);
+  const p = await open({ path: '?toggles=cover:desk' });
+  await p.waitForTimeout(900);
+  const mid = () => p.evaluate(() => { const r = document.querySelector('.desk__item--hockey .desk__obj').getBoundingClientRect(); return (r.top + r.bottom) / 2; });
+  const before = await mid();
+  await p.hover('.desk__item--hockey a'); await p.waitForTimeout(600);
+  const lifted = await mid();
+  await p.click('.desk__item--hockey a');
+  await p.waitForURL(/files\/hockey\/$/, { timeout: 5000 }).catch(() => {});
+  check(lifted < before - 4 && /files\/hockey\/$/.test(p.url()), `T40: pointing at the mask picks it up (${Math.round(before - lifted)}px) and a click opens the hockey file`);
+  await p.context().close();
+  const poster = await open();
+  check(await poster.evaluate(() => !document.querySelector('.desk').checkVisibility() && document.querySelector('.cover .sticker--mask').checkVisibility()), 'T40: the poster (the default) shows no desk');
+  await poster.context().close();
 }
 
 /* ---------- 8. console ---------- */

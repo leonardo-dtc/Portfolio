@@ -179,7 +179,7 @@ html.gl .glass::after { display: none; }
 .hero { position: fixed; inset: 0; z-index: 6; display: none; pointer-events: none; --hero-fs: min(8.2vw, 24svh, 160px); }
 html.is-hello .hero, html.is-entering .hero { display: block; }
 /* the name's box: the button, and (without the room) the copies of the name that draw its light, set exactly as it is */
-.hero__name, .hero__neon i, .hero__neon b, .hero__neon::after { position: absolute; left: 50%; top: 45%; translate: -50% -50%; margin: 0; padding: .05em .12em; font: 780 var(--hero-fs)/1 var(--font-name); letter-spacing: -.03em; white-space: nowrap; text-align: center; }
+.hero__name, .hero__neon i, .hero__neon b, .hero__neon::after { position: absolute; left: 50%; top: var(--name-y, 45%); translate: -50% -50%; margin: 0; padding: .05em .12em; font: 780 var(--hero-fs)/1 var(--font-name); letter-spacing: -.03em; white-space: nowrap; text-align: center; }
 .hero__name { border: 0; border-radius: .2em; background: none; color: #fff; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
 .hero__name:focus-visible { outline: 2px solid #fff; outline-offset: 12px; box-shadow: 0 0 0 14px rgba(255, 255, 255, .08); border-radius: .2em; }
 .hero__w { white-space: nowrap; }
@@ -217,7 +217,7 @@ html:not(.gl) .hero {
   --face: rgba(4, 2, 14, .7); --face-a: 40%; --face-b: 36%; --face-glow: 0%; --edge-glow: transparent;
 }
 html:not(.gl) .hero::after { content: ""; position: absolute; z-index: -3; inset: 0; background: var(--stage); pointer-events: none; }
-html:not(.gl) .hero::before { content: ""; position: absolute; z-index: -2; left: 50%; top: 45%; width: min(100vw, calc(var(--hero-fs) * 11.6)); height: calc(var(--hero-fs) * var(--pool-h)); translate: -50% -50%; background: var(--pool); opacity: 0; transition: opacity .9s var(--ease-out); }
+html:not(.gl) .hero::before { content: ""; position: absolute; z-index: -2; left: 50%; top: var(--name-y, 45%); width: min(100vw, calc(var(--hero-fs) * 11.6)); height: calc(var(--hero-fs) * var(--pool-h)); translate: -50% -50%; background: var(--pool); opacity: 0; transition: opacity .9s var(--ease-out); }
 html:not(.gl) .hero__neon { display: block; }
 /* the shade: by day the room falls to the style's deep colour right round the letters (by night there is none: the
    stage is the ground) */
@@ -274,6 +274,22 @@ html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-
   html[data-appearance="day"]:not(.gl) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); }
 }
 @media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); } }
+/* the glass look without the room (T41, a design toggle): the name as it was before the neon, in CSS glass with a
+   glow in the colour style, over the room's still with no stage; by day a deeper glass in the style's colour. Solid
+   under reduced transparency, as the neon is */
+html[data-hero-name="glass"]:not(.gl) .hero { --stage: transparent; --pool: none; }
+html[data-hero-name="glass"]:not(.gl) .hero__neon, html[data-hero-name="glass"]:not(.gl) .hero__name::after { display: none; }
+html[data-hero-name="glass"]:not(.gl) .hero__text {
+  background: linear-gradient(172deg, rgba(255, 255, 255, .97) 18%, rgba(206, 220, 255, .72) 52%, rgba(255, 255, 255, .9) 88%);
+  -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em color-mix(in srgb, var(--style, #3866ff) 72%, transparent)) drop-shadow(0 0 .3em color-mix(in srgb, var(--style, #3866ff) 72%, transparent));
+}
+html[data-hero-name="glass"][data-appearance="day"]:not(.gl) .hero__text { background-image: linear-gradient(172deg, color-mix(in srgb, var(--style, #3866ff) 86%, #fff) 18%, color-mix(in srgb, var(--style, #3866ff) 78%, #000) 55%, color-mix(in srgb, var(--style, #3866ff) 86%, #fff) 88%); }
+@media (prefers-color-scheme: light) { html[data-hero-name="glass"]:not(.gl):not([data-appearance="night"]) .hero__text { background-image: linear-gradient(172deg, color-mix(in srgb, var(--style, #3866ff) 86%, #fff) 18%, color-mix(in srgb, var(--style, #3866ff) 78%, #000) 55%, color-mix(in srgb, var(--style, #3866ff) 86%, #fff) 88%); } }
+@media (prefers-reduced-transparency: reduce) {
+  html[data-hero-name="glass"]:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; filter: none; }
+  html[data-hero-name="glass"][data-appearance="day"]:not(.gl) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); }
+}
 @media (max-width: 699px) {
   .hero { --hero-fs: min(18vw, 15svh, 120px); }
   .hero__name, .hero__neon i, .hero__neon b, .hero__neon::after { line-height: .98; }
@@ -294,6 +310,128 @@ html[data-appearance="day"] .hero__hint { color: #fff; text-shadow: 0 0 12px rgb
 html.is-entering .hero .hero__hint { opacity: 0; transition: opacity .12s; }
 html.is-entering .hero__name, html.is-entering .hero__hint span { pointer-events: none; }
 html:not(.gl).is-entering .hero { opacity: 0; transition: opacity .25s ease; }
+
+/* ---------- under the name: one line of who I am, and the apps (T27, T34, T39) ----------
+   The line and the apps sit under the name as one group, which hero.js centres a little above the middle (it sets
+   --name-y, the name's centre, and --below-y, the group's top, from what is shown). Which of them show, and how the
+   apps look, are design toggles (toggles.js): data-hero-content (name, line, apps, both) and data-launcher (icons,
+   library, widgets, desktop). The apps are real links: each glides into its page (hero.js); Write to me opens mail.
+   Every app carries its name, never a count. They take the colour style (--style, --glass-css: hue.js) with white
+   glyphs, so they change with the color control like the rest of the room. */
+.hero__below { position: absolute; left: 0; right: 0; top: var(--below-y, 64%); width: min(100% - 32px, 1040px); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: clamp(22px, 3.4svh, 34px); pointer-events: none; opacity: 0; transition: opacity .6s var(--ease-out) .3s; }
+.hero.is-ready .hero__below { opacity: 1; }
+html.is-entering .hero__below { opacity: 0; transition: opacity .16s; }
+html[data-hero-content="name"] .hero__below, html[data-hero-content="apps"] .hero__line, html[data-hero-content="line"] .apps { display: none; }
+.hero__line { margin: 0; max-width: 46ch; color: #fff; font: 600 clamp(16px, 1.3vw, 20px)/1.35 var(--font); letter-spacing: .005em; text-align: center; text-wrap: balance; text-shadow: 0 0 18px rgba(4, 8, 36, .6), 0 0 4px rgba(4, 8, 36, .45); }
+.apps { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 26px; pointer-events: auto; }
+.app { --tint: color-mix(in srgb, var(--style, #3d6bff) 42%, rgba(8, 12, 44, .5)); position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 92px; color: #fff; font: 600 14px/1.25 var(--font); text-align: center; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.app__art { position: relative; display: grid; place-items: center; width: 72px; height: 72px; border: 1px solid rgba(255, 255, 255, .36); border-radius: 50%; background: linear-gradient(180deg, rgba(255, 255, 255, .24), rgba(255, 255, 255, .05) 62%), var(--tint); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 10px 30px rgba(4, 8, 40, .35); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); transition: scale .45s var(--ease-out), box-shadow .45s var(--ease-out), translate .45s var(--ease-out), opacity .3s; }
+.app .icon { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.app__name { text-shadow: 0 1px 10px rgba(4, 8, 36, .6), 0 0 3px rgba(4, 8, 36, .4); white-space: nowrap; }
+.app__more { display: none; }
+.app:hover .app__art { scale: 1.06; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 0 0 1px rgba(255, 255, 255, .22), 0 14px 34px rgba(4, 8, 40, .42), 0 0 28px color-mix(in srgb, var(--style, #3d6bff) 45%, transparent); }
+.app:active .app__art { scale: .96; transition-duration: .1s; }
+.app:focus-visible { outline: none; }
+.app:focus-visible .app__art { outline: 2px solid #fff; outline-offset: 4px; }
+/* choosing one: it swells a little and fades as its window comes in; the line and the other apps fade at once */
+html.is-launching .hero__below { opacity: 1; }
+html.is-launching .hero__line { opacity: 0; transition: opacity .15s; }
+html.is-launching .app { pointer-events: none; }
+html.is-launching .app:not(.is-chosen) { opacity: 0; transition: opacity .15s; }
+html.is-launching .app.is-chosen .app__art { scale: 1.16; opacity: 0; transition: scale .5s var(--ease-out), opacity .4s ease .1s; }
+html.is-launching .app.is-chosen .app__name, html.is-launching .app.is-chosen .app__more { opacity: 0; transition: opacity .2s; }
+
+/* the library (T39 a): tall covers on a shelf, each with its glyph and its name set large, lifting toward you */
+html[data-launcher="library"] .apps { flex-wrap: nowrap; gap: clamp(12px, 1.4vw, 20px); }
+html[data-launcher="library"] .app { width: clamp(104px, 9.6vw, 146px); gap: 0; }
+html[data-launcher="library"] .app__art { width: 100%; height: auto; aspect-ratio: 2 / 3; border-radius: 12px; place-items: start; padding: 14%; overflow: hidden;
+  background: linear-gradient(200deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 46%), linear-gradient(165deg, color-mix(in srgb, var(--style, #3d6bff) var(--hi, 88%), #fff), color-mix(in srgb, var(--style, #3d6bff) 70%, #050816) 70%);
+  border-color: rgba(255, 255, 255, .28); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 16px 34px rgba(2, 4, 24, .5); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-launcher="library"] .app .icon { width: 46%; height: auto; stroke-width: 1.5; opacity: .92; }
+html[data-launcher="library"] .app__name { position: absolute; left: 11%; right: 9%; bottom: 9%; font: 800 clamp(17px, 1.5vw, 23px)/.96 var(--font-name); letter-spacing: -.02em; text-align: left; white-space: normal; text-shadow: 0 1px 12px rgba(2, 4, 24, .55); }
+html[data-launcher="library"] .app[data-app="work"] { --hi: 96%; }
+html[data-launcher="library"] .app[data-app="hockey"] { --hi: 80%; }
+html[data-launcher="library"] .app[data-app="about"] { --hi: 90%; }
+html[data-launcher="library"] .app[data-app="resume"] { --hi: 76%; }
+html[data-launcher="library"] .app[data-app="write"] { --hi: 84%; }
+html[data-launcher="library"] .app:hover .app__art { scale: 1; translate: 0 -8px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 0 0 2px rgba(255, 255, 255, .55), 0 24px 44px rgba(2, 4, 24, .55), 0 0 36px color-mix(in srgb, var(--style, #3d6bff) 55%, transparent); }
+html[data-launcher="library"] .app:hover .app__name { translate: 0 -8px; }
+html[data-launcher="library"] .app__name { transition: translate .45s var(--ease-out); }
+html[data-launcher="library"] .app:focus-visible .app__art { outline-offset: 5px; border-radius: 12px; }
+
+/* widgets (T39 b): a dashboard of glass tiles, each with a glimpse of its page: Work's pictures, the hockey line, my
+   photo, a page of the résumé, the address to write to */
+html[data-launcher="widgets"] .apps { display: grid; grid-template-columns: repeat(4, var(--wd)); grid-auto-rows: var(--wd); gap: 14px; --wd: clamp(128px, 10.4vw, 156px); }
+html[data-launcher="widgets"] .app { width: auto; height: 100%; display: grid; grid-template: "art" auto "more" 1fr "name" auto / minmax(0, 1fr); align-items: start; justify-items: start; gap: 8px; padding: 14px 15px 13px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 26px; background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .02)), color-mix(in srgb, var(--style, #3d6bff) 26%, rgba(6, 9, 34, .74)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 14px 36px rgba(2, 4, 24, .4); -webkit-backdrop-filter: blur(22px) saturate(1.4); backdrop-filter: blur(22px) saturate(1.4); text-align: left; overflow: hidden; transition: scale .45s var(--ease-out), box-shadow .45s var(--ease-out), opacity .3s; }
+html[data-launcher="widgets"] .app:is([data-app="work"], [data-app="hockey"], [data-app="write"]) { grid-column: span 2; }
+html[data-launcher="widgets"] .app__art { grid-area: art; width: 34px; height: 34px; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--style, #3d6bff) 70%, #fff 6%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-launcher="widgets"] .app .icon { width: 19px; height: 19px; stroke-width: 2; }
+html[data-launcher="widgets"] .app__name { grid-area: name; font: 650 15px/1.2 var(--font); text-shadow: none; }
+html[data-launcher="widgets"] .app__more { grid-area: more; display: block; align-self: stretch; justify-self: stretch; min-height: 0; color: var(--ink-2); font: 500 13px/1.35 var(--font); }
+html[data-launcher="widgets"] .app__shots { display: flex; gap: 6px; }
+html[data-launcher="widgets"] .app__shots img { flex: 1; min-width: 0; height: 100%; max-height: 64px; border-radius: 9px; object-fit: cover; }
+html[data-launcher="widgets"] .app__photo { grid-area: auto; position: absolute; inset: 0; z-index: -1; }   /* (a grid area would be its box) */
+html[data-launcher="widgets"] .app__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+html[data-launcher="widgets"] .app__photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4, 6, 26, .1) 30%, rgba(4, 6, 26, .78)); }
+html[data-launcher="widgets"] .app[data-app="about"] { isolation: isolate; }
+html[data-launcher="widgets"] .app[data-app="about"] .app__art { background: rgba(255, 255, 255, .2); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+html[data-launcher="widgets"] .app__page { position: relative; display: grid; align-content: start; gap: 5px; width: 74%; height: calc(100% + 8px); margin-bottom: -8px; padding: 9px 10px; border-radius: 6px 6px 0 0; background: rgba(255, 255, 255, .92); box-shadow: 0 6px 18px rgba(2, 4, 24, .3); overflow: hidden; }
+html[data-launcher="widgets"] .app__page i { display: block; height: 4px; border-radius: 2px; background: rgba(12, 18, 60, .28); }
+html[data-launcher="widgets"] .app__page i:first-child { width: 58%; height: 6px; background: rgba(12, 18, 60, .62); }
+html[data-launcher="widgets"] .app__page i:nth-child(3) { width: 84%; } html[data-launcher="widgets"] .app__page i:nth-child(5) { width: 70%; }
+html[data-launcher="widgets"] .app[data-app="resume"] .app__more { justify-self: end; }
+html[data-launcher="widgets"] .app__line { align-self: end; color: var(--ink-2); overflow-wrap: anywhere; }
+html[data-launcher="widgets"] .app[data-app="write"] .app__line { color: #fff; font-size: 14px; }
+html[data-launcher="widgets"] .app:hover { scale: 1.03; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 0 0 1px rgba(255, 255, 255, .3), 0 18px 40px rgba(2, 4, 24, .48); }
+html[data-launcher="widgets"] .app:hover .app__art { scale: 1; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4); }
+html[data-launcher="widgets"] .app:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+html[data-launcher="widgets"] .app:focus-visible .app__art { outline: none; }
+html[data-launcher="widgets"].is-launching .app.is-chosen { scale: 1.06; opacity: 0; transition: scale .5s var(--ease-out), opacity .4s ease .1s; }
+
+/* a desktop (T39 c, after myOS): folders, a document and a mail icon down the right edge, as a Mac lays them out;
+   one click opens, as on the web */
+html[data-launcher="desktop"] .apps { position: fixed; top: calc(22px + env(safe-area-inset-top)); right: calc(22px + env(safe-area-inset-right)); display: flex; flex-flow: column wrap-reverse; align-content: flex-start; gap: 6px 10px; max-height: calc(100svh - 150px); }
+html[data-launcher="desktop"] .app { width: 96px; gap: 5px; padding: 6px 4px 7px; border-radius: 10px; font: 600 13px/1.2 var(--font); }
+html[data-launcher="desktop"] .app__art { width: 64px; height: 56px; border: 0; border-radius: 8px; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-launcher="desktop"] .app__name { padding: 1px 6px 2px; border-radius: 5px; }
+html[data-launcher="desktop"] .app:is([data-app="work"], [data-app="hockey"], [data-app="about"]) .app__art::before,
+html[data-launcher="desktop"] .app:is([data-app="work"], [data-app="hockey"], [data-app="about"]) .app__art::after { content: ""; position: absolute; z-index: -1; border-radius: 7px; }
+html[data-launcher="desktop"] .app:is([data-app="work"], [data-app="hockey"], [data-app="about"]) .app__art::before { left: 2px; top: 2px; width: 26px; height: 12px; border-radius: 5px 5px 0 0; background: color-mix(in srgb, var(--style, #3d6bff) 82%, #fff); }
+html[data-launcher="desktop"] .app:is([data-app="work"], [data-app="hockey"], [data-app="about"]) .app__art::after { left: 2px; right: 2px; top: 8px; bottom: 2px; background: linear-gradient(180deg, color-mix(in srgb, var(--style, #3d6bff) 70%, #fff), var(--style, #3d6bff)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 4px 10px rgba(2, 4, 24, .35); }
+html[data-launcher="desktop"] .app:is([data-app="work"], [data-app="hockey"], [data-app="about"]) .icon { width: 26px; height: 26px; margin-top: 8px; stroke: color-mix(in srgb, var(--style, #3d6bff) 45%, #061040); stroke-width: 2; opacity: .75; }
+html[data-launcher="desktop"] .app[data-app="resume"] .app__art::before { content: ""; position: absolute; z-index: -1; left: 13px; right: 13px; top: 1px; bottom: 1px; background: linear-gradient(225deg, transparent 9px, #fff 9px); border-radius: 3px; box-shadow: 0 4px 10px rgba(2, 4, 24, .35); }
+html[data-launcher="desktop"] .app[data-app="resume"] .icon { width: 26px; height: 26px; stroke: rgba(12, 18, 60, .55); stroke-width: 1.6; }
+html[data-launcher="desktop"] .app[data-app="write"] .app__art::before { content: ""; position: absolute; z-index: -1; left: 4px; right: 4px; top: 0; bottom: 0; border-radius: 13px; background: linear-gradient(180deg, color-mix(in srgb, var(--style, #3d6bff) 55%, #fff), color-mix(in srgb, var(--style, #3d6bff) 90%, #061040)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 4px 10px rgba(2, 4, 24, .35); }
+html[data-launcher="desktop"] .app:hover .app__art { scale: 1; }
+html[data-launcher="desktop"] .app:hover { background: rgba(255, 255, 255, .14); }
+html[data-launcher="desktop"] .app:focus-visible { outline: none; }
+html[data-launcher="desktop"] .app:focus-visible .app__art { outline: none; }
+html[data-launcher="desktop"] .app:focus-visible .app__name { background: color-mix(in srgb, var(--style, #3d6bff) 80%, #000); outline: 2px solid #fff; outline-offset: 1px; text-shadow: none; }
+
+/* phones: the icons two rows of three, the covers and widgets smaller, the desktop across the top */
+@media (max-width: 699px) {
+  .apps { gap: 14px 22px; max-width: 340px; }
+  .app { width: 86px; gap: 8px; font-size: 13px; }
+  .app__art { width: 60px; height: 60px; }
+  .app .icon { width: 26px; height: 26px; }
+  html[data-launcher="library"] .apps { flex-wrap: wrap; max-width: 360px; gap: 10px; }
+  html[data-launcher="library"] .app { width: calc((100% - 20px) / 3); }
+  html[data-launcher="library"] .app__name { font-size: 16px; }
+  html[data-launcher="widgets"] .apps { --wd: 92px; grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 340px); max-width: none; gap: 10px; }
+  html[data-launcher="widgets"] .apps { grid-auto-rows: minmax(var(--wd), auto); }
+  html[data-launcher="widgets"] .app:is([data-app="hockey"], [data-app="write"]) { grid-column: auto; }
+  html[data-launcher="widgets"] .app[data-app="resume"] .app__more, html[data-launcher="widgets"] .app[data-app="write"] .app__line { display: none; }
+  html[data-launcher="widgets"] .app { padding: 11px 12px; border-radius: 22px; gap: 6px; }
+  html[data-launcher="widgets"] .app__art { width: 30px; height: 30px; }
+  html[data-launcher="widgets"] .app__shots img { height: 52px; max-height: none; }
+  html[data-launcher="widgets"] .app[data-app="hockey"] .app__line { display: none; }
+  html[data-launcher="desktop"] .apps { top: calc(16px + env(safe-area-inset-top)); left: 8px; right: 8px; max-width: none; flex-flow: row nowrap; justify-content: center; gap: 0; max-height: none; }
+  html[data-launcher="desktop"] .app { width: 74px; font-size: 12px; }
+}
+html.is-entering .app, html.is-entering .apps { pointer-events: none; }
+@media (prefers-reduced-transparency: reduce) { .app__art, html[data-launcher="widgets"] .app { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in srgb, var(--style, #3d6bff) 40%, #0a0e30); } }
+@media (forced-colors: active) { .app__art, html[data-launcher="widgets"] .app { border: 1px solid CanvasText; background: Canvas; } .app .icon { stroke: CanvasText; } .hero__line, .app__name { text-shadow: none; } }
+
 html.is-hello .space > * { opacity: 0; pointer-events: none; }
 html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards; }
 @keyframes boot-cover { to { opacity: 1; } }
@@ -542,6 +680,8 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 .close:hover { background: var(--fill-3); }
 .close svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 .close + .win__head { padding-left: 84px; }
+/* Write to me in the header of Work and of every project sheet (T4), so a way to write shows from every view */
+.head__write { flex: none; margin-top: 2px; }
 .is-behind > * { filter: brightness(calc(1 - var(--back, 1) * .5)) saturate(calc(1 - var(--back, 1) * .2)); }   /* dimmed, never blurred: text stays sharp while it steps back */
 .win.is-behind > * { opacity: calc(1 - var(--back, 1) * 4); }   /* gone by a quarter of the way back; a sheet's text shows only beyond that point (windows.js setIn), so the two never overlap */
 .toolbar.is-behind, .grab.is-behind { opacity: calc(1 - var(--back, 1) * 2.5); }
@@ -646,6 +786,7 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .name__w { display: block; }
   .home-head .avatar { display: none; }
   .home-head { padding-top: 32px; }
+  .win__head:has(.head__write) { flex-wrap: wrap; row-gap: 12px; }   /* Write to me goes under the title */
 }
 @media (max-width: 599px) {
   .facts { grid-template-columns: minmax(0, 1fr); gap: 2px 0; }
@@ -758,6 +899,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   .hue__panel { scale: 1; }
   .hero__hint { transition-delay: 0s; }
   .card:active, .btn:active { scale: 1; }
+  .app .app__art, .app .app__name, html[data-launcher="widgets"] .app { scale: 1 !important; translate: none !important; }   /* the apps: no lift or swell */
 }
 
 /* ---------- forced colours ---------- */
@@ -772,7 +914,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
 @media print {
   html, body { background: #fff !important; }
   body { min-height: 0; font-size: 10pt; line-height: 1.38; }
-  .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue { display: none !important; }
+  .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue, .head__write { display: none !important; }
   .space, .win, .sheet, .side { position: static !important; inset: auto !important; transform: none !important; translate: none !important; width: auto !important; height: auto !important; max-height: none !important; overflow: visible !important; background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; margin: 0 0 14pt !important; opacity: 1 !important; filter: none !important; perspective: none !important; }   /* (no border: the CSS glass rim of a floating side window has no place on paper) */
   .sr-live { display: none; }   /* nothing to announce on paper, and its 1px box can reach past the page's foot */
   .space .print-contact { display: block !important; margin: 0 !important; white-space: nowrap; color: #000 !important; font-size: 10pt !important; }   /* the address a coach needs, where the avatar sits on screen: no added height */

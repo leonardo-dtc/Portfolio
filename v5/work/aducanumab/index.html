@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#0b1138">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../assets/css/site.css">
-<script>(function(d){d.classList.add('js');try{if(d.dataset.page==='home'&&!sessionStorage.getItem('v5:hello')&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting')})(document.documentElement)</script>
+<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting')})(document.documentElement)</script>
 <script type="module" src="../../assets/js/boot.js"></script>
 </head>
 <body>
@@ -30,6 +30,7 @@
     <a class="close" href="../" aria-label="Close" data-close><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></a>
     <header class="win__head">
       <div><h1 tabindex="-1">Aducanumab</h1><p class="sub">A comparative pharmacovigilance analysis of FDA adverse-event reports.</p></div>
+      <a class="btn head__write" href="mailto:leonardo.dtc2009@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v11H4zM4.5 7l7.5 6 7.5-6"/></svg>Write to me</a>
     </header>
     <div class="win__body" data-scroll tabindex="0">
       <p class="paper-title">Amyloid-related imaging abnormalities dominate aducanumab’s complete post-marketing record</p>

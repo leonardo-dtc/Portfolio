@@ -88,6 +88,8 @@ b { font-weight: 700; }
 .chrome { position: fixed; top: 0; left: 0; right: 0; height: var(--chrome); z-index: 100; display: flex; align-items: center; justify-content: space-between; padding-inline: var(--gutter); font-size: var(--small); letter-spacing: .12em; text-transform: uppercase; color: #fff; mix-blend-mode: difference; pointer-events: none; }
 .chrome a { pointer-events: auto; text-decoration: none; }
 .chrome a:focus-visible { outline-color: #fff; }
+/* the year, and a way to write from every sheet (T4) */
+.chrome__end { display: inline-flex; align-items: center; gap: clamp(1rem, 2.4vw, 2rem); }
 /* The rail: a dot per sheet, each on an invisible hit cell one row tall and 24 to 36px wide (the dots
    themselves are 8px), the current sheet's number and name running down beside them, and the folder
    button on top. The rows start at 50% - n/2 rows + 16px (so the rail, button included, is centred), the
@@ -527,6 +529,103 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
   .end__btn:hover .end__up { translate: 0 -2px; }
 }
 
+/* ---------- the cover as a desk (T40; a design toggle, data-cover="desk", toggles.js) ----------
+   The poster stays: the name, the hand line and the year. Around them, the objects on the desk open the project
+   files, each named in marker like the hand line's words: the code panel (Research, its link laid over it), the
+   mask (Hockey), a page of the résumé, a print of Loquar, the exoskeleton's sketch and the OCAPEX sticker. Pointing
+   at one picks it up (it lifts and straightens); its name's stroke darkens. On phones they sit in a grid of three under
+   the name. Hidden unless the toggle is on, and in print. */
+.desk { display: none; }
+html[data-cover="desk"] .desk { display: block; position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; pointer-events: none; }   /* (no stacking of its own: Research's link goes under the title, the rest over it) */
+html[data-cover="desk"] .cover .sticker--mask { display: none; }   /* the desk's own mask takes its place */
+.desk__item { position: absolute; z-index: 2; pointer-events: auto; }
+.desk__item a { position: relative; display: grid; justify-items: center; gap: .55rem; color: var(--white); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.desk__obj { display: block; width: 100%; height: auto; filter: drop-shadow(0 10px 16px rgba(0,0,0,.45)); transition: translate 380ms var(--ease-out), rotate 380ms var(--ease-out), filter 380ms var(--ease-out); }
+.desk__label { position: relative; font: 400 clamp(1rem, .7rem + .85vw, 1.5rem)/1 var(--hand); white-space: nowrap; text-shadow: 0 0 4px #151515, 0 0 10px #151515; }
+.desk__label::after { content: ""; position: absolute; left: -.06em; right: -.1em; bottom: -.12em; height: .3em; z-index: -1; pointer-events: none; opacity: .5; clip-path: inset(0 0 0 0); transition: clip-path 300ms var(--ease), opacity 300ms var(--ease); background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 9.5C34 6.8 61 8.6 92 7.1s68-2.6 105-.9' fill='none' stroke='%23EA3D2E' stroke-width='6.5' stroke-linecap='round'/%3E%3Cpath d='M9 11.4c40-1.9 92-3.3 182-2.6' fill='none' stroke='%23EA3D2E' stroke-width='3' stroke-linecap='round' opacity='.7'/%3E%3C/svg%3E") 0 100% / 100% 100% no-repeat; }
+.desk__item a:focus-visible { outline: 2px solid var(--red); outline-offset: 6px; border-radius: 4px; }
+@media (hover: hover) and (pointer: fine) {
+  .desk__item a:hover .desk__obj { translate: 0 -8px; rotate: calc(var(--rot, 0deg) * -.6); filter: drop-shadow(0 22px 26px rgba(0,0,0,.55)); }
+  .desk__item a:hover .desk__label::after { opacity: 1; }
+  html[data-cover="desk"] .cover__block:has(.desk__item--research a:hover) .cover__code { translate: 0 -8px; box-shadow: 0 30px 50px rgba(0,0,0,.6); border-color: #555; }
+}
+.js .cover__code.pop { transition-property: opacity, transform, translate, box-shadow, border-color; }
+/* the drawn objects: a page of the résumé, a print with its white border, a scrap of lined paper, a small window */
+.desk__paper { display: grid; align-content: start; gap: 7%; aspect-ratio: 8.5 / 11; padding: 12% 11%; background: var(--paper); color: var(--black); }
+.desk__paper b { font: 400 clamp(.75rem, .5rem + .7vw, 1.15rem)/1 var(--display); letter-spacing: .02em; text-transform: uppercase; }
+.desk__paper i { display: block; height: 3px; background: #c9c4c3; }
+.desk__paper i:nth-of-type(2n) { width: 82%; } .desk__paper i:nth-of-type(3n) { width: 64%; } .desk__paper i:first-of-type { height: 2px; background: var(--red); width: 40%; }
+.desk__print { padding: 6% 6% 18%; background: #f4f1ec; }
+.desk__print img, .desk__scrap img { display: block; width: 100%; height: auto; }
+.desk__scrap { padding: 3%; background: #fff; clip-path: polygon(0 2%, 9% 0, 26% 3%, 47% 0, 70% 2%, 92% 0, 100% 3%, 99% 52%, 100% 97%, 81% 100%, 58% 98%, 33% 100%, 12% 97%, 0 100%, 1% 48%); }
+.desk__win { display: grid; grid-template-rows: auto; gap: 8%; aspect-ratio: 4 / 5; padding: 0 0 14%; background: #151515; border: 1px solid #3a3a3a; }
+.desk__win span { display: none; }
+.desk__win::before { content: ""; height: 12%; background: #222 radial-gradient(circle at 9% 50%, var(--red) 0 3px, transparent 3.5px) no-repeat; }
+.desk__win i { display: block; height: 3px; margin-left: 12%; width: 62%; background: #8A8684; }
+.desk__win i:nth-of-type(2) { width: 44%; background: var(--red); } .desk__win i:nth-of-type(3) { margin-left: 20%; width: 50%; } .desk__win i:nth-of-type(4) { width: 70%; background: #bdb9b7; }
+/* wide screens: round the name, as if laid there, clear of its letters, the rail and the tag: three down the right
+   of the name, the sketch under the code panel, the sticker under the name; Research's link lies over the code panel
+   (the drawn window hidden) */
+@media (min-width: 900px) {
+  .desk__item--research { left: calc(-1 * clamp(40px, 4.5vw, 72px)); top: -8%; width: clamp(196px, 19vw, 290px); height: clamp(300px, 46vh, 420px); z-index: 0; --rot: -12deg; }   /* over the panel, under the title */
+  .desk__item--research a { height: 100%; align-content: end; padding-bottom: 14px; }
+  .desk__item--research .desk__win { display: none; }
+  .desk__item--research .desk__label { justify-self: start; margin-left: 16px; }
+  .desk__item--hockey { left: calc(100% + 10px); top: -18%; width: clamp(104px, 10vw, 170px); }
+  .desk__item--resume { left: calc(100% + 24px); top: 30%; width: clamp(80px, 6.4vw, 112px); }
+  .desk__item--loquar { left: calc(100% + 14px); top: 76%; width: clamp(112px, 9.6vw, 170px); }
+  .desk__item--exo { right: calc(100% + 4px); top: calc(-8% + clamp(300px, 46vh, 420px) + 48px); width: clamp(112px, 10vw, 170px); }   /* under the code panel */
+  .desk__item--ocapex { left: 20%; top: 102%; width: clamp(64px, 5.6vw, 96px); }
+}
+/* phones and tablets: the six in a grid of three under the name, the drawn window standing for the code panel */
+@media (max-width: 899px) {
+  html[data-cover="desk"] .cover__code { display: none; }
+  html[data-cover="desk"] .cover__block { width: 100%; }   /* (its max-content would count the pictures at full size) */
+  html[data-cover="desk"] .desk { position: relative; inset: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 1.6rem .9rem; width: min(100%, 360px); margin: 2.2rem auto 2.4rem; }
+  .desk__item { position: relative; }
+  .desk__item a { gap: .45rem; }
+  .desk__obj { width: min(100%, 92px); justify-self: center; }
+  .desk__item--hockey .desk__obj { width: min(100%, 78px); }
+  .desk__item--ocapex .desk__obj { width: min(100%, 70px); }
+  .desk__label { font-size: 1rem; }
+}
+@media print { .desk { display: none !important; } html[data-cover="desk"] .cover .sticker--mask { display: block; } }
+
+/* ---------- 12 Contact, clean (T18; the default of a design toggle, data-talk, toggles.js) ----------
+   Leonardo found the sheet "not great" and asked for it very clean, with the words inside their lines: the framed
+   words alone (a calmer hand-drawn frame, padded so the letters never touch it at any size), the address straight
+   on its slab with no tape, the profiles, and a plain end on the dark sheet with no torn paper. data-talk="collage"
+   shows the sheet as round three left it (with its frame now clear of the letters too). The words themselves are a
+   toggle (data-talk-words): LET'S TALK, GET IN TOUCH or SAY HELLO; --ww is each pair's width in em. */
+.talk__word { --ww: 1.9; }
+html[data-talk-words="get-in-touch"] .talk__word { --ww: 2.75; }
+html[data-talk-words="say-hello"] .talk__word { --ww: 2.4; }
+html:not([data-talk="collage"]) .talk__line--collage, html[data-talk="collage"] .talk__line--clean { display: none; }
+html:not([data-talk="collage"]) .talk__frame { left: -.2em; right: auto; top: -.36em; bottom: auto; width: calc(100% + .4em); height: calc(100% + .72em); }
+html:not([data-talk="collage"]) .talk__word { margin: .42em .26em; }
+html:not([data-talk="collage"]) .talk .sticker, html:not([data-talk="collage"]) .talk__word > .tape { display: none; }
+@media (min-width: 900px) {
+  html:not([data-talk="collage"]) .talk__top { justify-items: center; }
+  html:not([data-talk="collage"]) .talk__word { font-size: clamp(3rem, calc(78vw * 6 / 11 / (var(--ww) + .52)), 13rem); }
+}
+@media (min-width: 900px) and (min-height: 600px) {
+  html.js:not([data-talk="collage"]) .talk__word { font-size: clamp(3rem, min(calc(84cqw / (var(--ww) + .52)), calc(100cqh / 2.7)), 13rem); }
+  html.js[data-talk="collage"] .talk__word { font-size: clamp(3rem, min(calc(55cqw / var(--ww)), 36cqh), 13rem); }
+}
+@media (max-width: 899px) { html:not([data-talk="collage"]) .talk__word { font-size: clamp(3.4rem, calc(60vw / (var(--ww) + .52)), 13rem); } }
+/* the collage's old frame, its jitter reaching 14% into its box: wider, so it no longer cuts through the letters */
+html[data-talk="collage"] .talk__frame { left: -15%; right: auto; top: -26%; bottom: auto; width: 130%; height: 152%; }
+html[data-talk="collage"] .talk__word { margin-block: .32em; }
+html:not([data-talk="collage"]) .mail { rotate: none; box-shadow: 0 10px 26px rgba(0,0,0,.3); }
+html:not([data-talk="collage"]) .mail::before { display: none; }
+html:not([data-talk="collage"]) .talk__foot { background: transparent; color: var(--white); --fg: var(--white); --fg-2: var(--stage-2); --rule: #2E2E2E; }
+html:not([data-talk="collage"]) .talk__foot .tear { display: none; }
+html:not([data-talk="collage"]) .talk__foot .sheet__in { padding-top: clamp(.9rem, 2.2vh, 1.4rem); }
+html:not([data-talk="collage"]) .talk__foot .end { border-top: 1px solid #3a3a3a; padding-top: clamp(.9rem, 2.2vh, 1.4rem); }
+html:not([data-talk="collage"]) .end__btn { border-color: rgba(255,255,255,.85); color: var(--white); }
+html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
+@media (hover: hover) and (pointer: fine) { html:not([data-talk="collage"]) .end__btn:hover { background: var(--white); color: var(--black); } }
+
 /* ---------- Small parts shared by the project slides ---------- */
 .hl { display: block; }
 .title__sub { font-size: max(.4em, 1.5rem); line-height: 1; margin-top: .14em; letter-spacing: .01em; } /* never under 24px, so vermilion on paper stays large text */
@@ -656,6 +755,7 @@ html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
   html { scroll-behavior: auto !important; }
   .js .r, .js .pop, .js .bar { transform: none !important; transition: opacity 200ms ease; }
   .js .pop { transform: rotate(var(--rot, 0deg)) !important; }
+  .desk__obj, .cover__code { translate: none !important; rotate: none !important; } /* the desk: nothing is picked up */
   .js .hl__in { transform: none !important; transition: none; }
   .js .strip-wrap { clip-path: none !important; transition: none; }
   .js .draw { stroke-dashoffset: 0; transition: none; }

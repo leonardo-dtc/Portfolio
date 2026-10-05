@@ -1,7 +1,7 @@
 // The color style control (bottom right): palettes, a hue and vibrance to play with, and Night, Day or Auto.
 // It turns the whole room (and so every pane of glass) and gives the hero's name its neon (palette.js); the few pieces
-// of CSS glass follow through --glass-css, and the CSS hero's neon through --neon-*. The choice is kept in this browser
-// only.
+// of CSS glass follow through --glass-css, the hero's apps through --style, and the CSS hero's neon through --neon-*.
+// The choice is kept in this browser only.
 import { createSpring, tween } from './springs.js';
 import { PRESETS, turn, neonFor } from './palette.js';
 
@@ -56,6 +56,8 @@ export function initHue({ room }) {
     if (room) room.set({ color: [h * Math.PI / 180, k], day: d, neon: neon.list, arc: neon.arc });
     const base = d > .5 ? [.10, .16, .52] : [.16, .22, .77];
     html.style.setProperty('--glass-css', css(turn(base, h, k), d > .5 ? .5 : .34));
+    // the style's own colour, solid: the hero's apps are drawn in it (site.css, --style)
+    html.style.setProperty('--style', css(turn([.22, .40, 1], h, k)));
     // the hero's neon (its CSS version), the same colours as the shader's
     for (const [n, i, f = 1] of CSS_NEON) html.style.setProperty(`--neon-${n}`, css(neon.set[i].map(v => v * f)));
     button.querySelector('i').style.background = swatch(h, k);

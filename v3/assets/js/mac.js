@@ -379,7 +379,7 @@
      file's window opens once it has */
   d.addEventListener('v3:find', function (e) {
     var t = e.detail && e.detail.target, f = t && files.filter(function (x) { return x.li === t || x.li.contains(t); })[0];
-    if (!f) return;
+    if (!f || d.documentElement.getAttribute('data-archive') === 'cards') return;   /* the wall of cards: the card itself */
     e.detail.target = root; e.detail.handled = true;
     var tries = 0;
     (function wait() {

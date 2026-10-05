@@ -9,6 +9,8 @@ import { lut, turn, neonFor } from './palette.js';
 // down. The stage is near black, a breath of the room's violet.
 const TINTS = [[.16, .34, 1], [.24, .46, 1], [.15, .20, .90], [.10, .16, .40]];
 const STAGE = [.010, .009, .026];
+// the glass name's light behind it by night and by day, and its day glass (the hero's other look, T41), turned too
+const GLASS = [[.44, .58, 1], [.86, .93, 1], [.13, .27, .80]];
 
 export function createRoom(canvas) {
   const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' });
@@ -33,7 +35,7 @@ export function createRoom(canvas) {
   gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   const uniforms = (p, names) => Object.fromEntries(names.map(n => [n, gl.getUniformLocation(p, n)]));
   const us = uniforms(sceneP, ['uRes', 'uTime', 'uDay', 'uAspect', 'uShift', 'uLut', 'uTurn', 'uLutK']);
-  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uInk1', 'uInkL', 'uStage', 'uTint', 'uStageC', 'uNeon', 'uArc']);
+  const uc = uniforms(compP, ['uScene', 'uInk', 'uRes', 'uLod', 'uFrostLod', 'uTime', 'uDay', 'uLight', 'uCount', 'uInv', 'uBox', 'uState', 'uInk0', 'uInkX', 'uPointer', 'uInk1', 'uInkL', 'uStage', 'uTint', 'uStageC', 'uNeon', 'uArc', 'uInkMode', 'uGlassC']);
 
   const tex = gl.createTexture(), fbo = gl.createFramebuffer(), inkTex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, inkTex);
@@ -42,7 +44,7 @@ export function createRoom(canvas) {
   // (palette.js), made again whenever the style changes: 9 to a side while it is moving (a palette crossfading), 17 once
   // it rests (about 5 ms to make). Cobalt, the room as drawn, needs none.
   const lutTex = gl.createTexture();
-  const tone = { key: '', n: 0, at: -9, turned: false, tints: new Float32Array(TINTS.flat()), stage: new Float32Array(STAGE) };
+  const tone = { key: '', n: 0, at: -9, turned: false, tints: new Float32Array(TINTS.flat()), stage: new Float32Array(STAGE), glass: new Float32Array(GLASS.flat()) };
   table(0, 1, 2);                                            // until a style turns it: the identity, two to a side
   function toneFor([a, k]) {
     const deg = a * 180 / Math.PI, key = deg.toFixed(2) + ' ' + k.toFixed(4);
@@ -51,6 +53,7 @@ export function createRoom(canvas) {
       tone.key = key; tone.at = frames;
       tone.turned = Math.abs(deg) > .005 || Math.abs(k - 1) > 1e-4;
       tone.tints = new Float32Array(TINTS.flatMap(c => turn(c, deg, k))); tone.stage = new Float32Array(turn(STAGE, deg, k));
+      tone.glass = new Float32Array(GLASS.flatMap(c => turn(c, deg, k)));
       if (tone.turned) table(deg, k, moving ? 9 : 17);
     } else if (tone.turned && tone.n < 17 && frames - tone.at > 2) table(deg, k, 17);
   }
@@ -155,6 +158,7 @@ export function createRoom(canvas) {
     gl.uniform2f(uc.uPointer, st.pointer[0] * dpr, st.pointer[1] * dpr);
     gl.uniform3fv(uc.uTint, tone.tints); gl.uniform3fv(uc.uStageC, tone.stage);
     gl.uniform3fv(uc.uNeon, st.neon); gl.uniform2f(uc.uArc, st.arc[0], st.arc[1]);
+    gl.uniform1f(uc.uInkMode, st.ink && st.ink.mode ? 1 : 0); gl.uniform3fv(uc.uGlassC, tone.glass);
     const P = st.panels;
     gl.uniform1i(uc.uCount, P.count || 0);
     if (P.count) { gl.uniformMatrix3fv(uc.uInv, true, P.inv); gl.uniform4fv(uc.uBox, P.box); gl.uniform4fv(uc.uState, P.state); }

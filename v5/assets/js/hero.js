@@ -1,26 +1,37 @@
-// The hero: "Leonardo Carvalho" in Switzer, heavy and blocky, drawn by the room in neon light (after Apple's "It's
-// Glowtime"): a crisp tube of flowing colour locked to every letter's outline, three echoes tracing it again in their
-// own colours (pink, orange, cyan) a little inside and outside the edge, translucent faces in the tube's colours, and
-// a coloured bloom behind (the ink in shaders.js). By night the whole room gives way to a dark stage while the hero
-// shows, so the light blooms into near black; by day there is none. The echoes grow out of the outline as the light
-// arrives. The title is the control: click or tap it (or press Return) and the name glides into the main window's
-// title slot, the light going out as it turns white while the room's lights come up, and hands off to the HTML title,
-// which is plain text from then on (the effect stays out of the content layer). Without the room (no WebGL2, reduced
-// transparency, forced colours) the same name is HTML text with the neon approximated in CSS over its own dark stage
-// (solid under reduced transparency, plain in forced colours), and entering is a fade.
+// The hero: "Leonardo Carvalho" in Switzer, heavy and blocky, drawn by the room in one of two looks (a design toggle,
+// T41: data-hero-name on <html>, toggles.js). The neon (after Apple's "It's Glowtime"): a crisp tube of flowing colour
+// locked to every letter's outline, three echoes tracing it again in their own colours (pink, orange, cyan) a little
+// inside and outside the edge, translucent faces in the tube's colours, and a coloured bloom behind (the ink in
+// shaders.js); by night the whole room gives way to a dark stage while the hero shows, so the light blooms into near
+// black, and by day there is none; the echoes grow out of the outline as the light arrives. The glass (the launcher
+// mock's look): solid Liquid Glass letters in the lit room with a light behind them. Under the name, one line of who
+// I am and the apps (T27, T34: data-hero-content and data-launcher), placed by arrange().
+//
+// The title is the control: click or tap it, press Return, scroll, swipe up, or press Down, Page Down or Space (T26),
+// and the name glides into the main window's title slot, the light going out as it turns white while the room's
+// lights come up, and hands off to the HTML title, which is plain text from then on (the effect stays out of the
+// content layer). An app goes straight to its page instead: the page is put in the window behind the hero, unseen,
+// and the light goes out as its windows arrive, with the tab bubble already on its tab. Without the room (no WebGL2,
+// reduced transparency, forced colours) the same name is HTML text with either look approximated in CSS over its own
+// stage (solid under reduced transparency, plain in forced colours), and entering is a fade.
 //
 // Layouts are read from the page itself, glyph by glyph: the hero button and the window's title are real text set
 // by the stylesheet, so the mask is drawn exactly where (and as) the browser sets them, and the glide ends on the
 // title's own glyphs. The mask (red the letters, green a soft copy of them whose half level is the outline the neon
-// follows, blue a wide blur of them for the bloom and the day pool) is redrawn at screen resolution on every frame of
-// the glide.
+// follows and the glass's bevel, blue a wide blur of them for the bloom, the pool and the light behind) is redrawn
+// at screen resolution on every frame of the glide.
 import { createSpring, tween } from './springs.js';
 import { onFrame } from './frame.js';
 
 // the same stack as --font-name in site.css, so if Switzer cannot load, the canvas and the title fall back alike
 const FAMILY = '"Switzer", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, system-ui, sans-serif';
-const TUBE = .024, GLOW = .4;               // the outline's softness and the halo's, as fractions of the font size
-const DRIFT = .05;                          // how far the echoes stray from the outline, with their glow (font sizes)
+// each look's mask, as fractions of the font size: the outline's softness (the neon's tube, the glass's bevel), the
+// halo's, and the margin round the letters (the neon's echoes stray up to DRIFT from the outline, with their glow)
+const DRIFT = .05;
+const LOOKS = {
+  neon: { soft: .024, glow: .4, margin: (gs, soft, fs, withGlow) => (withGlow ? gs * 2.6 : soft * 4 + fs * DRIFT) },
+  glass: { soft: .035, glow: .3, margin: (gs, soft, fs, withGlow) => (withGlow ? gs * 2.8 : soft * 3) },
+};
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const wait = s => new Promise(r => setTimeout(r, s * 1000));
 
@@ -67,13 +78,17 @@ export function between(a, b, v) {
   return { size: s, weight: a.weight + (b.weight - a.weight) * v, glyphs };
 }
 
-export function createHero({ room, windows }) {
+export function createHero({ room, windows, go }) {
   const html = document.documentElement;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const hero = document.querySelector('.hero');
   const btn = hero && hero.querySelector('.hero__name'), hint = hero && hero.querySelector('.hero__hint');
+  const below = hero && hero.querySelector('.hero__below'), apps = hero && hero.querySelector('.apps');
   const space = document.querySelector('[data-space]');
   const glass = () => !!room && html.classList.contains('gl');
+  const look = () => (html.dataset.heroName === 'glass' ? 'glass' : 'neon');
+  // the neon stands on a dark stage by night; the glass stands in the lit room
+  const stageFor = () => (look() === 'neon' ? 1 : 0);
   let state = 'off', cleanup = () => {};
 
   const parts = () => ({
@@ -89,13 +104,16 @@ export function createHero({ room, windows }) {
   const ctx = document.createElement('canvas').getContext('2d');
   const canvas = document.createElement('canvas'), g = canvas.getContext('2d');
   const letters = document.createElement('canvas'), lg = letters.getContext('2d');
-  // on: how much shows; white: 0 is neon, 1 the white title; px: the outline's softness; fs: the font size; glow: the
-  // light (with hover and press); lean: the halo's lean toward the pointer; light: the hot spot (x, y, radius, strength)
-  const ink = { on: 0, dim: 0, white: 0, px: 3, fs: 100, glow: 0, lean: [0, 0], light: [0, 0, 1, 0], canvas, dirty: false, xform: [1, 0, 0] };
+  // on: how much shows; white: 0 is neon or glass, 1 the white title; px: the outline's softness; fs: the font size;
+  // glow: the light (with hover and press); lean: the halo's lean toward the pointer; light: the hot spot (x, y, radius,
+  // strength); mode: 0 the neon, 1 the glass
+  const ink = { on: 0, dim: 0, white: 0, px: 3, fs: 100, glow: 0, lean: [0, 0], light: [0, 0, 1, 0], canvas, dirty: false, xform: [1, 0, 0], mode: 0 };
   let drawnAt = 0;                                                         // the room's pixel ratio the mask was drawn for
   function draw(L, withGlow) {
-    const dpr = drawnAt = room.dpr, fs = L.size * dpr, bev = fs * TUBE, gs = fs * GLOW, b = bounds(L);
-    const m = Math.ceil((withGlow ? gs * 2.6 : bev * 4 + fs * DRIFT) + 4);
+    const K = LOOKS[look()];
+    ink.mode = look() === 'glass' ? 1 : 0;
+    const dpr = drawnAt = room.dpr, fs = L.size * dpr, bev = fs * K.soft, gs = fs * K.glow, b = bounds(L);
+    const m = Math.ceil(K.margin(gs, bev, fs, withGlow) + 4);
     const ox = Math.floor(b.x0 * dpr) - m, oy = Math.floor(b.y0 * dpr) - m;
     const cw = Math.ceil(b.x1 * dpr) + m - ox, ch = Math.ceil(b.y1 * dpr) + m - oy;
     for (const c of [canvas, letters]) if (c.width !== cw || c.height !== ch) { c.width = cw; c.height = ch; }
@@ -146,18 +164,34 @@ export function createHero({ room, windows }) {
     return Promise.race([Promise.all([document.fonts.load('780 100px "Switzer"'), document.fonts.load('700 40px "Switzer"')]).catch(() => {}), wait(2.5)]);
   }
 
+  // The name and what is under it (the line, the apps) as one group: the name's centre (--name-y) and the group's top
+  // (--below-y). The group centres a little below the middle (53%, as in the launcher mock), the name never lower than
+  // its own place (45%), all of it clear of the hint at the foot. With nothing under it the name keeps its place. Apps
+  // laid out along the screen's edge (the desktop) are not in the group.
+  function arrange() {
+    if (!hero || !btn) return;
+    const shown = below && getComputedStyle(below).display !== 'none' ? below.offsetHeight : 0;
+    if (!shown) { hero.style.removeProperty('--name-y'); hero.style.removeProperty('--below-y'); return; }
+    const vh = innerHeight, nameH = btn.offsetHeight, gap = clamp(vh * .045, 20, 46), total = nameH + gap + shown;
+    const top = Math.max(vh * .05, Math.min(vh * .53 - total / 2, vh * .45 - nameH / 2, vh - 96 - total));
+    hero.style.setProperty('--name-y', `${(top + nameH / 2).toFixed(1)}px`);
+    hero.style.setProperty('--below-y', `${(top + nameH + gap).toFixed(1)}px`);
+  }
+
   async function start() {
     if (!hero || !btn) { html.classList.remove('is-hello'); return; }
     state = 'hero';
     space.inert = true;
     windows.hideNow(all(parts()));
-    // the stage: by night the room gives way to near black at once, from the first frame it draws, before the light
-    // comes up on it (the page's own CSS keeps it dark until then); by day the shader leaves it out
-    if (glass()) { room.set({ defocus: 1, ink, stage: 1 }); ink.on = 0; ink.white = 0; }
+    // the stage: by night the neon's room gives way to near black at once, from the first frame it draws, before the
+    // light comes up on it (the page's own CSS keeps it dark until then); by day, and for the glass, the shader leaves
+    // it out
+    if (glass()) { room.set({ defocus: 1, ink, stage: stageFor() }); ink.on = 0; ink.white = 0; }
     listen();
     await fontsReady();
     if (state !== 'hero') return;
-    hero.classList.add('is-ready');                                       // the CSS name and the hint come up
+    arrange();
+    hero.classList.add('is-ready');                                       // the CSS name, the line, the apps and the hint come up
     if (!glass()) return;
     H = heroLayout();
     if (!H) return;
@@ -180,33 +214,81 @@ export function createHero({ room, windows }) {
   function listen() {
     const onClick = () => enter();
     const onKey = (e) => {
-      if (state !== 'hero' || e.key !== 'Enter' || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (state !== 'hero' || e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.target.closest && e.target.closest('.hue')) return;          // the color control is not part of the hero
-      e.preventDefault(); e.stopPropagation();
-      flare(); enter();
+      const on = e.target.closest && e.target.closest('.app');
+      // Return anywhere enters, except on an app, which it opens; Down, Page Down and Space enter too (T26)
+      if (e.key === 'Enter' && !on) { e.preventDefault(); e.stopPropagation(); flare(); enter(); }
+      else if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); enter(); }
     };
     const onSkip = (e) => { if (state === 'hero' && e.target.closest && e.target.closest('.skip')) { e.preventDefault(); enter(); } };
     const onEnterBtn = () => { glowS.target = 1.22; };
     const onLeaveBtn = () => { glowS.target = 1; };
     const onDown = () => flare();
-    const onResize = () => { if (state === 'hero' && glass()) { H = heroLayout(); if (H) draw(H, true); } };
+    const onResize = () => { if (state !== 'hero') return; arrange(); if (glass()) { H = heroLayout(); if (H) draw(H, true); } };
+    // scrolling down (a wheel, a trackpad) enters, once it adds up to a deliberate move rather than a stray nudge
+    let wheel = 0, wheelAt = 0;
+    const onWheel = (e) => {
+      if (state !== 'hero' || (e.target.closest && e.target.closest('.hue'))) return;
+      const now = performance.now();
+      if (now - wheelAt > 300) wheel = 0;
+      wheelAt = now;
+      wheel += e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      if (wheel > 40) enter();
+    };
+    // so does a swipe up, mostly upward, of 48 px or more (a tap on an app is a click, not a swipe)
+    let touch = null;
+    const onTouchStart = (e) => { touch = e.touches.length === 1 && !(e.target.closest && e.target.closest('.hue')) ? [e.touches[0].clientX, e.touches[0].clientY] : null; };
+    const onTouchMove = (e) => {
+      if (!touch || state !== 'hero') return;
+      const dx = e.touches[0].clientX - touch[0], dy = touch[1] - e.touches[0].clientY;
+      if (dy > 48 && dy > Math.abs(dx) * 1.2) { touch = null; enter(); }
+    };
+    // an app goes to its page (Write to me opens mail and the hero stays)
+    const onApp = (e) => {
+      const a = e.target.closest && e.target.closest('a.app');
+      if (!a || state !== 'hero' || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const url = new URL(a.href, location.href);
+      if (url.protocol === 'mailto:') return;
+      e.preventDefault();
+      launch(url, a);
+    };
+    // a design toggle changed while the hero shows (toggles.js): place the group again, and redraw the name
+    const onToggle = (e) => {
+      if (state !== 'hero' || !/^(heroName|heroContent|launcher)$/.test(e.detail.name)) return;
+      arrange();
+      if (!glass()) return;
+      room.set({ stage: stageFor() });
+      H = heroLayout();
+      if (H) draw(H, true);
+    };
     btn.addEventListener('click', onClick);
     if (hint) hint.addEventListener('click', onClick);
     btn.addEventListener('pointerenter', onEnterBtn);
     btn.addEventListener('pointerleave', onLeaveBtn);
     btn.addEventListener('pointerdown', onDown);
+    if (apps) apps.addEventListener('click', onApp);
     addEventListener('keydown', onKey, true);
     document.addEventListener('click', onSkip, true);
     addEventListener('resize', onResize);
+    addEventListener('wheel', onWheel, { passive: true });
+    addEventListener('touchstart', onTouchStart, { passive: true });
+    addEventListener('touchmove', onTouchMove, { passive: true });
+    document.addEventListener('v5:toggle', onToggle);
     cleanup = () => {
       btn.removeEventListener('click', onClick);
       if (hint) hint.removeEventListener('click', onClick);
       btn.removeEventListener('pointerenter', onEnterBtn);
       btn.removeEventListener('pointerleave', onLeaveBtn);
       btn.removeEventListener('pointerdown', onDown);
+      if (apps) apps.removeEventListener('click', onApp);
       removeEventListener('keydown', onKey, true);
       document.removeEventListener('click', onSkip, true);
       removeEventListener('resize', onResize);
+      removeEventListener('wheel', onWheel);
+      removeEventListener('touchstart', onTouchStart);
+      removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('v5:toggle', onToggle);
     };
   }
   // a press flares the light behind the letters briefly: a kick to a critically damped spring, which settles back
@@ -265,7 +347,7 @@ export function createHero({ room, windows }) {
         ink.on = shown;
         // the lights come up: the stage lifts on the term the neon goes out on, (1 - v)³, so the room's light rises
         // as the name glides and the window's glass forms in it
-        room.set({ stage: glowLeft * (1 - v) });
+        room.set({ stage: stageFor() * glowLeft * (1 - v) });
         if ((1 - v) * travel < .25 && Math.abs(glide.velocity) * travel < 2) {
           off();
           draw(T, false);
@@ -299,11 +381,31 @@ export function createHero({ room, windows }) {
     await Promise.all(arrivals);
   }
 
+  // ---------- an app ----------
+  // The page goes into the window behind the hero, unseen (its windows are still hidden, nav.js's quiet change), with
+  // the tab bubble on its tab; then the light goes out as its windows arrive, while the app swells and fades. If the
+  // page cannot be had in time, it loads as an ordinary page.
+  async function launch(url, a) {
+    if (state !== 'hero') return;
+    state = 'entering';
+    try { sessionStorage.setItem('v5:hello', '1'); } catch (e) { /* storage blocked: the hero plays again next time */ }
+    a.classList.add('is-chosen');
+    html.classList.add('is-entering', 'is-launching');
+    html.classList.remove('is-hello');
+    space.inert = false;
+    let moved = false;
+    try { moved = !!go && await Promise.race([go(url.href, { quiet: true }).then(() => true), wait(1.5).then(() => false)]); } catch (e) { moved = false; }
+    if (!moved) { location.assign(url.href); return; }
+    if (state !== 'entering') return;
+    if (room) tween(createSpring({ value: room.state.defocus, response: .6, damping: 1 }), 0, v => room.set({ defocus: Math.max(0, v) }));
+    await fade(parts(), { defocused: true });
+  }
+
   // reduced motion, or no room: the hero fades out and the windows fade in (150 ms crossfades under reduced motion).
   // With the room, its light comes up as the name's light goes out, over the same 150 ms (250 ms otherwise) in real
   // time, as the windows' CSS fades run; without it, the CSS hero fades with its stage
-  async function fade(p) {
-    if (room) room.set({ defocus: 0 });
+  async function fade(p, { defocused = false } = {}) {
+    if (room && !defocused) room.set({ defocus: 0 });                // (an app has its own pull of focus)
     let lights = null;
     if (room && glass()) {
       const T = reduced.matches ? .15 : .25, on = ink.on, stage = room.state.stage, t0 = performance.now();
@@ -336,8 +438,9 @@ export function createHero({ room, windows }) {
     if (title) title.style.opacity = '';
     if (p.main) [...p.main.children].forEach(k => { k.style.opacity = ''; });
     if (settle) all(p).forEach(el => windows.settle(el));
-    html.classList.remove('is-hello', 'is-entering');
+    html.classList.remove('is-hello', 'is-entering', 'is-launching');
     hero.classList.remove('is-ready');
+    hero.querySelectorAll('.app.is-chosen').forEach(a => a.classList.remove('is-chosen'));
   }
 
   // if the room goes away: during the hero the CSS name takes over by itself; while entering, finish at once
@@ -345,5 +448,5 @@ export function createHero({ room, windows }) {
     if (state === 'entering') finish(true);
   }
 
-  return { start, enter, abort, ink, get state() { return state; } };
+  return { start, enter, abort, arrange, ink, get state() { return state; } };
 }

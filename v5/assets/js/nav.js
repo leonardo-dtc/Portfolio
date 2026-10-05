@@ -70,11 +70,13 @@ export function initNav({ windows }) {
   }
   // A page change keeps every window where it is. The side window stays too (its glass and its corner probes), and
   // its contents crossfade with the main window's; inside the window (laptops and phones) it goes with the body.
-  async function swapPage(info) {
+  // A quiet change (an app on the hero, while every window is still hidden) swaps at once, with no motion: the hero
+  // brings the windows in itself.
+  async function swapPage(info, quiet) {
     const win = $main(), side = $side();
     const floating = !!side && !side.classList.contains('side--inline');
     const inner = el => [...el.children].filter(c => !c.matches('.probe'));
-    await fade([...win.children, ...(floating ? inner(side) : [])], OUT, T_OUT, 'cubic-bezier(.4, 0, 1, 1)');
+    if (!quiet) await fade([...win.children, ...(floating ? inner(side) : [])], OUT, T_OUT, 'cubic-bezier(.4, 0, 1, 1)');
     const fresh = copy(info.main.children);
     if (side && !floating) side.remove();                             // lifted out of the old body before it goes
     win.replaceChildren(...fresh);
@@ -88,24 +90,26 @@ export function initNav({ windows }) {
       side.scrollTop = 0;
       if (!floating) win.after(side);                                  // the layout puts it back inside the new body
     } else if (side) {
-      if (floating) windows.dematerialise([side], { from: 'side' }).then(() => side.remove());
+      if (quiet) side.remove();
+      else if (floating) windows.dematerialise([side], { from: 'side' }).then(() => side.remove());
     } else if (info.side) {
       const added = document.importNode(info.side, true);
       windows.hideNow([added]);
       win.after(added);
       windows.refresh();
-      windows.materialise([added]);
+      if (!quiet) windows.materialise([added]);
     }
     windows.refresh();
-    fade([...fresh, ...(floating ? freshSide : [])], IN, T_IN, 'cubic-bezier(.2, .8, .2, 1)').then(as => as.forEach(a => a.cancel()));
+    if (!quiet) fade([...fresh, ...(floating ? freshSide : [])], IN, T_IN, 'cubic-bezier(.2, .8, .2, 1)').then(as => as.forEach(a => a.cancel()));
   }
   // Every toolbar still on screen leaves (not only the first one found): one that is still fading out from an
   // earlier change is marked, so a quick second click never mistakes it for the current one and leaves two.
-  function swapBar(info) {
+  function swapBar(info, quiet) {
     const current = [...document.querySelectorAll('.space > .toolbar:not(.toolbar--sheet):not(.is-leaving)')];
     const fresh = info.bar ? document.importNode(info.bar, true) : null;
     if (fresh && current.length === 1 && current[0].className === fresh.className && current[0].innerHTML === fresh.innerHTML) return;
     for (const old of current) {
+      if (quiet) { old.remove(); continue; }
       old.classList.add('is-leaving');
       old.inert = true;
       windows.dematerialise([old], { from: 'ornament' }).then(() => old.remove());
@@ -113,19 +117,19 @@ export function initNav({ windows }) {
     if (fresh) {
       windows.hideNow([fresh]);
       space.insertBefore(fresh, document.querySelector('.space > .grab'));
-      windows.materialise([fresh], { delay: .14, from: 'ornament' });
+      if (!quiet) windows.materialise([fresh], { delay: .14, from: 'ornament' });
     }
   }
 
   // ---------- pages ----------
-  async function showPage(info, url, token) {
+  async function showPage(info, url, token, quiet) {
     if ($sheet()) await closeSheet();
     if (token !== seq) return false;                                   // a newer page change took over
     if (under === url.pathname) return false;                          // the page was already underneath
     under = url.pathname;
-    swapBar(info);
+    swapBar(info, quiet);
     windows.setTab(info.tab);
-    await swapPage(info);
+    await swapPage(info, quiet);
     return true;
   }
 
@@ -173,7 +177,7 @@ export function initNav({ windows }) {
   }
 
   // ---------- going somewhere ----------
-  async function go(href, { push = true } = {}) {
+  async function go(href, { push = true, quiet = false } = {}) {
     const url = new URL(href, location.href);
     const token = ++seq;
     pin();
@@ -197,7 +201,7 @@ export function initNav({ windows }) {
       shown = url.pathname;
       let moved = true;
       if (info.kind === 'sheet') await showSheet(info, token);
-      else moved = await showPage(info, url, token);
+      else moved = await showPage(info, url, token, quiet);
       if (token !== seq) return;
       finish(info, url, moved, !push);
     } catch (e) {
