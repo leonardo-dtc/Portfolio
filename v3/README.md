@@ -19,7 +19,7 @@ Then open `http://127.0.0.1:8778/v3/`.
 
 | Id | Sheet | Source of the copy |
 | --- | --- | --- |
-| `cover` | The name on two lines, sliced letter, torn red strip, goalie mask, a tilted code panel that types itself | |
+| `cover` | The name on two lines, sliced letter, torn red strip, goalie mask, a tilted code panel that types itself (or, by design toggle, a desk whose objects open the project files) | |
 | `about` | About me, cutout portrait on a red arch with text curved along it | `v2/about/` |
 | `skills` | Skills, tools, how I work (red panel) | `v2/resume/#technical`, `v2/about/` |
 | `research` | Drug safety: aducanumab pharmacovigilance, ARIA chart | `v2/work/aducanumab/` |
@@ -30,10 +30,47 @@ Then open `http://127.0.0.1:8778/v3/`.
 | `music` | Viola and violin, Carnegie Hall ticket, honors | `v2/resume/#music`, `#music-honors` |
 | `record` | Education, honors, service and leadership | `v2/resume/` |
 | `archive` | A personal archive on a classic Macintosh: each index card is a file on its desktop, opened in its own window and linked to the sheet that describes it | v4 and v5 experiments lists, `v2/resume/#projects`, `#robotics`, `#amora` |
-| `contact` | Let's talk: the framed poster, the email slab, the three profiles, the end strip | `v2/` footer, v4 and v5 contact sections |
+| `contact` | Let's talk, clean: the framed words, the email slab, the three profiles, a plain end | `v2/` footer, v4 and v5 contact sections |
 
 Every fact and caveat comes from the v2 pages and `CONTENT-REVIEW.md`. Copy is
 first person, no en or em dashes, no superlatives. Detail links open v3's own project files (below).
+
+## Design toggles
+
+The choices Leonardo left open on the decision page, or asked to try, are design
+toggles: data attributes on `<html>`, read by the stylesheets and the scripts,
+set before the first paint by the page's head script, and kept in that browser
+only (`localStorage`, `v3:toggles`), so visitors always see the defaults.
+`assets/js/toggles.js` holds them, and runs before `site.js` and `mac.js`.
+
+| Toggle | Question | Default | Choices |
+| --- | --- | --- | --- |
+| `archive` | T17 | `mac` | `mac` (the archive's Macintosh), `cards` (the wall of index cards) |
+| `cover` | T40 | `poster` | `poster`, `desk` (the cover's objects open the six project files) |
+| `talk` | T18 | `clean` | `clean` (the contact sheet, clean), `collage` (as round three left it: stickers, tape, the torn end) |
+| `talkWords` | T18 | `lets-talk` | `lets-talk`, `get-in-touch`, `say-hello` |
+
+- **In the console:**
+  - `toggles` shows their values, and `toggles.list()` what each is and its
+    choices, with a note on what the Mac would change;
+  - `toggles.cover = 'desk'`, `toggles.set('cover', 'desk')` or
+    `toggles.T40 = 'desk'` sets one;
+  - `toggles.reset()` forgets them all.
+- **In the address:** `?toggles=archive:cards,cover:desk`.
+- **In the Elements panel:** edit the attribute on `<html>`. A value a toggle
+  does not take goes back, with a note in the console.
+
+**If the Mac is picked (T17), the rest of the site does not have to change.**
+- It stays one object on one sheet, as the mask and the code panel are, and the
+  deck stays paper.
+- Its pixel face, Tiny5, stays inside its screen.
+- It adds no navigation: the index's Find opens its files.
+- Print, scripts off and forced colours show the cards.
+- Its cost is about 12 KB compressed and a 9 KB font, for this sheet only.
+
+What could tie it in further: a small Mac on the desk cover that opens the
+archive. What would not: the project files opening as Mac windows, or a menu bar
+for the deck. Either makes two systems for the same files.
 
 ## How the transitions work
 
@@ -215,16 +252,42 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
   24px vermilion years keep 3.59:1. Touch screens,
   print and pages without the script show every line. Four cards a row on desktop,
   one or two on phones; two columns in print.
-- **The contact sheet.** On desktop the framed LET'S TALK (crown, star, tape and
-  mask, all sized in `em` so the group scales as one) keeps the left column at
-  full size, sized by container query units to the room it has; the reply stands
-  beside it on the dark sheet: one large email action (the address in Anton on a
-  vermilion slab, taped down), the note, and the three profiles as named rows,
-  each marked as leaving the site. The torn paper strip below is the end: back to
-  the top, open the index, and the colophon. Phones read poster, reply, end. The
-  slab and the end buttons are lightly magnetic on fine pointers. The old
-  discipline marquee is retired: it was text moving on its own, and it crowded
-  the actions.
+- **The contact sheet, clean (T18, 2026-10-05).** Leonardo found it "not great"
+  and asked for it very clean, with the text inside its lines.
+  - **Left column:** the framed words alone, in a calmer hand-drawn frame,
+    centred and sized by container query units to the room it has. The frame's
+    line wanders 3% across and 7.5% down, and it is padded by 0.2 em at the
+    sides and 0.36 em above and below, so every letter stays 4 px or more from
+    the line at any size and in any wording (the old frame's jitter reached 14%
+    into its box and ran through the letters).
+  - **Beside it, on the dark sheet:**
+    - one large email action: the address in Anton on a vermilion slab, square
+      to the page;
+    - the note;
+    - the three profiles as named rows, each marked as leaving the site.
+  - **The end:** a hairline and outlined buttons on the dark sheet (back to the
+    top, open the index), and the colophon.
+  - **Phones** read words, reply, end. The slab and the end buttons are lightly
+    magnetic on fine pointers.
+  - **Two design toggles:** `talk = 'collage'` brings back round three's sheet,
+    with the crown, the star, the mask, the tape and the torn paper end (its
+    frame now wide enough to clear the letters too); `talkWords` sets LET'S
+    TALK, GET IN TOUCH or SAY HELLO.
+- **Email in the chrome (T4).** Beside the year, on every sheet. Narrow windows
+  bring the chrome back while it has focus.
+- **The desk (T40, a design toggle).** The poster stays: the name, the hand line
+  and the year. Around them, six objects open the six project files, each named
+  in marker like the hand line's words:
+  - the code panel (Research), its link laid over the panel itself;
+  - the mask (Hockey);
+  - a page of the résumé;
+  - a print of Loquar;
+  - the exoskeleton's lined-paper sketch;
+  - the OCAPEX sticker.
+
+  Pointing at one picks it up. Wide screens lay them round the name, clear of
+  its letters, the rail and the tag; phones and tablets set them in a grid of
+  three under the name, with a drawn window for the code panel.
 - **Small interactions.** Stickers and tape settle a beat after their sheet as it
   slides in (`translate`, composed with their rotate). Link underlines redraw on
   hover; quiet links thicken; on the profile rows the other two step back. A
@@ -244,6 +307,7 @@ first person, no en or em dashes, no superlatives. Detail links open v3's own pr
 | `files/<slug>/index.html` | The project files: `aducanumab`, `genuvalens`, `loquar`, `ocapex`, `hockey` (the coach one-pager) and `resume` |
 | `assets/css/files.css` | The files' own stylesheet: tokens and faces as in `site.css`, the desk, drawer, paper, sections, figures, the pager, the view transition, print and the hockey one-page print |
 | `assets/js/files.js` | The hockey file's print button, and eager figures before printing (the files work without it) |
+| `assets/js/toggles.js` | The design toggles for the developer tools (above): `window.toggles`, the address, the attribute on `<html>`, and the contact sheet's words |
 | `assets/js/mac.js`, `assets/css/mac.css` | The archive's Macintosh: the case, the one-bit screen, the menus, the windows and the files, built from the archive's cards |
 | `DESIGN.md` | The system as built: tokens, type roles, the stack, the cabinet, the hover grammar, the archive, phones, and how to add a sheet, a file or a card |
 | `../tests/v3/check.mjs` | Browser checks: structure and counts, no links into other editions (the deck, the six files and both stylesheets), the 12px floor (the files on screen and in print too), contrast at rest and while a card steps back, the cabinet and its hover intent, the routes, Find, the pill, the keyboard walk, touch targets, the hockey file on one Letter page, Back from a file, console errors with and without the script |
