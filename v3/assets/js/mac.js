@@ -184,8 +184,7 @@
   desk.appendChild(finder); desk.appendChild(trash);
   var boot = el('div', 'mac__boot', { 'aria-hidden': 'true' });
   boot.innerHTML = svg(badge(), 2) + '<span class="mac__bootbar"><i></i></span>';
-  desk.appendChild(boot);
-  screen.appendChild(menubar); screen.appendChild(desk);
+  screen.appendChild(menubar); screen.appendChild(desk); screen.appendChild(boot);
 
   list.parentNode.insertBefore(root, list);
   sheet.classList.add('has-mac');
@@ -241,8 +240,9 @@
     var k = open.filter(function (o) { return o._doc; }).length - 1, W = desk.clientWidth, H = desk.clientHeight;   /* the other files open */
     var ww = w.offsetWidth, wh = w.offsetHeight;
     var x = w === finder ? 14 : w === trash ? W - ww - 120 : 64 + k * 26, y = w === finder ? 12 : w === trash ? 40 : 30 + k * 22;
-    if (x + ww > W - 8) x = Math.max(8, W - ww - 8 - (k % 4) * 20);
-    if (y + wh > H - 8) y = Math.max(8, H - wh - 8 - (k % 4) * 16);
+    var step = Math.max(0, k) % 4;
+    if (x + ww > W - 8) x = Math.max(8, W - ww - 8 - step * 20);
+    if (y + wh > H - 8) y = Math.max(8, H - wh - 8 - step * 16);
     w.style.left = x + 'px'; w.style.top = y + 'px'; w._placed = true;
   }
   /* a file's window: the year and kind, the title, the card's line, then the rest of the card (its paragraphs and
@@ -260,7 +260,7 @@
       if (f.link) { var go = f.link.cloneNode(true); go.className = 'mac__go'; go.removeAttribute('tabindex'); body.appendChild(el('p', 'mac__goline', null, [go])); }
       w = docs[f.i] = win('doc', f.title, body);
       w.setAttribute('role', 'dialog'); w._doc = true; w._file = f;
-      desk.insertBefore(w, boot);
+      desk.appendChild(w);
       wireWin(w);
     }
     select(f.icon);
@@ -454,6 +454,16 @@
   function arrive() { if (started || !sheet.classList.contains('is-in')) return; started = true; start(false); }
   new MutationObserver(arrive).observe(sheet, { attributes: true, attributeFilter: ['class'] });
   if (reduce.matches) { started = true; start(false); } else arrive();
+  /* the keyboard can come in before the screen is on (Tab from the sheet before, or Shift+Tab from the one after): the
+     screen comes on at once, with the Archive window, and the focus stays where it landed */
+  function onNow() {
+    started = true; clearTimeout(timer);
+    if (screen.classList.contains('is-on')) return;
+    screen.className = 'mac__screen is-on';
+    if (finder.hidden) show(finder, null);
+    menuState();
+  }
+  root.addEventListener('focusin', onNow);
 
   /* Find (in the index) going to a card opens its file here instead: the deck still lands on the sheet, and the
      file's window opens once it has */
@@ -462,9 +472,11 @@
     if (!f || !root.getClientRects().length) return;   /* the wall of cards (or forced colours): the card itself */
     e.detail.target = root; e.detail.handled = true;
     var tries = 0;
+    /* the file opens once the deck has landed and the screen is on, so the Archive window coming on never covers it */
+    var waited = screen.classList.contains('is-on');
     (function wait() {
-      if (!started && tries++ < 20) { arrive(); setTimeout(wait, 100); return; }
-      setTimeout(function () { var w = openFile(f, false); w.classList.remove('is-found'); void w.offsetWidth; w.classList.add('is-found'); setTimeout(function () { w.classList.remove('is-found'); }, 2700); }, reduce.matches ? 0 : 450);
+      if (!screen.classList.contains('is-on') && tries++ < 40) { arrive(); setTimeout(wait, 100); return; }
+      setTimeout(function () { var w = openFile(f, false); w.classList.remove('is-found'); void w.offsetWidth; w.classList.add('is-found'); setTimeout(function () { w.classList.remove('is-found'); }, 2700); }, reduce.matches ? 0 : waited ? 450 : 220);
     })();
   });
   window.__v3mac = { files: files, open: openFile, shut: shut, view: setView, sort: setSort, zoom: zoomWin, start: start, get windows() { return open.slice(); } };

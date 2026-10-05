@@ -416,7 +416,10 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 3rem); margin-top: 1.25rem; }
 @media (min-width: 900px) { .cols { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .cols h3 { font: 400 clamp(1.5rem, 2.4vw, 2.25rem)/1 var(--display); text-transform: uppercase; padding-bottom: .5rem; border-bottom: 3px solid var(--red); }
+/* the record's three columns and the music sheet's lists at 14px, not 13 (a legibility pass, 2026-10-05: the densest
+   text on the deck), where the sheet still holds them */
 .cols ul { margin-top: .5rem; font-size: var(--small); line-height: 1.45; }
+@media (min-width: 900px) and (min-height: 700px) { .cols ul, .list { font-size: .875rem; line-height: 1.5; } }
 .cols li { padding: .45rem 0; border-top: 1px solid var(--rule); }
 .cols li:first-child { border-top: 0; }
 .cols li > b:first-child { display: block; }
@@ -630,8 +633,9 @@ html[data-cover="desk"] .cover .sticker--mask { display: none; }   /* the desk's
 /* phones and tablets: the six in a grid of three under the name, the drawn window standing for the code panel */
 @media (max-width: 899px) {
   html[data-cover="desk"] .cover__code { display: none; }
-  html[data-cover="desk"] .cover__block { width: 100%; }   /* (its max-content would count the pictures at full size) */
-  html[data-cover="desk"] .desk { position: relative; inset: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 1.6rem .9rem; width: min(100%, 360px); margin: 2.2rem auto 2.4rem; }
+  /* the grid takes no part in the block's width (contain: its pictures' full sizes would widen the block past the
+     name, and the year would leave the name's end), and stands centred under the name */
+  html[data-cover="desk"] .desk { contain: inline-size; justify-self: start; position: relative; inset: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 1.6rem .9rem; width: min(calc(100vw - 2 * var(--gutter)), 360px); margin: 2.2rem 0 2.4rem calc(50% - min(calc(50vw - var(--gutter)), 180px)); }   /* its own width, centred on the name's block (which it may be wider than) */
   .desk__item { position: relative; }
   .desk__item a { gap: .45rem; }
   .desk__obj { width: min(100%, 92px); justify-self: center; }
@@ -798,6 +802,9 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
   .out a { min-height: 44px; }
   .entry__link { display: inline-flex; align-items: flex-end; min-height: 44px; }
 }
+
+/* a sheet a long jump passes by shows at once as it rests, already read (site.js go()) */
+.slide.is-passing, .slide.is-passing *, .slide.is-passing *::before, .slide.is-passing *::after { transition: none !important; animation: none !important; }
 
 /* ---------- Reduced motion: keep the fades, drop the movement ---------- */
 @media (prefers-reduced-motion: reduce) {
@@ -997,7 +1004,7 @@ html:not(.js) .cabinet__shut { display: inline-flex; }
   html:is(.pill-away, .at-end) .index-tab:focus-visible { translate: none; opacity: 1; pointer-events: auto; }
 }
 /* windows under 540px tall: the pill names only the number ("Index · 09"), so it stays small at the edge */
-@media (max-height: 539px) { .index-tab__name { display: none; } }
+@media (max-height: 539px), (max-width: 359px) { .index-tab__name { display: none; } }   /* short or very narrow: the pill keeps the sheet's number, out of the reading column */
 @media screen and (max-width: 899px), screen and (max-height: 539px) { .js .slide .sheet__in { padding-bottom: calc(clamp(1.25rem, 4vh, 3rem) + 64px); } } /* not in print, where there is no pill */
 /* the cabinet as a bottom panel (phones, and windows under 540px tall): rows 44px tall, no rising files (a
    tap opens the sheet), the drawer front with Find and Close kept in reach */
@@ -1053,6 +1060,13 @@ html:not(.js) .cabinet__shut { display: inline-flex; }
   .mail { rotate: none; box-shadow: none; background: none !important; color: #000 !important; padding: 0; font-size: 16pt; }
   .end { border: 0; padding: 0; }
   .end .colophon { margin: 0; text-align: left; }
+  /* the research chart's bars print in their colours, as the files' charts do; the words print without their halo;
+     the tools print as outlined tiles; the clean contact sheet's words at the print size and its slab flat */
+  .bars, .bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .route, .desk__label { text-shadow: none !important; }
+  .tools span { background: none !important; color: #000 !important; box-shadow: inset 0 0 0 1px #000; }
+  html:not([data-talk="collage"]) .talk__word, html.js:not([data-talk="collage"]) .talk__word { font-size: 28pt !important; margin: 0 0 .5rem; }
+  html:not([data-talk="collage"]) .mail { box-shadow: none !important; }
 }
 
 /* files: view transition ----------------------------------------------------------------------------------

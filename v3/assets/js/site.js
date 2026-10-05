@@ -244,7 +244,8 @@
         'top_terms = ["ARIA-E", "ARIA-H", "headache",',
         '             "confusional state", "cerebral haemorrhage"]',
         'serious = {"aducanumab": 0.547, "lecanemab": 0.424, "donanemab": 0.516}',
-        'female  = binomtest(k=round(0.528 * 486), n=486, p=0.5)',
+        'known   = round(486 * (1 - 0.088))   # sex unspecified in 8.8% of cases',
+        'female  = binomtest(k=round(0.528 * known), n=known, p=0.5)',
         ''
       ]],
       ['genuvalens/controller.py', [
@@ -274,7 +275,7 @@
         '    for rep in range(5):',
         '        capacity = 0.50 + 0.05 * rep   # quadriceps symmetry, 50% to 70%',
         '        theta, omega, kp = 0.0, 0.0, KP_HOLD',
-        '        for t in np.arange(0.0, 2.0, 0.005):',
+        '        for t in np.arange(0.0, 2.0, 0.01):  # Euler, 0.01 s',
         '            p_rise = phase(theta, omega)',
         '            kp = gain(p_rise, kp)',
         '            assist = {',
@@ -562,7 +563,9 @@
   var corpus = null, found = [], foundAt = -1;
   var UNITS = '.tile, .timeline li, .stat-list > div, .numbers > div, .entry__meta';
   var LEAVES = 'h1, h2, h3, p, li, dt, dd, figcaption';
-  function fold(t) { t = t.toLowerCase(); return t.normalize ? t.normalize('NFD').replace(/[̀-ͯ]/g, '') : t; }
+  /* folding: lower case, accents aside, and the page's curly apostrophes and primes (’ ′ ″) read as the keyboard's, so
+     "let's" finds LET’S and 5'11 finds 5′11″ (one character for one, so a quote can still mark the words) */
+  function fold(t) { t = t.toLowerCase().replace(/[’‘′]/g, "'").replace(/[“”″]/g, '"'); return t.normalize ? t.normalize('NFD').replace(/[̀-ͯ]/g, '') : t; }
   function textOf(el) {
     var out = '';
     (function walk(n) {
@@ -588,11 +591,24 @@
       });
       units.concat(leaves).sort(function (a, b) { return a.compareDocumentPosition(b) & 4 ? -1 : 1; }).forEach(function (el) {
         if (el.closest('[aria-hidden="true"]')) return;
+        /* only what shows: not the desk while the cover is a poster, say. The archive's cards count while the Mac
+           stands in for them, as its files */
+        if (!el.getClientRects().length && !el.closest('.entries')) return;
         var t = textOf(el);
         if (t.length > 1) corpus.push({ i: i, el: el, text: t, key: fold(t) });
       });
+      var own = sheetTitle(i);
+      if (own && !corpus.some(function (e) { return e.i === i && e.key.indexOf(fold(own)) >= 0; })) corpus.push({ i: i, el: s, text: own, key: fold(own) });
     });
   }
+  /* the sheet's own title where a match has no place of its own to ring (a heading read only by screen readers) */
+  function visibleOf(el, i) {
+    if (el && el !== slides[i] && el.getClientRects().length && !el.closest('.sr-only')) return el;
+    var heads = slides[i].querySelectorAll('.title, .cover__title, .talk__word, h2, h3');
+    for (var k = 0; k < heads.length; k++) if (heads[k].getClientRects().length && !heads[k].closest('.sr-only')) return heads[k];
+    return slides[i];
+  }
+  d.addEventListener('v3:toggle', function () { corpus = null; });
   function esc(t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
   /* The project files are searched too. Their text is fetched once, on the first search (they are pages of their
      own, so it is a request each, from this site); each file says which sheet it belongs to by its link back. A
@@ -678,15 +694,16 @@
     var match = function (e) { return res.every(function (re) { re.lastIndex = 0; return re.test(e.key); }); };
     corpus.forEach(function (e) { if (match(e)) (bySheet[e.i] = bySheet[e.i] || []).push(e); });
     (fileCorpus || []).forEach(function (e) { if (match(e)) (inFiles[e.i] = inFiles[e.i] || []).push(e); });
-    /* the best match first: a sheet whose own name matches, then the sheet with more matching lines (its file's
-       counted with them), then the earlier sheet; Up and Down step through them in that order */
+    /* the best match first: a sheet whose own name matches, then the sheet with more matching lines of its own, then
+       the one whose file has more, then the earlier sheet (so a match on a sheet always comes before one only in a
+       file); Up and Down step through them in that order */
     Object.keys(bySheet).concat(Object.keys(inFiles)).map(Number).forEach(function (i) {
       if (found.some(function (r) { return r.i === i; })) return;
       var own = fold(sheetTitle(i) + ' ' + (names[i] || ''));
       found.push({ i: i, hits: bySheet[i] || [], fileHits: inFiles[i] || [], own: res.every(function (re) { return re.test(own); }) ? 1 : 0 });
     });
     var n = function (r) { return r.hits.length + r.fileHits.length; };
-    found.sort(function (a, b) { return (b.own - a.own) || (n(b) - n(a)) || (a.i - b.i); });
+    found.sort(function (a, b) { return (b.own - a.own) || (b.hits.length - a.hits.length) || (b.fileHits.length - a.fileHits.length) || (a.i - b.i); });
     cabinet.classList.add('is-finding');
     found.forEach(function (r) {
       var f = folders[folderOf[r.i]];
@@ -726,6 +743,7 @@
   function goFound(r, kb) {
     if (!r.hits.length && r.url) { closeCabinet(false); location.assign(r.url); return; }   /* found only in its file */
     var el = r.hits[0].el, target = el.closest('.entry, li, .tile, .card, .ticket') || el;
+    if (!target.closest('.entries')) target = visibleOf(target, r.i);
     /* an archive card found here is a file on the archive's Macintosh (mac.js): the Mac takes the landing and
        opens the file's window itself */
     var found = { target: target, handled: false };
@@ -805,6 +823,12 @@
         opener = b;
         openCabinet('pin', kb);
       });
+      /* the links among them act as buttons with the script (they say so to screen readers), so Space opens the
+         index too, as on a button, instead of scrolling the page */
+      if (b.tagName === 'A') {
+        b.setAttribute('role', 'button');
+        b.addEventListener('keydown', function (e) { if (e.key === ' ') { e.preventDefault(); b.click(); } });
+      }
     });
     d.querySelectorAll('[data-index-close]').forEach(function (b) {
       b.addEventListener('click', function (e) { closeCabinet(e.detail === 0 || within(d.activeElement)); });
@@ -1016,7 +1040,13 @@
     if (instant || reduce) { stopTween(); scrollNow(y); return; }
     if (tween && tweenTo === y) return;
     var from = window.pageYOffset || html.scrollTop;
-    if (Math.abs(y - from) > vh * 1.5) scrollNow(y > from ? Math.max(0, y - vh) : y + vh);
+    if (Math.abs(y - from) > vh * 1.5) {
+      /* a long jump cuts to the sheet beside the one it goes to, then slides the last step: the sheet it cuts to is
+         shown already read (its entrance is for arriving, and it is only passed), never blank or half revealed */
+      var by = slides[y > from ? i - 1 : i + 1];
+      if (by) { by.classList.add('is-passing', 'is-in'); setTimeout(function () { by.classList.remove('is-passing'); }, SLIDE_MS + 160); }
+      scrollNow(y > from ? Math.max(0, y - vh) : y + vh);
+    }
     slideTo(y);
   }
   d.addEventListener('click', function (e) {
@@ -1059,6 +1089,9 @@
     else if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
   });
 
+  /* before printing, pictures still waiting to load lazily are asked to load, so a deck printed before it was
+     scrolled through prints its pictures (the browser may still print before a slow one arrives) */
+  window.addEventListener('beforeprint', function () { d.querySelectorAll('img[loading="lazy"]').forEach(function (im) { im.loading = 'eager'; }); });
   window.addEventListener('scroll', function () { onScroll(); bars(); }, { passive: true });
   window.addEventListener('resize', measure);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', measure);

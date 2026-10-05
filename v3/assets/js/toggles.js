@@ -7,7 +7,7 @@
                       toggles.archive = 'cards'     or toggles.set('archive', 'cards'), or by its question:
                                                     toggles.T40 = 'desk'
                       toggles.reset()               every one back to its default (or toggles.reset('archive'))
-     In the address   ?toggles=archive:cards,cover:desk
+     In the address   ?toggles=archive:cards,cover:desk (for that visit only)
      In Elements      edit the data attribute on <html>
 
    It runs before site.js and mac.js (the scripts are deferred, in order), so they read the toggles as they start. */
@@ -54,21 +54,23 @@
     // the cards' folds and the Mac measure themselves on a resize
     if (!initial) window.dispatchEvent(new Event('resize'));
   }
-  function put(n, v) {
+  function put(n, v, keepIt) {
     var was = current(n);
     write(n, v);
-    var kept = stored();
-    if (v === TOGGLES[n].def) delete kept[n]; else kept[n] = v;
-    keep(kept);
+    if (keepIt !== false) {
+      var kept = stored();
+      if (v === TOGGLES[n].def) delete kept[n]; else kept[n] = v;
+      keep(kept);
+    }
     effect(n, v);
     if (v !== was) d.dispatchEvent(new CustomEvent('v3:toggle', { detail: { name: n, value: v, was: was } }));
   }
-  function set(n, v) {
+  function set(n, v, keepIt) {
     var k = nameOf(n);
     if (!k) { console.warn('toggles: no toggle "' + n + '". There are: ' + names.join(', ')); return; }
     var t = TOGGLES[k], val = valueOf(t, v);
     if (!val) { console.warn('toggles: ' + k + ' (' + t.q + ') takes ' + Object.keys(t.values).map(function (x) { return '"' + x + '"'; }).join(', ')); return; }
-    put(k, val);
+    put(k, val, keepIt);
     return val;
   }
   function list() {
@@ -86,7 +88,8 @@
   var kept = stored();
   names.forEach(function (k) { write(k, valueOf(TOGGLES[k], kept[k] || TOGGLES[k].def) || TOGGLES[k].def); });
   var asked = (location.search.match(/[?&]toggles=([^&]*)/) || [])[1];
-  if (asked) decodeURIComponent(asked).split(',').forEach(function (pair) { var p = pair.split(':'); if (p[0] && p[1]) set(p[0], p[1]); });
+  /* (for this visit only: a link with ?toggles= never changes what that browser shows next time) */
+  if (asked) decodeURIComponent(asked).split(',').forEach(function (pair) { var p = pair.split(':'); if (p[0] && p[1]) set(p[0], p[1], false); });
   effect('talkWords', current('talkWords'), true);
 
   // an attribute edited in the Elements panel counts as a change (a value it does not take goes back, with a note)

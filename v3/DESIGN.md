@@ -79,7 +79,6 @@ edge) clear of it: 11 to 15px at 1440px, 5px between the tab and the content at 
 | `--ease-out` | cubic-bezier(.23, 1, .32, 1) | reveals, the cabinet, files |
 | `--t-settle` | 800ms | an image settling, a card easing flat and lifting |
 | `--t-arrow` | 450ms | the badge growing in, its arrow turning, tape pressing |
-| `--t-open` | 500ms | an archive card unfolding |
 | `--t-reveal` / `--stagger` | 560ms / 60ms | text rising as a sheet arrives |
 | slide | 380ms, cubic-bezier(.3, 0, .2, 1) | the last sheet of a jump sliding over |
 
@@ -103,7 +102,10 @@ with a `#id` goes to that sheet, except a load from Back or Forward (`performanc
 ## The rail, the index tab and the cabinet
 
 **The rail** (`nav.rail`, difference-blended, z 100): the folder button, one dot per sheet, and the
-current sheet's number and name running down beside them. Each dot sits on a hit cell `--row` tall (24px,
+current sheet's number and name running down beside them. At 1880px wide and more every dot carries its
+sheet's name at rest instead (`::after` from `data-name`, 12px, white at 62% through the blend, about 6.5:1 on
+either colour; the current one white and bold), clear of every sheet by 54px or more; the names hide while
+the cabinet is open, whose folders say the same. Each dot sits on a hit cell `--row` tall (24px,
 28px on touch screens at desktop widths) and 24 to 36px wide. The rows start at
 `50% - var(--n) * var(--row) / 2 + 16px`, the line the cabinet's folders start on, so each dot is level
 with its folder.
@@ -149,13 +151,19 @@ drawer front. The current sheet's tab is vermilion with black text.
 **Find** (the drawer front's label holder): a white slip in a black frame held by two screws, "Find"
 printed on it, the reader's word written after it. `/` opens the cabinet at Find from anywhere but a
 field. It searches the page's own text sheet by sheet (tiles, timeline rows, table rows and figures as
-units, otherwise the innermost headings, paragraphs and list items), matching each typed word at the
-start of a word, accents aside. Matching folders keep their ink and carry a count; the others fade to the
+units, otherwise the innermost headings, paragraphs and list items), only what shows (the archive's cards
+count while the Mac stands in for them), plus each sheet's name; it matches each typed word at the start of
+a word, accents aside, curly apostrophes and primes read as straight ones. The six project files are
+searched too: fetched once on the first search, each file says its sheet by its link back. A sheet found
+only in its file quotes it after "In its file ·", and while the search lasts its folder links to the file at
+the words (a `#:~:text=` fragment) and its file reads "Open the file"; a match on a sheet always ranks before
+one only in a file. Matching folders keep their ink and carry a count; the others fade to the
 muted ink (still 5.4:1), except the current sheet's vermilion tab, which keeps black (the muted ink would
 be 1.6:1 on vermilion). The best match (a sheet whose own name matches, then more matching lines, then
 the earlier sheet) has its file out, quoting the matching line with the word marked in vermilion. Up and
 Down step through the matches, Enter goes to the one that is out and rings the line in vermilion for a
-moment (colour only), Escape clears the word, then closes. The drawer's label reads
+moment (colour only; a match with no place of its own to ring, such as a heading read only by screen
+readers, rings the sheet's title), Escape clears the word, then closes. The drawer's label reads
 "Found · 3 of 12"; a status line tells screen readers the same in words.
 
 ## The hover grammar (project cards)
@@ -236,55 +244,80 @@ and the torn paper end. Its old jittery frame now sits at 130% by 152% of the wo
 
 **The Mac, or the wall of cards, is a design toggle (T17); the Mac is the default.**
 
-**On screen, with the script: a classic Macintosh** (`assets/js/mac.js`, `assets/css/mac.css`). The case:
-platinum (`#EFEADF` to `#D9D2C1`), the screen set in a recess, a floppy slot and a vermilion badge on the chin,
-two strips of tape. It stands square; only the tape is askew. It is sized from the window's height on desktop
-(`min(860px, max(600px, 1.6 × (100svh − 460px) + 64px))`) so the sheet still stacks, and is the compact
-Mac on phones (the screen 7:10).
+**On screen, with the script: a Macintosh of the mid-nineties** (`assets/js/mac.js`, `assets/css/mac.css`;
+2026-10-05, after Leonardo found the one-bit System 1 screen too rudimentary). The case: platinum (`#EFEADF` to
+`#D9D2C1`), the screen set in a recess, a floppy slot and a vermilion badge on the chin, two strips of tape. It
+stands square; only the tape is askew. It is sized from the window's height on desktop (`min(900px,
+max(640px, 1.6 × (100svh − 450px) + 64px))`) so the sheet still stacks; a window under 600px tall keeps a 640px
+case and the sheet scrolls; phones and tablets have a taller screen (7:10.5, or 4:3.6 from 560px).
 
-The screen is one-bit on a two-pixel grid:
-- every line is 2px and every picture 32 dots at 2px;
-- the desk is the old 50% grey of alternate dots;
-- the face is Tiny5 at 16px (24px for a file's title), the sizes where it lands on that grid.
+The screen is Platinum in the poster's colours:
+- **Face** `#DEDEDE`; a raised edge is white along its top and left and `#9A9A9A` along its bottom and right (a
+  sunk one the other way round); windows have a 1px ink edge and a 3px shadow.
+- **Desk** the poster's black (`#211F1F`) under a 6px grid of faint dots.
+- **Chosen** deep vermilion `#B92B1C` with white letters (5.9:1): a file in the list, an open menu title, a
+  menu item under the pointer.
+- **Type** the site's Metropolis: menus and window titles 14px bold, the list 14px, headers and the window's
+  header 13px, a file's page 15px (its title 22px, its line 16px). Nothing is under 13px.
+- **Pictures** 32 dots, at 1px a dot in the list and 2px as icons, in ink, white, three greys and vermilion: a
+  page with its corner folded and a shadow, carrying an emblem chosen by the card's kind (music video, statistics,
+  arrangement, game design, robotics, rocketry, games; `data-icon` on the card names one; anything else is lines
+  of text), the drive and the Trash.
 
 What is on the screen:
-- **The menu bar:** the poster's star, File (Open, Close Window), View (by Icon, by Name) and Special
-  (Restart). Each title is a button that opens its list; arrows move through it and Escape closes it.
-- **The desk:** the Archive disk and the Trash down its right side.
-- **The Archive window:** one file for each card, its picture chosen by the card's kind (games, music
-  video, statistics, arrangement, game design, robotics, rocketry; `data-icon` on the card names one), its
-  title clamped to two lines (one row a file by Name).
-- **A file's window:** the year and kind, the title at 24px, the one line, and the card's link drawn as the
-  old default button.
+- **The menu bar:** the poster's star in vermilion, File (Open, Close Window), View (as Icons, as List; by Name,
+  by Kind, by Year, a tick on the current ones) and Special (Restart). Each title is a button that opens its
+  list; arrows move through it, Escape closes it, and with one open, pointing at another title opens that one.
+- **The desk:** the Archive disk and the Trash down its right side, their names on white labels.
+- **The Archive window:** a header with "7 items" and "Click a file to open it" ("Tap" on touch screens), the
+  columns' headings (Name, Kind, Year; the sorted one pressed in with a triangle for its direction), then a row a
+  file: its picture, name, kind and year, rows alternating white and `#F5F5F5`. Sorted by Year, newest first
+  ("Now" first, then "2026 to now"; ties keep the cards' order), which is the order the cards stand in. A
+  heading sorts by its column (names and kinds A to Z, years newest first); the same heading again turns it
+  round. Under 700px wide the kind column gives way to the names; under 520px the list has one column, each
+  file's kind and year under its name, and the headings become a row of buttons. View, as Icons lays the files
+  out as 64px pictures with their names under them, two lines at most.
+- **A file's window:** a page of plain type: the year and kind in 13px vermilion capitals, the title, the card's
+  line, then the card's paragraphs and details list (`.entry__more`, copied), and the card's link drawn as the
+  old default button (rounded, with a heavy ring). It scrolls inside the window.
 
 Windows:
-- The front window alone has the striped title bar.
+- The front window alone has the ruled title bar and its boxes; the others' titles are muted.
 - A window comes to the front when pressed. It drags by its title bar with a mouse or pen, its left edge and
   title bar staying on the screen; on a screen under 520px wide it takes the whole desk and stays put.
-- Opening draws four zooming outlines (180ms, inverting what is under them). Closing draws them back to the
-  file's icon, and the focus returns there.
+- The zoom box (or a double click on the title bar) fills the screen with the window and puts it back.
+- Opening draws four zooming outlines (180ms, dotted, inverting what is under them). Closing draws them back to
+  the file, and the focus returns there.
 
 Opening a file:
 - One click or Return opens it, as on a phone; the old Mac wanted two.
-- Arrow keys move between files, and while the focus is on the Mac they never change the sheet.
+- Up and Down move along the list (arrows across the grid as icons), Home and End jump, a name's first letters
+  go to it, and while the focus is on the Mac the arrows never change the sheet.
 
-The screen coming on, the first time the sheet arrives: the poster's star badge on the grey desk (600ms),
-then the menu bar and the Archive window zooming open from the disk. Special, Restart does it again.
+The screen coming on, the first time the sheet arrives: the poster's star badge on the desk with a bar filling
+under it (700ms; 800ms on Restart), then the menu bar and the Archive window zooming open from the disk. Until
+then the desk's black covers the screen, but its controls stay in the Tab order: focus coming in turns the
+screen on at once. Find going to a file opens it once the screen is on, in front.
 
 Reduced motion: no outlines and no coming on; the screen is on from the first frame.
 
-**Without the script, in print and in forced colours: the cards.** Index cards taped to the paper, four across on desktop. At rest a card shows its year (Anton, vermilion,
-24px), its kind (a black tag) and its title (the hand face). Pointing at a card, or tabbing to its link,
-unfolds its line and link (grid rows 0fr to 1fr, 500ms), straightens the card to 0 degrees and lifts it
-4px while its tape presses (800ms), and steps the other cards back by colour, with no blur: `#F3F1F1`
-paper, `--ink-2` titles (6.05:1), the kind tag on `--ink-2` (white 6.8:1), the 24px vermilion year at 3.59:1. The
-unfolding part hangs below the card's resting edge, over the gap, so the grid never moves; the card stays
-in front until it has folded again. A card the row has stretched (its title is shorter than its
-neighbours') unfolds from just under its own title (`--fold-top`), never below an empty band. A card near
-the foot of its sheet lifts as far as its line needs to
-stay on the sheet (`--rise`, measured by the script). Cards without a link always show their line. Touch
-screens, print and pages without the script show every line. The script wraps the line and the link
-(`.entry__fold`), so the authored card stays one `<li>`.
+**The wall of cards (with the script, by toggle), and the cards without the script, in print and in forced
+colours.** Index cards taped to the paper, four across on desktop. A card is one `<li class="entry">`: its year
+(Anton, vermilion, 24px), its kind (a black tag), its title (the hand face), its line, its file
+(`.entry__more`: paragraphs and a details list) and its link.
+- *With the script* (screen, colours not forced) a card shows its year, kind, title and line; the file and the
+  link are the card's file. The title is a button (`.entry__open`, its `::after` covering the card, so the whole
+  card answers), and its focus ring rings the card. Pointing at a card straightens it to 0 degrees and lifts it
+  4px while its tape presses (800ms), and steps the other cards back by colour, with no blur: `#F3F1F1` paper,
+  `--ink-2` titles (6.05:1), the kind tag on `--ink-2` (white 6.8:1), the 24px vermilion year at 3.59:1.
+- *The card's file* is a `<dialog>` over the deck: white paper up to 40rem wide and 84vh tall, a vermilion tab
+  standing on it with the year and kind (black on vermilion, 12px bold capitals), the title in the hand face
+  (up to 36px), the line at 17px, a vermilion rule, the paragraphs at the body size, the details as ruled rows
+  (their names in 12px capitals), the link, and Close in the top right corner, in view however far the file
+  scrolls. It rises 12px as it fades in (280ms) over a 72% black; Escape, Close or a press outside put it away,
+  and the focus goes back to the card. Keys stay with it while it is open (the deck's arrows wait), and the deck
+  behind does not scroll.
+- *Without the script, in print and in forced colours* every card shows its whole file under its line.
 
 ## Phones (below 900px, and windows under 540px tall)
 
@@ -309,24 +342,34 @@ Each sheet keeps 64px more space at its foot, so the pill never covers its last 
 
 - **No script.** Every sheet reads in order; the dots are plain anchors; the index tab and "portfolio" link
   to `#cabinet`, which shows the cabinet as the link's target (choosing a folder, or Close, which links to
-  `#shut`, hides it). Archive cards show every line; the hand line's strokes are faint until hovered.
+  `#shut`, hides it). Archive cards show their whole files; the hand line's strokes are faint until hovered.
 - **Reduced motion.** Fades stay, every transform goes: no recede, no reveals' travel, no slide (jumps are
-  instant), no settle, lift or turn on hover; the cabinet and files fade; archive cards open in place.
+  instant), no settle, lift or turn on hover; the cabinet and files fade; a card's file opens without rising.
 - **Print.** A plain document of 13 Letter pages (the phones' clearance for the pill stays off paper): chrome, rail, index tab, cabinet, badges, tape and the
-  frame are hidden; archive lines are shown; small vermilion text prints in `--red-ink`.
+  frame are hidden; archive cards print with their files; small vermilion text prints in `--red-ink`; the
+  research chart's bars print in their colours, the tools as outlined tiles, and the clean contact sheet's words
+  at 28pt. Before printing, pictures still waiting to load lazily are asked to load.
 
 ## Adding things
 
-**An archive card.** Copy one `<li class="entry">` in `#archive` and change its year, kind, title and line.
-The link is optional; for a sheet on this page write `<a class="entry__link" href="#record">Sheet 10, The
-record</a>` and the script rewrites the number and name from the sheet. Tilt, tape, the unfolding, the
-reveal order and Find all follow without other markup. The card is also a file on the Mac, with nothing
+**An archive card.** Copy one `<li class="entry">` in `#archive` (newest first) and change its year, kind,
+title and line, and its file: a paragraph or two in `<div class="entry__more">`, then the details list, one
+`<div><dt>Name</dt><dd>What</dd></div>` a row (rows that cannot be filled are left out; the whole file is
+optional). The link is optional; for a sheet on this page write `<a class="entry__link" href="#record">Sheet
+10, The record</a>` and the script rewrites the number and name from the sheet. Tilt, tape, the card's file,
+the reveal order and Find all follow without other markup. The card is also a file on the Mac, with nothing
 more to do: its kind picks its picture (games, music video, statistics, arrangement, game design, robotics,
 rocketry; anything else is a page of text), or add `data-icon="maze"` (games, film, chart, notes, maze,
 robot, rocket, text) to the `<li>` to choose one.
 
 **A file's wording.** Each folder's file is inside its link (`.folder__btn > .file`): edit its title,
 kicker and one line. Leave the "Sheet NN / N" line as it is; the script writes it.
+
+**A project file.** Copy the closest file's folder in `files/`, write its sections, add it to `FILES` in
+`tools/v3-files.mjs` and run `node tools/v3-files.mjs`: it writes the file's title, chrome, drawer, links back
+and pager from the deck, and every other file's drawer and pager. Add its `file-NN` view transition name to the
+lists in `files.css` and `site.css`. The unit test (`node --test tests/v3/unit/*.test.mjs`) fails if a file
+drifts from the deck.
 
 **A sheet.**
 

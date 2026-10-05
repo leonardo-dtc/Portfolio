@@ -835,6 +835,99 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
   await poster.context().close();
 }
 
+/* ---------- 7c. the bug audit of 2026-10-05: what it found, held ---------- */
+{
+  /* the Mac is in the Tab order before its screen comes on: Tab from the record's last link lands in it */
+  for (const [w, h] of [[1440, 900], [390, 844]]) {
+    const page = await open({ width: w, height: h, touch: w < 900 });
+    await page.evaluate(() => { const l = [...document.querySelectorAll('#record a')]; l[l.length - 1].focus(); });
+    await page.waitForTimeout(500); await page.keyboard.press('Tab'); await page.waitForTimeout(300);
+    const r = await page.evaluate(() => ({ mac: !!document.activeElement.closest('.mac'), on: document.querySelector('.mac__screen').classList.contains('is-on') }));
+    check(r.mac && r.on, `${w}x${h}: Tab from the record goes into the Mac, which comes on at once`, JSON.stringify(r));
+    await page.context().close();
+  }
+  /* Find on a first visit: the file it opens is the window in front, once the screen has come on */
+  {
+    const page = await open();
+    await page.keyboard.press('/'); await page.waitForTimeout(300); await page.keyboard.type('Gompurkle'); await page.waitForTimeout(500);
+    for (let k = 0; k < 6 && await page.evaluate(() => (document.querySelector('.folder.is-out .folder__btn') || {}).hash) !== '#archive'; k++) { await page.keyboard.press('ArrowDown'); await page.waitForTimeout(120); }
+    await page.keyboard.press('Enter'); await page.waitForTimeout(2800);
+    const r = await page.evaluate(() => { const w = window.__v3mac.windows; return w.length ? w[w.length - 1].querySelector('.mac__title').textContent : ''; });
+    check(/labyrinth/.test(r), `Find on a first visit opens the file in front of the Archive window (${r})`);
+    await page.context().close();
+  }
+  /* Find reads what shows: the hidden desk is not a match, a curly apostrophe or prime is typed straight, and a
+     match read only by screen readers rings the sheet's visible title */
+  {
+    const page = await open();
+    const q = async (word) => { await page.fill('#find', word); await page.waitForTimeout(500); return page.evaluate(() => [...document.querySelectorAll('.folder.is-match .folder__btn')].map(a => a.getAttribute('data-sheet-href') || a.getAttribute('href'))); };
+    await page.keyboard.press('/'); await page.waitForTimeout(300);
+    const resume = await q('resume'), apos = await q("let's"), prime = await q("5'11"), skills = await q('how i work');
+    await page.keyboard.press('Enter'); await page.waitForTimeout(1500);
+    const ring = await page.evaluate(() => { const e = document.querySelector('.is-found'); return e ? { vis: !!e.getClientRects().length && !e.closest('.sr-only'), cls: e.className } : null; });
+    check(!resume.includes('#cover') && apos.includes('#contact') && prime.includes('#hockey') && ring && ring.vis, 'Find reads what shows: no match on the hidden desk, "let\'s" and 5\'11 found, and a screen-reader heading rings something visible', JSON.stringify({ resume, apos, prime, skills, ring }));
+    await page.context().close();
+  }
+  /* a long jump: the sheet it cuts to is shown already read */
+  {
+    const page = await open();
+    const r = await page.evaluate(() => new Promise(res => {
+      const mid = document.getElementById('ocapex'); let low = 1;
+      document.querySelector('.rail a[href="#hockey"]').click();
+      const t0 = performance.now();
+      (function f() { if (mid.getBoundingClientRect().top < 60) low = Math.min(low, ...[...mid.querySelectorAll('.r, .hl__in')].map(e => +getComputedStyle(e).opacity)); if (performance.now() - t0 < 300) requestAnimationFrame(f); else res(low); })();
+    }));
+    check(r === 1, `a long jump shows the sheet it cuts to already read (lowest opacity on it while shown: ${r})`);
+    await page.context().close();
+  }
+  /* print: the research chart's bars keep their colours, the tools are outlined, the clean contact words print at 28pt */
+  {
+    const page = await open(); await page.emulateMedia({ media: 'print' });
+    const r = await page.evaluate(() => ({ bars: getComputedStyle(document.querySelector('.bar')).printColorAdjust, tools: getComputedStyle(document.querySelector('.tools span')).backgroundColor, talk: getComputedStyle(document.querySelector('.talk__word')).fontSize, halo: getComputedStyle(document.querySelector('.route')).textShadow }));
+    check(r.bars === 'exact' && /0\)$|transparent/.test(r.tools) && Math.abs(parseFloat(r.talk) - 37.33) < 1 && r.halo === 'none', 'print: the chart\'s bars in colour, the tools outlined, the contact words at 28pt, no halo on the cover\'s words', JSON.stringify(r));
+    await page.context().close();
+  }
+  /* a link with ?toggles= is for that visit only */
+  {
+    const page = await open({ path: '?toggles=archive:cards' });
+    const during = await page.evaluate(() => document.documentElement.dataset.archive);
+    await page.goto(new URL('', BASE).href); await page.waitForTimeout(800);
+    const after = await page.evaluate(() => ({ archive: document.documentElement.dataset.archive, kept: localStorage.getItem('v3:toggles') }));
+    check(during === 'cards' && after.archive === 'mac' && after.kept === null, '?toggles= in a link applies to that visit only', JSON.stringify({ during, after }));
+    await page.context().close();
+  }
+  /* Space on the Index tab opens the index, as on a button; under 360px the pill names only the number */
+  {
+    const page = await open();
+    await page.focus('.index-tab'); await page.keyboard.press(' '); await page.waitForTimeout(400);
+    const r = await page.evaluate(() => ({ open: document.getElementById('cabinet').classList.contains('is-open'), y: scrollY, role: document.querySelector('.index-tab').getAttribute('role') }));
+    check(r.open && r.y === 0 && r.role === 'button', 'Space on the Index tab opens the index and does not scroll the page', JSON.stringify(r));
+    await page.context().close();
+    const ph = await open({ width: 320, height: 640, touch: true, path: '#exoskeleton' }); await ph.waitForTimeout(600);
+    const pill = await ph.evaluate(() => { const t = document.querySelector('.index-tab'); return { text: t.innerText.replace(/\s+/g, ' ').trim(), w: Math.round(t.getBoundingClientRect().width) }; });
+    check(/^Index · \d\d$/i.test(pill.text) && pill.w <= 140, `320px: the pill names only the number ("${pill.text}", ${pill.w}px)`);
+    await ph.context().close();
+  }
+  /* the hockey sheet names the coaches and how to write; the hockey file on a phone reaches the contacts within two screens */
+  {
+    const page = await open({ path: '#hockey' });
+    const r = await page.evaluate(() => ({ coaches: [...document.querySelectorAll('#hockey .coaches dd')].map(d => d.textContent), mail: !!document.querySelector('#hockey a[href^="mailto:"]') }));
+    check(r.coaches.length === 3 && r.mail, 'the hockey sheet names its three coaches with their roles, and how to write', JSON.stringify(r));
+    await page.context().close();
+    const ph = await open({ width: 390, height: 844, touch: true, path: 'files/hockey/' });
+    const at = await ph.evaluate(() => document.getElementById('coaches').getBoundingClientRect().top / innerHeight);
+    check(at < 2, `phones: the hockey file reaches the coach contacts within two screens (${at.toFixed(2)})`);
+    await ph.context().close();
+  }
+  /* the names beside the rail at 1880px and more, clear of the sheets */
+  {
+    const page = await open({ width: 1920, height: 1080, path: '#about' });
+    const r = await page.evaluate(() => { const a = document.querySelector('.rail a[aria-current="true"]'), cs = getComputedStyle(a, '::after'); return { content: cs.content, weight: cs.fontWeight, size: parseFloat(cs.fontSize) }; });
+    check(/About me/.test(r.content) && +r.weight >= 700 && r.size >= 12, 'at 1920px every dot has its sheet\'s name at rest, the current one bold', JSON.stringify(r));
+    await page.context().close();
+  }
+}
+
 /* ---------- 8. console ---------- */
 check(errors.length === 0, 'no console errors', errors);
 
