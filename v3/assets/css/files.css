@@ -72,10 +72,11 @@ cite { font-style: italic; }
 .skip:focus { transform: none; outline: 2px solid var(--white); outline-offset: 2px; }
 .file:focus { outline: none; } /* the file takes focus only as the skip link's target */
 
-/* ---------- Chrome: name left, year right, as on the deck ---------- */
+/* ---------- Chrome: name left, Email and the year right, as on the deck ---------- */
 .chrome { display: flex; align-items: center; justify-content: space-between; height: var(--chrome); padding-inline: var(--gutter); font-size: .8125rem; letter-spacing: .12em; text-transform: uppercase; color: var(--white); }
 .chrome a { text-decoration: none; padding-block: .6rem; }
 .chrome a:focus-visible { outline-color: var(--white); }
+.chrome__end { display: inline-flex; align-items: center; gap: clamp(1rem, 2.4vw, 2rem); } /* a way to write from every file, as from every sheet (T4) */
 @media (hover: hover) and (pointer: fine) { .chrome a { transition: letter-spacing var(--t-arrow) var(--ease); } .chrome a:hover { letter-spacing: .16em; } }
 
 /* ---------- The desk and the drawer ----------
