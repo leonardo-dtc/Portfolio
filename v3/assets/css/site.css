@@ -107,6 +107,17 @@ b { font-weight: 700; }
 html:not(.js) .rail__label { display: none; } /* without the script it could not follow the reader */
 html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* holds the folder button's row, so no dot is placed in it */
 @media (hover: hover) and (pointer: fine) { .rail a:hover::before { background: #fff; } }
+/* Wide screens: every sheet's name at rest beside its dot, the current one in full, where the margin holds them
+   clear of the sheets (1880px and up); the running label gives way. They are the drawn names only: the dots keep
+   their own labels, and pointing at a name does nothing the dot would not. */
+@media (min-width: 1880px) and (min-height: 600px) {
+  .js .rail a::after { content: attr(data-name); position: absolute; right: calc(100% + 4px); top: 50%; translate: 0 -50%; font-size: var(--micro); line-height: 1; letter-spacing: .06em; white-space: nowrap; color: rgba(255,255,255,.62); pointer-events: none; transition: color var(--t-fast) ease, opacity 120ms ease; }
+  .js .rail a[aria-current="true"]::after { color: #fff; font-weight: 700; }
+  .js .rail a.is-hot::after { color: #fff; }
+  .js .rail .rail__label { display: none; }
+  .js .rail.is-indexing a::after { opacity: 0; }
+}
+@media (min-width: 1880px) and (min-height: 600px) and (hover: hover) and (pointer: fine) { .js .rail a:hover::after { color: #fff; } }
 
 /* ---------- Slides as sheets ---------- */
 .deck { position: relative; }
@@ -384,8 +395,20 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .ticket p { margin-top: .6rem; font-size: var(--small); color: var(--fg-2); }
 .ticket .tape { left: 28%; top: -14px; transform: rotate(-6deg); width: 120px; height: 28px; }
 .hockey .sticker--num { right: 4%; top: -4%; --rot: 10deg; transform: rotate(var(--rot)); } /* inside the stack, clear of the rail and its index tab */
-.hockey .stat-line { margin-top: 1rem; font-size: var(--small); }
-.hockey .stat-line b { font: 400 1.05rem/1 var(--display); letter-spacing: .03em; }
+@media (max-width: 899px) { .hockey .stack { margin-top: 1.75rem; } .hockey .sticker--num { top: -1.6rem; } } /* under the text, the badge sits on the tiles' corner, clear of the links above */
+/* the season's line in the display face, as the tiles' values are (2026-10-05: the key numbers read at a glance);
+   its caveat under it in the body face */
+.hockey .stat-line { margin-top: 1.1rem; }
+.hockey .stat-line b, .stat-line__n { font: 400 clamp(1.2rem, 1.05rem + .5vw, 1.5rem)/1.15 var(--display); letter-spacing: .03em; }
+.hockey .stat-line b { color: var(--red); margin-right: .3em; }
+.stat-line__note { display: block; margin-top: .3rem; font-size: var(--small); color: var(--fg-2); }
+/* the coaches by name and role, then how to reach them */
+.coaches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .25rem 1rem; margin-top: 1rem; padding-top: .7rem; border-top: 1px solid var(--rule); }
+.coaches dt { font-size: var(--micro); letter-spacing: .1em; text-transform: uppercase; color: var(--fg-2); }
+.coaches dd { margin-top: .2rem; font-size: .9375rem; font-weight: 700; }
+.coaches__note { margin-top: .6rem; font-size: var(--small); color: var(--fg-2); }
+.coaches__note a { color: var(--fg); text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: .18em; overflow-wrap: anywhere; }
+@media (max-width: 599px) { .coaches { grid-template-columns: minmax(0, 1fr); gap: .5rem; } }
 
 /* ---------- 10 Record ---------- */
 .record .sheet__in { align-content: center; }
@@ -424,37 +447,64 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 @media (hover: hover) and (pointer: fine) { .entry__link:hover { background-size: 100% 4px; } }
 .js .entry { opacity: 0; translate: 0 8px; transition-property: opacity, translate, rotate, transform, box-shadow, background-color, color, z-index; transition-duration: 420ms, 420ms, var(--t-settle), var(--t-settle), var(--t-settle), 300ms, 300ms, 0s; transition-timing-function: var(--ease-out), var(--ease-out), var(--ease), var(--ease), var(--ease), ease, ease, linear; transition-delay: calc(160ms + var(--i, 0) * 50ms), calc(160ms + var(--i, 0) * 50ms), 0s, 0s, 0s, 0s, 0s, var(--t-open); }
 .js .is-in .entry { opacity: 1; translate: none; }
-/* The archive opens like the dim room's experiments, in paper. At rest a card shows its year, kind and
-   title; pointing at it, or tabbing to its link, unfolds the line and the link (grid rows 0fr to 1fr,
-   500ms), the card straightens to 0 degrees and lifts while its tape presses, and the other cards step back
-   by colour, not opacity: greyer paper, muted ink, a muted kind tag, so their text keeps 4.5:1 (the 24px
-   years 3:1); nothing blurs. The unfolding part hangs below the card's resting edge, over the
-   gap, so the grid never moves; the card stays in front until it has folded again. A card whose title is
-   shorter than its neighbours' (so the row has stretched it) unfolds from just under its own title
-   (--fold-top, set by the script), never from below an empty band. The script wraps the
-   line and the link in .entry__fold (only on cards with a link); touch screens, print and pages without the
-   script show every line. */
-.entry__fold { display: grid; grid-template-rows: 1fr; }
-.entry__fold-in { min-height: 0; display: flex; flex-direction: column; }
+/* The archive opens like the dim room's experiments, in paper. With the script a card on the wall shows its
+   year, kind, title and line, and its title is the button that opens the card's file (the whole card answers
+   to it). Pointing at a card straightens it to 0 degrees and lifts it while its tape presses, and the other
+   cards step back by colour, not opacity: greyer paper, muted ink, a muted kind tag, so their text keeps 4.5:1
+   (the 24px years 3:1); nothing blurs. The file is a dialog over the deck with the whole card on it (below).
+   Without the script, in print and in forced colours each card shows its file itself, under its line. */
+.entry__more { margin-top: .75rem; padding-top: .65rem; border-top: 1px solid var(--paper-2); font-size: var(--small); line-height: 1.5; }
+.entry__more p + p { margin-top: .5rem; }
+.entry__facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: .3rem .75rem; margin-top: .75rem; }
+.entry__facts > div { display: contents; }
+.entry__facts dt { font-weight: 700; color: var(--ink-2); }
+.entry__open { display: inline; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: inherit; cursor: pointer; }
+.entry__open::after { content: ""; position: absolute; inset: 0; z-index: 1; }   /* the whole card is its target */
+.entry__open:focus-visible { outline: none; }
+.entry.has-file:has(.entry__open:focus-visible) { outline: 2px solid var(--red); outline-offset: 4px; }
 .entry::before { transition: scale var(--t-arrow) var(--ease), box-shadow var(--t-arrow) var(--ease); }
+@media screen and (forced-colors: none) {
+  .js .entry.has-file > .entry__more, .js .entry.has-file > .entry__link { display: none; }
+}
+@media (forced-colors: active) { .entry__open::after { display: none; } }
 @media screen and (hover: hover) and (pointer: fine) {
-  .js .entry.has-fold { z-index: 1; }
-  .js .entry__fold { position: absolute; z-index: 1; left: 0; right: 0; top: var(--fold-top, calc(100% - 1px)); grid-template-rows: 0fr; padding: 0 1.05rem; background-color: inherit; clip-path: inset(0 -60px -60px -60px); transition: grid-template-rows var(--t-open) var(--ease), box-shadow var(--t-open) var(--ease); }
-  .js .entry__fold-in { overflow: hidden; }
-  .js .entry__fold .entry__line { margin-top: 0; }
-  .js .entry__fold .entry__link { margin-bottom: 1rem; }
-  .js .is-in .entry.has-fold:is(:hover, :focus-within) { z-index: 3; rotate: 0deg; transform: translateY(calc(-4px - var(--rise, 0px))); box-shadow: 0 2px 4px rgba(0,0,0,.1), 0 24px 44px rgba(0,0,0,.2); transition-delay: 0s, 0s, 0s, 0s, 0s, 0s, 0s, 0s; }
-  .js .entry.has-fold:is(:hover, :focus-within) .entry__fold { grid-template-rows: 1fr; box-shadow: 0 2px 4px rgba(0,0,0,.1), 0 24px 44px rgba(0,0,0,.2); }
-  .js .entry.has-fold:is(:hover, :focus-within)::before { scale: .94; box-shadow: 0 1px 1px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.05); }
+  .js .is-in .entry.has-file:is(:hover, :has(.entry__open:focus-visible)) { z-index: 3; rotate: 0deg; transform: translateY(-4px); box-shadow: 0 2px 4px rgba(0,0,0,.1), 0 24px 44px rgba(0,0,0,.2); transition-delay: 0s, 0s, 0s, 0s, 0s, 0s, 0s, 0s; }
+  .js .entry.has-file:is(:hover, :has(.entry__open:focus-visible))::before { scale: .94; box-shadow: 0 1px 1px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.05); }
   /* the other cards step back by colour (as the files' pager does): white #F3F1F1 paper 6.05:1 with the muted ink,
      white on the muted kind tag 6.8:1, the 24px vermilion year 3.59:1 */
   .entry__year { transition: color 300ms ease; }
   .entry__kind { transition: background-color 300ms ease; }
-  .entries:has(.entry.has-fold:hover) .entry:not(:hover),
-  .entries:has(.entry.has-fold:focus-within):not(:has(.entry:hover)) .entry:not(:focus-within) { background-color: #F3F1F1; color: var(--ink-2); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 14px rgba(0,0,0,.08); }
-  .entries:has(.entry.has-fold:hover) .entry:not(:hover) .entry__kind,
-  .entries:has(.entry.has-fold:focus-within):not(:has(.entry:hover)) .entry:not(:focus-within) .entry__kind { background-color: var(--ink-2); }
+  .entries:has(.entry.has-file:hover) .entry:not(:hover),
+  .entries:has(.entry__open:focus-visible):not(:has(.entry:hover)) .entry:not(:has(.entry__open:focus-visible)) { background-color: #F3F1F1; color: var(--ink-2); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 14px rgba(0,0,0,.08); }
+  .entries:has(.entry.has-file:hover) .entry:not(:hover) .entry__kind,
+  .entries:has(.entry__open:focus-visible):not(:has(.entry:hover)) .entry:not(:has(.entry__open:focus-visible)) .entry__kind { background-color: var(--ink-2); }
 }
+
+/* the card's file: the whole card on a sheet of paper over the dimmed deck, a vermilion tab with its year and
+   kind standing on top. Close, Escape or a press outside put it away, and the focus goes back to its card. */
+.entry-file { width: min(40rem, calc(100vw - 2rem)); max-width: none; max-height: min(84vh, 54rem); margin: auto; padding: 0; overflow: visible; border: 0; background: var(--white); color: var(--black); box-shadow: 0 2px 4px rgba(0,0,0,.12), 0 32px 64px rgba(0,0,0,.4); }
+.entry-file[open] { display: flex; flex-direction: column; animation: file-in 280ms var(--ease-out); }
+.entry-file::backdrop { background: rgba(21,21,21,.72); }
+.entry-file[open]::backdrop { animation: file-dim 280ms ease; }
+@keyframes file-in { from { opacity: 0; translate: 0 12px; } }
+@keyframes file-dim { from { opacity: 0; } }
+.entry-file__tab { position: absolute; left: clamp(1.25rem, 4vw, 2.25rem); bottom: 100%; margin: 0; padding: .6rem 1.1rem .5rem; background: var(--red); color: var(--black); font-size: var(--micro); font-weight: 700; letter-spacing: .14em; line-height: 1.2; text-transform: uppercase; white-space: nowrap; clip-path: polygon(0 100%, 9px 0, calc(100% - 9px) 0, 100% 100%); }
+.entry-file__in { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: clamp(1.4rem, 3.4vh, 2rem) clamp(1.25rem, 4vw, 2.25rem) 1.5rem; }
+.entry-file__title { padding-right: 5.5rem; font: 400 clamp(1.6rem, 1.25rem + 1.2vw, 2.25rem)/1.12 var(--hand); text-wrap: balance; }
+.entry-file__line { margin-top: .7rem; font-size: 1.0625rem; line-height: 1.5; }
+.entry-file__more { margin-top: 1.1rem; padding-top: 1rem; border-top: 2px solid var(--red); font-size: var(--text); line-height: 1.6; }
+.entry-file__more p + p { margin-top: .7rem; }
+.entry-file__more .entry__facts { gap: 0 1.25rem; margin-top: 1.2rem; font-size: var(--small); line-height: 1.45; }
+.entry-file__more .entry__facts dt, .entry-file__more .entry__facts dd { padding: .55rem 0; border-top: 1px solid var(--paper-2); }
+.entry-file__more .entry__facts dt { letter-spacing: .1em; text-transform: uppercase; font-size: var(--micro); line-height: 1.6; }
+.entry-file__go { margin-top: 1.5rem; }
+.entry-file__go:empty { display: none; }
+.entry-file__go .entry__link { margin: 0; padding-top: 0; }
+/* Close stands in the file's top right corner, in view however far the file has scrolled */
+.entry-file__close { position: absolute; z-index: 1; top: .7rem; right: .7rem; padding: .6rem .9rem .55rem; border: 2px solid var(--black); background: var(--white); color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+.entry-file__close:focus-visible { outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) { .entry-file__close { transition: background-color 150ms ease, color 150ms ease; } .entry-file__close:hover { background: var(--black); color: var(--white); } }
+@media (max-width: 599px) { .entry-file { width: calc(100vw - 1.5rem); max-height: calc(100svh - 5rem); margin-bottom: 1rem; } }
 
 /* ---------- 12 Contact: the poster and the reply, then a deliberate end ----------
    Desktop: the framed LET'S TALK keeps its full size in the left column and the reply (one large email
@@ -712,7 +762,7 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
   .cols { margin-top: .5rem; gap: 1.5rem; }
   .cols h3 { font-size: 1.4rem; padding-bottom: .3rem; }
   .cols li { padding: .3rem 0; }
-  .list, .stat-list, .also, .hockey .stat-line { font-size: .76rem; }
+  .list, .stat-list, .also, .stat-line__note { font-size: .76rem; }
   .list { gap: .2rem; }
   .split__text .list { margin-top: .75rem; }
   .list li { padding-top: .2rem; }
@@ -739,7 +789,6 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
   .entry__title { margin-top: .5rem; font-size: 1.02rem; }
   .entry__line { margin-top: .3rem; font-size: .75rem; line-height: 1.4; }
   .entry__link { padding-top: .55rem; }
-  @media screen and (hover: hover) and (pointer: fine) { .js .entry__fold { padding: 0 .85rem; } .js .entry__fold .entry__link { margin-bottom: .8rem; } }
 }
 
 /* ---------- Touch screens at desktop widths (tablets in landscape): larger targets ---------- */
@@ -774,9 +823,9 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
   .card__go, .card__go svg { scale: none; rotate: none; }
   .card__go { transition: opacity 200ms ease; }
   .js .entry { translate: none !important; transition: opacity 200ms ease, background-color 200ms ease, color 200ms ease, box-shadow 200ms ease; }
-  .js .is-in .entry.has-fold:is(:hover, :focus-within) { rotate: var(--tilt, 0deg); transform: translateY(calc(-1 * var(--rise, 0px))); } /* no movement: a card at the foot of its sheet is simply placed higher */
-  .js .entry__fold { transition: none !important; }
-  .js .entry.has-fold:is(:hover, :focus-within)::before { scale: none; }
+  .js .is-in .entry.has-file:is(:hover, :has(.entry__open:focus-visible)) { rotate: var(--tilt, 0deg); transform: none; } /* no movement */
+  .js .entry.has-file:is(:hover, :has(.entry__open:focus-visible))::before { scale: none; }
+  .entry-file[open], .entry-file[open]::backdrop { animation: none; }
   .entry::before { transition: none; }
   .route::after { clip-path: none; opacity: 0; transition: opacity 200ms ease; }
   .route:hover::after, .route:focus-visible::after { opacity: 1; }
@@ -885,6 +934,7 @@ html:not(.js) .cabinet:target { display: block; }
 .file__quote { display: none; margin-top: .55rem; padding-left: .55rem; border-left: 3px solid var(--black); font-size: var(--small); line-height: 1.42; text-wrap: pretty; }
 .file__quote mark, .found__q mark { background: linear-gradient(transparent 58%, var(--red) 58%, var(--red) 92%, transparent 92%); color: inherit; font-weight: 700; }
 .cabinet.is-finding .folder.is-match .file__quote { display: block; }
+.file__in { font-size: var(--micro); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; } /* a match found only in the sheet's file */
 .cabinet.is-finding .folder.is-match .file__kicker, .cabinet.is-finding .folder.is-match .file__sum { display: none; }
 /* while finding, the folders without a match fade their tabs to the muted ink (still 5.4:1) and the
    matching ones carry a small vermilion count */

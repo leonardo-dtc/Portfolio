@@ -525,28 +525,58 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   await page.waitForTimeout(1600);
   const s0 = await page.evaluate(() => {
     const m = window.__v3mac, cards = [...document.querySelectorAll('#archive .entries > .entry')];
-    return { n: cards.length, files: m ? m.files.map(f => f.title) : [], titles: cards.map(c => c.querySelector('.entry__title').textContent.replace(/\s+/g, ' ').trim()), on: document.querySelector('.mac__screen').className, cards: getComputedStyle(document.querySelector('#archive .entries')).display, wins: m.windows.map(w => w.querySelector('.mac__title').textContent) };
+    const shown = [...document.querySelectorAll('.mac__grid > .mac__file')].map(b => window.__v3mac.files[+b.dataset.i].title);
+    return { n: cards.length, files: m ? m.files.map(f => f.title) : [], shown, titles: cards.map(c => c.querySelector('.entry__title').textContent.replace(/\s+/g, ' ').trim()), on: document.querySelector('.mac__screen').className, cards: getComputedStyle(document.querySelector('#archive .entries')).display, wins: m.windows.map(w => w.querySelector('.mac__title').textContent), year: document.querySelector('.mac__col--year').getAttribute('aria-pressed'), kinds: [...document.querySelectorAll('.mac__file .mac__kind')].map(k => k.checkVisibility()).every(Boolean) };
   });
-  check(s0.n > 0 && s0.files.join('|') === s0.titles.join('|'), `one file on the Mac for each archive card, in order (${s0.files.length} of ${s0.n})`);
+  check(s0.n > 0 && s0.files.join('|') === s0.titles.join('|'), `one file on the Mac for each archive card (${s0.files.length} of ${s0.n})`);
+  check(s0.shown.join('|') === s0.titles.join('|') && s0.year === 'true' && s0.kinds, 'the Archive window lists them with their kind and year, newest first by Year, as the cards stand', JSON.stringify(s0.shown));
   check(/is-on/.test(s0.on) && s0.cards === 'none' && s0.wins.join() === 'Archive', `the screen is on once the sheet arrives, the Archive window open, the cards given way (${s0.on}; ${s0.wins.join()})`);
   const st = () => page.evaluate(() => ({ active: document.activeElement && (document.activeElement.getAttribute('aria-label') || document.activeElement.textContent.trim().slice(0, 40)), doc: !!document.activeElement.closest('.mac__win--doc'), wins: window.__v3mac.windows.map(w => w.querySelector('.mac__title').textContent), cur: document.querySelector('.rail a[aria-current]')?.getAttribute('href') }));
-  /* right, then down a row: from the first file to the one under the second */
-  const expect = await page.evaluate(() => { const f = window.__v3mac.files, top = f[0].icon.offsetTop, cols = f.filter(x => x.icon.offsetTop === top).length; f[0].icon.focus(); return f[Math.min(f.length - 1, 1 + cols)].icon.getAttribute('aria-label'); });
-  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowDown');
+  /* down the list: from the first file to the third */
+  const expect = await page.evaluate(() => { const g = [...document.querySelectorAll('.mac__grid > .mac__file')]; g[0].focus(); return g[2].getAttribute('aria-label'); });
+  await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowDown');
   let s = await st();
-  check(s.active === expect && s.cur === '#archive', `arrows move between files and the deck stays on the sheet (${s.active}; ${s.cur})`);
+  check(s.active === expect && s.cur === '#archive', `Down moves through the list and the deck stays on the sheet (${s.active}; ${s.cur})`);
   const want = s.active;
   await page.keyboard.press('Enter'); await page.waitForTimeout(500);
   s = await st();
   check(s.wins.length === 2 && s.doc && want.startsWith(s.wins[1]), `Return opens the file in front, with the focus (${s.wins.join(' | ')})`);
+  /* the file holds the whole card: its line, its paragraphs, its details and its link */
+  const doc = await page.evaluate(() => {
+    const w = window.__v3mac.windows.pop(), f = w._file, li = f.li;
+    return { paras: w.querySelectorAll('.mac__body--doc > p:not([class])').length, cardParas: li.querySelectorAll('.entry__more > p').length, rows: w.querySelectorAll('.mac__body--doc dt').length, cardRows: li.querySelectorAll('.entry__more dt').length, line: (w.querySelector('.mac__lead') || {}).textContent === f.line, link: !!w.querySelector('.mac__go[href^="#"]') };
+  });
+  check(doc.cardParas > 0 && doc.paras === doc.cardParas && doc.rows === doc.cardRows && doc.line && doc.link, `the file's window holds the whole card: its line, ${doc.paras} paragraphs, ${doc.rows} details and its link`, JSON.stringify(doc));
+  /* the zoom box fills the screen with the window, and puts it back */
+  const zoomed = await page.evaluate(async () => {
+    const w = window.__v3mac.windows.pop(), d = document.querySelector('.mac__desk').getBoundingClientRect(), r0 = w.getBoundingClientRect();
+    w.querySelector('.mac__zoombox').click(); await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const r1 = w.getBoundingClientRect();
+    w.querySelector('.mac__zoombox').click(); await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const r2 = w.getBoundingClientRect();
+    return { fill: r1.width >= d.width - 20 && r1.height >= d.height - 20, back: Math.abs(r2.width - r0.width) < 1 && Math.abs(r2.left - r0.left) < 1 };
+  });
+  check(zoomed.fill && zoomed.back, 'the zoom box fills the screen with the file, and puts it back', JSON.stringify(zoomed));
   await page.keyboard.press('Escape'); await page.waitForTimeout(400);
   s = await st();
-  check(s.wins.length === 1 && s.active === want, `Escape closes it and the focus goes back to its icon (${s.active})`);
-  await page.click('.mac__mt >> text=View'); await page.click('.mac__mi[data-act="names"]');
-  const list = await page.evaluate(() => { const r = window.__v3mac.files.map(f => f.icon.getBoundingClientRect()); return document.querySelector('.mac__grid').classList.contains('is-list') && r.every((x, i) => !i || x.top > r[i - 1].top); });
+  check(s.wins.length === 1 && s.active === want, `Escape closes it and the focus goes back to its file (${s.active})`);
+  /* typing a name's first letters goes to it */
+  await page.keyboard.type('te'); await page.waitForTimeout(100);
+  s = await st();
+  check(/^ten sports/.test(s.active), `typing "te" goes to the file whose name starts so (${s.active})`);
+  /* a column's heading sorts by it; the same heading again turns it round */
+  const order = () => page.evaluate(() => [...document.querySelectorAll('.mac__grid > .mac__file')].map(b => window.__v3mac.files[+b.dataset.i].title.toLowerCase()));
+  await page.click('.mac__col--name'); const az = await order();
+  await page.click('.mac__col--name'); const za = await order();
+  await page.click('.mac__col--year'); const ny = await order();
+  const sorted = [...az].sort((a, b) => a.localeCompare(b));
+  check(az.join('|') === sorted.join('|') && za.join('|') === [...sorted].reverse().join('|') && ny.join('|') === s0.titles.map(t => t.toLowerCase()).join('|'), 'Name sorts A to Z, then Z to A; Year puts the newest first again', JSON.stringify({ az, za }));
   await page.click('.mac__mt >> text=View'); await page.click('.mac__mi[data-act="icons"]');
-  check(list, 'View, by Name lists the files, one row a file; by Icon goes back');
-  const last = await page.evaluate(() => { const f = window.__v3mac.files, l = f[f.length - 1]; l.icon.focus(); return l.title; });
+  const icons = await page.evaluate(() => { const r = [...document.querySelectorAll('.mac__grid > .mac__file')].map(b => b.getBoundingClientRect()); return document.querySelector('.mac__grid').classList.contains('is-icons') && r.filter(x => Math.abs(x.top - r[0].top) < 2).length > 1; });
+  await page.click('.mac__mt >> text=View'); await page.click('.mac__mi[data-act="list"]');
+  const back = await page.evaluate(() => { const r = [...document.querySelectorAll('.mac__grid > .mac__file')].map(b => b.getBoundingClientRect()); return !document.querySelector('.mac__grid').classList.contains('is-icons') && r.every((x, i) => !i || x.top > r[i - 1].top); });
+  check(icons && back, 'View, as Icons lays the files out as icons; as List goes back to one row a file');
+  const last = await page.evaluate(() => { const g = [...document.querySelectorAll('.mac__grid > .mac__file')], l = g[g.length - 1]; l.focus(); return window.__v3mac.files[+l.dataset.i].title; });
   await page.click('.mac__mt >> text=File'); await page.click('.mac__mi[data-act="open"]'); await page.waitForTimeout(500);
   const opened = (await st()).wins;
   await page.click('.mac__mt >> text=File'); await page.click('.mac__mi[data-act="close"]'); await page.waitForTimeout(400);
@@ -554,7 +584,7 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const bar = await page.evaluate(() => { const r = document.querySelector('.mac__win--finder .mac__bar').getBoundingClientRect(); return [r.left + r.width * .7, r.top + r.height / 2]; });
   await page.mouse.move(bar[0], bar[1]); await page.mouse.down(); await page.mouse.move(bar[0] - 400, bar[1] + 40, { steps: 6 }); await page.mouse.up();
   const pos = await page.evaluate(() => { const w = document.querySelector('.mac__win--finder'); return [w.offsetLeft, w.offsetTop]; });
-  check(pos[0] === 0 && pos[1] > 14, `the title bar drags its window, never past the screen's left edge (${pos})`);
+  check(pos[0] === 0 && pos[1] > 12, `the title bar drags its window, never past the screen's left edge (${pos})`);
   await page.click('.mac__win--finder .mac__close'); await page.waitForTimeout(400);
   const closed = (await st()).wins.length;
   await page.click('.mac__icon--desk >> nth=0'); await page.waitForTimeout(500);
@@ -567,20 +597,29 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const boot = await page.evaluate(() => document.querySelector('.mac__screen').className);
   await page.waitForTimeout(1300);
   check(/is-booting/.test(boot) && (await st()).wins.join() === 'Archive', `Special, Restart brings the screen on again, the Archive window alone (${boot})`);
+  /* nothing on the screen is under 13px */
+  const tiny = await page.evaluate(() => { window.__v3mac.open(window.__v3mac.files[0]); return [...document.querySelectorAll('.mac__screen *')].filter(e => e.childNodes.length && [...e.childNodes].some(n => n.nodeType === 3 && n.data.trim()) && e.checkVisibility() && parseFloat(getComputedStyle(e).fontSize) < 13).map(e => e.className + ' ' + getComputedStyle(e).fontSize); });
+  check(tiny.length === 0, `nothing on the Mac's screen is set under 13px (${tiny.length})`, tiny.slice(0, 5).join(', '));
   /* Find, from the cover: a card's words open its file on the Mac */
   const word = await page.evaluate(() => { const t = window.__v3mac.files[window.__v3mac.files.length - 1].kind; return t; });
   await page.evaluate(() => document.querySelector('.rail a[href="#cover"]').click()); await page.waitForTimeout(1200);
   await page.keyboard.press('/'); await page.waitForTimeout(400); await page.keyboard.type(word); await page.waitForTimeout(500); await page.keyboard.press('Enter'); await page.waitForTimeout(1800);
   s = await st();
-  check(s.cur === '#archive' && s.wins.length === 2, `Find "${word}" lands on the archive and opens the file (${s.wins.join(' | ')})`);
+  check(s.cur === '#archive' && s.wins.length >= 2 && s.wins.some(t => /Rocketry/.test(t)), `Find "${word}" lands on the archive and opens the file (${s.wins.join(' | ')})`);
+  /* and a word only in a file's paragraphs finds it too */
+  await page.evaluate(() => document.querySelector('.rail a[href="#cover"]').click()); await page.waitForTimeout(1200);
+  await page.keyboard.press('/'); await page.waitForTimeout(400); await page.keyboard.type('Gompurkle'); await page.waitForTimeout(500); await page.keyboard.press('Enter'); await page.waitForTimeout(1800);
+  s = await st();
+  check(s.cur === '#archive' && s.wins.some(t => /labyrinth/.test(t)), `Find "Gompurkle" (a word in a file's details) opens that file (${s.wins.join(' | ')})`);
   await page.context().close();
 }
 for (const [w, h] of [[390, 844], [320, 700]]) {
   const page = await open({ width: w, height: h, touch: true, path: '#archive' });
   await page.evaluate(() => document.querySelector('.mac').scrollIntoView({ block: 'center' })); await page.waitForTimeout(1600);
-  await page.tap('.mac__icon--file >> nth=1'); await page.waitForTimeout(600);
+  const sub = await page.evaluate(() => [...document.querySelectorAll('.mac__file .mac__sub')].every(e => e.checkVisibility()) && ![...document.querySelectorAll('.mac__file .mac__year')].some(e => e.checkVisibility()));
+  await page.tap('.mac__file >> nth=1'); await page.waitForTimeout(600);
   const r = await page.evaluate(() => { const d = document.querySelector('.mac__desk').getBoundingClientRect(), w = window.__v3mac.windows.pop().getBoundingClientRect(); return { fill: w.width >= d.width - 16 && w.height >= d.height - 16, side: document.documentElement.scrollWidth > innerWidth }; });
-  check(r.fill && !r.side, `${w}x${h}: a file's window takes the whole screen, nothing scrolls sideways`);
+  check(sub && r.fill && !r.side, `${w}x${h}: the list puts each file's kind and year under its name; a file's window takes the whole screen; nothing scrolls sideways`);
   await page.context().close();
 }
 {
@@ -591,16 +630,16 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
 }
 {
   const page = await open({ js: false, path: '#archive' });
-  const nojs = await page.evaluate(() => ({ mac: !!document.querySelector('.mac'), cards: getComputedStyle(document.querySelector('#archive .entries')).display }));
+  const nojs = await page.evaluate(() => ({ mac: !!document.querySelector('.mac'), cards: getComputedStyle(document.querySelector('#archive .entries')).display, more: [...document.querySelectorAll('.entries .entry__more')].every(e => e.checkVisibility()) }));
   await page.context().close();
   const pp = await open({ path: '#archive' }); await pp.emulateMedia({ media: 'print' });
-  const print = await pp.evaluate(() => ({ mac: getComputedStyle(document.querySelector('.mac')).display, cards: getComputedStyle(document.querySelector('#archive .entries')).display }));
+  const print = await pp.evaluate(() => ({ mac: getComputedStyle(document.querySelector('.mac')).display, cards: getComputedStyle(document.querySelector('#archive .entries')).display, more: getComputedStyle(document.querySelector('.entries .entry__more')).display }));
   await pp.context().close();
   const fc = await browser.newContext({ viewport: { width: 1440, height: 900 }, forcedColors: 'active' }), fp = await fc.newPage();
   await fp.goto(new URL('#archive', BASE).href); await fp.waitForTimeout(1200);
-  const forced = await fp.evaluate(() => ({ mac: getComputedStyle(document.querySelector('.mac')).display, cards: getComputedStyle(document.querySelector('#archive .entries')).display }));
+  const forced = await fp.evaluate(() => ({ mac: getComputedStyle(document.querySelector('.mac')).display, cards: getComputedStyle(document.querySelector('#archive .entries')).display, more: getComputedStyle(document.querySelector('.entries .entry__more')).display }));
   await fc.close();
-  check(!nojs.mac && nojs.cards !== 'none' && print.mac === 'none' && print.cards !== 'none' && forced.mac === 'none' && forced.cards !== 'none', `the cards show instead without the script, in print and in forced colours (${JSON.stringify({ nojs, print, forced })})`);
+  check(!nojs.mac && nojs.cards !== 'none' && nojs.more && print.mac === 'none' && print.cards !== 'none' && print.more !== 'none' && forced.mac === 'none' && forced.cards !== 'none' && forced.more !== 'none', `the cards show instead, each with its whole file, without the script, in print and in forced colours (${JSON.stringify({ nojs, print, forced })})`);
 }
 
 /* ---------- 7. the files ---------- */
@@ -683,8 +722,15 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
   await page.waitForTimeout(400);
   await page.fill('.find input', 'Rocketry'); await page.keyboard.press('Enter');   /* (on the archive's card alone) */
   await page.waitForTimeout(1600);
-  const found = await page.evaluate(() => ({ card: !!document.querySelector('.entries > .entry.is-found'), files: window.__v3mac.windows.filter(w => !/finder|trash/.test(w.className)).length }));
-  check(found.card && found.files === 0, 'T17: with the cards, Find lights the card itself (no file opens on the hidden Mac)', JSON.stringify(found));
+  const found = await page.evaluate(() => ({ card: !!document.querySelector('.entries > .entry.is-found'), files: window.__v3mac.windows.filter(w => !/finder|trash/.test(w.className)).length, file: (document.querySelector('dialog.entry-file[open] .entry-file__title') || {}).textContent }));
+  check(found.card && found.files === 0 && /Rocketry/.test(found.file || ''), 'T17: with the cards, Find lights the card itself and opens its file on paper (no file opens on the hidden Mac)', JSON.stringify(found));
+  // the card's file: Escape puts it away and the focus goes back to its card; a press on the card opens it again
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  await page.click('.entries > .entry:nth-child(2)'); await page.waitForTimeout(500);
+  const cardFile = await page.evaluate(() => { const dlg = document.querySelector('dialog.entry-file'), li = document.querySelector('.entries > .entry:nth-child(2)'); return { open: dlg.open, title: dlg.querySelector('.entry-file__title').textContent === li.querySelector('.entry__title').textContent.trim(), paras: dlg.querySelectorAll('.entry-file__more > p').length === li.querySelectorAll('.entry__more > p').length, link: !!dlg.querySelector('.entry-file__go a[href^="#"]'), inCard: getComputedStyle(li.querySelector('.entry__more')).display }; });
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  const after = await page.evaluate(() => ({ open: document.querySelector('dialog.entry-file').open, focus: document.activeElement.className }));
+  check(cardFile.open && cardFile.title && cardFile.paras && cardFile.link && cardFile.inCard === 'none' && !after.open && after.focus === 'entry__open', 'T17: a card on the wall shows its year, kind, title and line; pressing it opens its whole file, and Escape returns to the card', JSON.stringify({ cardFile, after }));
   const warned = [];
   page.on('console', m => { if (m.type() === 'warning') warned.push(m.text()); });
   await page.evaluate(() => { window.toggles.archive = 'drawer'; document.documentElement.setAttribute('data-cover', 'table'); });

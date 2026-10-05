@@ -27,39 +27,54 @@
   });
   /* archive cards reveal one after another, however many Leonardo adds */
   d.querySelectorAll('.entries > li').forEach(function (li, i) { li.style.setProperty('--i', i); });
-  /* each card with a link folds its line and link away until it is pointed at (the stylesheet decides
-     where that happens: never on touch screens or in print) */
-  d.querySelectorAll('.entries > .entry').forEach(function (li) {
-    var link = li.querySelector('.entry__link');
-    if (!link) return;
-    var fold = d.createElement('div'), inner = d.createElement('div');
-    fold.className = 'entry__fold'; inner.className = 'entry__fold-in';
-    var line = li.querySelector('.entry__line');
-    if (line) inner.appendChild(line);
-    inner.appendChild(link);
-    fold.appendChild(inner); li.appendChild(fold);
-    li.classList.add('has-fold');
-  });
-  /* a card the row has stretched (its title is shorter than its neighbours') unfolds from just under its own
-     title (--fold-top), and a card near the foot of its sheet lifts as far as its unfolded line needs to stay
-     on the sheet (--rise); both measured with the layout: offsets, so the stacking's scale does not count */
-  var folded = Array.prototype.slice.call(d.querySelectorAll('.entry.has-fold'));
-  function riseCards() {
-    folded.forEach(function (li) {
-      var sheet = li.closest('.sheet'), inner = li.querySelector('.entry__fold-in'), fold = li.querySelector('.entry__fold'), title = li.querySelector('.entry__title');
-      li.style.removeProperty('--rise'); li.style.removeProperty('--fold-top');
-      if (!sheet || !inner || getComputedStyle(fold).position !== 'absolute') return;
-      var foldTop = li.offsetHeight - 1;
-      if (title && title.offsetParent === li) {
-        var under = Math.ceil(title.offsetTop + title.offsetHeight + parseFloat(getComputedStyle(li).paddingBottom) - 1);
-        if (under < foldTop - 1) { foldTop = under; li.style.setProperty('--fold-top', under + 'px'); }
-      }
-      var top = 0;
-      for (var e = li; e && e !== sheet; e = e.offsetParent) top += e.offsetTop;
-      var over = top + foldTop + inner.scrollHeight + 12 - sheet.clientHeight;
-      if (over > 0) li.style.setProperty('--rise', Math.ceil(over) + 'px');
+  /* The wall of cards (the archive's design toggle, T17; the Macintosh shows the same cards as its files): a card
+     shows its year, kind, title and line, and its title is a button (the whole card answers to it) that opens the
+     card's file: a sheet of paper over the deck with the whole card on it, its line, its paragraphs and details
+     (.entry__more) and its link. Without the script, in print and in forced colours every card shows all of it. */
+  var entryFile = null, entryFrom = null;
+  function entryText(li, sel) { var e = li.querySelector(sel); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; }
+  function makeEntryFile(home) {
+    entryFile = d.createElement('dialog');
+    entryFile.className = 'entry-file';
+    entryFile.setAttribute('aria-labelledby', 'entry-file-title');
+    entryFile.innerHTML = '<p class="entry-file__tab"></p><button class="entry-file__close" type="button">Close</button><div class="entry-file__in"><h2 class="entry-file__title" id="entry-file-title"></h2><p class="entry-file__line"></p><div class="entry-file__more"></div><p class="entry-file__go"></p></div>';
+    home.appendChild(entryFile);
+    entryFile.querySelector('.entry-file__close').addEventListener('click', function () { entryFile.close(); });
+    entryFile.addEventListener('click', function (e) {
+      /* a press on the dimmed deck around the file closes it; so does its link, before the deck goes to the sheet */
+      if (e.target === entryFile || (e.target.closest && e.target.closest('a[href^="#"]'))) entryFile.close();
     });
+    /* the dimmed deck stays still while the file is open, and keys stay with the file (the deck's arrows wait) */
+    entryFile.addEventListener('wheel', function (e) { if (e.target === entryFile) e.preventDefault(); }, { passive: false });
+    entryFile.addEventListener('touchmove', function (e) { if (e.target === entryFile) e.preventDefault(); }, { passive: false });
+    entryFile.addEventListener('keydown', function (e) { if (e.key !== 'Escape' && e.key !== 'Tab') e.stopPropagation(); });
+    entryFile.addEventListener('close', function () { if (entryFrom && entryFrom.isConnected) entryFrom.focus({ preventScroll: true }); entryFrom = null; });
   }
+  function openEntry(li) {
+    if (!entryFile) makeEntryFile(li.closest('.slide') || d.body);
+    entryFile.querySelector('.entry-file__tab').textContent = [entryText(li, '.entry__year'), entryText(li, '.entry__kind')].filter(Boolean).join(' · ');
+    entryFile.querySelector('.entry-file__title').textContent = entryText(li, '.entry__title');
+    var line = entryFile.querySelector('.entry-file__line');
+    line.textContent = entryText(li, '.entry__line'); line.hidden = !line.textContent;
+    var more = entryFile.querySelector('.entry-file__more'), src = li.querySelector('.entry__more');
+    more.textContent = ''; more.hidden = !src;
+    if (src) Array.prototype.forEach.call(src.children, function (n) { more.appendChild(n.cloneNode(true)); });
+    var go = entryFile.querySelector('.entry-file__go'), link = li.querySelector('.entry__link');
+    go.textContent = ''; if (link) go.appendChild(link.cloneNode(true));
+    entryFrom = li.querySelector('.entry__open');
+    if (!entryFile.open) entryFile.showModal();
+    entryFile.querySelector('.entry-file__in').scrollTop = 0;
+  }
+  if (window.HTMLDialogElement) d.querySelectorAll('.entries > .entry').forEach(function (li) {
+    var h = li.querySelector('.entry__title');
+    if (!h) return;
+    var b = d.createElement('button');
+    b.type = 'button'; b.className = 'entry__open'; b.setAttribute('aria-haspopup', 'dialog');
+    while (h.firstChild) b.appendChild(h.firstChild);
+    h.appendChild(b);
+    li.classList.add('has-file');
+    b.addEventListener('click', function () { openEntry(li); });
+  });
 
   /* ---- counts from the page: the number of sheets, each folder's place and number, each file's
      "Sheet NN / N", the drawer's "N sheets" and the archive's "Sheet NN, name" links. The HTML keeps
@@ -156,7 +171,6 @@
     }
     var y = deck.offsetTop;
     tops = slides.map(function (s) { var t = y; y += s.offsetHeight; return t; });
-    riseCards();
     update();
   }
 
@@ -580,6 +594,45 @@
     });
   }
   function esc(t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  /* The project files are searched too. Their text is fetched once, on the first search (they are pages of their
+     own, so it is a request each, from this site); each file says which sheet it belongs to by its link back. A
+     sheet whose file matches when the sheet itself does not opens the file, at the words, from its folder. */
+  var fileCorpus = null, filesLoading = false;
+  var FILE_LEAVES = 'h1, h2, h3, p, li, dt, dd, figcaption, th, td';
+  function loadFiles() {
+    if (filesLoading || fileCorpus || !window.fetch || !window.DOMParser) return;
+    filesLoading = true;
+    var urls = [];
+    Array.prototype.forEach.call(d.querySelectorAll('a[href^="files/"]'), function (a) { var u = a.getAttribute('href').split('#')[0]; if (urls.indexOf(u) < 0) urls.push(u); });
+    Promise.all(urls.map(function (u) {
+      return fetch(u, { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) {
+        var doc = new DOMParser().parseFromString(t, 'text/html'), art = doc.querySelector('article.file'), back = doc.querySelector('a.back');
+        var i = back ? indexOfHash((back.getAttribute('href') || '').replace(/^[^#]*/, '')) : -1;
+        if (!art || i < 0) return [];
+        var title = (doc.querySelector('.file__title') || {}).textContent || '';
+        return Array.prototype.slice.call(art.querySelectorAll(FILE_LEAVES)).filter(function (el) {
+          return !el.closest('.drawer, .pager, .file__bar, .file__end, [aria-hidden="true"]') && !el.querySelector(FILE_LEAVES);
+        }).map(function (el) {
+          var t2 = el.textContent.replace(/\s+/g, ' ').trim();
+          return { i: i, url: u, file: title.trim(), text: t2, key: fold(t2) };
+        }).filter(function (e) { return e.text.length > 1; });
+      }).catch(function () { return []; });
+    })).then(function (lists) {
+      fileCorpus = [].concat.apply([], lists);
+      if (findIn && findIn.value.trim()) find(findIn.value);   /* the words typed so far, now with the files */
+    });
+  }
+  /* the address of a file at the words found: the whole word around the first match, as a text fragment, which
+     the browser scrolls to and marks */
+  function atWords(hit, res) {
+    var at = -1;
+    res.forEach(function (re) { re.lastIndex = 0; var m = re.exec(hit.key); if (m && (at < 0 || m.index + m[1].length < at)) at = m.index + m[1].length; });
+    if (at < 0 || hit.key.length !== hit.text.length) return hit.url;
+    var from = at, to = at;
+    while (to < hit.text.length && /[\wÀ-ɏ'’-]/.test(hit.text.charAt(to))) to++;
+    return hit.url + '#:~:text=' + encodeURIComponent(hit.text.slice(from, to) || hit.text.slice(from, from + 12));
+  }
+
   /* the quote: the matching line, cut to about 120 characters around the first match, the words marked */
   function quote(entry, res) {
     var t = entry.text, key = entry.key, at = Infinity;
@@ -606,25 +659,34 @@
     return frag;
   }
   function setLabel(t, said) { if (cabLabel) cabLabel.textContent = t; var st = d.getElementById('find-status'); if (st) st.textContent = said || ''; }
+  /* a folder found only in its sheet's file leads to the file while the search lasts, and back after */
+  function unfile(f) {
+    var a = f.querySelector('.folder__btn'), go = f.querySelector('.file__go');
+    if (a && a.hasAttribute('data-sheet-href')) { a.setAttribute('href', a.getAttribute('data-sheet-href')); a.removeAttribute('data-sheet-href'); }
+    if (go && go.hasAttribute('data-was')) { go.textContent = go.getAttribute('data-was'); go.removeAttribute('data-was'); }
+    f.classList.remove('is-in-file');
+  }
   function find(q) {
     var words = fold(q).trim().split(/\s+/).filter(Boolean);
     found = []; foundAt = -1;
-    folders.forEach(function (f) { f.classList.remove('is-match'); });
+    folders.forEach(function (f) { f.classList.remove('is-match'); unfile(f); });
     if (!words.length) { cabinet.classList.remove('is-finding'); setLabel(cabLabelText); if (isOpen) pull(-1); return; }
     if (!corpus) buildCorpus();
+    loadFiles();
     var res = words.map(function (w) { return new RegExp('(^|[^a-z0-9])' + esc(w)); });
-    var bySheet = {};
-    corpus.forEach(function (e) {
-      if (!res.every(function (re) { re.lastIndex = 0; return re.test(e.key); })) return;
-      (bySheet[e.i] = bySheet[e.i] || []).push(e);
-    });
-    /* the best match first: a sheet whose own name matches, then the sheet with more matching lines, then
-       the earlier sheet; Up and Down step through them in that order */
-    Object.keys(bySheet).map(Number).forEach(function (i) {
+    var bySheet = {}, inFiles = {};
+    var match = function (e) { return res.every(function (re) { re.lastIndex = 0; return re.test(e.key); }); };
+    corpus.forEach(function (e) { if (match(e)) (bySheet[e.i] = bySheet[e.i] || []).push(e); });
+    (fileCorpus || []).forEach(function (e) { if (match(e)) (inFiles[e.i] = inFiles[e.i] || []).push(e); });
+    /* the best match first: a sheet whose own name matches, then the sheet with more matching lines (its file's
+       counted with them), then the earlier sheet; Up and Down step through them in that order */
+    Object.keys(bySheet).concat(Object.keys(inFiles)).map(Number).forEach(function (i) {
+      if (found.some(function (r) { return r.i === i; })) return;
       var own = fold(sheetTitle(i) + ' ' + (names[i] || ''));
-      found.push({ i: i, hits: bySheet[i], own: res.every(function (re) { return re.test(own); }) ? 1 : 0 });
+      found.push({ i: i, hits: bySheet[i] || [], fileHits: inFiles[i] || [], own: res.every(function (re) { return re.test(own); }) ? 1 : 0 });
     });
-    found.sort(function (a, b) { return (b.own - a.own) || (b.hits.length - a.hits.length) || (a.i - b.i); });
+    var n = function (r) { return r.hits.length + r.fileHits.length; };
+    found.sort(function (a, b) { return (b.own - a.own) || (n(b) - n(a)) || (a.i - b.i); });
     cabinet.classList.add('is-finding');
     found.forEach(function (r) {
       var f = folders[folderOf[r.i]];
@@ -632,10 +694,22 @@
       f.classList.add('is-match');
       var file = f.querySelector('.file'), q2 = file && file.querySelector('.file__quote');
       if (file && !q2) { q2 = d.createElement('p'); q2.className = 'file__quote'; var go = file.querySelector('.file__go'); file.insertBefore(q2, go); }
-      if (q2) { q2.textContent = ''; q2.appendChild(quote(r.hits[0], res)); }
+      var inFile = !r.hits.length;
+      if (q2) {
+        q2.textContent = '';
+        if (inFile) { var k = d.createElement('span'); k.className = 'file__in'; k.textContent = 'In its file · '; q2.appendChild(k); }
+        q2.appendChild(quote(inFile ? r.fileHits[0] : r.hits[0], res));
+      }
+      if (inFile) {
+        var a = f.querySelector('.folder__btn'), g = f.querySelector('.file__go');
+        r.url = atWords(r.fileHits[0], res);
+        a.setAttribute('data-sheet-href', a.getAttribute('href')); a.setAttribute('href', r.url);
+        if (g) { g.setAttribute('data-was', g.textContent); g.textContent = 'Open the file'; }
+        f.classList.add('is-in-file');
+      }
       var hits = f.querySelector('.folder__hits');
       if (!hits) { hits = d.createElement('span'); hits.className = 'folder__hits'; hits.setAttribute('aria-hidden', 'true'); f.querySelector('.folder__tab').appendChild(hits); }
-      hits.textContent = r.hits.length;
+      hits.textContent = n(r);
     });
     setLabel('Found · ' + found.length + ' of ' + N, 'Found on ' + found.length + ' of ' + N + ' sheets' + (found.length ? ', first ' + sheetTitle(found[0].i) : ''));
     /* the best match's file comes out (on the panel its tab turns white): Enter goes there */
@@ -650,6 +724,7 @@
   }
   /* go to a match: its sheet, then the line itself, ringed in vermilion for a moment */
   function goFound(r, kb) {
+    if (!r.hits.length && r.url) { closeCabinet(false); location.assign(r.url); return; }   /* found only in its file */
     var el = r.hits[0].el, target = el.closest('.entry, li, .tile, .card, .ticket') || el;
     /* an archive card found here is a file on the archive's Macintosh (mac.js): the Mac takes the landing and
        opens the file's window itself */
@@ -662,6 +737,8 @@
     if (!found.handled) {
       target.classList.remove('is-found'); void target.offsetWidth; target.classList.add('is-found');
       setTimeout(function () { target.classList.remove('is-found'); }, 2700);
+      /* a card on the wall of cards opens its file once the deck has landed */
+      if (target.classList.contains('has-file')) setTimeout(function () { openEntry(target); }, reduce ? 0 : 520);
     }
     if (kb) { slides[r.i].setAttribute('tabindex', '-1'); slides[r.i].focus({ preventScroll: true }); }
   }
