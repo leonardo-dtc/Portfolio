@@ -46,9 +46,11 @@
 :where(.mac__screen button) { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .mac__screen :focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
 
-/* the menu bar: the poster's star, then File, View and Special; an open menu drops below its title */
+/* the menu bar: the poster's star (the desk accessories), then File, View and Special; an open menu drops below its
+   title */
 .mac__menubar { position: relative; z-index: 200; flex: none; display: flex; align-items: stretch; height: 30px; padding: 0 8px; background: linear-gradient(#F4F4F4, #E2E2E2); border-bottom: 1px solid var(--ink); font-weight: 700; }
-.mac__mark { display: grid; place-items: center; padding: 0 10px 0 4px; }
+.mac__mt--star { display: grid; place-items: center; padding: 0 10px 0 6px; }
+.mac__mt--star:hover .px-r, .mac__mt--star[aria-expanded="true"] .px-r { fill: #fff; }   /* white on the vermilion it opens on */
 .mac__menu { position: relative; display: flex; }
 .mac__mt { padding: 0 11px; }
 .mac__mt:hover, .mac__mt[aria-expanded="true"] { background: var(--pick); color: #fff; }
@@ -63,13 +65,25 @@
 .mac__mi[aria-pressed="true"] .mac__tick { visibility: visible; }
 .mac__menuend { margin-left: auto; display: flex; align-items: center; padding: 0 6px; font-weight: 400; color: var(--mute); }
 
-/* the desk: the poster's black with a grid of faint dots; the disk and the Trash down its right side */
-.mac__desk { position: relative; flex: 1; min-height: 0; overflow: hidden; container-type: size; background: radial-gradient(circle at 1px 1px, rgba(255,255,255,.07) 1px, transparent 1.4px) 0 0 / 6px 6px, var(--desk); }
-.mac__deskicons { position: absolute; right: 10px; top: 12px; bottom: 12px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
-.mac__icon--desk { display: grid; justify-items: center; gap: 4px; width: 96px; padding: 4px 2px; }
-.mac__icon--desk .mac__name { padding: 1px 5px; background: #fff; color: var(--ink); font-size: 13px; }
+/* the desk: the poster's black with a grid of faint dots (Desktop Patterns offers five more); its icons lie where they
+   were put down (mac.js places them), under the windows */
+.mac__desk { position: relative; flex: 1; min-height: 0; overflow: hidden; container: desk / size; background: radial-gradient(circle at 1px 1px, rgba(255,255,255,.07) 1px, transparent 1.4px) 0 0 / 6px 6px, var(--desk); }
+.mac__deskicons { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.mac__icon--desk { position: absolute; left: 0; top: 0; display: grid; justify-items: center; align-content: start; gap: 4px; width: 96px; padding: 4px 2px; pointer-events: auto; touch-action: manipulation; }
+.mac__icon--desk .mac__name { max-width: 100%; padding: 1px 5px; background: #fff; color: var(--ink); font-size: 13px; line-height: 1.25; text-align: center; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.mac__icon--desk .mac__name { position: relative; z-index: 1; }   /* where icons overlap, every name stays over the pictures */
+.mac__icon--alias .mac__name { font-style: italic; }   /* an alias, as the old Mac set one */
 .mac__icon--desk.is-sel .mac__name { background: var(--pick); color: #fff; }
 .mac__icon.is-sel .mac__pic svg { filter: brightness(.62); }
+.mac__icon--desk.is-dragging { z-index: 5; opacity: .75; }
+/* the desk's patterns (Desktop Patterns; the swatches in its window draw the same) */
+:is(.mac__desk, .mac__swatch)[data-pattern="checks"] { background: conic-gradient(#363434 25%, #1E1D1D 0 50%, #363434 0 75%, #1E1D1D 0) 0 0 / 4px 4px; }
+:is(.mac__desk, .mac__swatch)[data-pattern="graph"] { background: linear-gradient(rgba(255,255,255,.17) 1px, transparent 1px) 0 0 / 60px 60px, linear-gradient(90deg, rgba(255,255,255,.17) 1px, transparent 1px) 0 0 / 60px 60px, linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px) 0 0 / 12px 12px, linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px) 0 0 / 12px 12px, var(--desk); }
+:is(.mac__desk, .mac__swatch)[data-pattern="staff"] { background: linear-gradient(180deg, rgba(255,255,255,.15) 0 1px, transparent 1px 7px, rgba(255,255,255,.15) 7px 8px, transparent 8px 14px, rgba(255,255,255,.15) 14px 15px, transparent 15px 21px, rgba(255,255,255,.15) 21px 22px, transparent 22px 28px, rgba(255,255,255,.15) 28px 29px, transparent 29px) 0 16px / 100% 62px, var(--desk); }
+:is(.mac__desk, .mac__swatch)[data-pattern="rink"] { background: linear-gradient(90deg, transparent calc(50% - 1px), rgba(234,61,46,.6) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(90deg, transparent 31%, rgba(96,132,232,.55) 31% calc(31% + 3px), transparent calc(31% + 3px) 69%, rgba(96,132,232,.55) 69% calc(69% + 3px), transparent calc(69% + 3px)), radial-gradient(circle closest-side at 50% 50%, transparent 46%, rgba(96,132,232,.5) 46% 48%, transparent 48%), linear-gradient(90deg, transparent 7%, rgba(234,61,46,.45) 7% calc(7% + 1px), transparent calc(7% + 1px) 93%, rgba(234,61,46,.45) 93% calc(93% + 1px), transparent calc(93% + 1px)), #1D2025; }
+:is(.mac__desk, .mac__swatch)[data-pattern="maze"] { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M.5 0v12M.5 16v12M0 .5h20M24 .5h4M7.5 0v8M7.5 12v8h8M14.5 4v8h8M21.5 0v4M21.5 8v12M0 24.5h4M8 24.5h20M14.5 20v8M28 16.5h-6' stroke='%23fff' stroke-opacity='.16' fill='none'/%3E%3C/svg%3E") 0 0 / 28px 28px, var(--desk); }
+:is(.mac__desk, .mac__swatch)[data-pattern="dots"] { background: radial-gradient(circle at 1px 1px, rgba(255,255,255,.07) 1px, transparent 1.4px) 0 0 / 6px 6px, var(--desk); }
+.mac__swatch[data-pattern="dots"] { background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.22) 1px, transparent 1.4px); }   /* the swatch is small: its dots show */
 
 /* ---------- a window: the grey frame with its bevel, a ruled title bar with the close box on the left and the zoom
    box on the right (the front window's only; the others are plain and their boxes hidden), then its header and its
@@ -91,8 +105,6 @@
 .mac__win:not(.is-front) .mac__box { visibility: hidden; }
 /* a box's target is bigger than its drawing: 26px square, as the bar is tall */
 .mac__box::before { content: ""; position: absolute; inset: -6px; }
-.mac__info { flex: none; display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 4px 8px 5px; font-size: 13px; color: var(--mute); }
-.mac__hint { white-space: nowrap; }
 .mac__body { min-height: 0; flex: 1; overflow: auto; overscroll-behavior: contain; background: #fff; border: 1px solid var(--ink); box-shadow: inset 1px 1px 0 var(--lo); scrollbar-color: #B5B5B5 #ECECEC; }
 .mac__body::-webkit-scrollbar { width: 15px; height: 15px; }
 .mac__body::-webkit-scrollbar-track { background: #E6E6E6; border-left: 1px solid var(--ink); box-shadow: inset 1px 1px 0 #C9C9C9; }
@@ -107,7 +119,13 @@
 .mac__col[aria-pressed="true"]::after { content: ""; position: absolute; right: 8px; top: 9px; border: 5px solid transparent; border-top: 6px solid var(--ink); border-bottom: 0; }
 .mac__col[aria-pressed="true"][data-dir="up"]::after { border-top: 0; border-bottom: 6px solid var(--ink); }
 .mac__grid { flex: 1; }
-.mac__win--finder { --cols: minmax(0, 1fr) 8.4em 8.2em; }
+.mac__win--finder { --cols: minmax(0, 1fr) 8.4em 8.2em; width: min(520px, calc(100% - 232px)); container: finder / inline-size; }
+/* a narrower window (as it opens beside the desk's icons) gives up the kind column: the file's picture and its window
+   still say it, and zoomed it comes back */
+@container finder (max-width: 559px) {
+  .mac__cols, .mac__file { --cols: minmax(0, 1fr) 8.2em; }
+  .mac__col--kind, .mac__file .mac__kind { display: none; }
+}
 .mac__file { display: grid; grid-template-columns: var(--cols); align-items: center; width: 100%; min-height: 36px; padding: 2px 0; }
 .mac__file > span { padding: 0 8px; min-width: 0; }
 .mac__file .mac__namecell { display: flex; align-items: center; gap: 8px; }
@@ -136,6 +154,7 @@
 .mac__win--doc { width: min(520px, calc(100% - 40px)); }
 .mac__win--doc.is-zoomed, .mac__win--finder.is-zoomed { left: 8px !important; top: 8px !important; width: calc(100% - 16px); height: calc(100% - 16px); max-height: none; }
 .mac__win--trash { width: min(300px, calc(100% - 40px)); }
+.mac__win--app { width: auto; max-width: calc(100% - 16px); }
 .mac__body--trash { height: 120px; flex: none; }
 .mac__body--doc { padding: 16px 22px 22px; user-select: text; -webkit-user-select: text; }   /* a file's words can be copied */
 .mac__meta { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--pick); }
@@ -146,9 +165,73 @@
 .mac__body--doc dl > div { display: contents; }
 .mac__body--doc dt, .mac__body--doc dd { margin: 0; padding: 6px 0; border-bottom: 1px solid #CFCFCF; }
 .mac__body--doc dt { font-weight: 700; color: var(--mute); }
-/* the card's link, drawn as the old default button: rounded, with a heavy ring */
-.mac__go { display: inline-block; margin: 16px 0 4px 4px; padding: 6px 16px; border: 1px solid var(--ink); border-radius: 8px; background: linear-gradient(#FAFAFA, #E0E0E0); box-shadow: 0 0 0 2px var(--face), 0 0 0 4px var(--ink); color: var(--ink); font-weight: 700; text-decoration: none; }
+/* the card's links, drawn as the old default button: rounded, with a heavy ring */
+.mac__goline { display: flex; flex-wrap: wrap; gap: 12px 14px; margin: 16px 0 4px; }
+.mac__go { display: inline-block; margin: 0 4px; padding: 6px 16px; border: 1px solid var(--ink); border-radius: 8px; background: linear-gradient(#FAFAFA, #E0E0E0); box-shadow: 0 0 0 2px var(--face), 0 0 0 4px var(--ink); color: var(--ink); font-weight: 700; text-decoration: none; }
 .mac__go:hover, .mac__go:active { background: var(--pick); color: #fff; }
+.mac__go--small { padding: 4px 14px; }
+.mac__cover { margin: 0 0 12px; }
+.mac__cover img { display: block; width: 132px; height: auto; border: 1px solid var(--ink); }
+.mac__by { margin: -6px 0 10px; font-weight: 700; color: var(--mute); }
+
+/* ---------- the desk accessories: each a small grey window ---------- */
+.mac__win--app > .mac__body { flex: none; padding: 10px; background: var(--face); border: 0; box-shadow: none; overflow: visible; }
+/* the Alarm Clock: the time in Groton to the second */
+.mac__body--clock { min-width: 200px; text-align: center; }
+.mac__clock-time { margin: 2px 0 0; font-size: 28px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.mac__clock-day { margin: 4px 0 2px; font-size: 13px; color: var(--mute); }
+/* the Calculator: its display, then its keys (= two rows tall, 0 two keys wide) */
+.mac__calc-out { display: block; margin-bottom: 10px; padding: 5px 10px; background: #fff; border: 1px solid var(--ink); box-shadow: inset 1px 1px 0 var(--lo); font-size: 22px; font-weight: 700; line-height: 1.25; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; }
+.mac__keys { display: grid; grid-template-columns: repeat(4, 46px); grid-auto-rows: 38px; gap: 6px; }
+.mac__key { display: grid; place-items: center; border: 1px solid var(--ink); border-radius: 6px; background: linear-gradient(#FCFCFC, #E3E3E3); box-shadow: inset 1px 1px 0 #fff, 1px 1px 0 rgba(0,0,0,.35); font-size: 17px; font-weight: 700; text-align: center; }
+.mac__key--op { background: linear-gradient(#EDEDED, #D2D2D2); }
+.mac__key--eq { grid-row: span 2; background: var(--pick); color: #fff; }
+.mac__key--zero { grid-column: span 2; }
+.mac__key:active, .mac__key.is-pressed { background: #C6C6C6; box-shadow: inset 1px 1px 2px rgba(0,0,0,.4); }
+.mac__key--eq:active, .mac__key--eq.is-pressed { background: #8A1F14; }
+.mac__key.is-on { box-shadow: inset 0 0 0 2px var(--pick); }   /* the operation waiting for its second number */
+/* the CD Player: a display and the track keys, then the cover beside the tracks */
+.mac__body--cd { width: 340px; max-width: 100%; }
+.mac__cdface { display: flex; gap: 8px; }
+.mac__lcd { flex: 1; min-width: 0; display: flex; align-items: center; margin: 0; padding: 8px 10px; min-height: 42px; background: #191919; border: 1px solid var(--ink); box-shadow: inset 1px 1px 3px rgba(0,0,0,.6); color: #F2F2F2; font-weight: 700; letter-spacing: .03em; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mac__cdkeys { display: flex; gap: 6px; }
+.mac__cdb { display: flex; align-items: center; justify-content: center; width: 42px; border: 1px solid var(--ink); border-radius: 6px; background: linear-gradient(#FCFCFC, #E3E3E3); box-shadow: inset 1px 1px 0 #fff, 1px 1px 0 rgba(0,0,0,.35); }
+.mac__cdb svg { display: block; width: 9px; height: 12px; }
+.mac__cdb:disabled { color: #8A8A8A; box-shadow: none; cursor: default; }
+.mac__cdmain { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; margin-top: 10px; }
+.mac__cdart:empty { display: none; }
+.mac__cdmain:has(> .mac__cdart:empty) { grid-template-columns: minmax(0, 1fr); }
+.mac__cdart img { display: block; width: 96px; height: 96px; object-fit: cover; border: 1px solid var(--ink); }
+.mac__tracks { margin: 0; padding: 0; list-style: none; max-height: 132px; overflow: auto; background: #fff; border: 1px solid var(--ink); }
+.mac__track { display: grid; grid-template-columns: 2.1em minmax(0, 1fr); column-gap: 4px; width: 100%; padding: 4px 8px; text-align: left; }
+.mac__track-n { grid-row: span 2; color: var(--mute); font-variant-numeric: tabular-nums; }
+.mac__track-t { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mac__track-by { font-size: 13px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mac__track[aria-current="true"], .mac__track[aria-current="true"] span { background: var(--pick); color: #fff; }
+.mac__body--cd .mac__goline { margin: 10px 0 0; }
+/* Desktop Patterns: six swatches, the chosen one ringed */
+.mac__pats { display: grid; grid-template-columns: repeat(3, 88px); gap: 8px; }
+.mac__pat { display: grid; justify-items: center; gap: 5px; padding: 6px 2px 4px; font-size: 13px; }
+.mac__swatch { width: 66px; height: 46px; border: 1px solid var(--ink); box-shadow: 1px 1px 0 rgba(0,0,0,.35); background: var(--desk); }
+.mac__pat[aria-checked="true"] .mac__swatch { outline: 3px solid var(--pick); outline-offset: 2px; }
+.mac__pat[aria-checked="true"] > span:last-child { font-weight: 700; }
+/* the Note Pad: a ruled page with a vermilion margin; its corner turns the eight pages */
+.mac__body--pad { display: flex; flex-direction: column; padding: 0 !important; background: #fff !important; border: 1px solid var(--ink) !important; }
+.mac__pad-text { display: block; width: 250px; max-width: 100%; height: 198px; margin: 0; padding: 8px 12px 8px 34px; border: 0; border-radius: 0; resize: none; background: linear-gradient(90deg, transparent 25px, rgba(234,61,46,.55) 25px 26px, transparent 26px), repeating-linear-gradient(180deg, transparent 0 21px, #D9D9D9 21px 22px) 0 8px / 100% 22px; background-attachment: local; color: var(--ink); font: 400 15px/22px var(--sans, 'Metropolis', system-ui, sans-serif); user-select: text; -webkit-user-select: text; }
+.mac__pad-text:focus { outline: 0; }
+.mac__pad-text:focus-visible { box-shadow: inset 0 0 0 2px var(--red); }
+.mac__pad-foot { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-top: 1px solid var(--lo); background: var(--face); font-size: 13px; }
+.mac__pad-turn { display: grid; place-items: center; width: 28px; height: 22px; border: 1px solid var(--ink); background: linear-gradient(#FCFCFC, #E3E3E3); }
+.mac__pad-turn svg { width: 10px; height: 10px; }
+.mac__pad-n { min-width: 1.6em; text-align: center; font-weight: 700; }
+/* the Puzzle: fifteen tiles in a recess; they slide (at once under reduced motion) */
+.mac__body--puz { display: grid; justify-items: center; gap: 10px; }
+.mac__puz { position: relative; width: 196px; height: 196px; background: var(--lo2); border: 1px solid var(--ink); box-shadow: inset 2px 2px 3px rgba(0,0,0,.45); }
+.mac__puz:focus { outline: 0; }
+.mac__puz:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.mac__tile { position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 25%; height: 25%; translate: calc(var(--x, 0) * 100%) calc(var(--y, 0) * 100%); border: 1px solid var(--ink); background: linear-gradient(#FCFCFC, #E1E1E1); box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 var(--lo); font-size: 18px; font-weight: 700; transition: translate 110ms ease-out; }
+.mac__puz.is-solved .mac__tile { color: var(--pick); }
+.mac__body--puz .mac__goline { margin: 0; }
 .mac__win.is-found { outline: 4px solid var(--red); outline-offset: 4px; }
 
 /* the zooming outlines, as the old screens drew them: inverting whatever is under them */
@@ -163,17 +246,22 @@
 
 /* a smaller screen (a laptop's short window): the names keep their room and the kind column gives way (the file's
    picture and its window still say it) */
-@container (max-width: 699px) {
+@container desk (max-width: 699px) {
   .mac__win--finder { --cols: minmax(0, 1fr) 8.2em; }
   .mac__col--kind, .mac__file .mac__kind { display: none; }
 }
+/* a short desk (most laptops): a desk icon's name keeps to one line, so the icons lie out without covering each
+   other's names (the whole name is in its tooltip, the list and the file's window) */
+@container desk (max-height: 439px) {
+  .mac__icon--desk .mac__name { display: block; white-space: nowrap; text-overflow: ellipsis; }
+}
 /* a narrow screen (a phone, a short window): every window takes the whole desk and stays put; the list keeps the
    name and puts the kind and the year under it */
-@container (max-width: 519px) {
+@container desk (max-width: 519px) {
   .mac__win { left: 6px !important; top: 6px !important; right: 6px; bottom: 6px; width: auto; max-height: none; }
   /* the list keeps one column, the name, with its kind and year under it; the headings become a row of buttons
      that sort it */
-  .mac__win--finder { --cols: minmax(0, 1fr); }
+  .mac__win--finder, .mac__cols, .mac__file { --cols: minmax(0, 1fr); }
   .mac__file .mac__kind, .mac__file .mac__year { display: none; }
   .mac__cols { display: flex; gap: 0; }
   .mac__col { flex: 1; }
@@ -182,9 +270,8 @@
   .mac__file .mac__name { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
   .mac__file .mac__namecell { align-items: center; padding-top: 4px; padding-bottom: 4px; }
   .mac__grid.is-icons { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-  .mac__deskicons { right: 4px; top: 8px; bottom: 8px; }
-  .mac__icon--desk { width: 80px; }
-  .mac__hint { display: none; }
+  /* an accessory sits in the middle of the screen at its own size */
+  .mac__win--app { left: 50% !important; top: 50% !important; right: auto; bottom: auto; translate: -50% -50%; width: max-content; max-width: calc(100% - 12px); max-height: calc(100% - 12px); overflow: auto; }
   .mac__body--doc { padding: 14px 16px 18px; }
   .mac__zoombox { display: none; }
 }
@@ -198,6 +285,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mac__zoom, .mac__boot { display: none !important; }
+  .mac__tile { transition: none; }
 }
 /* forced colours and print: the cards, not the Mac */
 @media (forced-colors: active) {

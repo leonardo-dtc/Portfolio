@@ -261,25 +261,47 @@ The screen is Platinum in the poster's colours:
   header 13px, a file's page 15px (its title 22px, its line 16px). Nothing is under 13px.
 - **Pictures** 32 dots, at 1px a dot in the list and 2px as icons, in ink, white, three greys and vermilion: a
   page with its corner folded and a shadow, carrying an emblem chosen by the card's kind (music video, statistics,
-  arrangement, game design, robotics, rocketry, games; `data-icon` on the card names one; anything else is lines
-  of text), the drive and the Trash.
+  arrangement, game design, robotics, rocketry, games; a song, or a disc for an album, EP, playlist or mixtape;
+  `data-icon` on the card names one; anything else is lines of text), the drive, the Trash, and the six
+  accessories (a clock, a calculator, a CD player, a swatch of patterns, a note pad, the puzzle).
 
 What is on the screen:
-- **The menu bar:** the poster's star in vermilion, File (Open, Close Window), View (as Icons, as List; by Name,
-  by Kind, by Year, a tick on the current ones) and Special (Restart). Each title is a button that opens its
-  list; arrows move through it, Escape closes it, and with one open, pointing at another title opens that one.
-- **The desk:** the Archive disk and the Trash down its right side, their names on white labels.
-- **The Archive window:** a header with "7 items" and "Click a file to open it" ("Tap" on touch screens), the
-  columns' headings (Name, Kind, Year; the sorted one pressed in with a triangle for its direction), then a row a
+- **The menu bar:** the poster's star in vermilion (the desk accessories), File (Open, Close Window), View (as
+  Icons, as List; by Name, by Kind, by Year, a tick on the current ones) and Special (Clean Up Desktop, Restart).
+  Each title is a button that opens its list; arrows move through it, Escape closes it, and with one open,
+  pointing at another title opens that one.
+- **The desk (a little messy, 2026-10-05):** the Archive disk and the Trash, aliases of the CD Player (only once
+  the archive holds a song or an album), the Puzzle and the Note Pad (their names in italics, as the old Mac set
+  an alias), and, lying out, what is still being made: the two newest entries whose year runs to now, never music.
+  They lie in two loose columns beside the Archive window, a little out of line and overlapping here and there;
+  every name stays over the pictures, and on a desk under 440px tall (most laptops) each name keeps to one line.
+  A mouse drags an icon (5px before it moves, and a drag never opens it); Special, Clean Up Desktop lines them up
+  down the right edge, and so does the `macDesk` design toggle (`tidy`) from the start. On phones they lie tidy.
+- **The desk accessories** (the star menu; each opens beside its alias, or from the menu's corner):
+  - *Alarm Clock:* the time in Groton to the second, and the day ("Monday, October 5 · Groton"); it ticks only
+    while open.
+  - *Calculator:* its keys, or the keyboard with its window in front (digits, + − × ÷ or * /, Return or =,
+    Backspace, Delete or C to clear); dividing by zero says Error.
+  - *CD Player:* the archive's songs and albums as its tracks, an LCD with the one playing, back and forward, the
+    cover, Listen on (its service), and Open its file. With no music in the archive it is not on the desk or in
+    the menu.
+  - *Desktop Patterns:* six patterns for the desk (Dots, Checks, Graph paper, Staff, Rink, Maze), kept in this
+    browser.
+  - *Note Pad:* eight pages to write on, turned at its corner, kept in this browser.
+  - *Puzzle:* the fifteen puzzle; a press on a tile beside the space slides it in, and with the board focused an
+    arrow slides the tile on that side; Shuffle starts again, and solving it is announced.
+- **The Archive window:** the columns' headings (Name, Kind, Year; the sorted one pressed in with a triangle for
+  its direction), then a row a
   file: its picture, name, kind and year, rows alternating white and `#F5F5F5`. Sorted by Year, newest first
   ("Now" first, then "2026 to now"; ties keep the cards' order), which is the order the cards stand in. A
   heading sorts by its column (names and kinds A to Z, years newest first); the same heading again turns it
   round. Under 700px wide the kind column gives way to the names; under 520px the list has one column, each
   file's kind and year under its name, and the headings become a row of buttons. View, as Icons lays the files
   out as 64px pictures with their names under them, two lines at most.
-- **A file's window:** a page of plain type: the year and kind in 13px vermilion capitals, the title, the card's
-  line, then the card's paragraphs and details list (`.entry__more`, copied), and the card's link drawn as the
-  old default button (rounded, with a heavy ring). It scrolls inside the window.
+- **A file's window:** a page of plain type: the cover (a song's or album's, square), the year and kind in 13px
+  vermilion capitals, the title, the artist, the card's line, then the card's paragraphs and details list
+  (`.entry__more`, copied), and the card's links drawn as the old default button (rounded, with a heavy ring):
+  Listen on its service, the sheet it belongs to, a page elsewhere. It scrolls inside the window.
 
 Windows:
 - The front window alone has the ruled title bar and its boxes; the others' titles are muted.
@@ -305,8 +327,9 @@ Reduced motion: no outlines and no coming on; the screen is on from the first fr
 colours.** Index cards taped to the paper, four across on desktop. A card is one `<li class="entry">`: its year
 (Anton, vermilion, 24px), its kind (a black tag), its title (the hand face), its line, its file
 (`.entry__more`: paragraphs and a details list) and its link.
-- *With the script* (screen, colours not forced) a card shows its year, kind, title and line; the file and the
-  link are the card's file. The title is a button (`.entry__open`, its `::after` covering the card, so the whole
+- *With the script* (screen, colours not forced) a card shows its year, kind, title and line (and a song's or
+  album's artist, cover and Listen link, over the card's own target); the file and the other links are the
+  card's file. The title is a button (`.entry__open`, its `::after` covering the card, so the whole
   card answers), and its focus ring rings the card. Pointing at a card straightens it to 0 degrees and lifts it
   4px while its tape presses (800ms), and steps the other cards back by colour, with no blur: `#F3F1F1` paper,
   `--ink-2` titles (6.05:1), the kind tag on `--ink-2` (white 6.8:1), the 24px vermilion year at 3.59:1.
@@ -352,18 +375,15 @@ Each sheet keeps 64px more space at its foot, so the pill never covers its last 
 
 ## Adding things
 
-**An archive card.** Copy one `<li class="entry">` in `#archive` (newest first) and change its year, kind,
-title and line, and its file: a paragraph or two in `<div class="entry__more">`, then the details list, one
-`<div><dt>Name</dt><dd>What</dd></div>` a row (rows that cannot be filled are left out; the whole file is
-optional). The link is optional; for a sheet on this page write `<a class="entry__link" href="#record">Sheet
-10, The record</a>` and the script rewrites the number and name from the sheet. Tilt, tape, the card's file,
-the reveal order and Find all follow without other markup. The card is also a file on the Mac, with nothing
-more to do: its kind picks its picture (games, music video, statistics, arrangement, game design, robotics,
-rocketry; anything else is a page of text), or add `data-icon="maze"` (games, film, chart, notes, maze,
-robot, rocket, text) to the `<li>` to choose one.
+**An archive entry** (a song, an album, a project of my own, anything made). The cards are written from
+`archive/*.md`, one file an entry, which v5's archive reads too: add a file there as `archive/README.md` says
+and run `node tools/archive.mjs`, never edit the cards by hand (`--check`, and the unit test, name any drift).
+Tilt, tape, the card's file, the reveal order and Find all follow; so does the Mac: the entry is a file there,
+its kind picks its picture (`icon:` chooses one), a song or an album is a track on the CD Player, and an entry
+still being made may lie out on the desk.
 
 **A file's wording.** Each folder's file is inside its link (`.folder__btn > .file`): edit its title,
-kicker and one line. Leave the "Sheet NN / N" line as it is; the script writes it.
+kicker and one line.
 
 **A project file.** Copy the closest file's folder in `files/`, write its sections, add it to `FILES` in
 `tools/v3-files.mjs` and run `node tools/v3-files.mjs`: it writes the file's title, chrome, drawer, links back
@@ -378,10 +398,9 @@ drifts from the deck.
 2. Add its dot to `.rail` at the same position: `<a href="#id" data-name="Short name" aria-label="Full
    name"></a>`. `data-name` feeds the rail label and the phone pill.
 3. Add its folder to the cabinet at the same position: copy one `<li class="folder">`, change the href,
-   the tab's name, `--tx` (where the tab sits along the folder, 0 to .44) and the file's four lines. If it
+   the tab's name, `--tx` (where the tab sits along the folder, 0 to .44) and the file's three lines. If it
    starts a new discipline, put a `<li class="divider">` before it.
-4. The script writes `--n`, every folder's `--k` and number, every "Sheet NN / N", "N sheets" and the
-   archive's sheet numbers. The HTML's own numbers are the fallback without the script: update them if you
+4. The script writes `--n`, every folder's `--k` and number, and the archive's sheet numbers. The HTML's own numbers are the fallback without the script: update them if you
    want that reading exact.
 5. Run `node tests/v3/check.mjs` (with `python3 tools/serve.py 8778` running): it checks that sections,
    dots and folders match in number and order, the counts, links, text sizes, contrast (at rest and while

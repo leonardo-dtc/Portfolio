@@ -6,8 +6,8 @@
 // It finds Playwright through PLAYWRIGHT_MODULE (the path of its index.mjs) or the usual package names, and runs
 // Chromium. Each check prints "ok" or "FAIL"; any FAIL sets the exit code to 1.
 //
-//   1. structure   the sections, the rail's dots and the cabinet's folders match in number and order, and the
-//                  counts the script writes (--n, "Sheet NN / N", folder numbers, "N sheets") agree with them
+//   1. structure   the sections, the rail's dots and the cabinet's folders match in number and order, the
+//                  counts the script writes (--n, folder numbers) agree with them, and the drawer's label is blank
 //   2. editions    no link, image or stylesheet points into another edition of the portfolio (the deck, every
 //                  file, site.css and files.css)
 //   3. 12px        no visible text under 12px (at rest, with the cabinet open, at desktop and phone widths; every
@@ -32,6 +32,13 @@
 //                  never off the screen's left edge; Find opens a card's file; at 390 and 320 every window takes
 //                  the whole screen and nothing scrolls sideways; under reduced motion no outline zooms; without
 //                  the script, in print and in forced colours the cards show instead
+//   6e. the desk   the Mac's star menu opens its six accessories, each working: the Alarm Clock tells Groton's time,
+//                  the Calculator calculates (keys and keyboard), the CD Player plays the archive's music (or says
+//                  there is no disc), Desktop Patterns changes the desk and keeps it, the Note Pad keeps its pages,
+//                  the Puzzle slides; the desk lies messy at first and every icon is on it, Clean Up and the tidy
+//                  toggle line them up, a mouse drags one without opening it, and what is still being made (the three
+//                  newest, never music) lies out on the desk and opens its file; nothing on the screen is under 13px
+//                  with all of it open
 //   7. files       the hockey file prints on one Letter page; pager lines show without the script; the narrow
 //                  drawer shows one tab; the chrome text sits where the deck's does; Back returns to where the
 //                  reader was
@@ -137,13 +144,11 @@ async function helpers(page) { await page.evaluate(HELPERS); }
     const folders = [...document.querySelectorAll('.cabinet .folder .folder__btn')].map(a => a.getAttribute('href'));
     const n = sections.length;
     const pad = i => (i < 9 ? '0' : '') + (i + 1);
-    const recs = [...document.querySelectorAll('.cabinet .folder')].map(f => f.querySelector('.file__rec').textContent.replace(/\s+/g, ' ').trim());
     const nums = [...document.querySelectorAll('.cabinet .folder__n')].map(x => x.textContent.trim());
     const ks = [...document.querySelectorAll('.cabinet .folder')].map(f => getComputedStyle(f).getPropertyValue('--k').trim());
     return {
       sections, dots, folders, n,
       cssN: getComputedStyle(document.documentElement).getPropertyValue('--n').trim(),
-      recsOk: recs.every((r, i) => r.endsWith(pad(i) + ' / ' + n)), recs,
       numsOk: nums.every((x, i) => x === pad(i)), ksOk: ks.every((k, i) => +k === i),
       label: document.querySelector('[data-cabinet-label]').textContent,
       archive: [...document.querySelectorAll('.entry__link[href^="#"]')].map(a => [a.getAttribute('href'), a.textContent.trim()]),
@@ -153,9 +158,8 @@ async function helpers(page) { await page.evaluate(HELPERS); }
   check(s.sections.length > 0 && s.sections.length === s.dots.length && s.dots.length === s.folders.length, `sections, dots and folders match in number (${s.sections.length}, ${s.dots.length}, ${s.folders.length})`);
   check(s.sections.every((id, i) => s.dots[i] === id && s.folders[i] === id), 'sections, dots and folders match in order', s.sections.map((id, i) => `${id} ${s.dots[i]} ${s.folders[i]}`).filter(l => new Set(l.split(' ')).size > 1));
   check(+s.cssN === s.n, `--n is the number of sheets (${s.cssN})`);
-  check(s.recsOk, '"Sheet NN / N" on every file is written from the sections', s.recs);
   check(s.numsOk && s.ksOk, 'folder numbers and --k follow the folders');
-  check(s.label.endsWith(s.n + ' sheets'), `the drawer says "${s.label}"`);
+  check(s.label === '', `the drawer's label is blank at rest, for Find's count ("${s.label}")`);
   check(s.archive.every(([h, t]) => !/^Sheet/.test(t) || t.startsWith('Sheet ' + s.names[h] + ',')), 'archive links that name a sheet name the right number', s.archive.map(x => x.join(' ')));
   await page.context().close();
 }
@@ -526,10 +530,12 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const s0 = await page.evaluate(() => {
     const m = window.__v3mac, cards = [...document.querySelectorAll('#archive .entries > .entry')];
     const shown = [...document.querySelectorAll('.mac__grid > .mac__file')].map(b => window.__v3mac.files[+b.dataset.i].title);
-    return { n: cards.length, files: m ? m.files.map(f => f.title) : [], shown, titles: cards.map(c => c.querySelector('.entry__title').textContent.replace(/\s+/g, ' ').trim()), on: document.querySelector('.mac__screen').className, cards: getComputedStyle(document.querySelector('#archive .entries')).display, wins: m.windows.map(w => w.querySelector('.mac__title').textContent), year: document.querySelector('.mac__col--year').getAttribute('aria-pressed'), kinds: [...document.querySelectorAll('.mac__file .mac__kind')].map(k => k.checkVisibility()).every(Boolean) };
+    return { n: cards.length, files: m ? m.files.map(f => f.title) : [], shown, titles: cards.map(c => c.querySelector('.entry__title').textContent.replace(/\s+/g, ' ').trim()), on: document.querySelector('.mac__screen').className, cards: getComputedStyle(document.querySelector('#archive .entries')).display, wins: m.windows.map(w => w.querySelector('.mac__title').textContent), year: document.querySelector('.mac__col--year').getAttribute('aria-pressed'), years: [...document.querySelectorAll('.mac__file .mac__year')].every(k => k.checkVisibility()),
+      /* the window opens beside the desk's icons, too narrow for the kind column; zoomed, it has it */
+      kinds: (() => { const f = document.querySelector('.mac__win--finder'); m.zoom(f, true); const k = [...document.querySelectorAll('.mac__file .mac__kind')].every(x => x.checkVisibility()); m.zoom(f, false); return k; })() };
   });
   check(s0.n > 0 && s0.files.join('|') === s0.titles.join('|'), `one file on the Mac for each archive card (${s0.files.length} of ${s0.n})`);
-  check(s0.shown.join('|') === s0.titles.join('|') && s0.year === 'true' && s0.kinds, 'the Archive window lists them with their kind and year, newest first by Year, as the cards stand', JSON.stringify(s0.shown));
+  check(s0.shown.join('|') === s0.titles.join('|') && s0.year === 'true' && s0.years && s0.kinds, 'the Archive window lists them with their year (and, zoomed, their kind), newest first by Year, as the cards stand', JSON.stringify(s0.shown));
   check(/is-on/.test(s0.on) && s0.cards === 'none' && s0.wins.join() === 'Archive', `the screen is on once the sheet arrives, the Archive window open, the cards given way (${s0.on}; ${s0.wins.join()})`);
   const st = () => page.evaluate(() => ({ active: document.activeElement && (document.activeElement.getAttribute('aria-label') || document.activeElement.textContent.trim().slice(0, 40)), doc: !!document.activeElement.closest('.mac__win--doc'), wins: window.__v3mac.windows.map(w => w.querySelector('.mac__title').textContent), cur: document.querySelector('.rail a[aria-current]')?.getAttribute('href') }));
   /* down the list: from the first file to the third */
@@ -541,12 +547,21 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   await page.keyboard.press('Enter'); await page.waitForTimeout(500);
   s = await st();
   check(s.wins.length === 2 && s.doc && want.startsWith(s.wins[1]), `Return opens the file in front, with the focus (${s.wins.join(' | ')})`);
-  /* the file holds the whole card: its line, its paragraphs, its details and its link */
-  const doc = await page.evaluate(() => {
-    const w = window.__v3mac.windows.pop(), f = w._file, li = f.li;
-    return { paras: w.querySelectorAll('.mac__body--doc > p:not([class])').length, cardParas: li.querySelectorAll('.entry__more > p').length, rows: w.querySelectorAll('.mac__body--doc dt').length, cardRows: li.querySelectorAll('.entry__more dt').length, line: (w.querySelector('.mac__lead') || {}).textContent === f.line, link: !!w.querySelector('.mac__go[href^="#"]') };
+  /* every file holds its whole card: its line, its paragraphs, its details and its links (each opened behind the one
+     in front and put away again, so the list keeps its place) */
+  const docs = await page.evaluate(() => {
+    const front = window.__v3mac.windows.pop(), out = [];
+    for (const f of window.__v3mac.files) {
+      const w = f === front._file ? front : window.__v3mac.open(f, false, front._back), li = f.li;
+      out.push({ t: f.title, paras: w.querySelectorAll('.mac__body--doc > p:not([class])').length, cardParas: li.querySelectorAll('.entry__more > p').length, rows: w.querySelectorAll('.mac__body--doc dt').length, cardRows: li.querySelectorAll('.entry__more dt').length, line: (w.querySelector('.mac__lead') || {}).textContent === f.line, links: w.querySelectorAll('.mac__goline > .mac__go').length, cardLinks: li.querySelectorAll('.entry__listen, .entry__link').length });
+      if (w !== front) window.__v3mac.shut(w);
+    }
+    window.__v3mac.open(front._file, true, front._back);
+    return out;
   });
-  check(doc.cardParas > 0 && doc.paras === doc.cardParas && doc.rows === doc.cardRows && doc.line && doc.link, `the file's window holds the whole card: its line, ${doc.paras} paragraphs, ${doc.rows} details and its link`, JSON.stringify(doc));
+  const bad = docs.filter(d => d.paras !== d.cardParas || d.rows !== d.cardRows || !d.line || d.links !== d.cardLinks);
+  check(docs.some(d => d.cardParas > 0) && docs.some(d => d.cardRows > 0) && !bad.length, `each file's window holds its whole card: its line, paragraphs, details and links (${docs.length} files, ${docs.reduce((n, d) => n + d.paras, 0)} paragraphs)`, JSON.stringify(bad));
+  await page.waitForTimeout(400);
   /* the zoom box fills the screen with the window, and puts it back */
   const zoomed = await page.evaluate(async () => {
     const w = window.__v3mac.windows.pop(), d = document.querySelector('.mac__desk').getBoundingClientRect(), r0 = w.getBoundingClientRect();
@@ -587,9 +602,9 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   check(pos[0] === 0 && pos[1] > 12, `the title bar drags its window, never past the screen's left edge (${pos})`);
   await page.click('.mac__win--finder .mac__close'); await page.waitForTimeout(400);
   const closed = (await st()).wins.length;
-  await page.click('.mac__icon--desk >> nth=0'); await page.waitForTimeout(500);
+  await page.click('.mac__icon--desk[data-act="disk"]'); await page.waitForTimeout(500);
   const disk = (await st()).wins.join();
-  await page.click('.mac__icon--desk >> nth=1'); await page.waitForTimeout(500);
+  await page.click('.mac__icon--desk[data-act="trash"]'); await page.waitForTimeout(500);
   const bin = (await st()).wins.join();
   check(closed === 0 && disk === 'Archive' && /Trash/.test(bin), `the close box shuts the Archive window, the disk opens it again, and the Trash opens (${disk}; ${bin})`);
   await page.keyboard.press('Escape');
@@ -621,6 +636,100 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
   const r = await page.evaluate(() => { const d = document.querySelector('.mac__desk').getBoundingClientRect(), w = window.__v3mac.windows.pop().getBoundingClientRect(); return { fill: w.width >= d.width - 16 && w.height >= d.height - 16, side: document.documentElement.scrollWidth > innerWidth }; });
   check(sub && r.fill && !r.side, `${w}x${h}: the list puts each file's kind and year under its name; a file's window takes the whole screen; nothing scrolls sideways`);
   await page.context().close();
+}
+/* ---------- 6e. the Mac's desk and its accessories ---------- */
+{
+  /* the sheet at rest, as a visitor arrives at it (scrolled past rest, the next sheet already covers its foot) */
+  const page = await open({ path: '#archive' });
+  await page.waitForTimeout(1600);
+  const wins = () => page.evaluate(() => window.__v3mac.windows.map(w => w.querySelector('.mac__title').textContent));
+  /* the star menu lists the six accessories, and each opens */
+  await page.click('.mac__mt--star');
+  const items = await page.evaluate(() => [...document.querySelectorAll('#mac-menu-star .mac__mi')].map(b => b.textContent.trim()));
+  const music = await page.evaluate(() => document.querySelectorAll('#archive .entries > .entry--music').length);
+  check(items.join('|') === (music ? 'Alarm Clock|Calculator|CD Player|Desktop Patterns|Note Pad|Puzzle' : 'Alarm Clock|Calculator|Desktop Patterns|Note Pad|Puzzle'), `the star menu lists the accessories, the CD Player only with music in the archive (${items.join(', ')})`);
+  await page.click('#mac-menu-star .mac__mi[data-act="app-clock"]'); await page.waitForTimeout(500);
+  const clock = await page.evaluate(() => [document.querySelector('.mac__clock-time').textContent, document.querySelector('.mac__clock-day').textContent]);
+  check(/^\d{1,2}:\d{2}:\d{2}\s?[AP]M$/.test(clock[0]) && /Groton$/.test(clock[1]) && (await wins()).includes('Alarm Clock'), `the Alarm Clock tells the time in Groton to the second (${clock.join(' ')})`);
+  /* the Calculator: by its keys, and by the keyboard */
+  await page.evaluate(() => window.__v3mac.app('calc')); await page.waitForTimeout(400);
+  const out = () => page.evaluate(() => document.querySelector('.mac__calc-out').textContent);
+  for (const k of ['7', '/', '0', '=']) await page.click(`.mac__key[data-k="${k}"]`);
+  const err = await out();
+  await page.click('.mac__key[data-k="clear"]');
+  await page.evaluate(() => document.querySelector('.mac__win--calc').focus());   /* (Return on a focused key presses that key) */
+  await page.keyboard.type('12*3'); await page.keyboard.press('Enter');
+  const typed = await out();
+  await page.keyboard.type('+0.5='); const half = await out();
+  check(err === 'Error' && typed === '36' && half === '36.5', `the Calculator calculates: 7 ÷ 0 is ${err}, 12*3 typed is ${typed}, then +0.5 is ${half}`);
+  /* the Puzzle: a tile beside the space slides into it, by a press or an arrow */
+  await page.evaluate(() => window.__v3mac.app('puzzle')); await page.waitForTimeout(400);
+  const board = () => page.evaluate(() => [...document.querySelectorAll('.mac__tile')].map(t => t.style.getPropertyValue('--x') + t.style.getPropertyValue('--y')).join());
+  const b0 = await board();
+  const movable = await page.evaluate(() => { const t = [...document.querySelectorAll('.mac__tile')], used = new Set(t.map(x => +x.style.getPropertyValue('--x') + 4 * +x.style.getPropertyValue('--y'))); let s = 0; while (used.has(s)) s++; const n = [s - 4, s + 4, s % 4 ? s - 1 : -1, s % 4 < 3 ? s + 1 : -1].find(j => j >= 0 && j < 16); return t.find(x => +x.style.getPropertyValue('--x') + 4 * +x.style.getPropertyValue('--y') === n).textContent; });
+  await page.click(`.mac__tile >> text="${movable}"`); await page.waitForTimeout(200);
+  const b1 = await board();
+  const arrow = await page.evaluate(() => { const used = new Set([...document.querySelectorAll('.mac__tile')].map(x => +x.style.getPropertyValue('--x') + 4 * +x.style.getPropertyValue('--y'))); let s = 0; while (used.has(s)) s++; return s >= 4 ? 'ArrowDown' : 'ArrowUp'; });
+  await page.focus('.mac__puz'); await page.keyboard.press(arrow); await page.waitForTimeout(200);
+  const b2 = await board();
+  check(b1 !== b0 && b2 !== b1, `the Puzzle's tiles slide: tile ${movable} by a press, then by the arrows`);
+  /* the CD Player: the archive's songs and albums as its tracks; with none it is not on the desk or in the menu */
+  if (music) {
+    await page.evaluate(() => window.__v3mac.app('cd')); await page.waitForTimeout(400);
+    const cd = await page.evaluate(() => ({ lcd: document.querySelector('.mac__lcd').textContent, tracks: document.querySelectorAll('.mac__track').length }));
+    check(cd.tracks === music && /^01 /.test(cd.lcd), `the CD Player holds the archive's ${music} songs and albums (${cd.tracks} tracks; ${cd.lcd})`);
+  } else check(!(await page.$('.mac__icon--desk[data-key="cd"]')), 'with no songs or albums in the archive the CD Player stays off the desk');
+  /* the Note Pad keeps its pages */
+  await page.evaluate(() => window.__v3mac.app('notepad')); await page.waitForTimeout(400);
+  await page.fill('.mac__pad-text', 'Mendelssohn next');
+  await page.click('.mac__pad-turn[aria-label="Next page"]');
+  const blankPage = await page.inputValue('.mac__pad-text');
+  await page.click('.mac__pad-turn[aria-label="Previous page"]');
+  /* Desktop Patterns: the desk takes the pattern chosen */
+  await page.evaluate(() => window.__v3mac.app('patterns')); await page.waitForTimeout(400);
+  await page.click('.mac__pat[data-pat="rink"]');
+  const pat = await page.evaluate(() => document.querySelector('.mac__desk').getAttribute('data-pattern'));
+  /* with everything open nothing on the screen is under 13px */
+  const tiny = await page.evaluate(() => [...document.querySelectorAll('.mac__screen *')].filter(e => e.childNodes.length && [...e.childNodes].some(n => n.nodeType === 3 && n.data.trim()) && e.checkVisibility() && parseFloat(getComputedStyle(e).fontSize) < 13).map(e => e.className + ' ' + getComputedStyle(e).fontSize));
+  check(tiny.length === 0, `with all six accessories open nothing on the screen is under 13px (${tiny.length})`, tiny.slice(0, 5).join(', '));
+  const n = (await wins()).length;
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  check((await wins()).length === n - 1, 'Escape closes the front accessory');
+  await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(2600);
+  await page.evaluate(() => window.__v3mac.app('notepad')); await page.waitForTimeout(400);
+  const kept = await page.inputValue('.mac__pad-text');
+  await page.focus('.mac__pad-text'); await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  const pat2 = await page.evaluate(() => document.querySelector('.mac__desk').getAttribute('data-pattern'));
+  check(blankPage === '' && kept === 'Mendelssohn next' && pat === 'rink' && pat2 === 'rink', `the Note Pad keeps each page and Desktop Patterns its pattern, after a reload (${JSON.stringify([blankPage, kept, pat, pat2])})`);
+  await page.evaluate(() => { localStorage.removeItem('v3:notepad'); localStorage.removeItem('v3:mac-pattern'); });
+  /* the desk: messy at first, every icon on it; what is still going lies out on it and opens its file */
+  const lay = () => page.evaluate(() => { const d = document.querySelector('.mac__desk').getBoundingClientRect(); return window.__v3mac.icons.map(b => { const r = b.getBoundingClientRect(); return { k: b.dataset.key, x: Math.round(r.left - d.left), y: Math.round(r.top - d.top), r: Math.round(r.right - d.left), b: Math.round(r.bottom - d.top), w: Math.round(d.width), h: Math.round(d.height) }; }); });
+  const messy = await lay();
+  const inside = l => l.every(i => i.x >= 0 && i.y >= 0 && i.r <= i.w && i.b <= i.h);
+  const columns = l => new Set(l.map(i => i.r)).size;
+  check(inside(messy) && columns(messy) > 2, `the desk lies messy: ${messy.length} icons, all on the desk, out of line (${columns(messy)} different right edges)`);
+  const loose = await page.evaluate(() => window.__v3mac.icons.filter(b => b.dataset.act === 'file').map(b => b.querySelector('.mac__name').textContent));
+  const going = await page.evaluate(() => window.__v3mac.files.filter(f => /now/i.test(f.year) && !f.music).slice(0, 3).map(f => f.title));
+  await page.click('.mac__icon--desk[data-act="file"] >> nth=0'); await page.waitForTimeout(500);
+  const opened = (await wins()).pop();
+  check(loose.length && loose.join('|') === going.join('|') && opened === going[0], `what is still going lies out on the desk and opens its file (${loose.join(', ')}; ${opened})`);
+  await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+  /* a mouse drags an icon without opening it */
+  const icon = await page.evaluate(() => { const r = document.querySelector('.mac__icon--desk[data-key="puzzle"]').getBoundingClientRect(); return [r.left + r.width / 2, r.top + 20]; });
+  const before = (await wins()).length;
+  await page.mouse.move(icon[0], icon[1]); await page.mouse.down(); await page.mouse.move(icon[0] - 60, icon[1] + 30, { steps: 5 }); await page.mouse.up(); await page.waitForTimeout(300);
+  const moved = (await lay()).find(i => i.k === 'puzzle'), was = messy.find(i => i.k === 'puzzle');
+  check(Math.abs(moved.x - was.x + 60) <= 2 && (await wins()).length === before, `a mouse drags an icon (Puzzle moved ${moved.x - was.x}, ${moved.y - was.y}) without opening it`);
+  /* Special, Clean Up Desktop lines them up down the right edge */
+  await page.click('.mac__mt >> text=Special'); await page.click('.mac__mi[data-act="cleanup"]'); await page.waitForTimeout(300);
+  const tidy = await lay();
+  check(inside(tidy) && columns(tidy) <= 2 && tidy.every(i => i.r > i.w - 220), `Clean Up lines them up down the right edge (${columns(tidy)} columns)`);
+  await page.context().close();
+  const tp = await open({ path: '?toggles=macDesk:tidy#archive' });
+  await tp.waitForTimeout(1600);
+  const t2 = await tp.evaluate(() => { const d = document.querySelector('.mac__desk').getBoundingClientRect(); return new Set(window.__v3mac.icons.map(b => Math.round(b.getBoundingClientRect().right - d.left))).size; });
+  check(t2 <= 2, `the tidy toggle (macDesk) lines the desk up from the start (${t2} columns)`);
+  await tp.context().close();
 }
 {
   const page = await open({ reduced: true, path: '#archive' });
@@ -793,7 +902,7 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
 }
 {
   // T40: the cover as a desk. Six objects, each a link to its project file, on screen, clear of the name's letters,
-  // of each other, the tag, the rail and the hint (the code panel's link lies under the name, as the panel does);
+  // of each other, the tag, the rail and the hand line (the code panel's link lies under the name, as the panel does);
   // on phones a grid of three under the name; pointing at one picks it up; a click opens its file
   const out = [];
   for (const [w, h] of [[1440, 900], [1280, 720], [1280, 800], [1536, 864], [1920, 1080], [1024, 768], [768, 1024], [390, 844], [320, 640]]) {
@@ -805,12 +914,12 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
       const items = [...document.querySelectorAll('.desk__item')].map(li => { const a = li.querySelector('a'), parts = [...a.children].filter(c => c.checkVisibility()).map(box); return { name: li.className.match(/--(\w+)/)[1], href: a.getAttribute('href'), parts, all: box(a), label: parseFloat(getComputedStyle(li.querySelector('.desk__label')).fontSize) }; });
       const rg = document.createRange(), letters = [];
       for (const w of document.querySelectorAll('.cover__title > .name .w')) { rg.selectNodeContents(w); for (const r of rg.getClientRects()) letters.push({ l: r.left, t: r.top + r.height * .12, r: r.right, b: r.bottom - r.height * .1 }); }
-      const others = ['.cover__foot .tag', '.rail', '.cover__hint', '.cover__hand'].map(s => document.querySelector(s)).filter(e => e && e.checkVisibility()).map(box);
+      const others = ['.cover__foot .tag', '.rail', '.cover__hand'].map(s => document.querySelector(s)).filter(e => e && e.checkVisibility()).map(box);
       const vw = innerWidth, vh = innerHeight, bad = [];
       for (const it of items) {
         if (it.all.l < 0 || it.all.r > vw || it.all.t < 0 || (vw >= 900 && it.all.b > vh)) bad.push(`${it.name} off screen`);
         if (it.name !== 'research' && it.parts.some(p => letters.some(L => meet(p, L)))) bad.push(`${it.name} on the name`);
-        if (it.parts.some(p => others.some(o => meet(p, o, 2)))) bad.push(`${it.name} on the tag, rail, hint or hand line`);
+        if (it.parts.some(p => others.some(o => meet(p, o, 2)))) bad.push(`${it.name} on the tag, rail or hand line`);
         for (const o of items) if (o !== it && it.name < o.name && it.parts.some(p => o.parts.some(q => meet(p, q)))) bad.push(`${it.name} on ${o.name}`);
         if (it.label < 16) bad.push(`${it.name}'s label at ${it.label}px`);
       }
@@ -819,7 +928,7 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
     if (m.n !== 6 || m.hrefs !== 'files/aducanumab/ files/genuvalens/ files/hockey/ files/loquar/ files/ocapex/ files/resume/' || m.bad.length || m.mask || m.wide > 0) out.push(`${w}x${h}: ${JSON.stringify(m)}`);
     await p.context().close();
   }
-  check(out.length === 0, 'T40: the desk lays six objects, each a link to its file, clear of the name, each other, the tag, the rail and the hint, from 1920x1080 to a 320px phone (labels 16px or more, no sideways scroll)', out);
+  check(out.length === 0, 'T40: the desk lays six objects, each a link to its file, clear of the name, each other, the tag, the rail and the hand line, from 1920x1080 to a 320px phone (labels 16px or more, no sideways scroll)', out);
   const p = await open({ path: '?toggles=cover:desk' });
   await p.waitForTimeout(900);
   const mid = () => p.evaluate(() => { const r = document.querySelector('.desk__item--hockey .desk__obj').getBoundingClientRect(); return (r.top + r.bottom) / 2; });

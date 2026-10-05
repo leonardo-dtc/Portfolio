@@ -29,7 +29,7 @@ Then open `http://127.0.0.1:8778/v3/`.
 | `hockey` | Goaltender: measurables, the season's line in the display face, team history, the coaches by name and role with how to write | `v2/hockey/` |
 | `music` | Viola and violin, Carnegie Hall ticket, honors | `v2/resume/#music`, `#music-honors` |
 | `record` | Education, honors, service and leadership | `v2/resume/` |
-| `archive` | A personal archive on a Macintosh: each index card is a file, listed with its kind and year and opened as a page holding the card's whole text and a link to the sheet that describes it | `v2/resume/#class-projects`, `#robotics`, `#amora`, `#music`, `v2/work/daedalus/`, v1's robotics line |
+| `archive` | A personal archive on a Macintosh: each index card is a file, listed with its kind and year and opened as a page holding the card's whole text and its links; songs and albums play on its CD Player. Written from `archive/*.md` by `tools/archive.mjs` (`archive/README.md` says how to add an entry) | `v2/resume/#class-projects`, `#robotics`, `#amora`, `#music`, `v2/work/daedalus/`, v1's robotics line |
 | `contact` | Let's talk, clean: the framed words, the email slab, the three profiles, a plain end | `v2/` footer, v4 and v5 contact sections |
 
 Every fact and caveat comes from the v2 pages and `CONTENT-REVIEW.md`. Copy is
@@ -49,6 +49,7 @@ only (`localStorage`, `v3:toggles`), so visitors always see the defaults.
 | `cover` | T40 | `poster` | `poster`, `desk` (the cover's objects open the six project files) |
 | `talk` | T18 | `clean` | `clean` (the contact sheet, clean), `collage` (as round three left it: stickers, tape, the torn end) |
 | `talkWords` | T18 | `lets-talk` | `lets-talk`, `get-in-touch`, `say-hello` |
+| `macDesk` | (Request E) | `messy` | `messy` (the Mac's icons lie out, a little out of line), `tidy` (lined up down the right edge, as Clean Up leaves them) |
 
 - **In the console:**
   - `toggles` shows their values, and `toggles.list()` what each is and its
@@ -211,8 +212,8 @@ for the deck. Either makes two systems for the same files.
   second tap resumes. It waits while the cover is covered or the tab is hidden, and
   stops when the script ends. Reduced motion shows the whole script at once, and so
   does the first key press anywhere on the page, so a keyboard reader never has
-  two minutes of typing beside them. Its
-  text is 12px, the site's floor; the "Scroll" hint below pulses three times and rests.
+  two minutes of typing beside them; finished, it shows the end of the last file, the one its bar names. Its
+  text is 12px, the site's floor. Without the script there is no panel (only the script types into it).
 - **Details from the deck's tutorial** (GraphiqVibe, "How to create a Graphic Design
   PORTFOLIO in 2025"): the sliced letter in the title, the torn strip with recoloured
   letters, a tilted editor panel (here Leonardo's own analysis and controller
@@ -230,10 +231,17 @@ for the deck. Either makes two systems for the same files.
     drawn on a grid of 32 dots, as the old icons were, now shaded in greys with a vermilion detail each: a page
     with its corner folded and its emblem (a screen with a play mark, bars, notes, a maze, a robot, a rocket,
     lines of text), the drive and the Trash.
-  - **The menu bar:** the poster's star in vermilion, then File (Open, Close Window), View (as Icons, as List;
-    by Name, by Kind, by Year) and Special (Restart). With a menu open, pointing at another title opens that one.
-  - **The Archive window:** "7 items" and "Click a file to open it" (Tap on touch screens) in its header, then a
-    list: a row a file, its picture, name, kind and year. It is sorted by Year, newest first, the order the cards
+  - **The menu bar:** the poster's star in vermilion (the desk accessories: Alarm Clock, Calculator, CD Player,
+    Desktop Patterns, Note Pad, Puzzle), then File (Open, Close Window), View (as Icons, as List; by Name, by
+    Kind, by Year) and Special (Clean Up Desktop, Restart). With a menu open, pointing at another title opens
+    that one.
+  - **The desk, a little messy (Request E):** Leonardo liked the Mac but found it "bland with only the archive".
+    The disk and the Trash share it with aliases of three accessories and, lying out, the two newest things still
+    being made; a mouse drags them, Clean Up lines them up, and the `macDesk` toggle starts it tidy. The
+    accessories are described in `DESIGN.md`: a clock set to Groton, a calculator, a CD player for the archive's
+    songs and albums (on the desk only once there are some), desktop patterns, a note pad and the fifteen puzzle,
+    their state kept in this browser.
+  - **The Archive window:** a list: a row a file, its picture, name, kind and year. It is sorted by Year, newest first, the order the cards
     stand in; a column's heading sorts by it (names A to Z, years newest first) and the same heading again turns
     it round. Up and Down move along the list, Home and End jump, typing a name's first letters goes to it, and
     one click or Return opens the file (as on a phone; the old Mac wanted two). View, as Icons shows the files as
@@ -435,8 +443,8 @@ then sections behind black divider tabs, and the previous and next files as two 
   so a file always rises in front of the folders behind it and behind its own
   folder's front.
 - The counts come from the page: the script writes `--n`, each folder's `--k` and
-  number, each file's "Sheet NN / N", "N sheets" and the archive's "Sheet NN, name"
-  links; the HTML keeps the same values as the fallback without the script.
+  number and the archive's "Sheet NN, name" links; the HTML keeps the same values as the fallback without the
+  script.
 - To add a sheet, a file or an archive card, follow the steps in `DESIGN.md`, then
   run `node tests/v3/check.mjs`.
 - Keep `<meta name="robots" content="noindex">`.
