@@ -70,10 +70,12 @@ export async function measure(page, { stage = false } = {}) {
     const cr = (a, b) => (Math.max(a, b) + .05) / (Math.min(a, b) + .05);
     const out = { pct, lit, bright, grey, oh, ground: med(rg), parts: parts.map(q => { const e = at(q.edge, .75), n = med(q.near), f = med(q.face), o = med(q.pool); return { ch: q.ch, edge: cr(e, n), face: cr(f, n), pool: cr(f, o), near: n }; }) };
     if (!stage) return out;
-    // the stage: everything but the hint and the colour control (which are not the room), outside the name's box
+    // the stage: everything but the hint, the colour control, and the line and the apps under the name (which are
+    // not the room), outside the name's box
     const skip = new Uint8Array(W * H);
     const hint = [...document.querySelectorAll('.hero__hint span')].find(s => getComputedStyle(s).display !== 'none'), hue = document.querySelector('.hue__button');
-    for (const el of [hint, hue].filter(Boolean)) { const b = el.getBoundingClientRect(); for (let y = Math.max(0, Math.floor((b.top - 10) * k)); y < Math.min(H, Math.ceil((b.bottom + 10) * k)); y++) for (let x = Math.max(0, Math.floor((b.left - 10) * k)); x < Math.min(W, Math.ceil((b.right + 10) * k)); x++) skip[y * W + x] = 1; }
+    const under = [...document.querySelectorAll('.hero__line, .hero .app')].filter(e => getComputedStyle(e).display !== 'none' && getComputedStyle(e.closest('.hero__below')).display !== 'none');
+    for (const el of [hint, hue, ...under].filter(Boolean)) { const b = el.getBoundingClientRect(); for (let y = Math.max(0, Math.floor((b.top - 10) * k)); y < Math.min(H, Math.ceil((b.bottom + 10) * k)); y++) for (let x = Math.max(0, Math.floor((b.left - 10) * k)); x < Math.min(W, Math.ceil((b.right + 10) * k)); x++) skip[y * W + x] = 1; }
     // each pixel's distance from the letters (em), by a two-pass chamfer over the screen, and the letters' centre
     const L = mask(0), em = size * k, D = new Float32Array(W * H);
     let cx = 0, cy = 0, n = 0;

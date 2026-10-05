@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/css/site.css">
 <link rel="preload" href="assets/fonts/switzer-variable.woff2" as="font" type="font/woff2" crossorigin>
-<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting')})(document.documentElement)</script>
+<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting')})(document.documentElement)</script>
 <script type="module" src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -21,6 +21,16 @@
 <div class="hero">
   <button class="hero__name" type="button" aria-label="Leonardo Carvalho. Enter the portfolio"><span class="hero__text"><span class="hero__w">Leonardo</span> <span class="hero__w">Carvalho</span></span></button>
   <span class="hero__neon" aria-hidden="true"><b></b><i></i><i></i></span>
+  <div class="hero__below">
+    <p class="hero__line">Goaltender at Groton School, Class of 2028.</p>
+    <nav class="apps" aria-label="Go straight to">
+      <a class="app" data-app="work" href="work/"><span class="app__art"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z"/></svg></span><span class="app__name">Work</span><span class="app__more app__shots" aria-hidden="true"><img src="assets/img/loquar-openworld-320.webp" width="320" height="200" alt="" loading="lazy" decoding="async"><img src="assets/img/genuvalens-hardware-crop-320.webp" width="320" height="213" alt="" loading="lazy" decoding="async"><img src="assets/img/ocapex-site-320.webp" width="320" height="200" alt="" loading="lazy" decoding="async"></span></a>
+      <a class="app" data-app="hockey" href="hockey/"><span class="app__art"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5 13.5 17h5.5M4 19a3.5 1.4 0 1 0 7 0 3.5 1.4 0 1 0-7 0"/></svg></span><span class="app__name">Hockey</span><span class="app__more app__line" aria-hidden="true">Groton School Boys’ Varsity, goaltender</span></a>
+      <a class="app" data-app="about" href="about/"><span class="app__art"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.4 8.5a3.6 3.6 0 1 0 7.2 0 3.6 3.6 0 1 0-7.2 0M5 20c.9-3.6 3.6-5.5 7-5.5s6.1 1.9 7 5.5"/></svg></span><span class="app__name">About</span><span class="app__more app__photo" aria-hidden="true"><img src="assets/img/leonardo-square-320.webp" width="320" height="320" alt="" loading="lazy" decoding="async"></span></a>
+      <a class="app" data-app="resume" href="resume/"><span class="app__art"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10A.5.5 0 0 1 7 20zM13.5 3.5v4.5H18M9.5 12.5h5M9.5 16h5"/></svg></span><span class="app__name">Résumé</span><span class="app__more app__page" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></a>
+      <a class="app" data-app="write" href="mailto:leonardo.dtc2009@gmail.com"><span class="app__art"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v11H4zM4.5 7l7.5 6 7.5-6"/></svg></span><span class="app__name">Write to me</span><span class="app__more app__line" aria-hidden="true">leonardo.dtc2009@gmail.com</span></a>
+    </nav>
+  </div>
   <p class="hero__hint"><span class="hero__fine">Click the title to proceed</span><span class="hero__coarse">Tap the title to proceed</span></p>
 </div>
 
@@ -71,7 +81,8 @@
         <p class="note section__sub">The smaller things, made for a class, a quartet or the fun of it.</p>
         <!-- Experiments: the same list on Home and on Work (v5/work/index.html); add one by copying an <li> into both -->
         <ul class="rows exp">
-          <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>snake, minesweeper and a dinosaur runner</em><small>Rebuilt from scratch in Python and Java, AP Computer Science</small></span><span class="row__m">2026</span></a></li>
+          <!-- Left out, as Leonardo chose on 2026-10-05 (T6: leave the class games out); the résumé keeps them as coursework.
+          <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>snake, minesweeper and a dinosaur runner</em><small>Rebuilt from scratch in Python and Java, AP Computer Science</small></span><span class="row__m">2026</span></a></li> -->
           <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>a cover with its own music video</em><small>A Calculus BC final</small></span><span class="row__m">2026</span></a></li>
           <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>ten sports, one composite index</em><small>Five categories, AP Statistics</small></span><span class="row__m">2026</span></a></li>
           <li><a class="row" href="resume/#amora" data-hover><span class="row__t"><em>vivaldi’s summer, arranged for amora</em><small>One season per player; mine is Summer</small></span><span class="row__m">2026</span></a></li>

@@ -103,6 +103,7 @@ uniform vec2 uLight; uniform vec2 uPointer; uniform int uCount; uniform float uS
 uniform mat3 uInv[16]; uniform vec4 uBox[16]; uniform vec4 uState[16];
 uniform vec4 uInk0; uniform vec3 uInkX; uniform vec4 uInk1; uniform vec4 uInkL;
 uniform vec3 uTint[4]; uniform vec3 uStageC; uniform vec3 uNeon[14]; uniform vec2 uArc;
+uniform float uInkMode; uniform vec3 uGlassC[3];
 // ---------- the hero's name in neon light (after Apple's "It's Glowtime") ----------
 const float TAU = 6.2831853;
 // The name's light held inside its colour style's family, the arc uArc (for Cobalt the Glowtime colours, orange through
@@ -199,6 +200,56 @@ vec3 glassOver(int i, vec2 lp, float sd, vec2 px, vec3 col) {
   return mix(col, g, smoothstep(1.5, -0.5, sd) * min(1.0, m * 1.6));
 }
 
+// The name in glass (the other look of the hero, T41: the launcher mock's): solid Liquid Glass letters lit from the
+// upper left, leaning toward the pointer, with a light behind them in the colour style (uGlassC: night and day glow,
+// day glass, turned with the room in room.js), in the lit room. The room behind is frosted inside the letters and
+// bent at their bevel (the mask's soft green), with a bright rim, a fainter one on the far side, a highlight drawn
+// toward the pointer and a slow sweep of light. As the window's title it turns plain white, as the neon does.
+vec3 glassName(vec3 col, vec2 mu, float lk, vec2 isz, vec2 px, vec2 uv) {
+  float on = uInk0.x, white = uInk0.z, bev = max(uInk0.w, 1.0);
+  float cov = textureLod(uInk, mu, lk).r * on;
+  vec2 lean = uInk1.yz * uInkX.x / isz;
+  float back = textureLod(uInk, mu - lean, lk).b;                     // the wide light behind
+  float leak = textureLod(uInk, mu - lean * 0.4, lk + 3.0).r;         // and a tight leak of it right at the edges
+  vec3 glowC = mix(uGlassC[0], uGlassC[1], uDay);
+  float glow = uInk1.x * on * (1.0 - white);
+  col += glowC * (back * mix(0.5, 0.26, uDay) + leak * mix(0.22, 0.14, uDay)) * glow;
+  if (cov <= 0.003) return col;
+  float hc = textureLod(uInk, mu, lk).g;
+  vec2 e = vec2(max(1.0, bev * 0.5) * uInkX.x) / isz;
+  float hx = textureLod(uInk, mu + vec2(e.x, 0.0), lk).g - textureLod(uInk, mu - vec2(e.x, 0.0), lk).g;
+  float hy = textureLod(uInk, mu + vec2(0.0, e.y), lk).g - textureLod(uInk, mu - vec2(0.0, e.y), lk).g;
+  // the moving surface, kept to a shimmer
+  vec2 q = uv * vec2(uRes.x / uRes.y, 1.0);
+  vec2 flow = vec2(sin(q.y * 21.0 + uTime * 0.9 + 1.7 * sin(q.x * 9.0 + uTime * 0.5)), cos(q.x * 17.0 - uTime * 0.7 + 1.9 * sin(q.y * 11.0 - uTime * 0.4)));
+  vec3 n = normalize(vec3(-vec2(hx, hy) * 3.0 + flow * 0.012, 1.0));
+  // the light: from the upper left, leaning gently toward the pointer
+  vec3 L = normalize(vec3(clamp((uLight - px) / uRes.y, -1.0, 1.0) * 0.5 + vec2(-0.42, -0.58), 0.75));
+  vec2 lit = normalize(L.xy + 1e-5), nn = normalize(n.xy + 1e-5);
+  float slope = clamp(1.0 - n.z, 0.0, 1.0);
+  float edge = exp(-pow((hc - 0.56) / 0.13, 2.0));                    // the rim, just inside the letter's edge
+  float facing = max(dot(nn, lit), 0.0), away = max(dot(nn, -lit), 0.0);
+  // frosted inside: the room behind, bent a little at the bevel and deeply blurred, lit from behind
+  vec2 spx = px - n.xy * bev * 3.5;
+  vec2 suv = spx / uRes; suv.y = 1.0 - suv.y;
+  vec3 frost = roomAt(suv, max(uLod, uFrostLod));
+  vec3 g = frost * 1.12 + glowC * (0.24 + 0.5 * back) * uInk1.x + vec3(0.1);
+  // by day the room behind is bright, so the glass is a deeper blue (as the windows are) and the rims draw on it
+  g = mix(g, mix(frost * 0.55, uGlassC[2], 0.62) + glowC * 0.12 * back * uInk1.x, uDay);
+  g *= 1.0 - 0.38 * slope * away;                                     // the bevel away from the light falls into shade
+  g += vec3(0.96, 0.98, 1.0) * edge * (0.95 * facing + 0.38 * away + 0.12);   // a bright rim, a fainter one behind
+  g += vec3(0.96, 0.98, 1.0) * slope * facing * 0.35;
+  // a soft highlight across the faces, drawn toward the pointer
+  vec2 dl = (px - uInkL.xy) / max(uInkL.z, 1.0);
+  g += vec3(0.95, 0.97, 1.0) * uInkL.w * exp(-dot(dl, dl));
+  float sweep = fract(uTime / 9.0) * 2.6 - 0.8;
+  g += vec3(1.0) * 0.045 * exp(-pow((uv.x * 0.85 + (1.0 - uv.y) * 0.35 - sweep) * 6.0, 2.0));
+  // as the window's title it is plain white, as the HTML title it hands off to
+  g = mix(g, vec3(1.0), white);
+  g *= 1.0 - 0.5 * uInk0.y;
+  return mix(col, g, cov);
+}
+
 void main() {
   vec2 px = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
   vec2 uv = gl_FragCoord.xy / uRes;
@@ -246,7 +297,9 @@ void main() {
     vec2 isz = vec2(textureSize(uInk, 0));
     vec2 mp = px * uInkX.x + uInkX.yz;                                   // this pixel in the mask
     vec2 mu = mp / isz;
-    if (mu.x > 0.0 && mu.y > 0.0 && mu.x < 1.0 && mu.y < 1.0) {
+    if (mu.x > 0.0 && mu.y > 0.0 && mu.x < 1.0 && mu.y < 1.0 && uInkMode > 0.5) {
+      col = glassName(col, mu, max(0.0, log2(max(uInkX.x, 1e-4))), isz, px, uv);
+    } else if (mu.x > 0.0 && mu.y > 0.0 && mu.x < 1.0 && mu.y < 1.0) {
       // an explicit mip level: inside this branch the GPU has no derivatives to choose one at the mask's edge
       float lk = max(0.0, log2(max(uInkX.x, 1e-4)));
       float on = uInk0.x, white = uInk0.z, sig = max(uInk0.w, 0.75);    // sig: the outline's softness, mask px

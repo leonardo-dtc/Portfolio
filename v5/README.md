@@ -259,6 +259,61 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   head script reads the navigation type), so it can be reviewed without
   clearing storage.
 
+### Under the name: the line and the apps (2026-10-05)
+
+- **The apps (T34):** Work, Hockey, About, Résumé and Write to me, under the
+  name. Each is a real link (`.apps`, written by `tools/v5-chrome.mjs` from the
+  tab bar's list), so they work from the keyboard and without the room.
+  - **A page's app:** choosing one puts that page in the window behind the
+    hero, unseen (`nav.go(href, { quiet: true })`), with the tab bubble already
+    on its tab. Then the light goes out as its windows arrive, while the app
+    swells and fades. Home is never passed through.
+  - **Write to me** opens mail, and the hero stays.
+  - **Keys:** Return on an app opens it; Return anywhere else enters Home.
+  - **Colour:** the apps take the colour style (`--style`, set by `hue.js`)
+    with white glyphs (T35), and none shows a number (T36).
+- **The line (T27):** "Goaltender at Groton School, Class of 2028.", the home
+  page's own first words. `hero.js` (`arrange()`) places the name and what is
+  under it as one group, a little below the middle as in the launcher mock;
+  the name never sits lower than its own place, 45%.
+- **Getting past it (T26):** a click or a tap on the title, Return, a scroll that
+  adds up to a deliberate move (40 px; a nudge does not), a swipe up of 48 px,
+  Down, Page Down or Space.
+- **Two looks for the name (T41):**
+  - the neon above;
+  - the glass name of round two, as in the launcher mock: solid Liquid Glass
+    letters with a light behind them in the colour style (`uGlassC`, turned
+    with the room), in the lit room with no stage, and the same glide.
+
+  Without WebGL each has its CSS version.
+
+## Design toggles
+
+The choices Leonardo left open on the decision page, or asked to try, are design
+toggles: data attributes on `<html>`, read by the stylesheet and the hero, set
+before the first paint by every page's head script, and kept in that browser
+only (`localStorage`, `v5:toggles`), so visitors always see the defaults.
+`assets/js/toggles.js` holds them.
+
+| Toggle | Question | Default | Choices |
+| --- | --- | --- | --- |
+| `heroContent` | T27 | `both` | `name` (a), `line` (b), `apps` (c), `both` (d): the name with the hint, the line, the apps, or both |
+| `launcher` | T39 | `icons` | `icons` (round glass, as in the mock), `library` (a: covers, like Steam's library), `widgets` (b: a dashboard), `desktop` (c: a Mac desktop down the right edge) |
+| `heroName` | T41 | `neon` | `neon`, `glass` |
+
+- **In the console:**
+  - `toggles` shows their values, and `toggles.list()` what each is and its
+    choices;
+  - `toggles.launcher = 'widgets'`, `toggles.set('launcher', 'widgets')` or
+    `toggles.T39 = 'b'` sets one (T27 and T39 take the decision page's
+    letters);
+  - `toggles.reset()` forgets them all.
+- **In the address:** `?toggles=launcher:widgets,heroName:glass`.
+- **In the Elements panel:** edit the attribute on `<html>`. A value a toggle
+  does not take goes back, with a note in the console.
+- **While the hero shows,** a change takes effect at once. Reload the home page
+  to see the hero again.
+
 ## The glass
 
 - Every glass element carries `data-glass` (`window`, `ornament`, `control` or
@@ -371,7 +426,11 @@ South Florida, correspondence goes via a parent.
 ## Adding a project or an experiment
 
 Every page repeats the same chrome (the tab bar first, then the main window, the
-side window and the toolbar), so a new item touches a few files by hand. In order:
+side window and the toolbar). The tab bar, the head script, the hero's apps and
+Write to me in the headers of Work and the project sheets are written by
+`node tools/v5-chrome.mjs` from one list (its `--check` names a page that drifts,
+and the unit tests run it); the rest of a new item touches a few files by hand.
+In order:
 
 **A project** (a sheet over Work):
 
@@ -380,7 +439,8 @@ side window and the toolbar), so a new item touches a few files by hand. In orde
    `<html>` attributes `data-kind="sheet" data-tab="work" data-parent="../"`,
    set `data-page="<slug>"`, the `<title>` ("Name · Leonardo Carvalho") and the
    description, and keep `<meta name="robots" content="noindex">`. Keep the tab
-   bar where it is, before `<main>`, with Work current.
+   bar where it is, before `<main>`, then run `node tools/v5-chrome.mjs`: it
+   marks Work current and adds Write to me to the sheet's header.
 2. Images go in `assets/img/` as WebP (and AVIF where it helps), EXIF stripped,
    each with a `.json` sidecar naming its origin. Every URL is relative and its
    case matches the file's exactly (GitHub Pages serves `/Portfolio/` and is case
@@ -427,6 +487,8 @@ side window and the toolbar), so a new item touches a few files by hand. In orde
 | `assets/js/spy.js` | The Résumé's Sections following the reader (any page with a `.toc` gets it) |
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |
 | `assets/js/palette.js` | The colour styles: the palettes, the turn in OKLab (and the room's table of colours), and each palette's neon for the hero |
+| `assets/js/toggles.js` | The design toggles for the developer tools (above): `window.toggles`, the address, the attribute on `<html>` |
+| `../tools/v5-chrome.mjs` | Writes the tab bar, the head script, the hero's apps and the headers' Write to me into every page from one list |
 | `assets/js/flip.js`, `assets/vendor/gsap/` | Work's grid reflowing when filtered, with GSAP's Flip (3.15.0, self-hosted, GreenSock's standard no-charge licence; `vendor/gsap/README.md` gives the source and checksums). Loaded only on a page with a grid to filter, once it is idle |
 | `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
 | Kept, unreferenced | The written hello of the first round: `assets/js/hello.js` (the pen timeline and the Enter button), `name.js` and `name-data.js` (Sacramento traced to pen strokes), `assets/img/name.svg` and `name-2.svg` (the name as an SVG, one line and two), and `tools/trace-name/` outside the edition. Nothing imports or links them any more; they stay in case the written name comes back |
@@ -441,7 +503,8 @@ above) and `tools/room-stills.mjs` regenerate the written name and the stills,
 
 ```sh
 node --test tests/v5/unit/*.test.mjs
-node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), neon (its colour), nav, modes, contrast, keys, perf, audit
+node tools/v5-chrome.mjs --check
+node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), launcher (its apps and the toggles), neon (its colour), nav, modes, contrast, keys, palettes, filters, perf, audit
 node tests/v5/e2e/capture.mjs # screenshots of every page at five widths into .impeccable/review/v5/
 ```
 

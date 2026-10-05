@@ -7,9 +7,13 @@ import { initNav } from './nav.js';
 import { initHue } from './hue.js';
 import { initSpy } from './spy.js';
 import { prepareFlip, reflow } from './flip.js';
+import { initToggles } from './toggles.js';
 
 const html = document.documentElement;
 html.classList.add('js');
+// the design toggles still open on the decision page, for the developer tools (toggles.js): first, so everything
+// below reads them
+initToggles();
 
 let room = null;
 // reduced transparency and forced colours keep to CSS glass over the still (forced colours hide the canvas)
@@ -47,7 +51,9 @@ window.__hue = initHue({ room });
 
 // the hero: on the first home view of a session (html.is-hello, set in the page's head). With the room it is drawn
 // in Liquid Glass; without it (no WebGL2, reduced transparency, forced colours) it is the same name in CSS glass.
-const hero = createHero({ room, windows });
+// (an app on the hero goes to its page through the navigation, which starts below)
+let nav = null;
+const hero = createHero({ room, windows, go: (href, o) => (nav ? nav.go(href, o) : Promise.reject(new Error('no navigation yet'))) });
 window.__hero = hero;
 if (html.classList.contains('is-hello')) hero.start();
 if (room) { const lost = room.onlost; room.onlost = (why) => { lost(why); hero.abort(); }; }
@@ -93,7 +99,7 @@ tick();
 setInterval(tick, 15000);
 document.addEventListener('v5:navigate', tick);
 
-const nav = initNav({ windows });
+nav = initNav({ windows });
 window.__nav = nav;
 
 // the Résumé's Sections follow the reader

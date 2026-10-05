@@ -37,11 +37,11 @@ const ready = (page) => page.waitForFunction(() => document.querySelector('.hero
   await page.waitForTimeout(300);
   const awake = await page.evaluate(() => ({ slow: window.__room.slow, fast: window.__room.state.fast }));
   check(awake.slow === true || awake.fast > 0, `the room stays awake for the light (${awake.slow ? 'budget tripped: held still' : 'full rate'})`);
-  // no wheel or swipe to enter any more
+  // a stray nudge of the wheel does not enter (a deliberate scroll does, as do a swipe, Down and Space: launcher.mjs)
   await page.mouse.move(720, 700);
-  await page.mouse.wheel(0, 400);
+  await page.mouse.wheel(0, 12);
   await page.waitForTimeout(500);
-  check(await page.evaluate(() => window.__hero.state === 'hero'), 'a scroll does not enter');
+  check(await page.evaluate(() => window.__hero.state === 'hero'), 'a nudge of the wheel does not enter');
   // Return anywhere enters. Every frame from here to the landing, the stage (the room's light held down while the
   // hero shows) and how white the name has turned, the glide's own progress
   const atRest = await page.evaluate(() => window.__room.state.stage);
