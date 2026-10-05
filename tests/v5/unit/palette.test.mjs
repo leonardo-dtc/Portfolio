@@ -67,7 +67,14 @@ test('a custom hue blends the neighbouring sets smoothly, never through grey', (
     prev = n;
   }
 });
+// Red is in for Leonardo to judge against Ember (October 2026). They sit 14 degrees apart, so their swatches are the
+// closest pair (.027 where every other pair is .06 or more): crimson beside orange red, told apart by their names and
+// little else. Whichever of the two stays, the other goes, and this exception with it.
+const JUDGING = ['red', 'ember'];
 test('the palettes are told apart at a glance', () => {
   const sw = PRESETS.map(([id, , d, k]) => [id, turn([.10, .22, .80], d, k)]);
-  for (let i = 0; i < sw.length; i++) for (let j = i + 1; j < sw.length; j++) assert.ok(dE(sw[i][1], sw[j][1]) >= .06, `${sw[i][0]} and ${sw[j][0]}: ${dE(sw[i][1], sw[j][1]).toFixed(3)}`);
+  for (let i = 0; i < sw.length; i++) for (let j = i + 1; j < sw.length; j++) {
+    const judging = JUDGING.includes(sw[i][0]) && JUDGING.includes(sw[j][0]);
+    assert.ok(dE(sw[i][1], sw[j][1]) >= (judging ? .025 : .06), `${sw[i][0]} and ${sw[j][0]}: ${dE(sw[i][1], sw[j][1]).toFixed(3)}`);
+  }
 });

@@ -1039,3 +1039,88 @@ Two audits went through each edition before this round's changes were final: eve
 
 Left as they are, for Leonardo: FreeCode's "more than 40 students" across four sessions next to classes of "six to ten" fits only if several classes ran per session (the audit could not confirm either way); and v5's Experiments rows set every title in lower case, acronyms included ("frc and ftc robots, in java"), which is the rows' style rather than an error.
 
+
+## 14. My own additions, less writing, a busier Mac, the heroes, and Red (2026-10-05)
+
+Leonardo: "Make the archive section open for personal additions, like spotify songs/CD adlbums or personal projects. Furthermore, eliminate all excess writing that doesn't really contribute anything, like the 2026 in the top right of v3. I do like the macintosh, but it also feels bland with only the archive, add other functions and make the desktop a little messy for personality." Then: "also make sure the two heros are perfect. If there are any potential changes to make them better but clean, list them. Add a red option for me to inspect (not a rose-color), then pick the best v5 color to make permanent (don't apply yet, I will be the judge)."
+
+### The archive, open to my own additions
+
+**One source for both editions.** The archive's entries left the two editions (v3's cards, typed by hand, and v5's `ARCHIVE` list) for `archive/`, one Markdown file an entry. `archive/README.md` says how to add one, with a start for a song, an album and a project; `node tools/archive.mjs` writes v3's cards (and so the Mac's files) and v5's rows and archive sheet, and copies covers into both editions. It refuses an entry it cannot read and says why (a missing title, a field it does not know, an en or em dash, a link that is not a full https address, a cover that is not there), and `--check` names anything in either edition that has drifted from the files; the unit tests run it.
+
+**What an entry can be.** Song, Album, EP, Single, Playlist and Mixtape are music; anything else is a thing made (Project, Arrangement, Game design...). An entry has a head (kind, title, year, the one line shown at rest, and as it needs: the artist, a listen link, a cover and its description, a link elsewhere, a link to a sheet of either edition, the Mac's picture, or `draft: true` to keep it unpublished) and, under it, paragraphs and `- Name: what` details. A listen link names its service by its address (Spotify, Apple Music, YouTube, Bandcamp, SoundCloud, Tidal, Deezer) and reads "Listen on Spotify", and so on. Covers live in `archive/covers/`; a copy whose entry has gone, or whose picture changed, is taken out of both editions on the next run.
+
+**How each edition shows music.**
+- *v3:* a song or album is a card with its artist, its cover and its Listen link, which stays on the card at rest (over the card's own target); on the Mac it is a file with a song or disc picture, and a track on the CD Player, which comes onto the desk and into the menu only once the archive holds music.
+- *v5:* songs and albums never go into the Experiments rows; the archive sheet gives them a shelf of their own, Listening, each with its artist, cover and Listen button.
+
+Both were checked with three temporary entries (a song, an album with a cover, a project with a picture and a link) at desktop and phone sizes, then removed; nothing of them is in the commit.
+
+### Less writing
+
+The rule: cut what tells the reader nothing new. Four kinds came up again and again: date stamps ("2026", "Updated September 2026", "fall 2026"), promises of content to come ("will be added", "will appear"), facts said twice in the same view (a subtitle repeated by the facts box under it, a paragraph repeated by the side window beside it), and labels that state the obvious ("Newest first", "Write to me" over an email address). Two audits, one an edition, listed every candidate with its line; what stayed is listed with them.
+
+**v3:**
+- *The cover and the chrome:* the "2026" in the top right (Leonardo's example), the big red "2026" under the name, the "Scroll" hint, the drawer's "Portfolio · 12 sheets" (the label is blank at rest; Find still writes its count there), and every file's "Sheet NN / N" line in the index.
+- *The sheets:* the research kicker's "2026", the Loquar and OCAPEX kickers' categories, the This site bullet's restatement, the hockey kicker's "Recruiting profile, fall 2026" and the body's details repeated by the measurables, the archive sheet's kicker, the contact sheet's "Write to me" label, "Profiles · each one leaves this site" and the colophon; shorter: the 486 card, the stat note, the timeline, the music kicker, the reply note.
+- *The six files:* every colophon, the aducanumab note and its "Redrawn from the manuscript's Figure N" lines, the Loquar file's promised sections (left as comments for when there is something to show), the OCAPEX photo placeholders (comments), the hockey file's repeated history, the résumé's update stamp and "Member of both".
+
+**v5:**
+- *Subtitles that repeated their page:* Home's Experiments, Work's, About's and the archive sheet's (the last also because, now that the archive takes songs and albums, a list of what it holds would go stale).
+- *Stamps and promises:* Hockey's "Recruiting profile, fall 2026", the 2026-27 note ("statistics will be posted"), Film's "A link will appear here", About's "Now, fall 2026", Home's foot ("Updated September 2026"), the Résumé's update stamp, the aducanumab "A link will be added", Daedalus's "No images yet" and its promised sketches, five Loquar promises, FreeCode's promised photograph, OCAPEX's "About the numbers" (its table caption already says it).
+- *Said twice in one view:* the stats caption (the season, team, role and number are beside it), the five sheets' Type rows ("Product", "Community", "Portfolio"), OCAPEX's Form, the aducanumab "What this is" note (now its two caveats and the advisor's role), Daedalus's Implementation and Current state (its facts box says both), the Loquar and OCAPEX captions, FreeCode's and This site's repeated sentences, About's portrait rows (From, Groton School), its Hometown row, its last essay paragraph (the Interests window says it), the music line's arrangement, the résumé's Biology Club bullet and its "Write to me" row, Home's Elite Prospects and NCSA rows (the toolbar carries both), the hockey history and closing note.
+- *Shorter:* Home's lead ("Loquar and Daedalus are the projects with friends. This site I build alone.") and its contact line.
+
+**Kept, though they look cuttable:** the hero's hint and line, every control and heading, "Write to me" in the windows' headers (T4), the contact notes ("Correspondence goes via a parent"), "Addresses on request", the caveats that travel with their facts ("A two-game sample", the research limitations), facts that appear only once on the site, and the Résumé's Honors (parity with v3's résumé file; v5's Honors repeat its Education entries, for Leonardo to decide). Home's Groton clock stays too: it is v5's one living detail, though it is the closest thing v5 has to v3's "2026" (for Leonardo to decide).
+
+### The Mac, with more to it (v3)
+
+The star menu holds six desk accessories, each a working program drawn in the Platinum style, its state kept in this browser:
+- **Alarm Clock:** Groton's time to the second, and the day.
+- **Calculator:** its keys or the keyboard; dividing by zero says Error.
+- **CD Player:** the archive's songs and albums as tracks, with an LCD, back and forward, the cover, Listen and Open its file; it appears only once there is music.
+- **Desktop Patterns:** six patterns for the desk (Dots, Checks, Graph paper, Staff, Rink, Maze).
+- **Note Pad:** eight pages, turned at the corner.
+- **Puzzle:** the fifteen puzzle, by pointer or arrows, with Shuffle.
+
+**The desk, a little messy:** the disk, the Trash, italic aliases of the CD Player, the Puzzle and the Note Pad, and lying out, the two newest things still being made (never music), in two loose columns, a little out of line and overlapping here and there. A mouse drags them; Special, Clean Up Desktop lines them up, and the `macDesk` design toggle (`tidy`) starts them lined up. Every name stays over the pictures, and on a desk under 440px tall (most laptops) each keeps to one line: with seven icons on the 576 by 330 desk of a 1280 by 720 window, names had disappeared under other icons. The Archive window lost its counts and its "Click a file to open it" (its rows say it).
+
+### The heroes
+
+An audit went through both at eight sizes, with and without WebGL and the script, by night and by day, by keyboard, in print, in forced colours and with reduced motion, and found fourteen defects. Fixed:
+
+**v5:**
+- *Entering left the line and the apps on screen,* over the arriving window, until they vanished in one frame: the rule that fades them lost to the one that shows them (`.hero.is-ready .hero__below` outranked `html.is-entering .hero__below`). They now fade out in 160ms as the glide starts; an app's launch keeps its own.
+- *By day the room went from sharp to soft* as WebGL took over: the CSS hero showed the day still sharp, the room's hero draws it defocused. The CSS hero now takes a soft copy (`room-day-soft.webp`, 2.6KB, made by `tools/room-stills.mjs` from the day still), so it reads as the room it hands over to, and without WebGL the name stands on a calmer ground.
+- *A one-visit link* (`?toggles=heroName:glass`) showed the default hero first and then the toggle: the head script now applies the address's toggles before the first paint, as it does the stored ones.
+- *A focused app had two focus rings* (the icon's and the page's glow round the whole app): one, on the icon.
+
+**v3:**
+- *On phones the mask hid the end of the name* ("LEONARD" at 390 wide; D, O, H and O at 320): it now lies under the name, clear of every letter.
+- *A phone held sideways* clipped CARVALHO at the fold, with the Index pill on it: the name is sized by the height as well there, the hand line keeps to one line, and the mask lies beside the name.
+- *The code panel, finished* (reduced motion, or a key press), named labyrinth.lua over the top of analysis.py: it now shows the end, the file its bar names. *Without the script* it was an empty panel with a cursor blinking for ever: it is not shown.
+- *The cover printed as a shrunken poster,* indented, its hand line in the marker face and turned, the tag tilted without the script: it prints as a plain heading at the margin, the hand line a kicker in the body face.
+- *The tag on a 320px phone* wrapped with a dot at the end of its first line and a paper as wide as the screen: under 380px it breaks after "Groton School", its paper as wide as the longer line; and with the hint and the year gone it has the foot's whole width, so on a 667px phone held sideways it keeps to one line.
+- *On the desk look at 1024 wide,* "research" ran into CARVALHO's C: the label lies lower and further left on its panel.
+- *On touch screens* a focused word's ring went round its 44px target and cut across the name: it goes round the word.
+- *Removing the year under the name* had moved the desk look's objects onto the name at five desktop sizes; the band it held is kept on the desk look, where the OCAPEX sticker lies.
+
+**Not fixed:** the glass name (the `heroName:glass` toggle, not the default) measures 2.4 to 3.0:1 by day with WebGL and 1.4 to 1.8:1 without; it needs a dark pool by day, as the neon has, before it can be chosen. And without WebGL by day at 320 by 568, the room's crest passes behind "Work" at 3.6:1 in its worst pixel (95% of its pixels 7.6:1 or better): borderline, left.
+
+**Improvements that would keep them clean (not applied; for Leonardo):**
+- *v3:* take the two tapes off the title (white tape over white letters reads as grey stubs behind them); never leave a "·" at the end of the hand line's first line (it wraps that way from 600 to 1100px wide, and on the narrowest phones); size the cover's block from the name rather than the hand line; start the code panel with a few lines showing (three seconds in it holds one); and, optional, show the chrome's name only once the cover is passed (it repeats the giant name under it).
+- *v5:* set the name on two lines on portrait tablets (at 768 by 1024 it is 63px, smaller than on a 390 phone); by day without WebGL drop the oval pool and keep the shade round the letters (the oval reads as a dark slab, the reason the night pool went); answer hover on the apps with light only (they grow 6% and lift 8px; `DESIGN.md` says nothing grows on hover); keep "Groton School" and "Class of 2028" together with non-breaking spaces; the dark pool for the glass name, above; rendering at 2× while the hero shows (the room is capped at 1.5×, so the neon is soft on 3× phones; a cost to measure on a mid-range phone first); optional, "Click my name to enter" for "Click the title to proceed" (his own wording, kept by T26 until he says otherwise); and the deletion of the unused hello files (T30), still waiting for his yes.
+
+### Red, and a colour to keep (v5)
+
+**Red** is in the colour panel for Leonardo to inspect: a true red (its glass at hue 26 in OKLCH, where pure red is 29), between Rose (near 1, pink) and Ember (near 35, orange), with its own neon (orange red, scarlet, red, crimson, ruby, raspberry). It passes the palette checks (text over glass at 4.5:1 or more, by night and by day; its neon in its own family). Two things to know: its swatch and Ember's are the closest pair in the panel (0.027 apart where every other pair is 0.06 or more; crimson beside orange red), so whichever of the two stays, the other should go; and by day its room is coral, near pink, as light red is. The nine swatches sit three across (with four across, Graphite stood alone on a third row).
+
+**Recommendation: Cobalt** (not applied). It is the room as drawn, every other palette being a turn of it; it is the only one where the hero's neon is the Glowtime colours themselves, the richest of all nine (orange, pink, violet, blue and cyan across the name, where the others are one family); its day room reads as a sky, where the warm palettes go coral, terracotta or brown by day; and blue is the calmest ground for long reading, for the coaches, admissions readers and researchers the site is for. Contrast does not decide it (every palette keeps 4.5:1). Second: Violet, if he wants v5 to look less like the default blue. Making it permanent can mean taking the colour control away, or keeping it with Cobalt as the default (as now); that is his call too.
+
+### For Leonardo to decide
+
+- **Red or Ember:** keep one (or neither); the swatch test holds an exception for the pair until then.
+- **The permanent colour:** Cobalt recommended; with or without the colour control.
+- **The cuts he may not want:** the cover's big red "2026" (only the top right's was named; both went), About's and the archive's subtitles, Home's Elite Prospects and NCSA rows (the toolbar has both), and the kept ones above (Home's clock, the Résumé's Honors).
+- **The hero improvements** above.
+- **T30:** the unused hello files, still in the repository.

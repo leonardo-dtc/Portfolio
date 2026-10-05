@@ -29,15 +29,16 @@
   d.querySelectorAll('.entries > li').forEach(function (li, i) { li.style.setProperty('--i', i); });
   /* The wall of cards (the archive's design toggle, T17; the Macintosh shows the same cards as its files): a card
      shows its year, kind, title and line, and its title is a button (the whole card answers to it) that opens the
-     card's file: a sheet of paper over the deck with the whole card on it, its line, its paragraphs and details
-     (.entry__more) and its link. Without the script, in print and in forced colours every card shows all of it. */
+     card's file: a sheet of paper over the deck with the whole card on it, its cover, its artist, its line, its
+     paragraphs and details (.entry__more) and its links (to listen, to a sheet, to a page elsewhere). Without the
+     script, in print and in forced colours every card shows all of it. */
   var entryFile = null, entryFrom = null;
   function entryText(li, sel) { var e = li.querySelector(sel); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; }
   function makeEntryFile(home) {
     entryFile = d.createElement('dialog');
     entryFile.className = 'entry-file';
     entryFile.setAttribute('aria-labelledby', 'entry-file-title');
-    entryFile.innerHTML = '<p class="entry-file__tab"></p><button class="entry-file__close" type="button">Close</button><div class="entry-file__in"><h2 class="entry-file__title" id="entry-file-title"></h2><p class="entry-file__line"></p><div class="entry-file__more"></div><p class="entry-file__go"></p></div>';
+    entryFile.innerHTML = '<p class="entry-file__tab"></p><button class="entry-file__close" type="button">Close</button><div class="entry-file__in"><div class="entry-file__art"></div><h2 class="entry-file__title" id="entry-file-title"></h2><p class="entry-file__by"></p><p class="entry-file__line"></p><div class="entry-file__more"></div><p class="entry-file__go"></p></div>';
     home.appendChild(entryFile);
     entryFile.querySelector('.entry-file__close').addEventListener('click', function () { entryFile.close(); });
     entryFile.addEventListener('click', function (e) {
@@ -54,13 +55,18 @@
     if (!entryFile) makeEntryFile(li.closest('.slide') || d.body);
     entryFile.querySelector('.entry-file__tab').textContent = [entryText(li, '.entry__year'), entryText(li, '.entry__kind')].filter(Boolean).join(' · ');
     entryFile.querySelector('.entry-file__title').textContent = entryText(li, '.entry__title');
+    var art = entryFile.querySelector('.entry-file__art'), pic = li.querySelector('.entry__cover');
+    art.textContent = ''; if (pic) { pic = pic.cloneNode(true); pic.loading = 'eager'; art.appendChild(pic); }
+    var by = entryFile.querySelector('.entry-file__by');
+    by.textContent = entryText(li, '.entry__by'); by.hidden = !by.textContent;
     var line = entryFile.querySelector('.entry-file__line');
     line.textContent = entryText(li, '.entry__line'); line.hidden = !line.textContent;
     var more = entryFile.querySelector('.entry-file__more'), src = li.querySelector('.entry__more');
     more.textContent = ''; more.hidden = !src;
     if (src) Array.prototype.forEach.call(src.children, function (n) { more.appendChild(n.cloneNode(true)); });
-    var go = entryFile.querySelector('.entry-file__go'), link = li.querySelector('.entry__link');
-    go.textContent = ''; if (link) go.appendChild(link.cloneNode(true));
+    var go = entryFile.querySelector('.entry-file__go');
+    go.textContent = '';
+    li.querySelectorAll('.entry__listen, .entry__link').forEach(function (a) { go.appendChild(a.cloneNode(true)); });
     entryFrom = li.querySelector('.entry__open');
     if (!entryFile.open) entryFile.showModal();
     entryFile.querySelector('.entry-file__in').scrollTop = 0;
@@ -76,9 +82,9 @@
     b.addEventListener('click', function () { openEntry(li); });
   });
 
-  /* ---- counts from the page: the number of sheets, each folder's place and number, each file's
-     "Sheet NN / N", the drawer's "N sheets" and the archive's "Sheet NN, name" links. The HTML keeps
-     the same values as a fallback for pages read without the script. ---- */
+  /* ---- counts from the page: the number of sheets, each folder's place and number, and the archive's
+     "Sheet NN, name" links. The HTML keeps the same values as a fallback for pages read without the
+     script. ---- */
   var N = slides.length;
   html.style.setProperty('--n', N);
   function pad(i) { return (i < 9 ? '0' : '') + (i + 1); }
@@ -97,12 +103,6 @@
     if (i < 0) return;
     folderOf[i] = k;
     var num = f.querySelector('.folder__n'); if (num) num.textContent = pad(i);
-    var rec = f.querySelector('.file__rec');
-    if (rec) {
-      var sh = rec.querySelector('.file__sheet') || d.createElement('span');
-      sh.className = 'file__sheet'; sh.textContent = 'Sheet ';
-      rec.textContent = ''; rec.appendChild(sh); rec.appendChild(d.createTextNode(pad(i) + ' / ' + N));
-    }
   });
   /* a divider stands just behind the folder after it, so it takes that folder's place */
   if (cabinetEl) cabinetEl.querySelectorAll('.divider').forEach(function (dv) {
@@ -115,7 +115,7 @@
     return t ? t.textContent.trim() : (dots[i] && dots[i].getAttribute('data-name')) || '';
   }
   var cabLabel = d.querySelector('[data-cabinet-label]');
-  var cabLabelText = 'Portfolio · ' + N + ' sheet' + (N === 1 ? '' : 's');
+  var cabLabelText = '';                                          /* at rest the drawer's label is blank; Find writes its count there */
   if (cabLabel) cabLabel.textContent = cabLabelText;
   d.querySelectorAll('.entry__link[href^="#"]').forEach(function (a) {
     var i = indexOfHash(a.getAttribute('href'));
@@ -361,6 +361,7 @@
         var sp = d.createElement('span'); if (seg.cls) sp.className = seg.cls; sp.textContent = seg.text; out.appendChild(sp);
       }
       codeBox.classList.add('is-done');
+      atBottom();   /* the end in view, the file the bar names (left at the top, it showed analysis.py under labyrinth.lua's name) */
     }
     if (reduce) {
       finish();

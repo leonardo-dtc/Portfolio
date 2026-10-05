@@ -1,7 +1,11 @@
 // Every link on every page resolves, stays inside v5 or goes to an allowed site, and every #target exists.
 import { open, BASE, PAGES, check } from './lib.mjs';
+import { published } from '../../../tools/archive.mjs';
 
-const ALLOWED = ['eliteprospects.com', 'ncsasports.org', 'ocapex.com', 'youtube.com', 'fda.gov', 'doi.org'];
+// the archive's own links (a song's service, a project's page) go where its entries say: archive/*.md, which
+// tools/archive.mjs reads and holds to full https addresses
+const ARCHIVED = published().flatMap(e => [e.listen, e.link].filter(Boolean)).map(h => new URL(h).hostname.replace(/^www\./, ''));
+const ALLOWED = ['eliteprospects.com', 'ncsasports.org', 'ocapex.com', 'youtube.com', 'fda.gov', 'doi.org', ...ARCHIVED];
 const { browser, page } = await open({ js: false });
 const seen = new Map();
 let bad = 0, total = 0;

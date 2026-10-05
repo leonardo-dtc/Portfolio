@@ -164,7 +164,6 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .js .is-in .bar { transform: none; }
 .js .strip-wrap { clip-path: inset(0 100% 0 0); transition: clip-path 620ms var(--ease-out) 380ms; }
 .js .is-in .strip-wrap { clip-path: inset(0 0 0 0); }
-@keyframes hint { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 
 /* ---------- Shared type ---------- */
 .title { font: 400 var(--title)/.9 var(--display); text-transform: uppercase; letter-spacing: -.005em; color: var(--fg); text-wrap: balance; }
@@ -253,6 +252,10 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 @media screen and (pointer: coarse) {
   .route { --hit: 12px; padding-block: var(--hit); }
   .route::before, .route::after { bottom: calc(var(--hit) - .04em); }
+  /* its focus ring goes round the word (round the 44px target it cut across the name below); the faint stroke,
+     not shown on touch, draws it */
+  .route:focus-visible { outline: none; }
+  .route:focus-visible::before { inset: calc(var(--hit) - 4px) -4px; height: auto; opacity: 1; background: none; border: 2px solid var(--red); border-radius: 2px; }
   .chrome a { display: inline-flex; align-items: center; min-height: 44px; }
 }
 @media (min-width: 600px) { .cover__hand { max-width: calc(113% - clamp(120px, 14.5vw, 215px) - 20px); } } /* ends before the mask */
@@ -263,6 +266,7 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .slice { position: relative; display: inline-block; }
 .slice > span:first-child { display: inline-block; clip-path: polygon(-2% -2%, 102% -2%, 102% 34%, -2% 66%); transform: translate(-.024em, -.014em); }
 .slice > span:last-child { position: absolute; left: 0; top: 0; clip-path: polygon(-2% 66%, 102% 34%, 102% 102%, -2% 102%); transform: translate(.024em, .014em); }
+html:not(.js) .cover__code { display: none; }   /* without the script it stays an empty panel with a blinking cursor */
 .cover__code { position: absolute; left: calc(-1 * clamp(40px, 4.5vw, 72px)); top: -8%; width: clamp(196px, 19vw, 290px); height: clamp(300px, 46vh, 420px); z-index: 0; background: #151515; border: 1px solid #333; box-shadow: 0 18px 40px rgba(0,0,0,.5); display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
 .code__bar { display: flex; align-items: center; gap: 5px; padding: 6px 9px; background: #222; font-size: var(--micro); letter-spacing: .02em; color: var(--stage-2); white-space: nowrap; overflow: hidden; }
 .code__bar span { width: 8px; height: 8px; border-radius: 50%; background: #555; }
@@ -285,26 +289,33 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .strip { background: var(--black); color: var(--red); }
 .strip-edge { transform: translate(4px, 5px); }
 .strip > .name { position: absolute; inset: 0; }
-.cover__year { position: relative; z-index: 1; font: 400 clamp(2.2rem, 1rem + 4.6vw, 5rem)/1 var(--display); color: var(--red); justify-self: end; margin: .02em 1% 0 0; }
 .cover .sticker--mask { right: -15%; top: -30%; --rot: 8deg; transform: rotate(var(--rot)); width: clamp(120px, 14.5vw, 215px); height: auto; }
 .cover .tape--a { left: -4%; top: 6%; transform: rotate(-32deg); width: clamp(90px, 11vw, 150px); }
 .cover .tape--b { right: -4%; bottom: 6%; transform: rotate(-16deg); width: clamp(90px, 11vw, 150px); }
-.cover__foot { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 1rem; min-height: 72px; }
+.cover__foot { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-items: end; gap: 1rem; min-height: 72px; }   /* the tag alone now (the hint and the year gone): all the width, so it keeps to one line */
 .cover__foot .tag { justify-self: start; }
 .tag { position: relative; display: inline-block; background: var(--paper); color: var(--black); font-weight: 700; font-size: var(--small); letter-spacing: .12em; text-transform: uppercase; text-wrap: balance; padding: .95em 1.3em; --rot: -6deg; transform: rotate(var(--rot)); transform-origin: 20% 100%; margin-left: 2%; }
 .tag .tape { left: -22px; top: -14px; width: 84px; height: 24px; transform: rotate(-38deg); }
-.cover__hint { font-size: var(--micro); letter-spacing: .24em; text-transform: uppercase; color: var(--stage-2); padding-bottom: .4rem; animation: hint 2.6s ease-in-out 1.4s 3; } /* three pulses, then it rests */
 @media (max-width: 599px) {
   .cover__title { font-size: clamp(3.4rem, 18.5vw, 6rem); }
   .cover__hand-p { display: none; }
   .cover__hand { font-size: .95rem; margin-left: 2%; }
   .cover__block { padding-left: 0; }
   .cover__code { display: none; }
-  .cover .sticker--mask { right: -14%; left: auto; top: -4%; width: 80px; }
+  .cover .sticker--mask { right: -2%; left: auto; top: calc(100% + 6px); width: 72px; }   /* under the name, clear of its letters (over LEONARDO's last O it hid it) */
   .cover .tape--b { right: 30%; bottom: -10%; }
-  .cover__year { margin-top: .05em; }
-  .cover__foot { grid-template-columns: 1fr; }
   .cover__foot .tag { margin-bottom: .5rem; }
+}
+/* the narrowest phones: the tag on two lines of its own, its paper as wide as the longer (wrapped, it kept the whole
+   width, with a dot at the end of the first line) */
+@media (max-width: 379px) { .tag__sep { display: none; } .tag__end { display: block; } }
+/* a phone held sideways (short and wide): the name sized by the height as well, the hand line on one line, so the
+   name, the line and the tag all fit the first screen */
+@media (max-width: 899px) and (max-height: 540px) and (orientation: landscape) {
+  .cover__title { font-size: clamp(2.6rem, min(16.6vw, 27svh), 15.4rem); }
+  .cover__hand { max-width: none; white-space: nowrap; font-size: clamp(1rem, 4.4svh, 1.4rem); }
+  .cover__stage { padding-block: 0; }
+  .cover .sticker--mask { left: calc(100% + 12px); right: auto; top: 4%; width: calc(min(16.6vw, 27svh) * .8); }   /* beside the name, where the room is */
 }
 
 /* ---------- 02 About ---------- */
@@ -430,7 +441,6 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
    so a copied card needs no extra markup. */
 .archive .sheet__in { align-content: center; }
 .archive .head { display: flex; align-items: end; justify-content: space-between; gap: .25rem 2rem; flex-wrap: wrap; }
-.archive .head .kicker { margin: 0 0 .55rem; max-width: 36ch; }
 .entries { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: clamp(1.25rem, 4.6vh, 3rem) clamp(1rem, 1.8vw, 1.6rem); margin-top: clamp(1.25rem, 5vh, 3.5rem); }
 @media (min-width: 900px) { .entries { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .entry { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 1rem 1.05rem 1rem; background: var(--white); color: var(--black); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 12px 26px rgba(0,0,0,.13); rotate: var(--tilt, 0deg); }
@@ -444,10 +454,16 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .entry__kind { padding: .32em .6em .26em; background: var(--black); color: var(--white); font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.2; text-transform: uppercase; }
 .entry__title { margin-top: .75rem; font: 400 clamp(1.05rem, .95rem + .35vw, 1.3rem)/1.2 var(--hand); text-wrap: balance; }
 .entry__line { margin-top: .45rem; font-size: var(--small); line-height: 1.45; color: var(--ink-2); text-wrap: pretty; }
-.entry__link { align-self: flex-start; margin-top: auto; padding-top: .8rem; font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.3; text-transform: uppercase; color: var(--black); text-decoration: none; }
-.entry__link::after { content: " →"; }
-.entry__link { background: linear-gradient(var(--red), var(--red)) 0 100% / 100% 2px no-repeat; padding-bottom: .3em; transition: background-size 200ms var(--ease-out); }
-@media (hover: hover) and (pointer: fine) { .entry__link:hover { background-size: 100% 4px; } }
+:is(.entry__link, .entry__listen) { align-self: flex-start; margin-top: auto; padding-top: .8rem; font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.3; text-transform: uppercase; color: var(--black); text-decoration: none; }
+:is(.entry__link, .entry__listen)::after { content: " →"; }
+:is(.entry__link, .entry__listen) { background: linear-gradient(var(--red), var(--red)) 0 100% / 100% 2px no-repeat; padding-bottom: .3em; transition: background-size 200ms var(--ease-out); }
+.entry__listen + .entry__link { margin-top: .2rem; }
+@media (hover: hover) and (pointer: fine) { :is(.entry__link, .entry__listen):hover { background-size: 100% 4px; } }
+/* a song, an album or a project of my own (archive/README.md): its cover under the card's head, its artist under the
+   title, and a way to listen */
+.entry__cover { display: block; width: 100%; height: auto; margin-top: .75rem; border: 1px solid var(--paper-2); }
+.entry--music .entry__cover { aspect-ratio: 1; object-fit: cover; }
+.entry__by { margin-top: .2rem; font-size: var(--small); font-weight: 700; line-height: 1.3; color: var(--ink-2); }
 .js .entry { opacity: 0; translate: 0 8px; transition-property: opacity, translate, rotate, transform, box-shadow, background-color, color, z-index; transition-duration: 420ms, 420ms, var(--t-settle), var(--t-settle), var(--t-settle), 300ms, 300ms, 0s; transition-timing-function: var(--ease-out), var(--ease-out), var(--ease), var(--ease), var(--ease), ease, ease, linear; transition-delay: calc(160ms + var(--i, 0) * 50ms), calc(160ms + var(--i, 0) * 50ms), 0s, 0s, 0s, 0s, 0s, var(--t-open); }
 .js .is-in .entry { opacity: 1; translate: none; }
 /* The archive opens like the dim room's experiments, in paper. With the script a card on the wall shows its
@@ -467,7 +483,8 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .entry.has-file:has(.entry__open:focus-visible) { outline: 2px solid var(--red); outline-offset: 4px; }
 .entry::before { transition: scale var(--t-arrow) var(--ease), box-shadow var(--t-arrow) var(--ease); }
 @media screen and (forced-colors: none) {
-  .js .entry.has-file > .entry__more, .js .entry.has-file > .entry__link { display: none; }
+  .js .entry.has-file > .entry__more, .js .entry.has-file > .entry__link, .js .entry.has-file:not(.entry--music) > .entry__listen { display: none; }
+  .js .entry--music.has-file > .entry__listen { position: relative; z-index: 2; }   /* a song's or album's way to listen stays on its card, over the card's own target */
 }
 @media (forced-colors: active) { .entry__open::after { display: none; } }
 @media screen and (hover: hover) and (pointer: fine) {
@@ -500,9 +517,13 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .entry-file__more .entry__facts { gap: 0 1.25rem; margin-top: 1.2rem; font-size: var(--small); line-height: 1.45; }
 .entry-file__more .entry__facts dt, .entry-file__more .entry__facts dd { padding: .55rem 0; border-top: 1px solid var(--paper-2); }
 .entry-file__more .entry__facts dt { letter-spacing: .1em; text-transform: uppercase; font-size: var(--micro); line-height: 1.6; }
-.entry-file__go { margin-top: 1.5rem; }
+.entry-file__go { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; margin-top: 1.5rem; }
 .entry-file__go:empty { display: none; }
-.entry-file__go .entry__link { margin: 0; padding-top: 0; }
+.entry-file__go :is(.entry__link, .entry__listen) { margin: 0; padding-top: 0; }
+.entry-file__art:empty { display: none; }
+.entry-file__art img { display: block; width: min(100%, 12rem); height: auto; margin-bottom: 1.1rem; border: 1px solid var(--paper-2); }
+.entry-file__by { margin-top: .35rem; font-weight: 700; color: var(--ink-2); }
+.entry-file__by[hidden] { display: none; }
 /* Close stands in the file's top right corner, in view however far the file has scrolled */
 .entry-file__close { position: absolute; z-index: 1; top: .7rem; right: .7rem; padding: .6rem .9rem .55rem; border: 2px solid var(--black); background: var(--white); color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
 .entry-file__close:focus-visible { outline-offset: 3px; }
@@ -541,8 +562,6 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .reply { display: grid; gap: clamp(1.5rem, 3.6vh, 2.5rem); min-width: 0; align-self: center; }
 .reply__mail { container-type: inline-size; min-width: 0; }
 .reply__out { min-width: 0; }
-.reply__k { font-size: var(--micro); font-weight: 700; letter-spacing: .14em; line-height: 1.3; text-transform: uppercase; color: var(--fg); }
-.reply__k span { font-weight: 400; color: var(--fg-2); }
 /* the one large action: the address on a vermilion slab, taped down like everything else */
 .mail { position: relative; display: flex; align-items: center; justify-content: space-between; gap: .45em; margin-top: .65rem; padding: .52em .55em .46em .6em; background: var(--red); color: var(--black); font: 400 clamp(1.25rem, 2.6vw, 2.6rem)/1.04 var(--display); font-size: clamp(1.25rem, 6.2cqi, 2.6rem); letter-spacing: .01em; text-transform: uppercase; text-decoration: none; rotate: -1deg; box-shadow: 0 14px 30px rgba(0,0,0,.35); transition: background var(--t-fast) ease, color var(--t-fast) ease, translate 160ms var(--ease-out); }
 .mail::before { content: ""; position: absolute; right: 14%; top: -15px; width: 88px; height: 22px; rotate: 4deg; pointer-events: none; background: linear-gradient(100deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,.55) 32%, rgba(255,255,255,.26) 58%, rgba(255,255,255,.5) 100%); box-shadow: 0 1px 3px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.08); clip-path: polygon(2% 0, 98% 3%, 100% 24%, 97% 48%, 100% 78%, 98% 100%, 3% 97%, 0 70%, 2% 42%, 0 16%); }
@@ -557,11 +576,11 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .out__m { display: inline-flex; align-items: center; gap: .5em; font-size: var(--micro); letter-spacing: .1em; text-transform: uppercase; color: var(--fg-2); }
 .out__m svg { width: 15px; height: 15px; flex: none; rotate: -45deg; transition: translate 240ms var(--ease-out); }
 .out a:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
-/* the end: a torn paper strip with the way back up, the index and the colophon */
+/* the end: a torn paper strip with the way back up and the index */
 .talk__foot { position: relative; background: var(--paper); color: var(--black); --fg: var(--black); --fg-2: var(--ink-2); --rule: var(--paper-2); }
 .talk__foot .tear { top: calc(1px - var(--tear)); color: var(--paper); }
 .talk__foot .sheet__in { min-height: 0; padding-block: clamp(.6rem, 1.6vh, 1.1rem) clamp(.9rem, 2.4vh, 1.5rem); }
-@media screen and (max-width: 899px), screen and (max-height: 539px) { .js .talk__foot .sheet__in { padding-bottom: 5rem; } } /* the colophon clears the pill (not in print) */
+@media screen and (max-width: 899px), screen and (max-height: 539px) { .js .talk__foot .sheet__in { padding-bottom: 5rem; } } /* the end clears the pill (not in print) */
 .end { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
 .end__btn { display: inline-flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 1.15rem 0 .95rem; border: 2px solid var(--black); border-radius: 999px; background: transparent; color: var(--black); font: 700 var(--micro)/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease, translate 160ms var(--ease-out); }
 .end__btn svg { width: 16px; height: 16px; flex: none; }
@@ -569,9 +588,6 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .end__index svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 .end__btn:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 html:not(.js) .end__index { display: none; } /* the cabinet needs the script */
-.colophon { font-size: var(--micro); letter-spacing: .08em; line-height: 1.5; text-transform: uppercase; color: var(--ink-2); }
-.end .colophon { margin-left: auto; text-align: right; }
-@media (max-width: 1099px) { .end .colophon { margin-left: 0; flex-basis: 100%; text-align: left; } }
 @media (hover: hover) and (pointer: fine) {
   .mail:hover { background: var(--white); color: var(--black); }
   .mail:hover .mail__go { rotate: -45deg; }
@@ -621,14 +637,15 @@ html[data-cover="desk"] .cover .sticker--mask { display: none; }   /* the desk's
    (the drawn window hidden) */
 @media (min-width: 900px) {
   .desk__item--research { left: calc(-1 * clamp(40px, 4.5vw, 72px)); top: -8%; width: clamp(196px, 19vw, 290px); height: clamp(300px, 46vh, 420px); z-index: 0; --rot: -12deg; }   /* over the panel, under the title */
-  .desk__item--research a { height: 100%; align-content: end; padding-bottom: 14px; }
+  .desk__item--research a { height: 100%; align-content: end; padding-bottom: 6px; }
   .desk__item--research .desk__win { display: none; }
-  .desk__item--research .desk__label { justify-self: start; margin-left: 16px; }
+  .desk__item--research .desk__label { justify-self: start; margin-left: 6px; }   /* low and left on the panel, clear of CARVALHO's C at 1024 wide */
   .desk__item--hockey { left: calc(100% + 10px); top: -18%; width: clamp(104px, 10vw, 170px); }
   .desk__item--resume { left: calc(100% + 24px); top: 30%; width: clamp(80px, 6.4vw, 112px); }
   .desk__item--loquar { left: calc(100% + 14px); top: 76%; width: clamp(112px, 9.6vw, 170px); }
   .desk__item--exo { right: calc(100% + 4px); top: calc(-8% + clamp(300px, 46vh, 420px) + 48px); width: clamp(112px, 10vw, 170px); }   /* under the code panel */
   .desk__item--ocapex { left: 20%; top: 102%; width: clamp(64px, 5.6vw, 96px); }
+  html[data-cover="desk"] .cover__block { padding-bottom: calc(clamp(2.2rem, 1rem + 4.6vw, 5rem) * 1.02); }   /* the band under the name the sticker lies in */
 }
 /* phones and tablets: the six in a grid of three under the name, the drawn window standing for the code panel */
 @media (max-width: 899px) {
@@ -677,7 +694,6 @@ html:not([data-talk="collage"]) .talk__foot .tear { display: none; }
 html:not([data-talk="collage"]) .talk__foot .sheet__in { padding-top: clamp(.9rem, 2.2vh, 1.4rem); }
 html:not([data-talk="collage"]) .talk__foot .end { border-top: 1px solid #3a3a3a; padding-top: clamp(.9rem, 2.2vh, 1.4rem); }
 html:not([data-talk="collage"]) .end__btn { border-color: rgba(255,255,255,.85); color: var(--white); }
-html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
 @media (hover: hover) and (pointer: fine) { html:not([data-talk="collage"]) .end__btn:hover { background: var(--white); color: var(--black); } }
 
 /* ---------- Small parts shared by the project slides ---------- */
@@ -792,7 +808,7 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
   .entry__meta { padding-bottom: .4rem; }
   .entry__title { margin-top: .5rem; font-size: 1.02rem; }
   .entry__line { margin-top: .3rem; font-size: .75rem; line-height: 1.4; }
-  .entry__link { padding-top: .55rem; }
+  :is(.entry__link, .entry__listen) { padding-top: .55rem; }
 }
 
 /* ---------- Touch screens at desktop widths (tablets in landscape): larger targets ---------- */
@@ -800,7 +816,7 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
   :root { --row: 28px; --tabh: 20px; }
   .rail .rail__folder { width: 34px; height: 34px; margin-left: -7px; } /* .rail: the base rule comes later in the file */
   .out a { min-height: 44px; }
-  .entry__link { display: inline-flex; align-items: flex-end; min-height: 44px; }
+  :is(.entry__link, .entry__listen) { display: inline-flex; align-items: flex-end; min-height: 44px; }
 }
 
 /* a sheet a long jump passes by shows at once as it rests, already read (site.js go()) */
@@ -817,7 +833,6 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
   .js .draw { stroke-dashoffset: 0; transition: none; }
   .js .deck .slide { transform: none !important; }
   .slide__dim { display: none; }
-  .cover__hint { animation: none; opacity: .8; }
   .tone img, .sticker--hover, .more, .linkrow a, .chrome a { transition: none; }
   .more:hover::after { animation: none; }
   /* the hover grammar keeps its colour and opacity changes and drops every movement */
@@ -842,7 +857,7 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
 /* ---------- Print: a plain document ---------- */
 @media print {
   html, body { background: #fff; color: #000; }
-  .chrome, .rail, .skip, .tear, .tape, .sticker, .slide__dim, .cover__hint, .strip-wrap, .talk__frame { display: none !important; }
+  .chrome, .rail, .skip, .tear, .tape, .sticker, .slide__dim, .strip-wrap, .talk__frame { display: none !important; }
   .slide, .sheet, .sheet__in { position: static !important; height: auto !important; min-height: 0 !important; background: #fff !important; color: #000 !important; overflow: visible !important; transform: none !important; }
   .sheet { margin-top: 0; }
   .sheet__in { padding: 0 0 1.5rem; page-break-inside: avoid; }
@@ -851,6 +866,14 @@ html:not([data-talk="collage"]) .colophon { color: var(--stage-2); }
   .card { position: static; margin-top: 1rem; border: 1px solid #ccc; }
   .collage { aspect-ratio: auto; }
   .cover__title, .title, .talk__word { font-size: 28pt; color: #000; }
+  /* the cover as a plain heading at the margin, as every sheet starts: the hand line a kicker in the body face,
+     nothing tilted (it printed as a shrunken poster, indented, its line in the marker face and turned) */
+  .slide--first .sheet__in { padding-top: 0; }
+  .cover__stage { display: block; padding: 0; justify-items: normal; }   /* (centred there, the block shrank to its line and sat mid-page) */
+  .cover__block { display: block; width: auto; padding-left: 0; }
+  .cover__hand { rotate: none; max-width: none; margin: 0 0 .3rem; font: 700 9pt/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+  .route { text-shadow: none; }
+  .cover .tag { transform: none !important; margin: .8rem 0 0; }
   .panel h3, .numbers .n, .card--red .big { color: #000 !important; }
   .timeline .yr, .ticket .card__k, .title .ac { color: var(--red-ink) !important; } /* small vermilion on white */
   .index-tab, .card__go, .card__link, .route::before, .route::after, .find, .cabinet__shut { display: none !important; }
@@ -926,11 +949,8 @@ html:not(.js) .cabinet:target { display: block; }
 /* one file moves at a time: when another is going back in, this one waits 60ms (set by the script) */
 .folder.is-out .file { transform: rotate(var(--tilt, -1.2deg)); visibility: visible; pointer-events: auto; transition: transform 250ms var(--ease-out) var(--rise-delay, 0ms), visibility 0s linear var(--rise-delay, 0ms); }
 .file::before { content: ""; position: absolute; top: -12px; left: 50%; width: 72px; height: 22px; translate: -50% 0; rotate: -3deg; background: linear-gradient(100deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.85) 32%, rgba(255,255,255,.6) 58%, rgba(255,255,255,.8) 100%); box-shadow: 0 1px 3px rgba(0,0,0,.22), inset 0 0 0 1px rgba(0,0,0,.06); clip-path: polygon(2% 0, 98% 3%, 100% 24%, 97% 48%, 100% 78%, 98% 100%, 3% 97%, 0 70%, 2% 42%, 0 16%); }
-.file__rec { font-size: var(--micro); letter-spacing: .14em; line-height: 1.3; text-transform: uppercase; color: var(--ink-2); }
 /* you are here: the current sheet's file says so in its first line (generated, so no other folder's
    description carries it) */
-.folder.is-current .file__sheet { display: none; }
-.folder.is-current .file__rec::before { content: "You are here · "; font-weight: 700; color: var(--black); }
 .file__title { margin-top: .4rem; font: 400 1.6rem/1 var(--display); letter-spacing: .005em; text-transform: uppercase; text-wrap: balance; }
 .file__kicker { margin-top: .45rem; padding-left: .55rem; border-left: 3px solid var(--red); font-size: var(--micro); font-weight: 700; letter-spacing: .12em; line-height: 1.3; text-transform: uppercase; }
 .file__sum { margin-top: .55rem; font-size: var(--small); line-height: 1.42; text-wrap: pretty; }
@@ -1059,7 +1079,6 @@ html:not(.js) .cabinet__shut { display: inline-flex; }
   .reply { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .mail { rotate: none; box-shadow: none; background: none !important; color: #000 !important; padding: 0; font-size: 16pt; }
   .end { border: 0; padding: 0; }
-  .end .colophon { margin: 0; text-align: left; }
   /* the research chart's bars print in their colours, as the files' charts do; the words print without their halo;
      the tools print as outlined tiles; the clean contact sheet's words at the print size and its slab flat */
   .bars, .bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }

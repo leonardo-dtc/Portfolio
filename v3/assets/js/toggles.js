@@ -24,7 +24,8 @@
     },
     cover: { q: 'T40', def: 'poster', values: { poster: 'the cover as a poster (built)', desk: 'a desk: its objects open the project files' } },
     talk: { q: 'T18', def: 'clean', values: { clean: 'the contact sheet, clean: the framed words, the address and the profiles, a plain end', collage: 'as round three left it: stickers, tape and the torn paper end' } },
-    talkWords: { q: 'T18 words', def: 'lets-talk', values: { 'lets-talk': 'LET’S TALK (the words now)', 'get-in-touch': 'GET IN TOUCH', 'say-hello': 'SAY HELLO' } }
+    talkWords: { q: 'T18 words', def: 'lets-talk', values: { 'lets-talk': 'LET’S TALK (the words now)', 'get-in-touch': 'GET IN TOUCH', 'say-hello': 'SAY HELLO' } },
+    macDesk: { q: 'Mac desk', def: 'messy', values: { messy: 'the Mac’s icons left where they were used, a desk in use (built)', tidy: 'the icons lined up down the right edge, as Clean Up leaves them' } }
   };
   var WORDS = { 'lets-talk': ['Let’s', 'Talk'], 'get-in-touch': ['Get in', 'Touch'], 'say-hello': ['Say', 'Hello'] };
   var names = Object.keys(TOGGLES);

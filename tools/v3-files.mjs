@@ -1,5 +1,5 @@
-// v3's project files, written from one list: each file's title, the chrome (the name, Email and the year, as on the
-// deck), the drawer of tabs, the links back to its sheet, the pager to the files on either side, and the name its
+// v3's project files, written from one list: each file's title, the chrome (the name and Email, as on the deck), the
+// drawer of tabs, the links back to its sheet, the pager to the files on either side, and the name its
 // view transition uses. The numbers, the names and the pager's lines come from the deck itself (v3/index.html): a
 // file is numbered by its sheet's place among the sheets, named by the sheet's folder in the index, and described by
 // that folder's file. So a sheet that moves, or a folder renamed in the index, changes every file. After changing
@@ -58,12 +58,12 @@ const arrow = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrow"/><
 
 export function chrome() {
   return ['<header class="chrome" aria-label="Page">', '  <a href="../../">Leonardo Carvalho</a>',
-    `  <span class="chrome__end"><a href="mailto:${EMAIL}">Email</a><span aria-hidden="true">2026</span></span>`, '</header>'].join('\n');
+    `  <span class="chrome__end"><a href="mailto:${EMAIL}">Email</a></span>`, '</header>'].join('\n');
 }
 
 export function drawer(all, cur) {
   const li = all.map(f => f === cur
-    ? `      <li class="is-current"><a href="./" aria-current="page"><span>File ${f.n} · ${esc(f.name)}</span></a></li>`
+    ? `      <li class="is-current"><a href="./" aria-current="page"><span><b>${f.n}</b> ${esc(f.name)}</span></a></li>`
     : `      <li><a href="../${f.dir}/" aria-label="${f.n} ${esc(f.name)}"><span><b>${f.n}</b> <span class="n-name">${esc(f.name)}</span></span></a></li>`);
   return ['<nav class="drawer" aria-label="Files">', '    <ol>', ...li, '    </ol>', '  </nav>'].join('\n');
 }
@@ -73,7 +73,7 @@ export function back(f) { return `<a class="back" href="../../#${f.sheet}">${arr
 export function pager(all, cur) {
   const i = all.indexOf(cur), prev = all[i - 1], next = all[i + 1];
   const label = prev && next ? 'Previous and next files' : prev ? 'Previous file' : 'Next file';
-  const link = (f, rel, word) => [`      <a href="../${f.dir}/" rel="${rel}">`, `        <span class="pager__k">${word} · File ${f.n}</span>`, `        <span class="pager__t">${esc(f.name)}</span>`,
+  const link = (f, rel, word) => [`      <a href="../${f.dir}/" rel="${rel}">`, `        <span class="pager__k">${word}</span>`, `        <span class="pager__t">${esc(f.name)}</span>`,
     `        <span class="pager__d"><span>${esc(f.line)}</span></span>`, '        <span class="pager__go" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#arrow"/></svg></span>', '      </a>'];
   return [`<nav class="pager" aria-label="${label}">`, ...(prev ? link(prev, 'prev', 'Previous') : []), ...(next ? link(next, 'next', 'Next') : []), '    </nav>'].join('\n');
 }

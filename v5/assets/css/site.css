@@ -262,12 +262,13 @@ html:not(.gl) .hero.is-ready .hero__name::after { animation: hero-turn 16s ease-
 /* the white-hot line on the letters' edge (only its outer half shows) */
 .hero__neon::after { pointer-events: none; color: rgba(255, 242, 250, .95); -webkit-text-fill-color: #000; -webkit-text-stroke: .02em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .045em var(--edge-glow)); opacity: 0; transition: opacity .9s var(--ease-out); }
 html:not(.gl) .hero.is-ready::before, .hero.is-ready .hero__neon::after { opacity: 1; }
-/* by day the room is bright: the pool under the whole name (solid to 70% of its radius, so the first and last
+/* by day the room is bright, and soft, as the room's own hero is (room-day-soft.webp, so nothing jumps from sharp to soft
+   when WebGL takes over): the pool under the whole name (solid to 70% of its radius, so the first and last
    letters sit on it too) and a tight shade round every letter fall to the style's deep colour, as the shader's day
    pool does, and the faces are nearly opaque, so the white-hot edge and the faces keep 3:1 or more against the ground
    right beside them, still or moving (over the pale sky the edge measured 1.7 to 2.6:1, the faces about 1:1) */
-@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, color-mix(in srgb, var(--n-deep) 94%, transparent) 70%, color-mix(in srgb, var(--n-deep) 60%, transparent) 88%, transparent); --pool-h: 2.2; --shade: color-mix(in srgb, var(--n-deep) 97%, transparent); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
-html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, color-mix(in srgb, var(--n-deep) 94%, transparent) 70%, color-mix(in srgb, var(--n-deep) 60%, transparent) 88%, transparent); --pool-h: 2.2; --shade: color-mix(in srgb, var(--n-deep) 97%, transparent); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
+@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day-soft.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, color-mix(in srgb, var(--n-deep) 94%, transparent) 70%, color-mix(in srgb, var(--n-deep) 60%, transparent) 88%, transparent); --pool-h: 2.2; --shade: color-mix(in srgb, var(--n-deep) 97%, transparent); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
+html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day-soft.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, color-mix(in srgb, var(--n-deep) 94%, transparent) 70%, color-mix(in srgb, var(--n-deep) 60%, transparent) 88%, transparent); --pool-h: 2.2; --shade: color-mix(in srgb, var(--n-deep) 97%, transparent); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
 /* reduced transparency: solid letters without the pool, traces or neon: white by night; by day a deep navy on a soft
    light halo, since the day room runs from pale sky to mid blue behind the name (5.4:1 or better against the darker
    parts round the letters, where #1f3fae alone measured 2.4:1) */
@@ -331,7 +332,7 @@ html:not(.gl).is-entering .hero { opacity: 0; transition: opacity .25s ease; }
    glyphs, so they change with the color control like the rest of the room. */
 .hero__below { position: absolute; left: 0; right: 0; top: var(--below-y, 64%); width: min(100% - 32px, 1040px); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: clamp(22px, 3.4svh, 34px); pointer-events: none; opacity: 0; transition: opacity .6s var(--ease-out) .3s; }
 .hero.is-ready .hero__below { opacity: 1; }
-html.is-entering .hero__below { opacity: 0; transition: opacity .16s; }
+html.is-entering .hero .hero__below { opacity: 0; transition: opacity .16s; }   /* (over .hero.is-ready's 1, which stays till the end) */
 html[data-hero-content="name"] .hero__below, html[data-hero-content="apps"] .hero__line, html[data-hero-content="line"] .apps { display: none; }
 .hero__line { margin: 0; max-width: 46ch; color: #fff; font: 600 clamp(16px, 1.3vw, 20px)/1.35 var(--font); letter-spacing: .005em; text-align: center; text-wrap: balance; text-shadow: 0 0 18px rgba(4, 8, 36, .6), 0 0 4px rgba(4, 8, 36, .45); }
 .apps { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px 26px; pointer-events: auto; }
@@ -342,10 +343,10 @@ html[data-hero-content="name"] .hero__below, html[data-hero-content="apps"] .her
 .app__more { display: none; }
 .app:hover .app__art { scale: 1.06; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 0 0 1px rgba(255, 255, 255, .22), 0 14px 34px rgba(4, 8, 40, .42), 0 0 28px color-mix(in srgb, var(--style, #3d6bff) 45%, transparent); }
 .app:active .app__art { scale: .96; transition-duration: .1s; }
-.app:focus-visible { outline: none; }
+.app:focus-visible { outline: none; box-shadow: none; }   /* one ring, on the icon (not the page's glow round the whole app as well) */
 .app:focus-visible .app__art { outline: 2px solid #fff; outline-offset: 4px; }
 /* choosing one: it swells a little and fades as its window comes in; the line and the other apps fade at once */
-html.is-launching .hero__below { opacity: 1; }
+html.is-launching .hero .hero__below { opacity: 1; }
 html.is-launching .hero__line { opacity: 0; transition: opacity .15s; }
 html.is-launching .app { pointer-events: none; }
 html.is-launching .app:not(.is-chosen) { opacity: 0; transition: opacity .15s; }
@@ -526,7 +527,6 @@ html.is-booting .space > * { opacity: 0; animation: boot-cover 0s 1.2s forwards;
 .more { font-size: 15px; font-weight: 650; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 999px; background: var(--fill); white-space: nowrap; }
 .more:hover { background: var(--fill-2); }
 .note { color: var(--ink-3); font-size: 15px; }
-.section__sub { margin: -8px 0 14px; }
 .after-lede { margin-top: 8px; }
 .after-note { margin-top: 18px; }
 .prose p + p { margin-top: 14px; }
@@ -621,7 +621,7 @@ a.row:focus-visible .row__m { color: #fff; }
   html.js .exp:has(a.row:is(:hover, :focus-visible)) { margin-bottom: -22px; }   /* one line: 2px and a 20px line box */
 }
 
-/* side-window rows */
+/* side-window rows (an icon, a name and a line; none on a page since About's two went, October 2026, kept to hand) */
 .srows { margin-top: 16px; display: grid; gap: 8px; }
 .srow { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px; border-radius: 16px; background: var(--fill); }
 .side:not(.side--inline) .srow { grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 9px; }
@@ -666,7 +666,7 @@ a.row:focus-visible .row__m { color: #fff; }
 /* The archive (work/archive/, written from tools/v5-chrome.mjs): every entry in full, newest first, each a group of
    its own: the year and kind, the title in the Experiments rows' italic, its line, its paragraphs, its details and
    where the rest of it lives */
-.arc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.arc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 0; padding: 0; list-style: none; container-type: inline-size; }
 .arc > li { padding: 20px 22px 22px; border-radius: var(--r-row); background: var(--fill); scroll-margin-top: 12px; }
 .arc__meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 14px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .arc__kind::before { content: "·"; margin-right: 10px; }
@@ -674,8 +674,19 @@ a.row:focus-visible .row__m { color: #fff; }
 .arc__line { margin-top: 6px; font-size: 17px; color: #fff; max-width: 40em; }
 .arc .prose { margin-top: 14px; }
 .arc .facts--box { margin-top: 16px; background: var(--fill); }
-.arc__go { margin-top: 16px; }
+.arc__go { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .arc__go .btn { max-width: 100%; white-space: normal; text-align: left; }   /* a long name wraps on a phone rather than leaving the window */
+/* a song, an album or a project of my own (archive/README.md): the cover beside the head on wider windows (above it on
+   a phone), the artist under the title; the music on its own shelf after the things made */
+.arc__by { margin-top: 2px; font-size: 17px; font-weight: 600; color: var(--ink-2); }
+.arc__cover { display: block; width: min(100%, 220px); height: auto; margin-top: 12px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .28); }
+.arc__item--music .arc__cover { aspect-ratio: 1; object-fit: cover; }
+@container (min-width: 560px) {
+  .arc > li:has(> .arc__cover) { display: grid; grid-template-columns: minmax(0, 1fr) 168px; column-gap: 22px; align-content: start; }
+  .arc > li:has(> .arc__cover) > * { grid-column: 1; }
+  .arc > li:has(> .arc__cover) > .arc__cover { grid-column: 2; grid-row: 1 / span 4; width: 100%; margin-top: 4px; }
+}
+.win__body .arc__shelf { margin: 34px 0 14px; font: 700 22px/1.2 var(--font-display); letter-spacing: -.005em; scroll-margin-top: 12px; }
 .cv { display: grid; gap: 10px; }
 .cv > li { padding: 15px 18px; border-radius: var(--r-row); background: var(--fill); }
 .cv__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
@@ -934,7 +945,7 @@ html.no-room .hue, html:not(.js) .hue { display: none; }
 .hue__head h2 { font: 700 17px/1.2 var(--font-display); }
 .hue__reset { padding: 7px 12px; border: 0; border-radius: 999px; background: var(--fill-2); color: #fff; font: 600 13px/1 var(--font); cursor: pointer; }
 .hue__reset:hover { background: var(--fill-3); }
-.hue__swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 6px; }
+.hue__swatches { display: grid; grid-template-columns: repeat(var(--across, 4), minmax(0, 1fr)); gap: 12px 6px; }
 .hue__swatches button { display: grid; justify-items: center; gap: 6px; padding: 0; border: 0; background: none; color: var(--ink-2); font: 600 12px/1 var(--font); cursor: pointer; }
 .hue__swatches i { width: 40px; height: 40px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25); transition: scale .3s var(--ease-out), box-shadow .2s; }
 @media (prefers-reduced-motion: no-preference) { .hue__swatches button:hover i { scale: 1.08; } }

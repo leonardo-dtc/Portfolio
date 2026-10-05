@@ -8,7 +8,7 @@
 
 // [id, label, hue turn in degrees, vibrance]
 export const PRESETS = [
-  ['cobalt', 'Cobalt', 0, 1], ['violet', 'Violet', 28, 1], ['rose', 'Rose', 92, 1], ['ember', 'Ember', 136, 1],
+  ['cobalt', 'Cobalt', 0, 1], ['violet', 'Violet', 28, 1], ['rose', 'Rose', 92, 1], ['red', 'Red', 122, 1], ['ember', 'Ember', 136, 1],
   ['gold', 'Gold', 170, 1], ['emerald', 'Emerald', -120, 1], ['teal', 'Teal', -66, 1], ['graphite', 'Graphite', 0, .12],
 ];
 
@@ -64,6 +64,10 @@ const NEON = {
   violet: { arc: [1.72, 1.209], set: [[0.985, 0.02, 0.722], [0.919, 0.021, 0.925], [0.744, 0.16, 0.998], [0.593, 0.286, 0.998], [0.438, 0.338, 0.997], [0.494, 0.625, 0.998], [0.187, 0.46, 0.998], [0.998, 0.345, 0.6], [0.43, 0.251, 0.997], [0.608, 0.115, 0.997], [0.846, 0.017, 0.851], [0.549, 0.256, 0.997], [0.233, 0.003, 0.513], [0.892, 0.017, 0.718]] },
   // peach, coral, rose, hot pink, magenta, lilac; echoes coral to rose, peach to apricot, fuchsia to lilac
   rose: { arc: [0.653, 0.896], set: [[0.999, 0.519, 0.199], [0.998, 0.259, 0.224], [0.997, 0.019, 0.432], [0.98, 0.019, 0.65], [0.928, 0.021, 0.901], [0.822, 0.515, 0.998], [0.796, 0.019, 0.964], [0.999, 0.657, 0.28], [0.932, 0.017, 0.556], [0.855, 0.017, 0.829], [0.998, 0.142, 0.208], [0.892, 0.017, 0.718], [0.343, 0.002, 0.191], [0.925, 0.016, 0.313]] },
+  // a true red (its glass at hue 26 in OKLCH, where pure red is 29; Rose sits near 1, pink, and Ember near 35, orange):
+  // orange red, scarlet, red, crimson, ruby, raspberry; echoes scarlet to red, orange red to amber, deep crimson to
+  // raspberry. It stops short of pink.
+  red: { arc: [0.27, 0.52], set: [[1, 0.42, 0.06], [1, 0.2, 0.04], [0.98, 0.05, 0.05], [0.92, 0.03, 0.2], [0.84, 0.02, 0.28], [0.86, 0.06, 0.42], [0.9, 0.02, 0.16], [1, 0.55, 0.1], [0.95, 0.2, 0.03], [0.9, 0.02, 0.06], [0.85, 0.03, 0.3], [0.93, 0.03, 0.18], [0.33, 0.01, 0.02], [0.96, 0.12, 0.08]] },
   // gold, amber, orange, vermilion, red, hot pink; echoes amber to orange, gold to yellow, crimson to hot pink
   ember: { arc: [0.058, 0.751], set: [[0.999, 0.788, 0.149], [0.999, 0.618, 0.132], [0.992, 0.451, 0.016], [0.982, 0.26, 0.012], [0.977, 0.018, 0.168], [0.998, 0.248, 0.626], [0.925, 0.016, 0.313], [0.999, 0.903, 0.3], [0.92, 0.385, 0.013], [0.939, 0.017, 0.076], [0.915, 0.016, 0.394], [0.936, 0.016, 0.159], [0.339, 0.065, 0.001], [0.888, 0.014, 0.261]] },
   // lemon, gold, amber, orange, copper, champagne; echoes gold to amber, lemon to orange, deep gold to champagne
