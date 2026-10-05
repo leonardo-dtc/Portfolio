@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#0b1138">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../assets/css/site.css">
-<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
+<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}try{var q=/[?&]toggles=([^&#]*)/.exec(location.search);if(q)decodeURIComponent(q[1]).split(',').forEach(function(p){var a=p.split(':');if(a.length===2&&/^[a-z][A-Za-z]{1,30}$/.test(a[0])&&/^[a-z][a-z-]{0,30}$/.test(a[1]=a[1].trim().toLowerCase()))d.dataset[a[0]]=a[1]})}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
 <script type="module" src="../../assets/js/boot.js"></script>
 </head>
 <body>
@@ -34,14 +34,12 @@
     </header>
     <div class="win__body" data-scroll tabindex="0" role="region" aria-label="Daedalus">
       <dl class="facts facts--box">
-        <dt>Type</dt><dd>Product. Cooperative game</dd>
+        <dt>Type</dt><dd>Product</dd>
         <dt>Role</dt><dd>Main builder: design and implementation</dd>
         <dt>Team</dt><dd>Three people, under the studio name Gompurkle. Roles shift to whatever the week needs</dd>
         <dt>Platform</dt><dd>Roblox</dd>
-        <dt>Status</dt><dd>Working toward an alpha. No release date has been announced</dd>
+        <dt>Status</dt><dd>At the design stage, working toward an alpha. No release date has been announced</dd>
       </dl>
-      <p class="note callout"><b>No images yet.</b> Daedalus is at the design stage, and there is no released gameplay to show.</p>
-
       <div class="prose">
         <h2 id="premise">Premise</h2>
         <p>A first-person cooperative survival-horror game for two to six players, set inside the Labyrinth as Daedalus’s still-running machine. Players are meant to need each other: the game is built so that isolation is what it punishes.</p>
@@ -50,13 +48,7 @@
         <p>We wrote a full design document before building: the systems, a bestiary, the items and a story with two endings. The rule for all of it is to show rather than tell. Every mechanic has a cause in the fiction, and the dread is meant to come from scale and wrongness rather than speed.</p>
 
         <h2 id="interaction">Interaction system</h2>
-        <p>Cooperation is the core interaction: parts of the labyrinth need more than one pair of hands, and the labyrinth itself changes. Map sketches, creature concepts and a short loop of a two-player mechanism will be added here once they can be shown.</p>
-
-        <h2 id="implementation">Implementation</h2>
-        <p>Built on Roblox. I am the main builder; design and implementation are shared across the three of us as the project develops.</p>
-
-        <h2 id="state">Current state</h2>
-        <p>Working toward an alpha release. No release date has been announced.</p>
+        <p>Cooperation is the core interaction: parts of the labyrinth need more than one pair of hands, and the labyrinth itself changes.</p>
       </div>
       <div class="toolbar--inline"><a class="btn" href="../loquar/" aria-label="Previous project: Loquar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6"/></svg>Loquar</a><a class="btn" href="../ocapex/" aria-label="Next project: OCAPEX">OCAPEX<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg></a></div>
     </div>

@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/css/site.css">
 <link rel="preload" href="assets/fonts/switzer-variable.woff2" as="font" type="font/woff2" crossorigin>
-<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
+<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}try{var q=/[?&]toggles=([^&#]*)/.exec(location.search);if(q)decodeURIComponent(q[1]).split(',').forEach(function(p){var a=p.split(':');if(a.length===2&&/^[a-z][A-Za-z]{1,30}$/.test(a[0])&&/^[a-z][a-z-]{0,30}$/.test(a[1]=a[1].trim().toLowerCase()))d.dataset[a[0]]=a[1]})}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
 <script type="module" src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -78,15 +78,12 @@
 
       <section class="section" id="experiments" aria-labelledby="exp-h">
         <div class="section__head"><h2 id="exp-h">Experiments</h2><a class="more" href="work/archive/">Archive</a></div>
-        <p class="note section__sub">The smaller things, made for a class, a quartet or the fun of it.</p>
-        <!-- Experiments: written by tools/v5-chrome.mjs from its ARCHIVE list (Home shows the newest four, Work all of them, and
-             the archive sheet, work/archive/, every entry in full). Add one there and run node tools/v5-chrome.mjs. -->
+        <!-- Experiments: written from archive/*.md by node tools/archive.mjs (Home shows the newest four things made, Work all
+             of them, and the archive sheet, work/archive/, every entry in full). archive/README.md says how to add one. -->
         <ul class="rows exp">
-          <!-- Left out, as Leonardo chose on 2026-10-05 (T6: leave the class games out); the résumé keeps them as coursework.
-          <li><a class="row" href="resume/#class-projects" data-hover><span class="row__t"><em>snake, minesweeper and a dinosaur runner</em><small>Rebuilt from scratch in Python and Java, AP Computer Science</small></span><span class="row__m">2025 to 2026</span></a></li> -->
           <li><a class="row" href="work/archive/#labyrinth" data-hover><span class="row__t"><em>a labyrinth that changes while you are in it</em><small>Daedalus, a cooperative survival-horror game for two to six players, in development</small></span><span class="row__m">Now</span></a></li>
           <li><a class="row" href="work/archive/#summer" data-hover><span class="row__t"><em>vivaldi’s summer, arranged for amora</em><small>Each of us arranges one season of The Four Seasons; mine is Summer</small></span><span class="row__m">2026 to now</span></a></li>
-          <li><a class="row" href="work/archive/#phantom" data-hover><span class="row__t"><em>the phantom of the opera, for string quartet</em><small>Arranged for string quartet, before Summer</small></span><span class="row__m">2026</span></a></li>
+          <li><a class="row" href="work/archive/#phantom" data-hover><span class="row__t"><em>the phantom of the opera, for string quartet</em><small>Arranged before Summer</small></span><span class="row__m">2026</span></a></li>
           <li><a class="row" href="work/archive/#music-video" data-hover><span class="row__t"><em>a cover with its own music video</em><small>A produced cover, as a Calculus BC final</small></span><span class="row__m">2025 to 2026</span></a></li>
         </ul>
       </section>
@@ -129,7 +126,7 @@
           </ul>
         </div>
         <div class="group">
-          <p class="lead">Loquar and Daedalus are the projects with friends, a language app and a game, and both are still being built. This site I build alone.</p>
+          <p class="lead">Loquar and Daedalus are the projects with friends. This site I build alone.</p>
           <ul class="rows">
             <li><a class="row" href="work/loquar/" data-hover><span class="row__t">Loquar, a language-learning web app</span><span class="row__m">In development</span></a></li>
             <li><a class="row" href="work/daedalus/" data-hover><span class="row__t">Daedalus, a cooperative survival-horror game</span><span class="row__m">In development</span></a></li>
@@ -142,16 +139,13 @@
 
       <section class="section" id="contact" aria-labelledby="contact-h">
         <div class="section__head"><h2 id="contact-h">Write to me</h2></div>
-        <p class="lede">For recruiting, project questions or a conversation, write to me at <a href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a>.</p>
+        <p class="lede">For recruiting, project questions or a conversation: <a href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a>.</p>
         <p class="note after-lede">Correspondence goes via a parent. Transcript, hockey film and coach references are available on request.</p>
         <ul class="rows after-note">
-          <li><a class="row" href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" rel="noopener" data-hover><span class="row__t">Elite Prospects</span><span class="row__m">eliteprospects.com</span></a></li>
-          <li><a class="row" href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" rel="noopener" data-hover><span class="row__t">NCSA recruiting profile</span><span class="row__m">ncsasports.org</span></a></li>
           <li><a class="row" href="https://ocapex.com" rel="noopener" data-hover><span class="row__t">OCAPEX</span><span class="row__m">ocapex.com</span></a></li>
         </ul>
         <div class="toolbar--inline"><a class="btn btn--primary" href="mailto:leonardo.dtc2009@gmail.com">Write to me</a><a class="btn" href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" rel="noopener">Elite Prospects</a><a class="btn" href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" rel="noopener">NCSA</a></div>
       </section>
-      <p class="note foot">Leonardo Carvalho, Groton School, Class of 2028. Updated September 2026.</p>
     </div>
   </main>
 

@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#0b1138">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../../assets/css/site.css">
-<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
+<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}try{var q=/[?&]toggles=([^&#]*)/.exec(location.search);if(q)decodeURIComponent(q[1]).split(',').forEach(function(p){var a=p.split(':');if(a.length===2&&/^[a-z][A-Za-z]{1,30}$/.test(a[0])&&/^[a-z][a-z-]{0,30}$/.test(a[1]=a[1].trim().toLowerCase()))d.dataset[a[0]]=a[1]})}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
 <script type="module" src="../../assets/js/boot.js"></script>
 </head>
 <body>
@@ -34,7 +34,7 @@
     </header>
     <div class="win__body" data-scroll tabindex="0" role="region" aria-label="Loquar">
       <dl class="facts facts--box">
-        <dt>Type</dt><dd>Product. Language-learning web app</dd>
+        <dt>Type</dt><dd>Product</dd>
         <dt>Role</dt><dd>Co-founder and CTO: systems, interface design and code</dd>
         <dt>Team</dt><dd>Founded by a friend; built with friends</dd>
         <dt>First language</dt><dd>Mandarin</dd>
@@ -43,7 +43,6 @@
       <p class="note callout"><b>About the screenshots.</b> They show the landing page, not the finished product.</p>
       <figure class="fig">
         <div class="fig__tile" style="--c: var(--gold)"><img src="../../assets/img/loquar-openworld-960.webp" srcset="../../assets/img/loquar-openworld-640.webp 640w, ../../assets/img/loquar-openworld-960.webp 960w, ../../assets/img/loquar-openworld-1440.webp 1440w" sizes="(min-width: 900px) 640px, 90vw" width="960" height="600" alt="Loquar landing page: photographed city scenes fanned into a spiral beside the headline “A world of experiences. You choose which ones.” and a section titled “Two things level up at once”"></div>
-        <figcaption>The open-world section of the landing page. Screenshot, in development.</figcaption>
       </figure>
 
       <div class="prose">
@@ -52,26 +51,23 @@
 
         <h2 id="approach">Approach</h2>
         <p>Loquar is an open world rather than a sequence of story events. The product opens as a city, not a syllabus: streets, counters and back rooms, with the people standing in them, and the learner chooses the way through. Every scene is meant to move the language and the reading of the culture together: words, tones and listening on one side; who orders, who pays and when “maybe” means no on the other.</p>
-        <p>We started with Mandarin because it is the language we can judge. The full product ships when it is ready.</p>
+        <p>We started with Mandarin because it is the language we can judge.</p>
 
         <h2 id="interaction">Interaction system</h2>
         <p>On the landing page the world is wound into a spiral: scrolling walks through it and dragging looks around. A progress line under each scene shows where the learner is in the sequence, and each scene carries the word it teaches, in characters and pinyin, before the description of what the scene is for.</p>
       </div>
       <figure class="fig">
         <div class="fig__tile" style="--c: var(--gold)"><img src="../../assets/img/loquar-journey-800.webp" srcset="../../assets/img/loquar-journey-640.webp 640w, ../../assets/img/loquar-journey-800.webp 800w, ../../assets/img/loquar-journey-1280.webp 1280w" sizes="(min-width: 900px) 640px, 90vw" width="800" height="450" loading="lazy" alt="Loquar landing page section titled “A city, not a syllabus”, with word cards for taxi, airport and beef noodles fanned around a courtyard photograph, and the line “Scroll to move through the world · drag to look around”"></div>
-        <figcaption>“A city, not a syllabus.” Landing page, screenshot.</figcaption>
       </figure>
       <div class="prose">
-        <p>A short loop of the in-app interaction will be added here once it can be shown.</p>
-
         <h2 id="visual">Visual design</h2>
-        <p>The landing page sets photographs of real places and people into a paper-toned field, with a serif for the headlines and Chinese characters given room to sit large on their own cards. Wireframes, the concepts we rejected and product screens will be added here when they can be shown.</p>
+        <p>The landing page sets photographs of real places and people into a paper-toned field, with a serif for the headlines and Chinese characters given room to sit large on their own cards.</p>
 
         <h2 id="implementation">Implementation</h2>
-        <p>I am responsible for implementing the systems, the interface and the code, and for the small things that make an app pleasant to use. Details of the stack will follow when the product ships.</p>
+        <p>I am responsible for implementing the systems, the interface and the code, and for the small things that make an app pleasant to use.</p>
 
         <h2 id="state">Current state</h2>
-        <p>In development. The landing page is public; the full product ships when it is ready, and no release date has been announced.</p>
+        <p>The landing page is public.</p>
       </div>
       <div class="toolbar--inline"><a class="btn" href="../genuvalens/" aria-label="Previous project: Genuvalens"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6"/></svg>Genuvalens</a><a class="btn" href="../daedalus/" aria-label="Next project: Daedalus">Daedalus<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg></a></div>
     </div>

@@ -91,12 +91,16 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   Fill 2 wash and steps the other titles back to Ink 2. The list takes the line into the space
   below it, so nothing after it moves. Touch, phones, reduced motion, scripts off and
   print show every line. Each row opens its entry on the archive's sheet.
-- **The archive (2026-10-05).** The experiments come from one list in
-  `tools/v5-chrome.mjs` (`ARCHIVE`), newest first: Home shows the newest four, Work
-  all seven, and a sheet over Work, `work/archive/`, holds every entry in full: its
-  year and kind, its title in the rows' italic, its line, a paragraph or two, its
-  details in a Fill box, and a button to where the rest of it lives (the résumé's
-  entry, or the Daedalus sheet). The Experiments heading on Home and Work carries
+- **The archive (2026-10-05).** The experiments come from `archive/*.md`, one file an
+  entry, shared with v3 (`archive/README.md` says how to add one; `node
+  tools/archive.mjs` writes both editions), newest first: Home shows the newest four
+  things made, Work all of them, and a sheet over Work, `work/archive/`, holds every
+  entry in full: its year and kind, its title in the rows' italic, its cover, its
+  line, a paragraph or two, its details in a Fill box, and buttons to where the rest
+  of it lives (the résumé's entry, a sheet, or a page elsewhere). Songs and albums
+  (Request E) never go in the rows: they sit on the sheet's own shelf, Listening, each
+  with its artist, its cover and Listen on its service (Spotify, Apple Music, YouTube,
+  Bandcamp, SoundCloud, Tidal or Deezer). The Experiments heading on Home and Work carries
   "Archive" to the sheet. A row opens the sheet already at its entry (it does not
   jump once the sheet has arrived), and the entry takes the landing wash, as a
   résumé entry does. Every fact is the site's own; what is not on file is left out.
@@ -129,7 +133,9 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
 - **Night and Day** follow `prefers-color-scheme`. A still of each
   (`room-night.webp`, `room-day.webp`, rendered from the shader by
   `tools/room-stills.mjs`) is the CSS background before WebGL starts, without
-  it, and with scripts off.
+  it, and with scripts off. By day the hero's own copy is a soft one
+  (`room-day-soft.webp`, 480 by 270, about the room's defocus), so the room no longer
+  goes from sharp to soft as WebGL takes over (Request E).
 
 ## The hero
 
@@ -204,7 +210,8 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   Cobalt keeps the Glowtime colours above, to the pixel; every other palette has
   its own set of fourteen colours of light from its family (Violet: magenta,
   orchid, purple, violet and periwinkle; Rose: peach, coral, rose, hot pink and
-  magenta; Ember: gold, amber, orange and red with a hot pink end; Gold: lemon,
+  magenta; Red: orange red, scarlet, red, crimson, ruby and raspberry; Ember: gold,
+  amber, orange and red with a hot pink end; Gold: lemon,
   gold, amber, orange and champagne; Emerald: lime, green, emerald, jade, teal
   and aqua; Teal: mint, aquamarine, turquoise, cyan and azure), and Graphite is
   Cobalt's set at its vibrance, a silver neon. The day pool takes the palette's
@@ -322,7 +329,7 @@ only (`localStorage`, `v5:toggles`), so visitors always see the defaults.
     `toggles.T39 = 'b'` sets one (T27 and T39 take the decision page's
     letters);
   - `toggles.reset()` forgets them all.
-- **In the address:** `?toggles=launcher:widgets,heroName:glass`, for that visit only (a link never changes what a browser shows next time).
+- **In the address:** `?toggles=launcher:widgets,heroName:glass`, for that visit only (a link never changes what a browser shows next time). The head script applies a name and value before the first paint, so the page does not show the default first; a letter or a question's name (`?toggles=T39:b`) waits for `toggles.js`.
 - **In the Elements panel:** edit the attribute on `<html>`. A value a toggle
   does not take goes back, with a note in the console.
 - **While the hero shows,** a change takes effect at once. Reload the home page
@@ -396,8 +403,12 @@ iOS 26; under 360 px, where five labelled tabs take the whole dock, a fill
 button in the window's toolbar) opens a small panel for trying colors. On
 desktop its name, "Color style", shows beside it while it is pointed at (after a
 beat) or focused from the keyboard, since the swatch alone does not say what it
-does. The panel has eight palettes (Cobalt, Violet, Rose, Ember, Gold, Emerald,
-Teal, Graphite), a Hue and a Vibrance slider, and Auto, Night or Day. A palette
+does. The panel has nine palettes (Cobalt, Violet, Rose, Red, Ember, Gold, Emerald,
+Teal, Graphite; three across, as nine fill three rows), a Hue and a Vibrance slider,
+and Auto, Night or Day. Red (Request E, for Leonardo to judge) is a true red, its
+glass at hue 26 where pure red is 29, between Rose (pink, near 1) and Ember (orange,
+near 35); it sits 14 degrees from Ember, so their swatches are the closest pair
+(crimson beside orange red), and whichever of the two he keeps, the other goes. A palette
 turns the whole room, so every pane of glass follows, and gives the hero's name
 its own neon (`assets/js/palette.js`); the choice is kept in this browser only
 (`assets/js/hue.js`). The turn is made in OKLab, where equal angles look equal:
@@ -407,9 +418,9 @@ Teal blue by night and green by day, and dark blue went olive on its way to
 Gold). The room is turned through a small table of colours, a 3D texture (17 to
 a side once it rests, 9 while a palette crossfades), so it costs one texture
 read a pixel; Cobalt needs none. The palettes sit at Cobalt 0, Violet +28, Rose
-+92, Ember +136, Gold +170, Emerald -120 and Teal -66 degrees, and Graphite is
-Cobalt at 12% vibrance; each pair is at least 0.066 apart in OKLab (Teal and
-Graphite, the closest). In every palette, by night and by day, every line of
++92, Red +122, Ember +136, Gold +170, Emerald -120 and Teal -66 degrees, and Graphite
+is Cobalt at 12% vibrance; each pair is at least 0.066 apart in OKLab (Teal and
+Graphite, the closest) but Red and Ember, at 0.027 while Red is being judged. In every palette, by night and by day, every line of
 text over the glass on Home and in the open panel keeps 4.5:1 (lowest 4.74:1).
 Where the room never started (no WebGL2, reduced transparency, Save-Data, a weak
 device) there is no control and the phone's tab bar is centred alone. That is
@@ -474,13 +485,12 @@ In order:
    land on it.
 7. Tests: add `'work/<slug>/'` to `PAGES` in `tests/v5/e2e/lib.mjs`.
 
-**An experiment** (a small thing with no sheet of its own): add it to `ARCHIVE`
-in `tools/v5-chrome.mjs`, where it belongs by date (newest first): its `id` (the
-archive sheet's anchor), year, kind, title, the one line the rows show, its
-paragraphs, its details and a link to where the rest of it lives (a Résumé entry
-with an `id`, or a sheet). Then run `node tools/v5-chrome.mjs`: it writes the rows
-on Home (the newest four) and Work, and the entry on `work/archive/`. Facts only
-from the site's own pages; leave out what is not on file.
+**An archive entry** (a song, an album, a project of my own, a small thing with no
+sheet): add a file to `archive/` as `archive/README.md` says (its name is the archive
+sheet's anchor), then run `node tools/archive.mjs`: it writes the rows on Home (the
+newest four things made) and Work, the entry on `work/archive/` (music on its
+Listening shelf), v3's card and Mac file, and copies any cover into both editions.
+Facts only; leave out what is not on file.
 
 **Then run** the unit tests and the browser checks against the preview server:
 `pages` (every page loads, noindex, no overflow, no third-party requests),

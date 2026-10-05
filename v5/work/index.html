@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#0b1138">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/css/site.css">
-<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
+<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}try{var q=/[?&]toggles=([^&#]*)/.exec(location.search);if(q)decodeURIComponent(q[1]).split(',').forEach(function(p){var a=p.split(':');if(a.length===2&&/^[a-z][A-Za-z]{1,30}$/.test(a[0])&&/^[a-z][a-z-]{0,30}$/.test(a[1]=a[1].trim().toLowerCase()))d.dataset[a[0]]=a[1]})}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
 <script type="module" src="../assets/js/boot.js"></script>
 </head>
 <body>
@@ -28,7 +28,7 @@
   </nav>
   <main id="main" class="win glass" data-glass="window" data-window="main">
     <header class="win__head">
-      <div><h1 tabindex="-1">Work</h1><p class="sub">Research, the things I build with friends, and the music and teaching I share.</p></div>
+      <div><h1 tabindex="-1">Work</h1></div>
       <a class="btn head__write" href="mailto:leonardo.dtc2009@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v11H4zM4.5 7l7.5 6 7.5-6"/></svg>Write to me</a>
     </header>
     <div class="win__body" data-scroll tabindex="0" role="region" aria-label="Work">
@@ -51,7 +51,7 @@
         <a class="card card--violet" href="daedalus/" data-cat="build" data-hover>
           <span class="card__tag">Game</span>
           <span class="card__shot card__art" aria-hidden="true"><svg viewBox="0 0 160 100"><g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M86 88h54V12H20v76h52" opacity=".5"/><path d="M98 76h30V24H32v52h40" opacity=".62"/><path d="M84 64h32V36H44v28h26" opacity=".76"/><path d="M56 52h48v-4H62" opacity=".9"/></g><circle cx="80" cy="88" r="4" fill="#fff"/></svg></span>
-          <p class="card__text"><b>Daedalus</b><span>Game, in development</span></p>
+          <p class="card__text"><b>Daedalus</b><span>In development</span></p>
         </a>
         <a class="card card--sand" href="ocapex/" data-cat="music" data-hover>
           <span class="card__tag">Nonprofit</span>
@@ -72,14 +72,12 @@
 
       <section class="section" id="experiments" aria-labelledby="exp-h">
         <div class="section__head"><h2 id="exp-h">Experiments</h2><a class="more" href="archive/">Archive</a></div>
-        <!-- Experiments: written by tools/v5-chrome.mjs from its ARCHIVE list (Home shows the newest four, Work all of them, and
-             the archive sheet, work/archive/, every entry in full). Add one there and run node tools/v5-chrome.mjs. -->
+        <!-- Experiments: written from archive/*.md by node tools/archive.mjs (Home shows the newest four things made, Work all
+             of them, and the archive sheet, work/archive/, every entry in full). archive/README.md says how to add one. -->
         <ul class="rows exp">
-          <!-- Left out, as Leonardo chose on 2026-10-05 (T6: leave the class games out); the résumé keeps them as coursework.
-          <li><a class="row" href="../resume/#class-projects" data-hover><span class="row__t"><em>snake, minesweeper and a dinosaur runner</em><small>Rebuilt from scratch in Python and Java, AP Computer Science</small></span><span class="row__m">2025 to 2026</span></a></li> -->
           <li><a class="row" href="../work/archive/#labyrinth" data-hover><span class="row__t"><em>a labyrinth that changes while you are in it</em><small>Daedalus, a cooperative survival-horror game for two to six players, in development</small></span><span class="row__m">Now</span></a></li>
           <li><a class="row" href="../work/archive/#summer" data-hover><span class="row__t"><em>vivaldi’s summer, arranged for amora</em><small>Each of us arranges one season of The Four Seasons; mine is Summer</small></span><span class="row__m">2026 to now</span></a></li>
-          <li><a class="row" href="../work/archive/#phantom" data-hover><span class="row__t"><em>the phantom of the opera, for string quartet</em><small>Arranged for string quartet, before Summer</small></span><span class="row__m">2026</span></a></li>
+          <li><a class="row" href="../work/archive/#phantom" data-hover><span class="row__t"><em>the phantom of the opera, for string quartet</em><small>Arranged before Summer</small></span><span class="row__m">2026</span></a></li>
           <li><a class="row" href="../work/archive/#music-video" data-hover><span class="row__t"><em>a cover with its own music video</em><small>A produced cover, as a Calculus BC final</small></span><span class="row__m">2025 to 2026</span></a></li>
           <li><a class="row" href="../work/archive/#sports-index" data-hover><span class="row__t"><em>ten sports, one composite index</em><small>Ten sports ranked across five categories, for AP Statistics</small></span><span class="row__m">2025 to 2026</span></a></li>
           <li><a class="row" href="../work/archive/#robots" data-hover><span class="row__t"><em>frc and ftc robots, in java</em><small>Programmer in Java on both teams; the FRC team reached the state championship</small></span><span class="row__m">2023 to 2025</span></a></li>

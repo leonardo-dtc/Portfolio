@@ -28,10 +28,12 @@ export function initHue({ room }) {
   const wrap = document.createElement('div');
   wrap.className = 'hue';
   const track = Array.from({ length: 13 }, (_, n) => css(turn([.10, .22, .80], -180 + n * 30, 1))).join(', ');
+  // the swatches fill their rows: four across, or three when four would leave one alone (nine of them)
+  const across = PRESETS.length % 4 && !(PRESETS.length % 3) ? 3 : 4;
   wrap.innerHTML = `
     <div class="hue__panel" id="hue-panel" role="dialog" aria-label="Color style" hidden>
       <div class="hue__head"><h2>Color</h2><button class="hue__reset" type="button">Reset</button></div>
-      <div class="hue__swatches" role="radiogroup" aria-label="Palette">
+      <div class="hue__swatches" role="radiogroup" aria-label="Palette" style="--across: ${across}">
         ${PRESETS.map(([id, label, d, k]) => `<button type="button" role="radio" aria-checked="false" data-preset="${id}"><i style="background:${swatch(d, k)}"></i><span>${label}</span></button>`).join('')}
       </div>
       <label class="hue__range"><span>Hue</span><input type="range" min="-180" max="180" step="1" data-k="hue" style="--track: linear-gradient(90deg, ${track})"><output></output></label>
@@ -133,10 +135,10 @@ export function initHue({ room }) {
   document.addEventListener('v5:navigate', place);
   new MutationObserver(place).observe(html, { attributes: true, attributeFilter: ['class'] });   // the hero leaving
   place();
-  // arrow keys move through a radio group and choose as they go (the swatches are a grid of four across)
+  // arrow keys move through a radio group and choose as they go (the swatches are a grid, so Up and Down go a row)
   wrap.querySelectorAll('[role="radiogroup"]').forEach(g => g.addEventListener('keydown', (e) => {
-    const all = [...g.querySelectorAll('[role="radio"]')], i = all.indexOf(document.activeElement), across = g.matches('.hue__swatches') ? 4 : 1;
-    const step = { ArrowRight: 1, ArrowDown: across, ArrowLeft: -1, ArrowUp: -across }[e.key];
+    const all = [...g.querySelectorAll('[role="radio"]')], i = all.indexOf(document.activeElement), row = g.matches('.hue__swatches') ? across : 1;
+    const step = { ArrowRight: 1, ArrowDown: row, ArrowLeft: -1, ArrowUp: -row }[e.key];
     if (i < 0 || step === undefined) return;
     e.preventDefault(); const next = all[(i + step + all.length) % all.length]; next.focus(); next.click();
   }));

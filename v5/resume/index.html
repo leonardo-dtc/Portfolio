@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#0b1138">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232438c4'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/css/site.css">
-<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
+<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}try{var q=/[?&]toggles=([^&#]*)/.exec(location.search);if(q)decodeURIComponent(q[1]).split(',').forEach(function(p){var a=p.split(':');if(a.length===2&&/^[a-z][A-Za-z]{1,30}$/.test(a[0])&&/^[a-z][a-z-]{0,30}$/.test(a[1]=a[1].trim().toLowerCase()))d.dataset[a[0]]=a[1]})}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>
 <script type="module" src="../assets/js/boot.js"></script>
 </head>
 <body>
@@ -28,7 +28,7 @@
   </nav>
   <main id="main" class="win glass" data-glass="window" data-window="main">
     <header class="win__head">
-      <div><h1 tabindex="-1">Résumé</h1><p class="sub">Leonardo Carvalho. Groton School, Class of 2028. South Florida. <a href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a>. Updated September 2026.</p></div>
+      <div><h1 tabindex="-1">Résumé</h1><p class="sub">Leonardo Carvalho. Groton School, Class of 2028. South Florida. <a href="mailto:leonardo.dtc2009@gmail.com">leonardo.dtc2009@gmail.com</a>.</p></div>
     </header>
     <div class="win__body" data-scroll tabindex="0" role="region" aria-label="Résumé">
       <section class="section" aria-labelledby="education">
@@ -41,7 +41,6 @@
             <ul>
               <li>2026-27: English; Multivariable Calculus; Advanced Physics: Mechanics; Organic Chemistry 1 and 2; United States History; Chamber Orchestra; Select Chamber Music; viola and voice lessons.</li>
               <li>2025-26: English; AP Calculus BC; AP Statistics; AP Computer Science; AP Chemistry; Chamber Orchestra; Select Chamber Music.</li>
-              <li>Biology Club and Biomed Club. Helping establish an OCAPEX chapter at Groton.</li>
             </ul>
           </li>
           <li id="ap">
@@ -105,7 +104,7 @@
           <li id="this-site">
             <div class="cv__head"><h3>This portfolio</h3><span class="cv__when">2026</span></div>
             <p class="cv__sub">HTML, CSS and JavaScript. No framework, no build step</p>
-            <p>Built by hand: static HTML, CSS and JavaScript with no framework and no build step. The room behind the windows is drawn in WebGL; the name is set in Switzer and the rest of the type is each device’s own. <a href="../work/this-site/">Project page</a>.</p>
+            <p>Built by hand. The room behind the windows is drawn in WebGL; the name is set in Switzer and the rest of the type is each device’s own. <a href="../work/this-site/">Project page</a>.</p>
           </li>
           <li id="robotics">
             <div class="cv__head"><h3>Robotics and rocketry</h3><span class="cv__when">2021 to 2025</span></div>
@@ -141,7 +140,7 @@
           <li id="clubs">
             <div class="cv__head"><h3>Clubs at Groton</h3><span class="cv__when">2025 to now</span></div>
             <p class="cv__sub">Biology Club. Biomed Club</p>
-            <p>Member of both. Helping establish an OCAPEX chapter at Groton.</p>
+            <p>Helping establish an OCAPEX chapter at Groton.</p>
           </li>
         </ul>
       </section>
@@ -275,7 +274,6 @@
       <h2 id="reach-h">Contact</h2>
       <!-- Add a "Download the PDF" row to these rows when a PDF exists -->
       <ul class="rows side-rows">
-        <li><a class="row" href="mailto:leonardo.dtc2009@gmail.com" data-hover><span class="row__t">Email</span><span class="row__m">Write to me</span></a></li>
         <li><a class="row" href="https://www.eliteprospects.com/player/836323/leonardo-carvalho" rel="noopener" data-hover><span class="row__t">Elite Prospects</span><span class="row__m">Profile</span></a></li>
         <li><a class="row" href="https://recruit-match.ncsasports.org/clientrms/athlete_profiles/13086136" rel="noopener" data-hover><span class="row__t">NCSA</span><span class="row__m">Profile</span></a></li>
         <li><a class="row" href="https://ocapex.com" rel="noopener" data-hover><span class="row__t">OCAPEX</span><span class="row__m">ocapex.com</span></a></li>
