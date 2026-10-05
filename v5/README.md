@@ -284,7 +284,12 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
 - **The line (T27):** "Goaltender at Groton School, Class of 2028.", the home
   page's own first words. `hero.js` (`arrange()`) places the name and what is
   under it as one group, a little below the middle as in the launcher mock;
-  the name never sits lower than its own place, 45%.
+  the name never sits lower than its own place, 45%. By day the line stands on
+  a capsule that darkens the room behind it (9.9:1 on a phone, where the soft
+  halo alone gave 3:1).
+- **Small screens:** every launcher keeps clear of the name, the hint and the
+  screen's edges, from 320×568 to 1920×1080 and held sideways (DESIGN.md, Under
+  the name). Held sideways, a phone sets the name on one line.
 - **Getting past it (T26):** a click or a tap on the title, Return, a scroll that
   adds up to a deliberate move (40 px; a nudge does not), a swipe up of 48 px,
   Down, Page Down or Space.
@@ -488,7 +493,7 @@ from the site's own pages; leave out what is not on file.
 | --- | --- |
 | `assets/css/site.css` | The one stylesheet: Switzer's `@font-face`, tokens, the room, windows and ornaments, CSS glass, the hero, content components, sheets, layouts, preferences, print |
 | `assets/fonts/` | `switzer-variable.woff2` (Switzer, Indian Type Foundry, via Fontshare; weights 100 to 900) and its licence, `FFL-switzer.txt` (the ITF Free Font License allows self-hosting and wordmarks). The name only; everything else is the system face |
-| `assets/js/boot.js` | Entry: starts the room, the windows, the hero and navigation; the Work filters, print buttons and Groton's clock |
+| `assets/js/boot.js` | Entry: starts the room, the windows, the hero and navigation; the Work filters, print buttons, Groton's clock and the phone header's fold. Last, it marks the page `booted`: a page the scripts never finished (a file that failed to load, an error, a browser without modules) is put back to the page without scripts by the head script at `DOMContentLoaded`, rather than left hidden behind the hero |
 | `assets/js/room.js`, `shaders.js` | The WebGL2 room: scene, composite, glass panels, the hero's dark stage and the ink (its name in neon light); frame budget |
 | `assets/js/panels.js`, `geometry.js` | Where the glass is: element boxes and projected corners into inverse homographies |
 | `assets/js/windows.js` | Layout modes, the side window, tab bar, materialising, sheets, the window bar, the pointer's light and the room's lean, hover and press light, scrolling from anywhere |
@@ -498,9 +503,9 @@ from the site's own pages; leave out what is not on file.
 | `assets/js/springs.js`, `frame.js` | Apple-style springs (response and damping) on one shared frame loop |
 | `assets/js/palette.js` | The colour styles: the palettes, the turn in OKLab (and the room's table of colours), and each palette's neon for the hero |
 | `assets/js/toggles.js` | The design toggles for the developer tools (above): `window.toggles`, the address, the attribute on `<html>` |
-| `../tools/v5-chrome.mjs` | Writes the tab bar, the head script, the hero's apps, the headers' Write to me, and the archive (the Experiments rows on Home and Work, and the archive sheet's entries) into every page from its lists |
+| `../tools/v5-chrome.mjs` | Writes the tab bar, the head script, the hero's apps, the headers' Write to me, each window body's name (a region called by the page's name), and the archive (the Experiments rows on Home and Work, and the archive sheet's entries) into every page from its lists |
 | `assets/js/flip.js`, `assets/vendor/gsap/` | Work's grid reflowing when filtered, with GSAP's Flip (3.15.0, self-hosted, GreenSock's standard no-charge licence; `vendor/gsap/README.md` gives the source and checksums). Loaded only on a page with a grid to filter, once it is idle |
-| `assets/img/` | The portrait, Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
+| `assets/img/` | The portrait (a 320px and a 600px square, AVIF and WebP, cut from `assets/img/portrait.jpg` at the same 608px crop), Loquar's landing page, ocapex.com, the Genuvalens figures, the two room stills. Each file has a `.json` sidecar naming its origin. The 320 px card derivatives are made by `tools/card-thumbs.mjs` (the largest derivative, resized with the browser's high-quality filter, saved as WebP without EXIF) |
 | Kept, unreferenced | The written hello of the first round: `assets/js/hello.js` (the pen timeline and the Enter button), `name.js` and `name-data.js` (Sacramento traced to pen strokes), `assets/img/name.svg` and `name-2.svg` (the name as an SVG, one line and two), and `tools/trace-name/` outside the edition. Nothing imports or links them any more; they stay in case the written name comes back |
 | `DESIGN.md` | The design system, recorded from the built pages |
 
@@ -514,7 +519,7 @@ above) and `tools/room-stills.mjs` regenerate the written name and the stills,
 ```sh
 node --test tests/v5/unit/*.test.mjs
 node tools/v5-chrome.mjs --check
-node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), launcher (its apps and the toggles), neon (its colour), nav, modes, contrast, keys, palettes, filters, perf, audit
+node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), launcher (its apps and the toggles), neon (its colour), nav, modes, contrast, keys, palettes, filters, perf, audit, fixes (the October 2026 bug audit's 21 findings, kept fixed)
 node tests/v5/e2e/capture.mjs # screenshots of every page at five widths into .impeccable/review/v5/
 ```
 

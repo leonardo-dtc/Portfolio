@@ -61,6 +61,14 @@ export function initNav({ windows }) {
       return a.finished.catch(() => {}).then(() => a);
     }));
   }
+  // a phone's folded header (boot.js) opens again at once, unseen, before a new page's contents arrive in its window, so
+  // they never slide down as it unfolds
+  function unfold(win) {
+    if (!win.classList.contains('is-folded')) return;
+    win.classList.add('is-instant'); win.classList.remove('is-folded');
+    void win.offsetWidth;
+    win.classList.remove('is-instant');
+  }
   // the outgoing content fades, the new content fades in rising 6px
   async function swapWindow(win, info) {
     await fade([...win.children], OUT, T_OUT, 'cubic-bezier(.4, 0, 1, 1)');
@@ -77,6 +85,7 @@ export function initNav({ windows }) {
     const floating = !!side && !side.classList.contains('side--inline');
     const inner = el => [...el.children].filter(c => !c.matches('.probe'));
     if (!quiet) await fade([...win.children, ...(floating ? inner(side) : [])], OUT, T_OUT, 'cubic-bezier(.4, 0, 1, 1)');
+    unfold(win);
     const fresh = copy(info.main.children);
     if (side && !floating) side.remove();                             // lifted out of the old body before it goes
     win.replaceChildren(...fresh);
@@ -117,7 +126,7 @@ export function initNav({ windows }) {
     if (fresh) {
       windows.hideNow([fresh]);
       space.insertBefore(fresh, document.querySelector('.space > .grab'));
-      if (!quiet) windows.materialise([fresh], { delay: .14, from: 'ornament' });
+      if (!quiet) windows.materialise([fresh], { delay: current.length ? .26 : .14, from: 'ornament' });
     }
   }
 
@@ -138,7 +147,7 @@ export function initNav({ windows }) {
     const s = document.createElement('section');
     s.className = 'sheet win glass';
     s.dataset.glass = 'window'; s.dataset.window = 'sheet';
-    s.setAttribute('role', 'dialog'); s.setAttribute('aria-modal', 'true');
+    s.setAttribute('role', 'dialog');   // modal in effect: everything behind it is inert. (aria-modal would hide its pager, which stands outside it)
     s.append(...children);
     label(s);
     return s;
@@ -174,6 +183,7 @@ export function initNav({ windows }) {
     opener = null;
     await windows.closeSheet();
     if (back && back.isConnected && !back.closest('[inert]')) back.focus({ preventScroll: true });
+    else { const h = $main() && $main().querySelector('h1'); if (h) h.focus({ preventScroll: true }); }   // a sheet loaded directly had no opener
   }
   // closing a sheet opened from inside the site is going back; one loaded directly goes to its parent
   function close() {
@@ -206,6 +216,8 @@ export function initNav({ windows }) {
       }
       remember();
       shown = url.pathname;
+      document.title = info.title;
+      announce(info);                                                  // said as the window starts to change, not after it
       let moved = true;
       if (info.kind === 'sheet') await showSheet(info, token, url);
       else moved = await showPage(info, url, token, quiet);
@@ -216,14 +228,16 @@ export function initNav({ windows }) {
       location.assign(url.href);
     }
   }
+  function announce(info) {
+    const live = document.querySelector('.sr-live');
+    if (live) live.textContent = `${info.title.split(' · ')[0]}, ${info.kind === 'sheet' ? 'sheet' : 'page'}`;
+  }
   function finish(info, url, moved, restoring) {
     document.title = info.title;
     document.dispatchEvent(new CustomEvent('v5:navigate', { detail: { page: info.page, kind: info.kind } }));
     Object.assign(html.dataset, { page: info.page, kind: info.kind, tab: info.tab });
     if (info.parent) html.dataset.parent = info.parent; else delete html.dataset.parent;
     const front = $front();
-    const live = document.querySelector('.sr-live');
-    if (live) live.textContent = `${info.title.split(' · ')[0]}, ${info.kind === 'sheet' ? 'sheet' : 'page'}`;
     if (!moved) return;
     const h = front.querySelector('h1');
     if (h && document.activeElement !== h) h.focus({ preventScroll: true });
@@ -239,8 +253,11 @@ export function initNav({ windows }) {
     if (s) scrolls.set(shown, s.scrollTop);
   }
   function reveal(hash, instant) {
-    const el = document.getElementById(decodeURIComponent(hash.slice(1)));
+    let el = document.getElementById(decodeURIComponent(hash.slice(1)));
     if (!el) return;
+    // with a sheet open, a target behind it (the skip link's #main, say) is out of reach: the sheet's own title takes it
+    const sheet = $sheet();
+    if (sheet && !sheet.contains(el)) { const h = sheet.querySelector('h1'); if (h) h.focus({ preventScroll: true }); return; }
     const smooth = !instant && !reduced.matches;
     el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
     if (!el.matches('a[href], button, input, select, textarea, [tabindex]')) el.setAttribute('tabindex', '-1');

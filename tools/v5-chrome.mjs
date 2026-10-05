@@ -101,7 +101,7 @@ export const ARCHIVE = [
     link: { href: 'resume/#class-projects', text: 'Résumé · Class projects' },
   },
   {
-    id: 'robots', year: '2021 to 2025', kind: 'Robotics', title: 'FRC and FTC robots, in Java',
+    id: 'robots', year: '2023 to 2025', kind: 'Robotics', title: 'FRC and FTC robots, in Java',
     line: 'Programmer in Java on both teams; the FRC team reached the state championship',
     text: [
       'I programmed in Java on both Wyld Stallyns teams, FRC 5472 and FTC 16759 Wyld Stallyns Untamed, with basic mechanical work on both and electrical work on the FTC team. The FRC team reached the state championship.',
@@ -156,8 +156,11 @@ export function archiveList(up) {
 
 // The head script. Before the first paint: scripts are on; the hero shows on the first home view of a session, and
 // again on a reload (?nohello skips it); a Night or Day kept by the color control; the design toggles kept in this
-// browser (toggles.js); a project loaded on its own boots as a sheet.
-export const HEAD = `<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting')})(document.documentElement)</script>`;
+// browser (toggles.js); a project loaded on its own boots as a sheet. And a way out: boot.js marks the page "booted"
+// once everything has started, which is always before DOMContentLoaded (it is a deferred module); a page that is not
+// booted by then (a file that failed to load, a script that stopped, a browser too old for modules) drops back to
+// the page without scripts, rather than staying hidden behind a hero that will never leave.
+export const HEAD = `<script>(function(d){d.classList.add('js');try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];if(d.dataset.page==='home'&&(n&&n.type==='reload'||!sessionStorage.getItem('v5:hello'))&&!/[?&]nohello/.test(location.search))d.classList.add('is-hello')}catch(e){}try{var l=JSON.parse(localStorage.getItem('v5:color')||'{}').look;if(l==='night'||l==='day')d.dataset.appearance=l}catch(e){}try{var t=JSON.parse(localStorage.getItem('v5:toggles')||'{}');for(var k in t)if(/^[a-z][A-Za-z]{1,30}$/.test(k)&&/^[a-z][a-z-]{0,30}$/.test(t[k]))d.dataset[k]=t[k]}catch(e){}if(d.dataset.kind==='sheet')d.classList.add('is-booting');document.addEventListener('DOMContentLoaded',function(){var c=d.classList;if(!c.contains('booted')){c.remove('js');c.remove('is-hello');c.remove('is-booting')}})})(document.documentElement)</script>`;
 
 const icon = d => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 
@@ -202,6 +205,14 @@ const HEAD_RE = /(<header class="win__head">\n      <div>[\s\S]*?<\/div>)(?:\n  
 const EXP_RE = /<ul class="rows exp">[\s\S]*?<\/ul>/;
 const ARC_RE = /<ol class="arc">[\s\S]*?<\/ol>/;
 const NEON = /(<span class="hero__neon" aria-hidden="true">[\s\S]*?<\/span>\n  )(?=<p class="hero__hint">)/;
+const BODY_RE = /<div class="win__body" data-scroll tabindex="0"[^>]*>/;
+
+// The window's body scrolls and is a tab stop, so it is named: a region called by the page's name (its title's first
+// part; Home's title is the name alone, so Home's is its tab's)
+export function bodyName(html, tab) {
+  const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || '';
+  return title.includes(' · ') ? title.split(' · ')[0] : (TABS.find(t => t.id === tab) || {}).name;
+}
 
 // the page as it should be: its chrome rewritten from the lists above
 export function render(html, up) {
@@ -218,6 +229,7 @@ export function render(html, up) {
     if (!ARC_RE.test(out)) throw new Error('the archive sheet has no list for its entries');
     out = out.replace(ARC_RE, () => archiveList(up));
   }
+  if (BODY_RE.test(out)) out = out.replace(BODY_RE, () => `<div class="win__body" data-scroll tabindex="0" role="region" aria-label="${bodyName(out, tab)}">`);
   if (/<div class="hero">/.test(out)) {
     if (APPS_RE.test(out)) out = out.replace(APPS_RE, () => appRow(up));
     else if (NEON.test(out)) out = out.replace(NEON, (m, neon) => `${neon}${appRow(up)}\n  `);

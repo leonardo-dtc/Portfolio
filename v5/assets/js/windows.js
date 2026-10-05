@@ -40,6 +40,16 @@ export function createWindows({ room }) {
     }
     // a row pinned between the head and the body takes a grid row of its own (a class, not :has(), for older browsers)
     main.classList.toggle('has-pin', !!main.querySelector(':scope > .side__part--pin'));
+    // crossing 1360px with a sheet open: a side window that comes out to float steps back with the parent, and one
+    // that goes inside the main window leaves the step back to it (so closing the sheet finds nothing left behind)
+    const open = !!$sheet();
+    asides.forEach(a => {
+      const away = open && !a.classList.contains('side--inline');
+      a.inert = away;
+      a.classList.toggle('is-behind', away);
+      if (away) { a.glass = a.glass || { m: 1, dim: 0 }; a.glass.dim = back.value; a.style.setProperty('--back', back.value.toFixed(4)); }
+      else { if (a.glass) a.glass.dim = 0; a.style.removeProperty('--back'); }
+    });
     placeBubble(true);
     scrollable();
   }
@@ -175,8 +185,9 @@ export function createWindows({ room }) {
   function kindOf(el) { return el.matches('aside.side') ? (el.classList.contains('side--inline') ? 'inline' : 'side') : el.matches('.tabs, .toolbar, .grab') ? 'ornament' : 'window'; }
   // A sheet and its toolbar show only over the part of their move where the parent's are gone (the parent's text is
   // out by a quarter of the way back, its toolbar by two fifths), so opening or closing, two texts or two toolbars
-  // never show at once; everything else fades over the first 70% of its move.
-  const lead = el => el.matches('section.sheet') ? .25 : el.matches('.toolbar--sheet') ? .4 : 0;
+  // never show at once; a page's toolbar leaving for the next page's is gone within its first 0.2s (the next one
+  // starts at 0.26s, nav.js swapBar); everything else fades over the first 70% of its move.
+  const lead = el => el.matches('section.sheet') ? .25 : el.matches('.toolbar--sheet') ? .4 : el.matches('.toolbar.is-leaving') ? .3 : 0;
   function setIn(el, v, from) {
     el.glass = el.glass || { m: 0, dim: 0 };
     const lo = lead(el), o = clamp((v - lo) * 1.4 / (1 - lo), 0, 1);
@@ -227,6 +238,7 @@ export function createWindows({ room }) {
   async function openSheet(sheet, { instant = false } = {}) {
     space.append(sheet);
     const bar = barOf();
+    if (bar) sheet.after(bar);                             // its pager comes after it in the tab order, as on screen
     hideNow([sheet, bar]);
     if (instant) {
       behind().forEach(el => { el.inert = true; el.classList.add('is-behind'); });
@@ -301,7 +313,12 @@ export function createWindows({ room }) {
     const b = scroller(); if (b) b.scrollBy({ top: e.deltaY, left: 0 });
   }, { passive: true });
   addEventListener('keydown', (e) => {
-    if (inHero() || document.activeElement !== document.body || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (inHero() || e.altKey || e.ctrlKey || e.metaKey) return;
+    // from nowhere in particular, or from the front window's title, where a page change leaves the focus: it sits in
+    // the window's head, above the part that scrolls, so the keys would otherwise scroll nothing
+    const a = document.activeElement, front = $front();
+    const fromTitle = !!(a && front && a.matches('h1') && front.contains(a) && !a.closest('.win__body'));
+    if (a !== document.body && !fromTitle) return;
     const b = scroller(); if (!b) return;
     const page = b.clientHeight * .85;
     const by = { ArrowDown: 60, ArrowUp: -60, PageDown: page, PageUp: -page, ' ': e.shiftKey ? -page : page, Home: -1e6, End: 1e6 }[e.key];

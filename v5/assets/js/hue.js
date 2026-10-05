@@ -111,6 +111,10 @@ export function initHue({ room }) {
   // Escape closes the panel before anything else hears it (an open sheet stays open); a click elsewhere closes it
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) { e.stopPropagation(); e.preventDefault(); close(true); } }, true);
   document.addEventListener('pointerdown', (e) => { if (isOpen() && !wrap.contains(e.target) && !button.contains(e.target)) close(false); });
+  // and so does focus arriving anywhere else (Tab past the panel either way, or back into the page from the browser's
+  // own controls), so it never stays open over what the keyboard has moved on to; the window losing focus leaves it
+  const ours = el => !!el && (wrap.contains(el) || button.contains(el));
+  document.addEventListener('focusin', (e) => { if (isOpen() && !ours(e.target)) close(false); });
 
   // Under 360px five labelled tabs fill the dock, so the button joins the front window's toolbar (its actions, inline
   // at the foot of the page or sheet; on Work, its filters) and the panel opens above the dock. During the hero it
