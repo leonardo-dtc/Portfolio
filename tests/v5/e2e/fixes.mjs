@@ -102,7 +102,8 @@ for (const [w, path] of [[390, 'work/freecode/'], [360, 'work/aducanumab/'], [32
 
   // 18. the title and the announcement come as a sheet opens, not after its animation
   await page.keyboard.press('Escape'); await page.waitForTimeout(1300);
-  const t0 = await page.evaluate(() => { window.__at = null; const t = performance.now(); new MutationObserver(() => { if (window.__at === null && /Daedalus/.test(document.title)) window.__at = performance.now() - t; }).observe(document.querySelector('title'), { childList: true, characterData: true, subtree: true }); return t; });
+  // (timed from the click itself, not from before Playwright's own wait for the card to hold still)
+  const t0 = await page.evaluate(() => { window.__at = null; let t = performance.now(); document.addEventListener('click', () => { t = performance.now(); }, { capture: true, once: true }); new MutationObserver(() => { if (window.__at === null && /Daedalus/.test(document.title)) window.__at = performance.now() - t; }).observe(document.querySelector('title'), { childList: true, characterData: true, subtree: true }); return t; });
   await page.click('a.card[href*="daedalus"]'); await page.waitForTimeout(1600);
   const at = await page.evaluate(() => window.__at), live = await page.evaluate(() => document.querySelector('.sr-live').textContent);
   check(at !== null && at < 500 && /Daedalus/.test(live), `18. the title changes ${at === null ? 'never' : Math.round(at) + 'ms'} after the click, and the announcement says "${live}"`);
@@ -140,7 +141,10 @@ for (const [w, path] of [[390, 'work/freecode/'], [360, 'work/aducanumab/'], [32
 {
   const page = await tab({ width: 1440, height: 900 });
   await go(page, 'work/loquar/', 1800);
-  await page.keyboard.press('Escape'); await page.waitForTimeout(1500);
+  // (once Work has swapped in under it: the address changes first, and a slow fetch can hold the page a moment)
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => document.documentElement.dataset.page === 'work' && !document.querySelector('section.sheet'), null, { timeout: 8000 }).catch(() => {});
+  await page.waitForTimeout(300);
   const f = await focused(page);
   check(f === 'the window title', `9. Escape on a sheet loaded on its own: focus goes to ${f}`);
   await done(page);
