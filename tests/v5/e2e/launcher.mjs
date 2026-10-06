@@ -37,9 +37,9 @@ const fresh = async (opts = {}, q = '') => { const o = await open(opts); await o
   // Tab reaches the title, then each app in order (from the top of the page: the skip link)
   await page.evaluate(() => document.querySelector('.skip').focus());
   const order = [];
-  for (let i = 0; i < 7; i++) { await page.keyboard.press('Tab'); order.push(await page.evaluate(() => document.activeElement.className + ':' + (document.activeElement.dataset.app || ''))); }
+  for (let i = 0; i < 8; i++) { await page.keyboard.press('Tab'); order.push(await page.evaluate(() => document.activeElement.className + ':' + (document.activeElement.dataset.app || ''))); }
   const ai = order.findIndex(o => o.startsWith('app:work'));
-  check(order.some(o => o.startsWith('hero__name')) && ai >= 0 && order.slice(ai, ai + 5).map(o => o.split(':')[1]).join(',') === 'work,hockey,about,resume,write', `Tab reaches the title and every app in order (${order.join(' ')})`);
+  check(order.some(o => o.startsWith('hero__name')) && ai >= 0 && order.slice(ai, ai + 6).map(o => o.split(':')[1]).join(',') === 'work,hockey,about,resume,archive,write', `Tab reaches the title and every app in order (${order.join(' ')})`);
   // Return on Hockey opens Hockey, straight from the hero
   while (!(await page.evaluate(() => document.activeElement.dataset.app === 'hockey'))) await page.keyboard.press('Shift+Tab');
   await page.keyboard.press('Enter');
