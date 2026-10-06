@@ -9,7 +9,7 @@ const done = (page, ms = 10000) => page.waitForFunction(() => window.__hero && w
 const fresh = async (opts = {}, q = '') => { const o = await open(opts); await o.page.goto(BASE + q, { waitUntil: 'load' }); await ready(o.page); await o.page.waitForTimeout(600); return o; };
 
 {
-  // the default: the name, one line of who I am, and five apps as round glass icons, each a real link, no numbers
+  // the default: the name, one line of who I am, and six apps as round glass icons, each a real link, no numbers
   const { browser, page, errors, foreign } = await fresh();
   const hero = await page.evaluate(() => {
     const apps = [...document.querySelectorAll('.hero .app')];
@@ -24,8 +24,8 @@ const fresh = async (opts = {}, q = '') => { const o = await open(opts); await o
     };
   });
   check(hero.toggles.heroName === 'neon' && hero.toggles.heroContent === 'both' && hero.toggles.launcher === 'icons', `the defaults: ${hero.toggles.heroName}, ${hero.toggles.heroContent}, ${hero.toggles.launcher}`);
-  check(hero.lineShown && hero.line === 'Goaltender at Groton School, Class of 2028.', `the line under the name: “${hero.line}”`);
-  check(JSON.stringify(hero.apps) === JSON.stringify([['Work', 'work/'], ['Hockey', 'hockey/'], ['About', 'about/'], ['Résumé', 'resume/'], ['Write to me', 'mailto:leonardo.dtc2009@gmail.com']]), `five apps, each a link: ${hero.apps.map(a => a[0]).join(', ')}`);
+  check(hero.lineShown && hero.line === 'Goaltender at Groton\u00a0School, Class\u00a0of\u00a02028.', `the line under the name, the school and the class year each kept together: “${hero.line}”`);
+  check(JSON.stringify(hero.apps) === JSON.stringify([['Work', 'work/'], ['Hockey', 'hockey/'], ['About', 'about/'], ['Résumé', 'resume/'], ['Archive', 'archive/'], ['Write to me', 'mailto:leonardo.dtc2009@gmail.com']]), `six apps, each a link: ${hero.apps.map(a => a[0]).join(', ')}`);
   check(hero.shown && !hero.digits && hero.label === 'Go straight to', 'every app shows with its name, and none shows a number');
   check(hero.below > hero.name && hero.appsBottom < hero.hint - 16, `the group sits under the name (${hero.name.toFixed(0)} to ${hero.below.toFixed(0)}) and clear of the hint (${hero.appsBottom.toFixed(0)} to ${hero.hint.toFixed(0)})`);
   // the apps take the colour style: Rose turns their tint
@@ -166,7 +166,7 @@ const fresh = async (opts = {}, q = '') => { const o = await open(opts); await o
         const name = document.querySelector('.hero__name').getBoundingClientRect();
         return { n: apps.length, inside: apps.every(r => r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight), clear: apps.every(r => !over(r, hr) && !over(r, ur) && !over(r, name)), small };
       });
-      check(m.n === 5 && m.inside && m.clear && m.small === 0, `${launcher} at ${w}x${h}: five apps on screen, clear of the name, the hint and the color control, no text under 12 px${errors.length ? ' ' + errors.join(' | ') : ''}`);
+      check(m.n === 6 && m.inside && m.clear && m.small === 0, `${launcher} at ${w}x${h}: six apps on screen, clear of the name, the hint and the color control, no text under 12 px${errors.length ? ' ' + errors.join(' | ') : ''}`);
       await browser.close();
     }
   }
@@ -178,5 +178,39 @@ const fresh = async (opts = {}, q = '') => { const o = await open(opts); await o
   check(css.neon === 'none' && /text/.test(css.clip) && /rgba\(0, 0, 0, 0\)|transparent/.test(css.stage), `without WebGL the glass look is the CSS glass name over the still, with no stage (${css.stage})`);
   await page.click('.app[data-app="about"]');
   check(await done(page) && await page.evaluate(() => /\/about\/$/.test(location.pathname)), `and an app still lands on its page${errors.length ? ' ' + errors.join(' | ') : ''}`);
+  await browser.close();
+}
+{
+  // the design toggles' panel (?dev, toggles.js): every toggle as buttons, the one in use pressed; a press switches the
+  // hero's title while it shows; Space and Return work its buttons, never the hero's way in; folded, it stays folded in
+  // this browser; Close forgets it; with no ?dev and nothing kept, there is none
+  const { browser, page, errors } = await fresh({ width: 390, height: 844, touch: true, dpr: 3 }, '?dev');
+  const st = () => page.evaluate(() => ({ panel: !!document.querySelector('.devtoggles'), pressed: [...document.querySelectorAll('.devtoggles [aria-pressed="true"]')].map(b => b.dataset.value).join(), name: document.documentElement.dataset.heroName, hero: window.__hero.state, meter: (document.querySelector('.devtoggles__meter') || {}).textContent || '' }));
+  const s0 = await st();
+  await page.click('.devtoggles button[data-value="glass"]'); await page.waitForTimeout(400);
+  const s1 = await st();
+  await page.focus('.devtoggles button[data-value="neon"]'); await page.keyboard.press(' '); await page.waitForTimeout(300);
+  await page.focus('.devtoggles button[data-value="line"]'); await page.keyboard.press('Enter'); await page.waitForTimeout(300);
+  const s2 = await st();
+  check(s0.panel && s0.pressed === 'neon,both,icons,standard' && s1.name === 'glass' && s1.pressed.startsWith('glass,') && s2.name === 'neon' && s2.pressed === 'neon,line,icons,standard' && s2.hero === 'hero', `?dev: the panel shows every toggle, the one in use pressed; a press switches the title while the hero shows, and Space and Return work its buttons, not the hero's way in (${s2.pressed}, hero ${s2.hero})`);
+  // the room's resolution: 1.5 times the screen's pixels at most, 2 with the test toggle (a 3x phone), and the readout
+  const res = async () => page.evaluate(() => ({ dpr: window.__room.dpr, w: document.querySelector('canvas.room').width, slow: window.__room.slow }));
+  check(/^The room: /.test(s2.meter), `the panel reads the room as it draws (“${s2.meter}”)`);
+  const r0 = await res();
+  if (r0.slow) console.log('skip: the room is held at 1x here (too slow a renderer), so its resolution test cannot be judged');
+  else {
+    await page.click('.devtoggles button[data-value="sharp"]'); await page.waitForTimeout(900);
+    const r1 = await res();
+    check(r0.dpr === 1.5 && r0.w === 585 && r1.dpr === 2 && r1.w === 780, `the room's resolution: ${r0.dpr}x (${r0.w}px across) as built, ${r1.dpr}x (${r1.w}px) with the test toggle`);
+  }
+  await page.click('.devtoggles__fold'); await page.waitForTimeout(200);
+  await page.goto(BASE, { waitUntil: 'load' }); await ready(page); await page.waitForTimeout(300);
+  const folded = await page.evaluate(() => ({ panel: !!document.querySelector('.devtoggles'), hidden: document.getElementById('devtoggles-body').hidden, exp: document.querySelector('.devtoggles__fold').getAttribute('aria-expanded') }));
+  await page.click('.devtoggles__fold'); await page.click('.devtoggles__close'); await page.waitForTimeout(200);
+  await page.goto(BASE, { waitUntil: 'load' }); await ready(page); await page.waitForTimeout(300);
+  const closed = await page.evaluate(() => ({ panel: !!document.querySelector('.devtoggles'), kept: localStorage.getItem('v5:dev') }));
+  check(folded.panel && folded.hidden && folded.exp === 'false' && !closed.panel && closed.kept === null, `folded, the panel stays folded in this browser (without ?dev); Close forgets it (${JSON.stringify({ folded, closed })})`);
+  check(errors.length === 0, 'the panel: no console errors ' + errors.join(' | '));
+  await page.evaluate(() => window.toggles.reset());
   await browser.close();
 }

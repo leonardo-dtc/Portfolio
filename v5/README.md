@@ -90,20 +90,23 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   title and date; pointing at one, or focusing it, unfolds its line (500 ms), raises a
   Fill 2 wash and steps the other titles back to Ink 2. The list takes the line into the space
   below it, so nothing after it moves. Touch, phones, reduced motion, scripts off and
-  print show every line. Each row opens its entry on the archive's sheet.
+  print show every line. Each row opens its entry on the Archive page.
 - **The archive (2026-10-05).** The experiments come from `archive/*.md`, one file an
   entry, shared with v3 (`archive/README.md` says how to add one; `node
   tools/archive.mjs` writes both editions), newest first: Home shows the newest four
-  things made, Work all of them, and a sheet over Work, `work/archive/`, holds every
-  entry in full: its year and kind, its title in the rows' italic, its cover, its
-  line, a paragraph or two, its details in a Fill box, and buttons to where the rest
-  of it lives (the résumé's entry, a sheet, or a page elsewhere). Songs and albums
-  (Request E) never go in the rows: they sit on the sheet's own shelf, Listening, each
-  with its artist, its cover and Listen on its service (Spotify, Apple Music, YouTube,
-  Bandcamp, SoundCloud, Tidal or Deezer). The Experiments heading on Home and Work carries
-  "Archive" to the sheet. A row opens the sheet already at its entry (it does not
-  jump once the sheet has arrived), and the entry takes the landing wash, as a
-  résumé entry does. Every fact is the site's own; what is not on file is left out.
+  things made, Work all of them, and a page of its own, Archive (`archive/`; Request
+  F made it a sixth tab and a sixth app on the hero, since as a sheet over Work it was
+  hard to find; its old address, `work/archive/`, sends a reader there with the
+  anchor kept), holds every entry in full: its year and kind, its title in the rows'
+  italic, its cover, its line, a paragraph or two, its details in a Fill box, and
+  buttons to where the rest of it lives (the résumé's entry, a sheet, or a page
+  elsewhere). Songs and albums (Request E) never go in the rows: they sit in the
+  page's side window, Listening (inside the window, after the entries, below
+  1360 px), each with its artist, its cover and Listen on its service (Spotify,
+  Apple Music, YouTube, Bandcamp, SoundCloud, Tidal or Deezer). The Experiments
+  heading on Home and Work carries "Archive" to the page. A row opens the page
+  already at its entry, and the entry takes the landing wash, as a résumé entry
+  does. Every fact is the site's own; what is not on file is left out.
 - **Side windows hold what fits.** Work's Experiments moved into the main window
   under the cards, so its side window is In progress alone; Hockey's side window no
   longer shows the Elite Prospects and NCSA rows (the toolbar carries both; they still
@@ -277,8 +280,8 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
 
 ### Under the name: the line and the apps (2026-10-05)
 
-- **The apps (T34):** Work, Hockey, About, Résumé and Write to me, under the
-  name. Each is a real link (`.apps`, written by `tools/v5-chrome.mjs` from the
+- **The apps (T34):** Work, Hockey, About, Résumé, Archive (Request F) and Write
+  to me, under the name. Each is a real link (`.apps`, written by `tools/v5-chrome.mjs` from the
   tab bar's list), so they work from the keyboard and without the room.
   - **A page's app:** choosing one puts that page in the window behind the
     hero, unseen (`nav.go(href, { quiet: true })`), with the tab bubble already
@@ -288,8 +291,13 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   - **Keys:** Return on an app opens it; Return anywhere else enters Home.
   - **Colour:** the apps take the colour style (`--style`, set by `hue.js`)
     with white glyphs (T35), and none shows a number (T36).
+  - **Hover answers with light only** (Request F): a ring and a glow, or a
+    deeper shadow on a widget; nothing grows or lifts (they grew 6% and the
+    covers rose 8 px, against "nothing grows on hover"). A press still gives a
+    little (.96), as a button does.
 - **The line (T27):** "Goaltender at Groton School, Class of 2028.", the home
-  page's own first words. `hero.js` (`arrange()`) places the name and what is
+  page's own first words, with "Groton School" and "Class of 2028" each kept on
+  one line (a 390 phone broke "Groton / School"). `hero.js` (`arrange()`) places the name and what is
   under it as one group, a little below the middle as in the launcher mock;
   the name never sits lower than its own place, 45%. By day the line stands on
   a capsule that darkens the room behind it (9.9:1 on a phone, where the soft
@@ -302,11 +310,19 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   Down, Page Down or Space.
 - **Two looks for the name (T41):**
   - the neon above;
-  - the glass name of round two, as in the launcher mock: solid Liquid Glass
-    letters with a light behind them in the colour style (`uGlassC`, turned
-    with the room), in the lit room with no stage, and the same glide.
+  - Liquid Glass, the glass name of round two, as in the launcher mock: solid
+    glass letters with a light behind them in the colour style (`uGlassC`,
+    turned with the room), in the lit room with no stage, and the same glide.
+    By night a soft shade of the style's deep colour lies right round the
+    letters, under that light; by day they are deep glass in the style's colour
+    with a light rim, on a pale halo, as tinted glass looks against a bright sky
+    (Request F: light glass on the bright day room measured 1.2 to 3.0:1; now
+    every face keeps 3.4:1 or more beside it, in every colour style).
 
-  Without WebGL each has its CSS version.
+  Without WebGL each has its CSS version. The panel below switches them.
+- **Portrait tablets** set the name on two lines, as phones do, at
+  `min(15vw, 12svh, 150px)` (on one line at 768 by 1024 it was 63 px, smaller
+  than on a phone).
 
 ## Design toggles
 
@@ -320,8 +336,19 @@ only (`localStorage`, `v5:toggles`), so visitors always see the defaults.
 | --- | --- | --- | --- |
 | `heroContent` | T27 | `both` | `name` (a), `line` (b), `apps` (c), `both` (d): the name with the hint, the line, the apps, or both |
 | `launcher` | T39 | `icons` | `icons` (round glass, as in the mock), `library` (a: covers, like Steam's library), `widgets` (b: a dashboard), `desktop` (c: a Mac desktop down the right edge) |
-| `heroName` | T41 | `neon` | `neon`, `glass` |
+| `heroName` | T41 | `neon` | `neon`, `glass` (Liquid Glass) |
+| `roomRes` | (a test) | `standard` | `standard` (the room at up to 1.5 times the screen's pixels), `sharp` (up to 2: a sharper neon on a phone, for about 1.8 times the pixels) |
 
+- **On the page (Request F):** `?dev` in the address opens a panel, top right
+  (at the foot on a phone, so the title shows above it): every toggle as a row
+  of buttons, the one in use pressed, with Replay the hero, Reset, and a reading
+  of the room's resolution and frame time (under about 17 ms keeps 60 frames a
+  second). Its heading folds it to a tab in the corner. It stays in that
+  browser (folded or not) until its Close; `?dev=0` forgets it too. Visitors
+  never see it. The hero's keys, wheel and swipe leave it alone. In the console,
+  `toggles.panel()` opens it. `roomRes` is there so the cost of a sharper room
+  can be judged on a real phone before it is built in: switch to 2×, watch the
+  hero, and read the frame time.
 - **In the console:**
   - `toggles` shows their values, and `toggles.list()` what each is and its
     choices;
@@ -399,8 +426,10 @@ only (`localStorage`, `v5:toggles`), so visitors always see the defaults.
 ## The color style control
 
 A glass button in the bottom-right corner (beside the tab bar on phones, as in
-iOS 26; under 360 px, where five labelled tabs take the whole dock, a fill
-button in the window's toolbar) opens a small panel for trying colors. On
+iOS 26; under 400 px, where six labelled tabs take the whole dock, a fill
+button with the window's actions at its foot, and on Work, whose inline toolbar
+is its filters, in a row of its own at the foot) opens a small panel for trying
+colors. On
 desktop its name, "Color style", shows beside it while it is pointed at (after a
 beat) or focused from the keyboard, since the swatch alone does not say what it
 does. The panel has nine palettes (Cobalt, Violet, Rose, Red, Ember, Gold, Emerald,
@@ -435,8 +464,9 @@ they look, as do the All work and Résumé links.
 | Path | Page | Copy source |
 | --- | --- | --- |
 | `index.html` | Home: the hero, then the name as the title, the introduction, work cards, the four newest experiments, the record as five first-person leads over dated rows, contact. Side window: This fall, with Groton's live time | `v4/index.html` (copy only) |
-| `work/` | All seven projects as cards, filtered by the toolbar (All, Research, Build, Music, Community), then the experiments (all seven; Home shows the newest four). Side window: In progress | new, from the project pages |
-| `work/archive/` | The archive: every experiment in full, newest first, each with its paragraphs, details and a link to the rest | `tools/v5-chrome.mjs` (`ARCHIVE`), from the résumé, the Daedalus sheet and the about page |
+| `work/` | All seven projects as cards, filtered by the toolbar (All, Research, Build, Music, Community), then the experiments (every one made; Home shows the newest four). Side window: In progress | new, from the project pages |
+| `archive/` | The archive: everything made in full, newest first, each with its paragraphs, details and a link to the rest. Side window: Listening, the songs and albums | `archive/*.md`, written by `node tools/archive.mjs` (through `tools/v5-chrome.mjs`) |
+| `work/archive/` | Its old address: sends a reader to `archive/`, the anchor kept | (a redirect) |
 | `hockey/` | Recruiting profile: stats with the sample size, how I play, academic snapshot, team history. Side window: Measurables, then Coach contacts. Prints on one Letter sheet | `v4/hockey/` |
 | `about/` | The essay, the facts and Now, fall 2026. Side window: the portrait and From, then Interests | `v4/about/` |
 | `resume/` | The full record with an anchor on every entry. Side window: Sections (jumps within the window and follows the reader), then Contact | `v4/resume/` |
@@ -487,9 +517,9 @@ In order:
 
 **An archive entry** (a song, an album, a project of my own, a small thing with no
 sheet): add a file to `archive/` as `archive/README.md` says (its name is the archive
-sheet's anchor), then run `node tools/archive.mjs`: it writes the rows on Home (the
-newest four things made) and Work, the entry on `work/archive/` (music on its
-Listening shelf), v3's card and Mac file, and copies any cover into both editions.
+page's anchor), then run `node tools/archive.mjs`: it writes the rows on Home (the
+newest four things made) and Work, the entry on `archive/` (music in its Listening
+window), v3's card and Mac file, and copies any cover into both editions.
 Facts only; leave out what is not on file.
 
 **Then run** the unit tests and the browser checks against the preview server:

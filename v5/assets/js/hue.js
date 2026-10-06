@@ -118,18 +118,26 @@ export function initHue({ room }) {
   const ours = el => !!el && (wrap.contains(el) || button.contains(el));
   document.addEventListener('focusin', (e) => { if (isOpen() && !ours(e.target)) close(false); });
 
-  // Under 360px five labelled tabs fill the dock, so the button joins the front window's toolbar (its actions, inline
-  // at the foot of the page or sheet; on Work, its filters) and the panel opens above the dock. During the hero it
-  // waits in the corner as before.
-  const narrow = matchMedia('(max-width: 359px)');
+  // Under 400px six labelled tabs fill the dock (five did under 360px, before the Archive had a tab), so the button
+  // joins the front window's actions, inline at the foot of the page or sheet, and the panel opens above the dock; a
+  // window with no actions there (Work, whose inline toolbar is its filters, where it read as one more filter) gives
+  // it a row of its own at its foot. During the hero it waits in the corner as before.
+  const narrow = matchMedia('(max-width: 399px)');
   function place() {
     const front = document.querySelector('section.sheet:not(.is-closing)') || document.getElementById('main');
-    const bar = narrow.matches && !html.matches('.is-hello, .is-entering') && front && (front.querySelector('.toolbar--inline:not(.filters)') || front.querySelector('.toolbar--inline'));
+    let bar = null;
+    if (narrow.matches && !html.matches('.is-hello, .is-entering') && front) {
+      bar = front.querySelector('.toolbar--inline:not(.filters)');
+      const body = !bar && front.querySelector('.win__body');
+      if (body) { bar = document.createElement('div'); bar.className = 'toolbar--inline hue__row'; body.append(bar); }
+    }
     wrap.classList.toggle('hue--toolbar', !!bar);
     const home = bar || wrap;
     if (button.parentElement === home) return;
     if (isOpen()) close(false);
+    const was = button.parentElement;
     home.append(button);
+    if (was && was.matches('.hue__row')) was.remove();
   }
   narrow.addEventListener('change', place);
   document.addEventListener('v5:navigate', place);

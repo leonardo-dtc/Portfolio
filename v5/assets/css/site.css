@@ -192,9 +192,9 @@ html:not(.gl) .hero.is-ready .hero__text { opacity: 1; transition: opacity .9s v
 .hero__neon { display: none; }
 /* Without the room (no WebGL2): the neon after the shader. The hero carries its own copy of the room's still (it lies
    exactly over the page's), so light can be screened onto it. Over it, bottom to top: by night the stage, the whole
-   still given way to near black from the first paint (.hero::after), as the room's own stage does; by day a pool that
-   covers the whole name (.hero::before) and a shade hugging every letter (.hero__neon b) in the style's deep colour
-   (a violet-blue for Cobalt);
+   still given way to near black from the first paint (.hero::after), as the room's own stage does; by day a pool
+   in the style's deep colour (a violet-blue for Cobalt) that follows the letters, as the room's own day pool does
+   (.hero__neon b: a copy of the name, its outline thickened and softened);
    two traces of the name (.hero__neon i), each a pair of copies on one slow orbit a few hundredths of an em round
    the letters (13 s and 17 s): a solid orange (or cyan) trace, and over it a copy whose stroke shows a gradient with
    gaps (hot pink and magenta, or electric blue and violet), crossfading in and out, so the colour turns along the name
@@ -213,18 +213,18 @@ html:not(.gl) .hero {
   --n-pink: var(--neon-pink, #ff1f75); --n-orange: var(--neon-orange, #ff660d); --n-violet: var(--neon-violet, #8533ff);
   --n-blue: var(--neon-blue, #2157ff); --n-cyan: var(--neon-cyan, #14ccff); --n-amber: var(--neon-amber, #ff8f14);
   --n-deep: var(--neon-deep, #180d60);
-  /* by night the stage (7% of the still left in it, as in the shader) and no pool or shade, so nothing outlines the
-     name: its light lies on the dark */
-  --stage: rgba(3, 2, 10, .93); --pool: none; --pool-h: 3.1; --shade: transparent; --shades: none;
+  /* by night the stage (7% of the still left in it, as in the shader) and no pool, so nothing outlines the name: its
+     light lies on the dark */
+  --stage: rgba(3, 2, 10, .93); --pool: transparent; --pool-w: 0; --pool-soft: none;
   /* the faces: each colour mixed with this, at these strengths (dark and tinted by night), and their glow */
   --face: rgba(4, 2, 14, .7); --face-a: 40%; --face-b: 36%; --face-glow: 0%; --edge-glow: transparent;
 }
 html:not(.gl) .hero::after { content: ""; position: absolute; z-index: -3; inset: 0; background: var(--stage); pointer-events: none; }
-html:not(.gl) .hero::before { content: ""; position: absolute; z-index: -2; left: 50%; top: var(--name-y, 45%); width: min(100vw, calc(var(--hero-fs) * 11.6)); height: calc(var(--hero-fs) * var(--pool-h)); translate: -50% -50%; background: var(--pool); opacity: 0; transition: opacity .9s var(--ease-out); }
 html:not(.gl) .hero__neon { display: block; }
-/* the shade: by day the room falls to the style's deep colour right round the letters (by night there is none: the
-   stage is the ground) */
-.hero__neon b { z-index: -1; pointer-events: none; color: transparent; -webkit-text-fill-color: transparent; text-shadow: var(--shades); opacity: 0; transition: opacity .9s var(--ease-out); }
+/* the pool: by day the room falls to the style's deep colour round the letters, following them, dense right round
+   each and soft further out (a copy of the name, its outline thickened, softened and shadowed twice), so the first
+   and last letters stand on it as the middle ones do; by night there is none: the stage is the ground */
+.hero__neon b { z-index: -1; pointer-events: none; color: transparent; -webkit-text-fill-color: var(--pool); -webkit-text-stroke: var(--pool-w) var(--pool); filter: var(--pool-soft); opacity: 0; transition: opacity .9s var(--ease-out); }
 .hero.is-ready .hero__neon b { opacity: 1; }
 .hero__neon i { z-index: 1; pointer-events: none; font-style: normal; opacity: 0; color: color-mix(in srgb, var(--n-orange) 75%, var(--n-amber)); -webkit-text-fill-color: #000; -webkit-text-stroke: .07em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .05em currentColor); will-change: transform; transition: opacity .9s var(--ease-out);
   --ga: 40deg; --gr: .024em; transform: rotate(var(--ga)) translateX(var(--gr)) rotate(calc(-1 * var(--ga))); }
@@ -261,46 +261,49 @@ html:not(.gl) .hero__name::after {
 html:not(.gl) .hero.is-ready .hero__name::after { animation: hero-turn 16s ease-in-out -4s infinite alternate; }
 /* the white-hot line on the letters' edge (only its outer half shows) */
 .hero__neon::after { pointer-events: none; color: rgba(255, 242, 250, .95); -webkit-text-fill-color: #000; -webkit-text-stroke: .02em currentColor; paint-order: stroke fill; mix-blend-mode: screen; filter: drop-shadow(0 0 .045em var(--edge-glow)); opacity: 0; transition: opacity .9s var(--ease-out); }
-html:not(.gl) .hero.is-ready::before, .hero.is-ready .hero__neon::after { opacity: 1; }
+.hero.is-ready .hero__neon::after { opacity: 1; }
 /* by day the room is bright, and soft, as the room's own hero is (room-day-soft.webp, so nothing jumps from sharp to soft
-   when WebGL takes over): the pool under the whole name (solid to 70% of its radius, so the first and last
-   letters sit on it too) and a tight shade round every letter fall to the style's deep colour, as the shader's day
-   pool does, and the faces are nearly opaque, so the white-hot edge and the faces keep 3:1 or more against the ground
-   right beside them, still or moving (over the pale sky the edge measured 1.7 to 2.6:1, the faces about 1:1) */
-@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day-soft.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, color-mix(in srgb, var(--n-deep) 94%, transparent) 70%, color-mix(in srgb, var(--n-deep) 60%, transparent) 88%, transparent); --pool-h: 2.2; --shade: color-mix(in srgb, var(--n-deep) 97%, transparent); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
-html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day-soft.webp"); background-color: #2f64c2; --stage: transparent; --pool: radial-gradient(closest-side, color-mix(in srgb, var(--n-deep) 94%, transparent) 70%, color-mix(in srgb, var(--n-deep) 60%, transparent) 88%, transparent); --pool-h: 2.2; --shade: color-mix(in srgb, var(--n-deep) 97%, transparent); --shades: 0 0 .05em var(--shade), 0 0 .14em var(--shade), 0 0 .3em var(--shade), 0 0 .6em var(--shade); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
+   when WebGL takes over): the pool round the letters falls to the style's deep colour, as the shader's day pool does,
+   and the faces are nearly opaque, so the white-hot edge and the faces keep 3:1 or more against the ground right
+   beside them, still or moving (over the pale sky the edge measured 1.7 to 2.6:1, the faces about 1:1). It follows
+   the letters: an oval pool under the whole name read as a dark slab, and a shade only a hair round each letter
+   left the faces at 1.0 to 1.9:1 */
+@media (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero { background-image: url("../img/room-day-soft.webp"); background-color: #2f64c2; --stage: transparent; --pool: color-mix(in srgb, var(--n-deep) 96%, transparent); --pool-w: .4em; --pool-soft: blur(.06em) drop-shadow(0 0 .2em var(--pool)) drop-shadow(0 0 .2em var(--pool)); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); } }
+html[data-appearance="day"]:not(.gl) .hero { background-image: url("../img/room-day-soft.webp"); background-color: #2f64c2; --stage: transparent; --pool: color-mix(in srgb, var(--n-deep) 96%, transparent); --pool-w: .4em; --pool-soft: blur(.06em) drop-shadow(0 0 .2em var(--pool)) drop-shadow(0 0 .2em var(--pool)); --face: rgba(236, 228, 255, .9); --face-a: 58%; --face-b: 52%; --face-glow: 30%; --edge-glow: var(--n-pink); }
 /* reduced transparency: solid letters without the pool, traces or neon: white by night; by day a deep navy on a soft
    light halo, since the day room runs from pale sky to mid blue behind the name (5.4:1 or better against the darker
    parts round the letters, where #1f3fae alone measured 2.4:1) */
 @media (prefers-reduced-transparency: reduce) {
   html:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; filter: none; }
-  html:not(.gl) .hero::before, html:not(.gl) .hero__name::after, html:not(.gl) .hero__neon { display: none; }
+  html:not(.gl) .hero__name::after, html:not(.gl) .hero__neon { display: none; }
   html[data-appearance="day"]:not(.gl) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); }
 }
 @media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) { html:not(.gl):not([data-appearance="night"]) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)) drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); } }
-/* the glass look without the room (T41, a design toggle): the name as it was before the neon, in CSS glass with a
-   glow in the colour style, over the room's still with no stage; by day a deeper glass in the style's colour. Solid
-   under reduced transparency, as the neon is */
-html[data-hero-name="glass"]:not(.gl) .hero { --stage: transparent; --pool: none; }
+/* the glass look without the room (T41, a design toggle): the name in CSS glass with a glow in the colour style, over
+   the room's still with no stage; by day, as the room draws it, deep glass in the style's colour with a light rim, on
+   a pale halo (the bright day room behind the name runs from pale sky to mid blue, so light glass on it measured 1.2
+   to 1.9:1; the rim lies outside the letters, since a stroke would draw Switzer's overlapping shapes inside them).
+   Solid under reduced transparency, as the neon is */
+html[data-hero-name="glass"]:not(.gl) .hero { --stage: transparent; }
 html[data-hero-name="glass"]:not(.gl) .hero__neon, html[data-hero-name="glass"]:not(.gl) .hero__name::after { display: none; }
 html[data-hero-name="glass"]:not(.gl) .hero__text {
   background: linear-gradient(172deg, rgba(255, 255, 255, .97) 18%, rgba(206, 220, 255, .72) 52%, rgba(255, 255, 255, .9) 88%);
   -webkit-background-clip: text; background-clip: text;
   filter: drop-shadow(0 0 .05em rgba(255, 255, 255, .5)) drop-shadow(0 0 .3em color-mix(in srgb, var(--style, #3866ff) 72%, transparent)) drop-shadow(0 0 .3em color-mix(in srgb, var(--style, #3866ff) 72%, transparent));
 }
-html[data-hero-name="glass"][data-appearance="day"]:not(.gl) .hero__text { background-image: linear-gradient(172deg, color-mix(in srgb, var(--style, #3866ff) 86%, #fff) 18%, color-mix(in srgb, var(--style, #3866ff) 78%, #000) 55%, color-mix(in srgb, var(--style, #3866ff) 86%, #fff) 88%); }
-@media (prefers-color-scheme: light) { html[data-hero-name="glass"]:not(.gl):not([data-appearance="night"]) .hero__text { background-image: linear-gradient(172deg, color-mix(in srgb, var(--style, #3866ff) 86%, #fff) 18%, color-mix(in srgb, var(--style, #3866ff) 78%, #000) 55%, color-mix(in srgb, var(--style, #3866ff) 86%, #fff) 88%); } }
+html[data-hero-name="glass"][data-appearance="day"]:not(.gl) .hero__text { background-image: linear-gradient(172deg, color-mix(in srgb, var(--style, #3866ff) 50%, #0b1240) 10%, color-mix(in srgb, var(--style, #3866ff) 30%, #050a2c) 55%, color-mix(in srgb, var(--style, #3866ff) 42%, #0b1240) 92%); filter: drop-shadow(0 0 .03em rgba(255, 255, 255, .95)) drop-shadow(0 0 .22em rgba(236, 244, 255, .85)) drop-shadow(0 0 .22em rgba(236, 244, 255, .6)); }
+@media (prefers-color-scheme: light) { html[data-hero-name="glass"]:not(.gl):not([data-appearance="night"]) .hero__text { background-image: linear-gradient(172deg, color-mix(in srgb, var(--style, #3866ff) 50%, #0b1240) 10%, color-mix(in srgb, var(--style, #3866ff) 30%, #050a2c) 55%, color-mix(in srgb, var(--style, #3866ff) 42%, #0b1240) 92%); filter: drop-shadow(0 0 .03em rgba(255, 255, 255, .95)) drop-shadow(0 0 .22em rgba(236, 244, 255, .85)) drop-shadow(0 0 .22em rgba(236, 244, 255, .6)); } }
 @media (prefers-reduced-transparency: reduce) {
   html[data-hero-name="glass"]:not(.gl) .hero__text { background: #fff; -webkit-background-clip: text; background-clip: text; filter: none; }
   html[data-hero-name="glass"][data-appearance="day"]:not(.gl) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); }
 }
-@media (max-width: 699px) {
+@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) { html[data-hero-name="glass"]:not(.gl):not([data-appearance="night"]) .hero__text { background: #142a85; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 .3em rgba(219, 237, 255, .7)); } }
+@media (max-width: 699px), (max-width: 1199px) and (orientation: portrait) {
   .hero { --hero-fs: min(18vw, 15svh, 120px); }
   .hero__name, .hero__neon i, .hero__neon b, .hero__neon::after { line-height: .98; }
   .hero__w { display: block; }
   .hero__neon b::before, .hero__neon i::before, .hero__neon i::after, .hero__neon::after, html:not(.gl) .hero__name::after { content: "Leonardo\A Carvalho"; white-space: pre; }
   html:not(.gl) .hero__name::after { content: "Leonardo\A Carvalho" / ""; }
-  html:not(.gl) .hero::before { width: calc(var(--hero-fs) * 6.4); height: calc(var(--hero-fs) * (var(--pool-h) + 1.2)); }
 }
 .hero__hint { position: absolute; left: 16px; right: 16px; bottom: calc(32px + env(safe-area-inset-bottom)); margin: 0; text-align: center; color: var(--ink-2); font: 500 14px/1.3 var(--font); letter-spacing: .01em; opacity: 0; transition: opacity .5s var(--ease-out) .75s; }
 .hero__hint span { pointer-events: auto; cursor: pointer; }
@@ -341,7 +344,7 @@ html[data-hero-content="name"] .hero__below, html[data-hero-content="apps"] .her
 .app .icon { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .app__name { text-shadow: 0 1px 10px rgba(4, 8, 36, .6), 0 0 3px rgba(4, 8, 36, .4); white-space: nowrap; }
 .app__more { display: none; }
-.app:hover .app__art { scale: 1.06; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 0 0 1px rgba(255, 255, 255, .22), 0 14px 34px rgba(4, 8, 40, .42), 0 0 28px color-mix(in srgb, var(--style, #3d6bff) 45%, transparent); }
+.app:hover .app__art { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 0 0 1px rgba(255, 255, 255, .22), 0 14px 34px rgba(4, 8, 40, .42), 0 0 28px color-mix(in srgb, var(--style, #3d6bff) 45%, transparent); }
 .app:active .app__art { scale: .96; transition-duration: .1s; }
 .app:focus-visible { outline: none; box-shadow: none; }   /* one ring, on the icon (not the page's glow round the whole app as well) */
 .app:focus-visible .app__art { outline: 2px solid #fff; outline-offset: 4px; }
@@ -366,8 +369,7 @@ html[data-launcher="library"] .app[data-app="hockey"] { --hi: 80%; }
 html[data-launcher="library"] .app[data-app="about"] { --hi: 90%; }
 html[data-launcher="library"] .app[data-app="resume"] { --hi: 76%; }
 html[data-launcher="library"] .app[data-app="write"] { --hi: 84%; }
-html[data-launcher="library"] .app:hover .app__art { scale: 1; translate: 0 -8px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 0 0 2px rgba(255, 255, 255, .55), 0 24px 44px rgba(2, 4, 24, .55), 0 0 36px color-mix(in srgb, var(--style, #3d6bff) 55%, transparent); }
-html[data-launcher="library"] .app:hover .app__name { translate: 0 -8px; }
+html[data-launcher="library"] .app:hover .app__art { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 0 0 2px rgba(255, 255, 255, .55), 0 24px 44px rgba(2, 4, 24, .55), 0 0 36px color-mix(in srgb, var(--style, #3d6bff) 55%, transparent); }
 html[data-launcher="library"] .app__name { transition: translate .45s var(--ease-out); }
 html[data-launcher="library"] .app:focus-visible .app__art { outline-offset: 5px; border-radius: 12px; }
 
@@ -375,7 +377,7 @@ html[data-launcher="library"] .app:focus-visible .app__art { outline-offset: 5px
    photo, a page of the résumé, the address to write to */
 html[data-launcher="widgets"] .apps { display: grid; grid-template-columns: repeat(4, var(--wd)); grid-auto-rows: var(--wd); gap: 14px; --wd: clamp(128px, 10.4vw, 156px); }
 html[data-launcher="widgets"] .app { width: auto; height: 100%; display: grid; grid-template: "art" auto "more" 1fr "name" auto / minmax(0, 1fr); align-items: start; justify-items: start; gap: 8px; padding: 14px 15px 13px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 26px; background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .02)), color-mix(in srgb, var(--style, #3d6bff) 26%, rgba(6, 9, 34, .74)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 14px 36px rgba(2, 4, 24, .4); -webkit-backdrop-filter: blur(22px) saturate(1.4); backdrop-filter: blur(22px) saturate(1.4); text-align: left; overflow: hidden; transition: scale .45s var(--ease-out), box-shadow .45s var(--ease-out), opacity .3s; }
-html[data-launcher="widgets"] .app:is([data-app="work"], [data-app="hockey"], [data-app="write"]) { grid-column: span 2; }
+html[data-launcher="widgets"] .app:is([data-app="work"], [data-app="hockey"]) { grid-column: span 2; }   /* two rows of six: Work and Hockey wide, then four */
 html[data-launcher="widgets"] .app__art { grid-area: art; width: 34px; height: 34px; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--style, #3d6bff) 70%, #fff 6%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4); -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-launcher="widgets"] .app .icon { width: 19px; height: 19px; stroke-width: 2; }
 html[data-launcher="widgets"] .app__name { grid-area: name; font: 650 15px/1.2 var(--font); text-shadow: none; }
@@ -394,16 +396,16 @@ html[data-launcher="widgets"] .app__page i:nth-child(3) { width: 84%; } html[dat
 html[data-launcher="widgets"] .app[data-app="resume"] .app__more { justify-self: end; }
 html[data-launcher="widgets"] .app__line { align-self: end; color: var(--ink-2); overflow-wrap: anywhere; }
 html[data-launcher="widgets"] .app[data-app="write"] .app__line { color: #fff; font-size: 14px; }
-html[data-launcher="widgets"] .app:hover { scale: 1.03; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 0 0 1px rgba(255, 255, 255, .3), 0 18px 40px rgba(2, 4, 24, .48); }
-html[data-launcher="widgets"] .app:hover .app__art { scale: 1; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4); }
+html[data-launcher="widgets"] .app:hover { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 0 0 1px rgba(255, 255, 255, .3), 0 18px 40px rgba(2, 4, 24, .48); }
+html[data-launcher="widgets"] .app:hover .app__art { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4); }
 html[data-launcher="widgets"] .app:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 html[data-launcher="widgets"] .app:focus-visible .app__art { outline: none; }
 html[data-launcher="widgets"].is-launching .app.is-chosen { scale: 1.06; opacity: 0; transition: scale .5s var(--ease-out), opacity .4s ease .1s; }
 
 /* a desktop (T39 c, after myOS): folders, a document and a mail icon down the right edge, as a Mac lays them out;
    one click opens, as on the web */
-html[data-launcher="desktop"] .apps { position: fixed; top: calc(22px + env(safe-area-inset-top)); right: calc(22px + env(safe-area-inset-right)); display: flex; flex-flow: column wrap-reverse; align-content: flex-start; gap: 6px 10px; max-height: calc(100svh - 150px); }
-html[data-launcher="desktop"] .app { width: 96px; gap: 5px; padding: 6px 4px 7px; border-radius: 10px; font: 600 13px/1.2 var(--font); }
+html[data-launcher="desktop"] .apps { position: fixed; top: calc(22px + env(safe-area-inset-top)); right: calc(22px + env(safe-area-inset-right)); display: flex; flex-flow: column wrap-reverse; align-content: flex-start; gap: 2px 10px; max-height: calc(100svh - 150px); }
+html[data-launcher="desktop"] .app { width: 96px; gap: 5px; padding: 4px 4px 5px; border-radius: 10px; font: 600 13px/1.2 var(--font); }
 html[data-launcher="desktop"] .app__art { width: 64px; height: 56px; border: 0; border-radius: 8px; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-launcher="desktop"] .app__name { padding: 1px 6px 2px; border-radius: 5px; }
 html[data-launcher="desktop"] .app:is([data-app="work"], [data-app="hockey"], [data-app="about"]) .app__art::before,
@@ -414,7 +416,6 @@ html[data-launcher="desktop"] .app:is([data-app="work"], [data-app="hockey"], [d
 html[data-launcher="desktop"] .app[data-app="resume"] .app__art::before { content: ""; position: absolute; z-index: -1; left: 13px; right: 13px; top: 1px; bottom: 1px; background: linear-gradient(225deg, transparent 9px, #fff 9px); border-radius: 3px; box-shadow: 0 4px 10px rgba(2, 4, 24, .35); }
 html[data-launcher="desktop"] .app[data-app="resume"] .icon { width: 26px; height: 26px; stroke: rgba(12, 18, 60, .55); stroke-width: 1.6; }
 html[data-launcher="desktop"] .app[data-app="write"] .app__art::before { content: ""; position: absolute; z-index: -1; left: 4px; right: 4px; top: 0; bottom: 0; border-radius: 13px; background: linear-gradient(180deg, color-mix(in srgb, var(--style, #3d6bff) 55%, #fff), color-mix(in srgb, var(--style, #3d6bff) 90%, #061040)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 4px 10px rgba(2, 4, 24, .35); }
-html[data-launcher="desktop"] .app:hover .app__art { scale: 1; }
 html[data-launcher="desktop"] .app:hover { background: rgba(255, 255, 255, .14); }
 html[data-launcher="desktop"] .app:focus-visible { outline: none; }
 html[data-launcher="desktop"] .app:focus-visible .app__art { outline: none; }
@@ -431,7 +432,8 @@ html[data-launcher="desktop"] .app:focus-visible .app__name { background: color-
   html[data-launcher="library"] .app__name { font-size: 16px; }
   html[data-launcher="widgets"] .apps { --wd: 92px; grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 340px); max-width: none; gap: 10px; }
   html[data-launcher="widgets"] .apps { grid-auto-rows: minmax(var(--wd), auto); }
-  html[data-launcher="widgets"] .app:is([data-app="hockey"], [data-app="write"]) { grid-column: auto; }
+  html[data-launcher="widgets"] .app[data-app="hockey"] { grid-column: auto; }
+  html[data-launcher="widgets"] .app[data-app="write"] { grid-column: span 2; }   /* Work across the top, Write to me across the foot */
   html[data-launcher="widgets"] .app[data-app="resume"] .app__more, html[data-launcher="widgets"] .app[data-app="write"] .app__line { display: none; }
   html[data-launcher="widgets"] .app { padding: 11px 12px; border-radius: 22px; gap: 6px; }
   html[data-launcher="widgets"] .app__art { width: 30px; height: 30px; }
@@ -464,7 +466,7 @@ html[data-launcher="desktop"] .app:focus-visible .app__name { background: color-
   html[data-launcher="library"] .app { width: 76px; }
   html[data-launcher="library"] .app__art { aspect-ratio: 4 / 5; }
   html[data-launcher="library"] .app__name { font-size: 15px; }
-  html[data-launcher="widgets"] .apps { --wd: auto; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: auto; width: min(100%, 680px); gap: 10px; }
+  html[data-launcher="widgets"] .apps { --wd: auto; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: auto; width: min(100%, 720px); gap: 10px; }
   html[data-launcher="widgets"] .app, html[data-launcher="widgets"] .app:is([data-app="work"], [data-app="hockey"], [data-app="write"]) { grid-column: auto; }
   html[data-launcher="widgets"] .app { grid-template: "art" auto "name" auto / minmax(0, 1fr); padding: 11px 12px; border-radius: 20px; gap: 6px; }
   html[data-launcher="widgets"] .app__art { width: 30px; height: 30px; }
@@ -474,17 +476,22 @@ html[data-launcher="desktop"] .app:focus-visible .app__name { background: color-
   html[data-launcher="library"] .app { width: 70px; }
   html[data-launcher="library"] .app__art { aspect-ratio: 1; }
 }
-/* the desktop's icons run down the right edge only where the name clears them (it is capped to keep clear); on a
-   narrower or shorter screen they run along the top, five across, their names wrapping on the narrowest */
+/* the desktop's icons run down the right edge, one column of six, only where the name clears them (it is capped to
+   keep clear); on a narrower or shorter screen they run along the top, six across, their names wrapping on a phone */
 html[data-launcher="desktop"] .hero { --hero-fs: min(8.2vw, 24svh, 160px, calc((100vw - 300px) / 8.8)); }
 @media (max-width: 1099px), (max-height: 699px) {
   html[data-launcher="desktop"] .hero { --hero-fs: min(8.2vw, 24svh, 160px); }
   html[data-launcher="desktop"] .apps { top: calc(16px + env(safe-area-inset-top)); left: 8px; right: 8px; max-width: none; flex-flow: row nowrap; justify-content: center; gap: 0 4px; max-height: none; }
 }
 @media (max-width: 699px) { html[data-launcher="desktop"] .hero { --hero-fs: min(18vw, 15svh, 120px); } }
-@media (max-width: 389px) {
+/* a tablet held upright sets the name on two lines too, larger than a phone's (on one line, at 768 by 1024, it was
+   63px, smaller than on a 390 phone) */
+@media (min-width: 700px) and (max-width: 1199px) and (orientation: portrait) {
+  .hero, html[data-launcher="desktop"] .hero { --hero-fs: min(15vw, 12svh, 150px); }
+}
+@media (max-width: 479px) {
   html[data-launcher="desktop"] .apps { gap: 0; }
-  html[data-launcher="desktop"] .app { width: calc((100vw - 16px) / 5); padding-left: 2px; padding-right: 2px; }
+  html[data-launcher="desktop"] .app { width: calc((100vw - 16px) / 6); padding-left: 2px; padding-right: 2px; }
   html[data-launcher="desktop"] .app__art { width: 48px; height: 44px; }
   html[data-launcher="desktop"] .app__name { white-space: normal; padding: 1px 3px 2px; }
 }
@@ -494,7 +501,6 @@ html[data-launcher="desktop"] .hero { --hero-fs: min(8.2vw, 24svh, 160px, calc((
   .hero__w { display: inline; }
   .hero__neon b::before, .hero__neon i::before, .hero__neon i::after, .hero__neon::after, html:not(.gl) .hero__name::after { content: "Leonardo Carvalho"; white-space: nowrap; }
   html:not(.gl) .hero__name::after { content: "Leonardo Carvalho" / ""; }
-  html:not(.gl) .hero::before { width: min(100vw, calc(var(--hero-fs) * 11.6)); height: calc(var(--hero-fs) * var(--pool-h)); }
 }
 html.is-entering .app, html.is-entering .apps { pointer-events: none; }
 @media (prefers-reduced-transparency: reduce) { .app__art, html[data-launcher="widgets"] .app { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in srgb, var(--style, #3d6bff) 40%, #0a0e30); } }
@@ -686,7 +692,13 @@ a.row:focus-visible .row__m { color: #fff; }
   .arc > li:has(> .arc__cover) > * { grid-column: 1; }
   .arc > li:has(> .arc__cover) > .arc__cover { grid-column: 2; grid-row: 1 / span 4; width: 100%; margin-top: 4px; }
 }
-.win__body .arc__shelf { margin: 34px 0 14px; font: 700 22px/1.2 var(--font-display); letter-spacing: -.005em; scroll-margin-top: 12px; }
+/* the Listening window, the archive page's side window (inside the window, after the things made, below 1360px):
+   the songs and albums, a size down */
+.side .arc { gap: 10px; margin-top: 12px; }
+.side .arc > li { padding: 14px 16px 16px; }
+.side .arc__title { margin-top: 4px; font: italic 550 19px/1.2 var(--font-display); letter-spacing: -.005em; }
+.side .arc__by, .side .arc__line { font-size: 15px; }
+.side .arc__go { margin-top: 12px; }
 .cv { display: grid; gap: 10px; }
 .cv > li { padding: 15px 18px; border-radius: var(--r-row); background: var(--fill); }
 .cv__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
@@ -857,7 +869,7 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
   .win__body { padding-bottom: 130px; }
   .win { translate: none; }
   /* the dock, as in iOS 26: the tab bar, each icon over its name, and the color control beside it as its own circle.
-     Each tab takes an equal share and never less than its name (12px), so five fit beside the circle from 360px;
+     Each tab takes an equal share and never less than its name (12px), so six fit beside the circle from 400px;
      narrower, the color control moves into the window's toolbar (hue.js) and the tab bar takes the width alone. */
   :root { --dock-h: 66px; --dock-y: calc(22px + env(safe-area-inset-bottom)); --dock-gap: 8px; --tab-w: min(360px, calc(100vw - 16px - var(--dock-gap) - var(--dock-h))); --dock-x: calc((100vw - var(--tab-w) - var(--dock-h) - var(--dock-gap)) / 2); }
   html.no-room { --dock-x: calc((100vw - var(--tab-w)) / 2); }   /* no color control without the room from the start: the tab bar is centred alone (a room that gives way later moves nothing) */
@@ -922,6 +934,34 @@ html:not(.js) .toolbar--filters, html:not(.js) .filters, html:not(.js) [data-pri
 }
 @media (min-width: 900px) { .toolbar--inline { display: none; } }
 
+/* ---------- the design toggles' panel (toggles.js): only for a visit with ?dev, never for visitors ----------
+   Top right; open on a phone, at the foot, so the title shows above it. Solid, not glass, so it reads the same over
+   the hero, the room and every colour style; above the hero and the colour control. Its heading folds it to a small
+   tab in the top right corner */
+.devtoggles { position: fixed; top: calc(12px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); z-index: 30; width: min(340px, calc(100vw - 24px)); max-height: calc(100svh - 24px); overflow: auto; padding: 10px 12px 12px 16px; border-radius: 20px; background: rgba(7, 10, 34, .95); color: #fff; font: 500 14px/1.35 var(--font); box-shadow: 0 14px 40px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .16); }
+@media (max-width: 699px) { .devtoggles { top: auto; bottom: calc(12px + env(safe-area-inset-bottom)); max-height: 56svh; } }
+.devtoggles.is-folded { top: calc(10px + env(safe-area-inset-top)); bottom: auto; width: auto; padding: 2px 4px 2px 12px; border-radius: 999px; }
+.devtoggles.is-folded h2 { font-size: 14px; }
+.devtoggles.is-folded .devtoggles__close { display: none; }
+.devtoggles__head { display: flex; align-items: center; gap: 8px; }
+.devtoggles h2 { flex: 1; margin: 0; font: 700 16px/1.2 var(--font); letter-spacing: 0; }
+.devtoggles .devtoggles__fold { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 6px 6px 0; border: 0; border-radius: 8px; background: none; font: inherit; text-align: left; }
+.devtoggles .devtoggles__fold::after { content: ""; width: 8px; height: 8px; margin-left: 2px; border: solid currentColor; border-width: 0 2px 2px 0; rotate: 45deg; translate: 0 -2px; }
+.devtoggles .devtoggles__fold[aria-expanded="false"]::after { rotate: -135deg; translate: 0 2px; }
+.devtoggles .devtoggles__fold:hover { background: none; }
+.devtoggles fieldset { margin: 12px 0 0; padding: 0; border: 0; min-width: 0; }
+.devtoggles legend { margin-bottom: 6px; padding: 0; font: 600 13px/1.3 var(--font); color: rgba(255, 255, 255, .78); }
+.devtoggles__set, .devtoggles__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.devtoggles__foot { margin-top: 14px; }
+.devtoggles__foot p { flex-basis: 100%; margin: 2px 0 0; font-size: 13px; color: rgba(255, 255, 255, .72); }
+.devtoggles__foot .devtoggles__meter { margin-top: 6px; color: #fff; font-variant-numeric: tabular-nums; }
+.devtoggles button { min-height: 34px; padding: 7px 13px; border: 1px solid rgba(255, 255, 255, .28); border-radius: 999px; background: transparent; color: #fff; font: 600 13px/1.2 var(--font); cursor: pointer; }
+.devtoggles button:hover { background: rgba(255, 255, 255, .1); }
+.devtoggles button[aria-pressed="true"] { border-color: #fff; background: #fff; color: #0b1138; }
+.devtoggles button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (pointer: coarse) { .devtoggles button { min-height: 44px; } }   /* every control answers 44px on touch */
+@media (forced-colors: active) { .devtoggles { border: 1px solid CanvasText; } .devtoggles button[aria-pressed="true"] { forced-color-adjust: none; border-color: Highlight; background: Highlight; color: HighlightText; } }
+
 /* ---------- the color style control, bottom right: a playground for the room's palette ---------- */
 .hue { position: fixed; right: calc(18px + env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 20; }
 html.no-room .hue, html:not(.js) .hue { display: none; }
@@ -982,9 +1022,9 @@ html.no-room .hue, html:not(.js) .hue { display: none; }
   .hue__button i { width: 26px; height: 26px; }
   .hue__panel { bottom: calc(var(--dock-h) + 10px); max-height: calc(100svh - var(--dock-h) - var(--dock-y) - 24px); overflow: auto; }
 }
-/* under 360px five labelled tabs take the dock's whole width: the control's button joins the window's toolbar (its
+/* under 400px six labelled tabs take the dock's whole width: the control's button joins the window's toolbar (its
    actions, inline at the foot of the page) as a fill like its neighbours, and the panel opens above the dock */
-@media (max-width: 359px) {
+@media (max-width: 399px) {
   :root { --tab-w: calc(100vw - 20px); --dock-x: 10px; }
   .hue.hue--toolbar { left: calc(10px + env(safe-area-inset-left)); right: calc(10px + env(safe-area-inset-right)); bottom: calc(var(--dock-y) + var(--dock-h) + 10px); }
   html:has(section.sheet:not(.is-closing)) .hue.hue--toolbar { opacity: 1; pointer-events: auto; }   /* a sheet's own toolbar holds it then */
@@ -1022,14 +1062,14 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
   .room { display: none; }
   .glass { forced-color-adjust: auto; background: Canvas; border: 1px solid CanvasText; }
 }
-@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } .hero::before, .hero::after, .hero__name::after, .hero__neon { display: none !important; } html .hero { background: none !important; } }
+@media (forced-colors: active) { .hero__text { background: none !important; -webkit-text-fill-color: CanvasText !important; color: CanvasText !important; -webkit-text-stroke: 0 !important; filter: none !important; } .hero::after, .hero__name::after, .hero__neon { display: none !important; } html .hero { background: none !important; } }
 
 /* ---------- print: plain text on white, Letter with half-inch margins ---------- */
 @page { size: letter; margin: .5in; }
 @media print {
   html, body { background: #fff !important; }
   body { min-height: 0; font-size: 10pt; line-height: 1.38; }
-  .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue, .head__write { display: none !important; }
+  .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue, .head__write, .devtoggles { display: none !important; }
   .space, .win, .sheet, .side { position: static !important; inset: auto !important; transform: none !important; translate: none !important; width: auto !important; height: auto !important; max-height: none !important; overflow: visible !important; background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; margin: 0 0 14pt !important; opacity: 1 !important; filter: none !important; perspective: none !important; }   /* (no border: the CSS glass rim of a floating side window has no place on paper) */
   .sr-live { display: none; }   /* nothing to announce on paper, and its 1px box can reach past the page's foot */
   .space .print-contact { display: block !important; margin: 0 !important; white-space: nowrap; color: #000 !important; font-size: 10pt !important; }   /* the address a coach needs, where the avatar sits on screen: no added height */

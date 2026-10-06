@@ -70,12 +70,14 @@ export function createWindows({ room }) {
     p.classList.remove('side__part--lifted', 'side__part--pin');
     a.insertBefore(p, a.querySelectorAll(':scope > .side__part')[p._home.index] || null);
   }
+  // the end of a window's body is before its actions (the inline toolbar at its foot), so they stay last
+  const atEnd = (body, el) => { const foot = body.lastElementChild; if (foot && foot !== el && foot.matches('.toolbar--inline')) foot.before(el); else body.append(el); };
   function inline(a, main, body) {
     const words = (a.dataset.inline || 'end').split(/\s+/);
     const places = partsOf(a).map(p => [p, words[Math.min(p._home.index, words.length - 1)]]);
     const own = (places.find(([, w]) => w !== 'pin') || [null, words.find(w => w !== 'pin') || 'end'])[1];
     if (own === 'start') { if (a.parentElement !== body) body.prepend(a); }
-    else if (a.parentElement !== body) body.append(a);
+    else if (a.parentElement !== body) atEnd(body, a);
     for (const [p, w] of places) {
       if (w === own) { if (p.parentElement !== a) putBack(p); continue; }
       p.classList.add('side__part--lifted');
@@ -84,7 +86,7 @@ export function createWindows({ room }) {
         if (qShort.matches) { if (p.parentElement !== body) body.prepend(p); }
         else if (p.parentElement !== main) body.before(p);
       }
-      else if (p.parentElement !== body) { if (w === 'start') body.prepend(p); else body.append(p); }
+      else if (p.parentElement !== body) { if (w === 'start') body.prepend(p); else atEnd(body, p); }
     }
   }
   function gather(a) { liftedOf(a).sort((x, y) => x._home.index - y._home.index).forEach(putBack); }

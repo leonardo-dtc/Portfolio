@@ -9,8 +9,9 @@ import { lut, turn, neonFor } from './palette.js';
 // down. The stage is near black, a breath of the room's violet.
 const TINTS = [[.16, .34, 1], [.24, .46, 1], [.15, .20, .90], [.10, .16, .40]];
 const STAGE = [.010, .009, .026];
-// the glass name's light behind it by night and by day, and its day glass (the hero's other look, T41), turned too
-const GLASS = [[.44, .58, 1], [.86, .93, 1], [.13, .27, .80]];
+// the glass name's light behind it by night and by day, and its deep colour (the shade round it by night, its glass by
+// day: the hero's other look, T41), turned too
+const GLASS = [[.44, .58, 1], [.86, .93, 1], [.05, .10, .36]];
 
 export function createRoom(canvas) {
   const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance' });
@@ -66,7 +67,10 @@ export function createRoom(canvas) {
     gl.activeTexture(gl.TEXTURE0);
   }
   let w = 0, h = 0, maxLod = 6;
-  let dpr = Math.min(devicePixelRatio || 1, 1.5);
+  // up to 1.5 times the screen's pixels; the roomRes design toggle ('sharp', toggles.js) allows 2, so its cost can be
+  // judged on a real phone
+  const cap = () => (document.documentElement.dataset.roomRes === 'sharp' ? 2 : 1.5);
+  let dpr = Math.min(devicePixelRatio || 1, cap());
   // stage: the hero's dark stage (1 while the name shows, 0 the room's own light; by night only, in the shader)
   // neon: the hero's colours of light and arc the family they are held in (palette.js, neonFor), set with the colour
   const cobalt = neonFor(0, 1);
@@ -91,6 +95,11 @@ export function createRoom(canvas) {
 
   let frames = 0, counted = 0, acc = 0, slow = false, clock = 0, lost = false, panelSum = 0;
   let drew = false, after = 0, acc1 = 0;                  // both looks time the tick that follows a drawn one; the second, at 1x
+  let frameMs = 0;                                        // the same, smoothed (the design toggles' panel shows it)
+  document.addEventListener('v5:toggle', (e) => {
+    if (e.detail.name !== 'roomRes' || slow || lost) return;
+    dpr = Math.min(devicePixelRatio || 1, cap()); w = h = 0; st.fast = Math.max(st.fast, .5);
+  });
   const still = matchMedia('(prefers-reduced-motion: reduce)');
   const note = (event, ms) => { api.log.push({ at: Math.round(performance.now()), event, ms: Math.round(ms * 10) / 10 }); };
   window.__roomFrames = 0;
@@ -100,6 +109,7 @@ export function createRoom(canvas) {
     // the room's own motion. Each drawn frame is timed by the tick that follows it, which carries its cost (while
     // only the room drifts it draws every other tick, so a drawn tick's own time is the cheap tick before it). Each
     // counts up to 50 ms, so a few long frames while the page loads cannot trip it alone.
+    if (drew) frameMs = frameMs ? frameMs * .9 + Math.min(dt, .1) * 100 : dt * 1000;
     if (drew && counted < 90) {
       counted++; acc += Math.min(dt, .05);
       if (counted === 90 && acc / 90 > .022) { slow = true; note('1x', acc / 90 * 1000); if (dpr > 1) { dpr = 1; w = h = 0; } }
@@ -191,6 +201,7 @@ export function createRoom(canvas) {
     log: [],                                             // what the budget decided, and when: { at, event, ms }
     get gaveWay() { return lost; },
     get dpr() { return dpr; },
+    get frameMs() { return frameMs; },
     get lod() { return maxLod; },
     get slow() { return slow; },                         // the budget tripped: 1x, and the room's own motion stopped
     set(o) { Object.assign(st, o); st.fast = Math.max(st.fast, .5); },

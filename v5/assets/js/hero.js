@@ -218,7 +218,7 @@ export function createHero({ room, windows, go }) {
     const onClick = () => enter();
     const onKey = (e) => {
       if (state !== 'hero' || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.target.closest && e.target.closest('.hue')) return;          // the color control is not part of the hero
+      if (e.target.closest && e.target.closest('.hue, .devtoggles')) return;   // the color control and the toggles' panel are not part of it
       const on = e.target.closest && e.target.closest('.app');
       // Return anywhere enters, except on an app, which it opens; Down, Page Down and Space enter too (T26)
       if (e.key === 'Enter' && !on) { e.preventDefault(); e.stopPropagation(); flare(); enter(); }
@@ -232,7 +232,7 @@ export function createHero({ room, windows, go }) {
     // scrolling down (a wheel, a trackpad) enters, once it adds up to a deliberate move rather than a stray nudge
     let wheel = 0, wheelAt = 0;
     const onWheel = (e) => {
-      if (state !== 'hero' || (e.target.closest && e.target.closest('.hue'))) return;
+      if (state !== 'hero' || (e.target.closest && e.target.closest('.hue, .devtoggles'))) return;
       const now = performance.now();
       if (now - wheelAt > 300) wheel = 0;
       wheelAt = now;
@@ -241,7 +241,7 @@ export function createHero({ room, windows, go }) {
     };
     // so does a swipe up, mostly upward, of 48 px or more (a tap on an app is a click, not a swipe)
     let touch = null;
-    const onTouchStart = (e) => { touch = e.touches.length === 1 && !(e.target.closest && e.target.closest('.hue')) ? [e.touches[0].clientX, e.touches[0].clientY] : null; };
+    const onTouchStart = (e) => { touch = e.touches.length === 1 && !(e.target.closest && e.target.closest('.hue, .devtoggles')) ? [e.touches[0].clientX, e.touches[0].clientY] : null; };
     const onTouchMove = (e) => {
       if (!touch || state !== 'hero') return;
       const dx = e.touches[0].clientX - touch[0], dy = touch[1] - e.touches[0].clientY;

@@ -22,13 +22,13 @@ function stretch(page) {
 }
 
 export const BASE = process.env.V5_BASE || 'http://127.0.0.1:8778/v5/';
-export const PAGES = ['', 'work/', 'hockey/', 'about/', 'resume/', 'work/aducanumab/', 'work/genuvalens/', 'work/loquar/', 'work/daedalus/', 'work/ocapex/', 'work/freecode/', 'work/this-site/', 'work/archive/'];
+export const PAGES = ['', 'work/', 'hockey/', 'about/', 'resume/', 'work/aducanumab/', 'work/genuvalens/', 'work/loquar/', 'work/daedalus/', 'work/ocapex/', 'work/freecode/', 'work/this-site/', 'archive/'];
 
-// noGL: launch without WebGL (the CSS glass fallback); touch: a phone's coarse pointer
-export async function open({ width = 1440, height = 900, js = true, reduced = false, scheme = 'dark', args = [], noGL = false, touch = false } = {}) {
+// noGL: launch without WebGL (the CSS glass fallback); touch: a phone's coarse pointer; dpr: the screen's pixel ratio
+export async function open({ width = 1440, height = 900, js = true, reduced = false, scheme = 'dark', args = [], noGL = false, touch = false, dpr = 0 } = {}) {
   const launchArgs = noGL ? ['--disable-webgl', '--disable-webgl2', ...args] : [...ARGS, ...args];
   const browser = await chromium.launch({ ...(CHANNEL ? { channel: CHANNEL } : {}), args: launchArgs });
-  const ctx = await browser.newContext({ viewport: { width, height }, javaScriptEnabled: js, reducedMotion: reduced ? 'reduce' : 'no-preference', colorScheme: scheme, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
+  const ctx = await browser.newContext({ viewport: { width, height }, javaScriptEnabled: js, reducedMotion: reduced ? 'reduce' : 'no-preference', colorScheme: scheme, ...(touch ? { hasTouch: true, isMobile: true } : {}), ...(dpr ? { deviceScaleFactor: dpr } : {}) });
   const page = await ctx.newPage();
   if (SLOW > 1) stretch(page);
   const errors = [], foreign = [];

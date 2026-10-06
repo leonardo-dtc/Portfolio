@@ -144,3 +144,17 @@ for (const [width, height, reduced] of [[1440, 900, false], [390, 844, false], [
   }
   await browser.close();
 }
+// the other look, the name in Liquid Glass (T41, a design toggle): its faces keep 3:1 or more against the ground right
+// beside them (0.06 to 0.15 em out), with the room and without, by night (a soft shade of the style's deep colour round
+// the letters, under the light behind them) and by day (deep glass on a pale halo), at 1440 on one line and 390 on two
+for (const noGL of [false, true]) for (const scheme of ['dark', 'light']) for (const [width, height] of [[1440, 900], [390, 844]]) {
+  const { browser, page, errors } = await open({ width, height, noGL, scheme, reduced: true, touch: width < 700 });
+  await page.goto(BASE + '?toggles=heroName:glass', { waitUntil: 'load' });
+  const gl = await page.evaluate(() => document.documentElement.classList.contains('gl'));
+  if (!noGL && !gl) { console.log('skip: no WebGL2 here'); await browser.close(); continue; }
+  if (gl) await lit(page); else { await ready(page); await page.waitForTimeout(1600); }
+  const s = await measure(page), where = `the glass name, ${noGL ? 'no WebGL' : 'with the room'}, ${scheme === 'dark' ? 'night' : 'day'} ${width}`;
+  check(s.parts.every(q => q.face >= 3), `${where}: the faces against the ground beside them ${s.parts.map(q => `${q.ch} ${q.face.toFixed(2)}:1`).join(', ')}`);
+  check(errors.length === 0, `${where}: no console errors ` + errors.join(' | '));
+  await browser.close();
+}

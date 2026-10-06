@@ -1,6 +1,6 @@
-// v5's chrome, written into every page from one list: the tab bar (the five pages, their icons and their names), the
+// v5's chrome, written into every page from one list: the tab bar (the six pages, their icons and their names), the
 // head script that runs before the first paint, on the home page the hero's line and its row of apps, and the
-// archive: the Experiments rows on Home and Work, and the entries of its sheet (work/archive/). The pages
+// archive: the Experiments rows on Home and Work, and the archive page's entries (archive/). The pages
 // stay plain HTML that works without scripts; this only keeps the copies the same. After changing the list below, or
 // adding a page, run it:
 //
@@ -23,6 +23,8 @@ export const TABS = [
   { id: 'hockey', path: 'hockey/', name: 'Hockey', icon: 'M7 3.5 13.5 17h5.5M4 19a3.5 1.4 0 1 0 7 0 3.5 1.4 0 1 0-7 0' },
   { id: 'about', path: 'about/', name: 'About', icon: 'M8.4 8.5a3.6 3.6 0 1 0 7.2 0 3.6 3.6 0 1 0-7.2 0M5 20c.9-3.6 3.6-5.5 7-5.5s6.1 1.9 7 5.5' },
   { id: 'resume', path: 'resume/', name: 'Résumé', icon: 'M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10A.5.5 0 0 1 7 20zM13.5 3.5v4.5H18M9.5 12.5h5M9.5 16h5' },
+  // a page of its own since Request F (it was a sheet over Work, and hard to find): what I make, and what I listen to
+  { id: 'archive', path: 'archive/', name: 'Archive', icon: 'M4 5h16v4H4zM5.5 9v10.5h13V9M10 12.5h4' },
 ];
 
 // The hero's apps (T34): every page in the tab bar but Home (entering is Home), and a way to write. What each
@@ -33,11 +35,16 @@ export const APPS = [
   { ...TABS[2], more: { line: 'Groton School Boys’ Varsity, goaltender' } },
   { ...TABS[3], more: { photo: ['leonardo-square-320.webp', 320, 320] } },
   { ...TABS[4], more: { page: true } },
-  { id: 'write', href: `mailto:${EMAIL}`, name: 'Write to me', icon: 'M4 6.5h16v11H4zM4.5 7l7.5 6 7.5-6', more: { line: EMAIL } },
+  { ...TABS[5], more: { line: 'What I make, and what I listen to' } },
+  { id: 'write', href: `mailto:${EMAIL}`, name: 'Write to me', icon: 'M4 6.5h16v11H4zM4.5 7l7.5 6 7.5-6', more: { line: EMAIL.replace('@', '@<wbr>') } },   // (a narrow widget breaks it after the @)
 ];
 
 // Who I am, in one line (T27): the home page's own first words.
 export const LINE = 'Goaltender at Groton School, Class of 2028.';
+// the line as written on the hero: the school and the class year each kept on one line (a narrow phone broke
+// "Groton / School")
+const KEEP = ['Groton School', 'Class of 2028'];
+export const lineHTML = (s = LINE) => KEEP.reduce((t, k) => t.replace(k, k.replace(/ /g, '&nbsp;')), s);
 
 // Write to me (T4): in the window's header on Work and on every project sheet, so a way to write shows from every
 // view (Home, Hockey, About and Résumé carry it in their toolbars).
@@ -46,27 +53,28 @@ export const WRITE = `<a class="btn head__write" href="mailto:${EMAIL}"><svg vie
 // The archive (T7: "a mix of personal work and small things"), kept with v3's in archive/*.md (tools/archive.mjs reads
 // it, newest first; archive/README.md says how to add an entry, a song, an album or a project included). Here it
 // writes the Experiments rows on Home (the newest four things made) and on Work (all of them), and every entry in
-// full on the archive's sheet, work/archive/: the things made, then the Listening shelf (songs and albums) once
-// there is music on it. Each entry's link reads as the page it opens names itself.
+// full on the archive's own page, archive/: the things made in its window, and the songs and albums, once there are
+// any, in a side window of their own, Listening (inside the window, after the things made, below 1360px). Each
+// entry's link reads as the page it opens names itself.
 export const ARCHIVE = forV5();
 export const MADE = ARCHIVE.filter(a => !a.music), HEARD = ARCHIVE.filter(a => a.music);
 // how many of the newest things made the home page shows; Work shows them all
 export const HOME_ARCHIVE = 4;
 
-// the rows of Experiments: each opens its entry on the archive's sheet (things made only; the music is on the sheet)
+// the rows of Experiments: each opens its entry on the archive's page (things made only; the music is there too)
 export function expRows(up, n = Infinity, list = ARCHIVE) {
-  const rows = list.filter(a => !a.music).slice(0, n).map(a => `          <li><a class="row" href="${up}work/archive/#${a.id}" data-hover><span class="row__t"><em>${esc(a.title.toLowerCase())}</em><small>${esc(a.line)}</small></span><span class="row__m">${esc(a.year)}</span></a></li>`);
+  const rows = list.filter(a => !a.music).slice(0, n).map(a => `          <li><a class="row" href="${up}archive/#${a.id}" data-hover><span class="row__t"><em>${esc(a.title.toLowerCase())}</em><small>${esc(a.line)}</small></span><span class="row__m">${esc(a.year)}</span></a></li>`);
   return ['<ul class="rows exp">', ...rows, '        </ul>'].join('\n');
 }
 const chevron = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg>';
 const away = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10v10M19 5 6 18"/></svg>';
-// the archive's sheet: every entry in full, the music on its own shelf
-export function archiveList(up, all = ARCHIVE) {
-  const entry = a => [
+// the archive's page: every entry in full; the things made in its window (archiveList), the music in its side window
+// (listening)
+const entryOf = (up, h = 2) => a => [
     `          <li class="arc__item${a.music ? ' arc__item--music' : ''}" id="${a.id}">`,
     `            <p class="arc__meta"><span class="arc__year">${esc(a.year)}</span><span class="arc__kind">${esc(a.kind)}</span></p>`,
     ...(a.cover ? [`            <img class="arc__cover" src="${up}assets/img/archive/${esc(a.cover.file)}" width="${a.cover.w}" height="${a.cover.h}" alt="${esc(a.cover.alt)}" loading="lazy" decoding="async">`] : []),
-    `            <h2 class="arc__title">${esc(a.title)}</h2>`,
+    `            <h${h} class="arc__title">${esc(a.title)}</h${h}>`,
     ...(a.by ? [`            <p class="arc__by">${esc(a.by)}</p>`] : []),
     `            <p class="arc__line">${esc(a.line)}.</p>`,
     ...(a.text.length ? ['            <div class="prose">', ...a.text.map(t => `              <p>${esc(t)}</p>`), '            </div>'] : []),
@@ -78,10 +86,16 @@ export function archiveList(up, all = ARCHIVE) {
       '            </p>'] : []),
     '          </li>',
   ].join('\n');
-  const list = items => ['<ol class="arc">', ...items.map(entry), '        </ol>'].join('\n');
-  const made = all.filter(a => !a.music), heard = all.filter(a => a.music);
-  if (!heard.length) return list(made);
-  return [list(made), '        <h2 class="arc__shelf" id="listening">Listening</h2>', '        ' + list(heard)].join('\n');
+export function archiveList(up, all = ARCHIVE) {
+  return ['<ol class="arc">', ...all.filter(a => !a.music).map(entryOf(up)), '        </ol>'].join('\n');
+}
+const probes = [0, 1, 2, 3].map(n => `<span class="probe" data-corner="${n}"></span>`).join('');
+export function listening(up, all = ARCHIVE) {
+  const heard = all.filter(a => a.music);
+  if (!heard.length) return '';
+  return ['', '  <aside class="side glass" data-glass="window" data-side="right" data-inline="end" aria-labelledby="listening">', `    ${probes}`,
+    '    <div class="side__part">', '      <h2 id="listening">Listening</h2>',
+    '      <ol class="arc arc--heard">', ...heard.map(a => entryOf(up, 3)(a).replace(/^ {2}/gm, '')), '      </ol>', '    </div>', '  </aside>'].join('\n');
 }
 
 // The head script. Before the first paint: scripts are on; the hero shows on the first home view of a session, and
@@ -109,7 +123,7 @@ export function appRow(up) {
     return `<span class="app__more app__line" aria-hidden="true">${line}</span>`;
   };
   const apps = APPS.map(a => `    <a class="app" data-app="${a.id}" href="${a.href || up + a.path}"><span class="app__art">${icon(a.icon)}</span><span class="app__name">${a.name}</span>${more(a.more)}</a>`);
-  return ['<div class="hero__below">', `    <p class="hero__line">${LINE}</p>`, '    <nav class="apps" aria-label="Go straight to">', ...apps.map(a => '  ' + a), '    </nav>', '  </div>'].join('\n');
+  return ['<div class="hero__below">', `    <p class="hero__line">${lineHTML()}</p>`, '    <nav class="apps" aria-label="Go straight to">', ...apps.map(a => '  ' + a), '    </nav>', '  </div>'].join('\n');
 }
 
 // every page: its file, how far below v5/ it sits, and the tab it belongs to
@@ -119,7 +133,7 @@ export function pages() {
     for (const f of readdirSync(dir).sort()) {
       const p = join(dir, f);
       if (statSync(p).isDirectory()) { if (f !== 'assets') walk(p); }
-      else if (f === 'index.html') out.push(p);
+      else if (f === 'index.html' && !/<html[^>]*\sdata-moved/.test(readFileSync(p, 'utf8'))) out.push(p);   /* (a page that moved only sends its visitors on) */
     }
   };
   walk(ROOT);
@@ -134,7 +148,8 @@ const SCRIPT = /<script>\(function\(d\)\{[\s\S]*?\}\)\(document\.documentElement
 const APPS_RE = /<(?:div class="hero__below"|p class="hero__line")>[\s\S]*?<\/(?:div|nav)>(?=\n  <p class="hero__hint">)/;
 const HEAD_RE = /(<header class="win__head">\n      <div>[\s\S]*?<\/div>)(?:\n      <a class="btn head__write"[\s\S]*?<\/a>)?(\n    <\/header>)/;
 const EXP_RE = /<ul class="rows exp">[\s\S]*?<\/ul>/;
-const ARC_RE = /<ol class="arc">[\s\S]*?<\/ol>(?:\n {8}<h2 class="arc__shelf"[\s\S]*?<\/ol>)?/;
+const ARC_RE = /<ol class="arc">[\s\S]*?<\/ol>/;
+const LISTEN_RE = /( {2}<!-- Listening: [^\n]*-->)(?:\n {2}<aside[\s\S]*?<\/aside>)?/;
 const NEON = /(<span class="hero__neon" aria-hidden="true">[\s\S]*?<\/span>\n  )(?=<p class="hero__hint">)/;
 const BODY_RE = /<div class="win__body" data-scroll tabindex="0"[^>]*>/;
 
@@ -157,8 +172,8 @@ export function render(html, up) {
   }
   if (EXP_RE.test(out)) out = out.replace(EXP_RE, () => expRows(up, page === 'home' ? HOME_ARCHIVE : Infinity));
   if (page === 'archive') {
-    if (!ARC_RE.test(out)) throw new Error('the archive sheet has no list for its entries');
-    out = out.replace(ARC_RE, () => archiveList(up));
+    if (!ARC_RE.test(out) || !LISTEN_RE.test(out)) throw new Error('the archive page has no list for its entries, or no place for its Listening window');
+    out = out.replace(ARC_RE, () => archiveList(up)).replace(LISTEN_RE, (m, note) => note + listening(up));
   }
   if (BODY_RE.test(out)) out = out.replace(BODY_RE, () => `<div class="win__body" data-scroll tabindex="0" role="region" aria-label="${bodyName(out, tab)}">`);
   if (/<div class="hero">/.test(out)) {

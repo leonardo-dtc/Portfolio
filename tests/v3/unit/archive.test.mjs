@@ -6,7 +6,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parse, entries, yearKey, imageSize, cover, strays, v3Card, run } from '../../../tools/archive.mjs';
-import { archiveList, expRows } from '../../../tools/v5-chrome.mjs';
+import { archiveList, listening, expRows } from '../../../tools/v5-chrome.mjs';
 
 const deck = readFileSync(new URL('../../../v3/index.html', import.meta.url), 'utf8');
 const SONG = `---
@@ -84,15 +84,18 @@ test('v3: a song is a card with its artist and a way to listen; a sheet link rea
   assert.match(card, /<div><dt>Album<\/dt><dd>The album<\/dd><\/div>/);
 });
 
-test('v5: music goes on the Listening shelf and never into the Experiments rows', () => {
+test('v5: music goes in the archive page’s Listening window and never into its list or the Experiments rows', () => {
   const made = { id: 'p', year: '2026', kind: 'Project', title: 'a project', by: '', line: 'A line', text: [], facts: [], music: false, cover: null, listen: null, link: null, away: { href: 'https://example.com', text: 'example.com' } };
   const song = { ...made, id: 's', kind: 'Song', title: 'A song', by: 'An artist', music: true, away: null, listen: { href: 'https://open.spotify.com/track/abc', service: 'Spotify' } };
-  const sheet = archiveList('../../', [made, song]);
-  assert.match(sheet, /<ol class="arc">[\s\S]*id="p"[\s\S]*<\/ol>\n {8}<h2 class="arc__shelf" id="listening">Listening<\/h2>\n {8}<ol class="arc">[\s\S]*id="s"/);
-  assert.match(sheet, /<p class="arc__by">An artist<\/p>/);
-  assert.match(sheet, /href="https:\/\/open\.spotify\.com\/track\/abc" rel="noopener">Listen on Spotify/);
-  assert.match(sheet, /href="https:\/\/example\.com" rel="noopener">example\.com/);
-  assert.doesNotMatch(archiveList('../../', [made]), /arc__shelf/);
+  const list = archiveList('../', [made, song]), side = listening('../', [made, song]);
+  assert.match(list, /<ol class="arc">[\s\S]*id="p"[\s\S]*<\/ol>/);
+  assert.doesNotMatch(list, /id="s"/);
+  assert.match(side, /<aside class="side glass"[^>]*aria-labelledby="listening">[\s\S]*<h2 id="listening">Listening<\/h2>[\s\S]*<ol class="arc arc--heard">[\s\S]*id="s"[\s\S]*<\/aside>/);
+  assert.match(side, /<h3 class="arc__title">A song<\/h3>/);
+  assert.match(side, /<p class="arc__by">An artist<\/p>/);
+  assert.match(side, /href="https:\/\/open\.spotify\.com\/track\/abc" rel="noopener">Listen on Spotify/);
+  assert.match(list, /href="https:\/\/example\.com" rel="noopener">example\.com/);
+  assert.equal(listening('../', [made]), '');
   const rows = expRows('', Infinity, [made, song]);
   assert.match(rows, /#p"/);
   assert.doesNotMatch(rows, /#s"/);

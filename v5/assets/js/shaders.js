@@ -201,21 +201,28 @@ vec3 glassOver(int i, vec2 lp, float sd, vec2 px, vec3 col) {
 }
 
 // The name in glass (the other look of the hero, T41: the launcher mock's): solid Liquid Glass letters lit from the
-// upper left, leaning toward the pointer, with a light behind them in the colour style (uGlassC: night and day glow,
-// day glass, turned with the room in room.js), in the lit room. The room behind is frosted inside the letters and
-// bent at their bevel (the mask's soft green), with a bright rim, a fainter one on the far side, a highlight drawn
-// toward the pointer and a slow sweep of light. As the window's title it turns plain white, as the neon does.
+// upper left, leaning toward the pointer, with a light behind them in the colour style (uGlassC: the night and day
+// light, and the deep colour, turned with the room in room.js), in the lit room. The room behind is frosted inside the
+// letters and bent at their bevel (the mask's soft green), with a bright rim, a fainter one on the far side, a
+// highlight drawn toward the pointer and a slow sweep of light. So the faces keep 3:1 or more against the ground
+// beside them: by night a soft shade of the deep colour lies right round the letters, under the light (the lit room
+// beside light glass measured 2.3 to 2.7:1); by day the letters are deep glass in that colour, on the pale light behind
+// them, as tinted glass looks against a bright sky (light glass on the bright day room measured 2.4 to 3.0:1, and
+// light glass on a dark pool read as a slab on a phone). As the window's title it turns plain white, as the neon
+// does, and the shade goes with the light.
 vec3 glassName(vec3 col, vec2 mu, float lk, vec2 isz, vec2 px, vec2 uv) {
   float on = uInk0.x, white = uInk0.z, bev = max(uInk0.w, 1.0);
-  float cov = textureLod(uInk, mu, lk).r * on;
+  vec4 m = textureLod(uInk, mu, lk);
+  float cov = m.r * on;
   vec2 lean = uInk1.yz * uInkX.x / isz;
   float back = textureLod(uInk, mu - lean, lk).b;                     // the wide light behind
   float leak = textureLod(uInk, mu - lean * 0.4, lk + 3.0).r;         // and a tight leak of it right at the edges
   vec3 glowC = mix(uGlassC[0], uGlassC[1], uDay);
   float glow = uInk1.x * on * (1.0 - white);
-  col += glowC * (back * mix(0.5, 0.26, uDay) + leak * mix(0.22, 0.14, uDay)) * glow;
+  col = mix(col, uGlassC[2], smoothstep(0.0, 0.24, m.b) * 0.62 * (1.0 - uDay) * min(glow, 1.0));
+  col += glowC * (back * mix(0.5, 0.46, uDay) + leak * mix(0.12, 0.22, uDay)) * glow;
   if (cov <= 0.003) return col;
-  float hc = textureLod(uInk, mu, lk).g;
+  float hc = m.g;
   vec2 e = vec2(max(1.0, bev * 0.5) * uInkX.x) / isz;
   float hx = textureLod(uInk, mu + vec2(e.x, 0.0), lk).g - textureLod(uInk, mu - vec2(e.x, 0.0), lk).g;
   float hy = textureLod(uInk, mu + vec2(0.0, e.y), lk).g - textureLod(uInk, mu - vec2(0.0, e.y), lk).g;
@@ -233,12 +240,12 @@ vec3 glassName(vec3 col, vec2 mu, float lk, vec2 isz, vec2 px, vec2 uv) {
   vec2 spx = px - n.xy * bev * 3.5;
   vec2 suv = spx / uRes; suv.y = 1.0 - suv.y;
   vec3 frost = roomAt(suv, max(uLod, uFrostLod));
-  vec3 g = frost * 1.12 + glowC * (0.24 + 0.5 * back) * uInk1.x + vec3(0.1);
-  // by day the room behind is bright, so the glass is a deeper blue (as the windows are) and the rims draw on it
-  g = mix(g, mix(frost * 0.55, uGlassC[2], 0.62) + glowC * 0.12 * back * uInk1.x, uDay);
+  vec3 g = frost * 1.12 + glowC * (0.24 + 0.5 * back) * uInk1.x + vec3(0.14);
+  // by day deep glass in the style's colour, the frosted room still showing through it, and the rims draw on it
+  g = mix(g, mix(frost * 0.5, uGlassC[2] * 1.4, 0.7), uDay);
   g *= 1.0 - 0.38 * slope * away;                                     // the bevel away from the light falls into shade
   g += vec3(0.96, 0.98, 1.0) * edge * (0.95 * facing + 0.38 * away + 0.12);   // a bright rim, a fainter one behind
-  g += vec3(0.96, 0.98, 1.0) * slope * facing * 0.35;
+  g += vec3(0.96, 0.98, 1.0) * slope * facing * mix(0.35, 0.5, uDay);
   // a soft highlight across the faces, drawn toward the pointer
   vec2 dl = (px - uInkL.xy) / max(uInkL.z, 1.0);
   g += vec3(0.95, 0.97, 1.0) * uInkL.w * exp(-dot(dl, dl));
