@@ -1300,3 +1300,20 @@ Two research passes went into this. One read Apple's Human Interface Guidelines 
 **On the hero's open question (Neon or Liquid Glass):** on Vision Pro, Apple used Liquid Glass for the Home View's icons and kept windows in frosted glass. That speaks for item 1, not for either title.
 
 **My pick:** 1, 2 and 5 together, about a day, so the hero and every page's tab bar read as visionOS. Then 3 as a toggle, to judge it beside the card arrows.
+
+### Checks
+
+- **Unit tests:** 40 of 40, now covering the player's markup (the card, the keys, the capsule, a cover in the drawing's place, a song with nowhere to listen, an entry with no colour). `node tools/archive.mjs --check` and `node tools/v5-chrome.mjs --check` find no drift.
+- **A new v5 suite, `tests/v5/e2e/listening.mjs`, 48 of 48.** It covers:
+  - the card and the marked row; Next and Previous going round; the screen reader's line; the keys staying put;
+  - the address picking a song, and the player after a page swaps in;
+  - Enter and Space; reduced motion; no word under 12px; every control 44px or more;
+  - a cover in the drawing's place; the page without the script, in print and in forced colours;
+  - contrast of 4.65:1 or more by Night and by Day, at 1440 and 390.
+- **The other v5 suites:** pages 108, links (275 on 13 pages), layouts 104, keys 19, nav 48, modes 58, contrast 12, palettes 71, filters 11, launcher 52, room 5, glass 3, fixes 29, and the visual audit at 12 sizes with no problems.
+- **Fixes was flaky; the cause was the test's timing, not the site.** The first run failed check 9 (Escape on a sheet loaded on its own); the second failed check 18 (the title within 500ms of a click).
+  - Check 9 missed one run in five on this branch and on 8ed68c4 alike. In the misses, the address had already changed to `work/` but Work's page had not yet swapped in when the test looked, 1.5 seconds after Escape. By 5 seconds focus was on the window title, as designed.
+  - Check 9 now waits for Work to be in place.
+  - Check 18 now times from the click itself rather than from before Playwright's own wait for the card to hold still: 60ms.
+- **v3:** `node tests/v3/check.mjs`, 157 of 157, with the two new CD checks: the CD Player's disc, and the wall's CDs after the things made, two columns wide.
+- **The staged deploy crawl:** 21 pages, 70 URLs, none failed; noindex on all 21; no link outside its own edition; the archive Mac's ten files; the Archive page reached from an Experiments row and from the old address.
