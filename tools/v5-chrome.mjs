@@ -71,7 +71,7 @@ const away = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10v10M19
 // the archive's page: every entry in full; the things made in its window (archiveList), the music in its side window
 // (listening)
 const entryOf = (up, h = 2) => a => [
-    `          <li class="arc__item${a.music ? ' arc__item--music' : ''}" id="${a.id}">`,
+    `          <li class="arc__item" id="${a.id}">`,
     `            <p class="arc__meta"><span class="arc__year">${esc(a.year)}</span><span class="arc__kind">${esc(a.kind)}</span></p>`,
     ...(a.cover ? [`            <img class="arc__cover" src="${up}assets/img/archive/${esc(a.cover.file)}" width="${a.cover.w}" height="${a.cover.h}" alt="${esc(a.cover.alt)}" loading="lazy" decoding="async">`] : []),
     `            <h${h} class="arc__title">${esc(a.title)}</h${h}>`,
@@ -90,12 +90,44 @@ export function archiveList(up, all = ARCHIVE) {
   return ['<ol class="arc">', ...all.filter(a => !a.music).map(entryOf(up)), '        </ol>'].join('\n');
 }
 const probes = [0, 1, 2, 3].map(n => `<span class="probe" data-corner="${n}"></span>`).join('');
+// The Listening window, after Spotify on Vision Pro: a now playing card (its artwork, title, artist and line, and
+// Listen on its service between Previous and Next, which step through the songs: listening.js), then every song and
+// album as a row that opens it where it plays. The artwork is drawn (only pictures I may publish go on the site): a
+// field of its own colour (its "hue") with its title set on it. Without the script the card shows the newest and
+// the rows do the rest.
+const play = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
+const skip = d => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d < 0 ? 'M6.5 5.5v13M18 6.2v11.6a.8.8 0 0 1-1.25.66L9 12.66a.8.8 0 0 1 0-1.32l7.75-5.8A.8.8 0 0 1 18 6.2z' : 'M17.5 5.5v13M6 6.2v11.6a.8.8 0 0 0 1.25.66L15 12.66a.8.8 0 0 0 0-1.32L7.25 5.54A.8.8 0 0 0 6 6.2z'}"/></svg>`;
+// (an entry always has its hue from archive/; one without keeps the stylesheet's)
+const hueOf = a => (Number.isFinite(a.hue) ? ` style="--h: ${a.hue}"` : '');
+// a cover of its own in archive/covers/ (a picture I may publish: my own photo or drawing) takes the drawn artwork's place
+const coverOf = (a, up) => (a.cover ? `${up}assets/img/archive/${a.cover.file}` : '');
+const artOf = (a, small, up) => {
+  const src = coverOf(a, up), img = src ? `<img src="${esc(src)}" width="${a.cover.w}" height="${a.cover.h}" alt="" loading="lazy" decoding="async">` : '';
+  return `<span class="art${small ? ' art--s' : ''}${src ? ' art--img' : ''}"${hueOf(a)} aria-hidden="true">${img}${small ? '' : `<i>${esc(a.by)}</i><b>${esc(a.title)}</b>`}</span>`;
+};
+const listenOf = a => (a.listen ? `<a class="player__listen${a.listen.service === 'Spotify' ? ' is-spotify' : ''}" href="${esc(a.listen.href)}" rel="noopener" data-hover>${play}<span><span class="player__on">Listen on </span>${esc(a.listen.service)}</span></a>` : `<a class="player__listen" hidden data-hover>${play}<span><span class="player__on">Listen on </span></span></a>`);
 export function listening(up, all = ARCHIVE) {
   const heard = all.filter(a => a.music);
   if (!heard.length) return '';
+  const now = heard[0], i = '      ';
+  const row = (a, n) => {
+    const go = a.listen ? ['a', ` href="${esc(a.listen.href)}" rel="noopener"`] : ['div', ''];
+    const kind = /^song$/i.test(a.kind) ? '' : `${esc(a.kind)} · `;
+    return [`${i}  <li class="track${n ? '' : ' is-current'}" id="${a.id}"${hueOf(a)} data-title="${esc(a.title)}" data-by="${esc(a.by)}" data-line="${esc(a.line)}."${a.listen ? ` data-href="${esc(a.listen.href)}" data-service="${esc(a.listen.service)}"` : ''}${a.cover ? ` data-cover="${esc(coverOf(a, up))}"` : ''}>`,
+      `${i}    <${go[0]} class="track__go"${go[1]}${n ? '' : ' aria-current="true"'}${a.listen ? ' data-hover' : ''}>${artOf(a, true, up)}<span class="track__t"><b>${esc(a.title)}</b><small>${kind}${esc(a.by)}</small></span>${a.listen ? `<span class="vh">, on ${esc(a.listen.service)}</span>${away}` : ''}</${go[0]}>`,
+      ...(a.text.length ? [`${i}    <div class="track__more">`, ...a.text.map(t => `${i}      <p>${esc(t)}</p>`), `${i}    </div>`] : []),
+      ...(a.facts.length ? [`${i}    <dl class="facts facts--box track__more">`, ...a.facts.map(([k, v]) => `${i}      <dt>${esc(k)}</dt><dd>${esc(v)}</dd>`), `${i}    </dl>`] : []),
+      `${i}  </li>`].join('\n');
+  };
   return ['', '  <aside class="side glass" data-glass="window" data-side="right" data-inline="end" aria-labelledby="listening">', `    ${probes}`,
-    '    <div class="side__part">', '      <h2 id="listening">Listening</h2>',
-    '      <ol class="arc arc--heard">', ...heard.map(a => entryOf(up, 3)(a).replace(/^ {2}/gm, '')), '      </ol>', '    </div>', '  </aside>'].join('\n');
+    '    <div class="side__part player" data-player>', '      <h2 id="listening">Listening</h2>',
+    `${i}<div class="player__now">`,
+    `${i}  ${artOf(now, false, up)}`,
+    `${i}  <div class="player__info"><h3 class="player__title">${esc(now.title)}</h3><p class="player__by">${esc(now.by)}</p><p class="player__line">${esc(now.line)}.</p></div>`,
+    `${i}  <p class="player__keys"><button class="player__skip" type="button" data-skip="-1" aria-label="Previous" data-hover>${skip(-1)}</button>${listenOf(now)}<button class="player__skip" type="button" data-skip="1" aria-label="Next" data-hover>${skip(1)}</button></p>`,
+    `${i}</div>`,
+    `${i}<ol class="tracks">`, ...heard.map(row), `${i}</ol>`,
+    '    </div>', '  </aside>'].join('\n');
 }
 
 // The head script. Before the first paint: scripts are on; the hero shows on the first home view of a session, and

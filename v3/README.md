@@ -29,7 +29,7 @@ Then open `http://127.0.0.1:8778/v3/`.
 | `hockey` | Goaltender: measurables, the season's line in the display face, team history, the coaches by name and role with how to write | `v2/hockey/` |
 | `music` | Viola and violin, Carnegie Hall ticket, honors | `v2/resume/#music`, `#music-honors` |
 | `record` | Education, honors, service and leadership | `v2/resume/` |
-| `archive` | A personal archive on a Macintosh: each index card is a file, listed with its kind and year and opened as a page holding the card's whole text and its links; songs and albums play on its CD Player. Written from `archive/*.md` by `tools/archive.mjs` (`archive/README.md` says how to add an entry) | `v2/resume/#class-projects`, `#robotics`, `#amora`, `#music`, `v2/work/daedalus/`, v1's robotics line |
+| `archive` | A personal archive on a Macintosh: each index card is a file, listed with its kind and year and opened as a page holding the card's whole text and its links; songs and albums are CDs, on the wall after the things made and in its CD Player. Written from `archive/*.md` by `tools/archive.mjs` (`archive/README.md` says how to add an entry) | `v2/resume/#class-projects`, `#robotics`, `#amora`, `#music`, `v2/work/daedalus/`, v1's robotics line |
 | `contact` | Let's talk, clean: the framed words, the email slab, the three profiles, a plain end | `v2/` footer, v4 and v5 contact sections |
 
 Every fact and caveat comes from the v2 pages and `CONTENT-REVIEW.md`. Copy is

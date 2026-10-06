@@ -682,23 +682,76 @@ a.row:focus-visible .row__m { color: #fff; }
 .arc .facts--box { margin-top: 16px; background: var(--fill); }
 .arc__go { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .arc__go .btn { max-width: 100%; white-space: normal; text-align: left; }   /* a long name wraps on a phone rather than leaving the window */
-/* a song, an album or a project of my own (archive/README.md): the cover beside the head on wider windows (above it on
-   a phone), the artist under the title; the music on its own shelf after the things made */
+/* a thing made (archive/README.md): its cover beside the head on wider windows (above it on a phone), who I made it
+   with under the title; the songs and albums are in the Listening window */
 .arc__by { margin-top: 2px; font-size: 17px; font-weight: 600; color: var(--ink-2); }
 .arc__cover { display: block; width: min(100%, 220px); height: auto; margin-top: 12px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .28); }
-.arc__item--music .arc__cover { aspect-ratio: 1; object-fit: cover; }
 @container (min-width: 560px) {
   .arc > li:has(> .arc__cover) { display: grid; grid-template-columns: minmax(0, 1fr) 168px; column-gap: 22px; align-content: start; }
   .arc > li:has(> .arc__cover) > * { grid-column: 1; }
   .arc > li:has(> .arc__cover) > .arc__cover { grid-column: 2; grid-row: 1 / span 4; width: 100%; margin-top: 4px; }
 }
-/* the Listening window, the archive page's side window (inside the window, after the things made, below 1360px):
-   the songs and albums, a size down */
-.side .arc { gap: 10px; margin-top: 12px; }
-.side .arc > li { padding: 14px 16px 16px; }
-.side .arc__title { margin-top: 4px; font: italic 550 19px/1.2 var(--font-display); letter-spacing: -.005em; }
-.side .arc__by, .side .arc__line { font-size: 15px; }
-.side .arc__go { margin-top: 12px; }
+/* ---------- the Listening window (the archive page's side window; inside the window, after the things made, below
+   1360px), after Spotify on Vision Pro (2026-10-06): a now playing card, then the list. Each artwork is drawn (only
+   pictures I may publish go on the site): a field of its own colour (--h, its "hue" in archive/, or one from its
+   name), lit from the top left and deepening to the bottom right, its artist across the top and its title set large
+   at the foot over a soft shade, with a glow of its colour under it. Listen on Spotify is Spotify's green, with black
+   text (11:1); Previous and Next step through the songs (listening.js) and show only with the script. ---------- */
+.player { container: player / inline-size; }
+.player__now { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin-top: 14px; }
+.art { --h: 250; position: relative; display: block; aspect-ratio: 1; border-radius: 18px; overflow: hidden; container-type: inline-size;
+  background: radial-gradient(95% 75% at 16% 8%, oklch(.85 .12 calc(var(--h) + 35) / .95), oklch(.85 .12 calc(var(--h) + 35) / 0) 62%),
+    radial-gradient(85% 85% at 94% 98%, oklch(.28 .15 calc(var(--h) - 25)), oklch(.28 .15 calc(var(--h) - 25) / 0) 72%),
+    linear-gradient(160deg, oklch(.66 .18 var(--h)), oklch(.44 .19 calc(var(--h) + 15)));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), 0 18px 34px -14px oklch(.42 .17 var(--h) / .8); }
+.art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, .3)); }
+.art i, .art b { position: absolute; z-index: 1; left: 8cqi; right: 8cqi; color: #fff; }
+.art i { top: 8cqi; font: 650 max(12px, 6.2cqi)/1.15 var(--font); font-style: normal; letter-spacing: .07em; text-transform: uppercase; opacity: .9; }
+.art b { bottom: 7cqi; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font: 800 15cqi/.92 var(--font-name); letter-spacing: -.035em; text-wrap: balance; }   /* (three lines at most, clear of the artist; the card's heading has a long title in full) */
+/* (a cover of its own, from archive/covers/, fills the square in the drawing's place) */
+.art > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.art--img::after, .art--img > i, .art--img > b { display: none; }
+.art--s { width: 44px; flex: none; border-radius: 9px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+.art--s::after { display: none; }
+.player__info { display: grid; gap: 3px; }
+.player__title { font: 700 22px/1.15 var(--font-display); letter-spacing: -.01em; color: #fff; }
+.player__by { font: 600 16px/1.3 var(--font); color: var(--ink-2); }
+.player__line { min-height: 2.7em; margin-top: 2px; font: 500 14px/1.35 var(--font); color: var(--ink-3); }   /* (two lines kept, so Previous and Next stay put from song to song) */
+.player__keys { display: flex; align-items: center; gap: 10px; margin: 2px 0 0; }
+.player__skip { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--fill-2); color: #fff; transition: background-color .2s; }
+.player__skip:hover { background: var(--fill-3); }
+.player__skip:active { scale: .94; }
+.player__skip svg, .player__listen svg { display: block; fill: currentColor; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.player__skip svg { width: 20px; height: 20px; }
+html:not(.js) .player__skip { visibility: hidden; }
+.player__listen { position: relative; flex: 1; min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--fill-2); color: #fff; font: 700 15px/1 var(--font); text-decoration: none; white-space: nowrap; transition: filter .2s; }   /* (visionOS keeps a white fill for what is selected) */
+.player__listen.is-spotify { background: #1ed760; color: #000; }
+.player__listen:hover { filter: brightness(1.08); }
+.player__listen:active { scale: .97; }
+.player__listen svg { width: 17px; height: 17px; stroke-width: .5; }
+.player__listen[hidden] { display: none; }
+.player__now.is-turning > :is(.art, .player__info) { animation: player-turn .34s var(--ease-out); }
+@keyframes player-turn { from { opacity: .35; translate: var(--turn, 16px) 0; } }
+.tracks { display: grid; gap: 4px; margin: 18px 0 0; padding: 12px 0 0; list-style: none; border-top: 1px solid var(--fill-2); }
+.track__go { position: relative; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 6px 12px 6px 6px; border-radius: 14px; color: #fff; text-decoration: none; transition: background-color .2s; }
+a.track__go:hover { background: var(--fill); }
+.track__go[aria-current="true"] { background: var(--fill-2); }
+.track__t { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.track__t b { font: 650 15px/1.25 var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.track__t small { font: 500 13px/1.3 var(--font); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.track__go > svg { flex: none; width: 18px; height: 18px; fill: none; stroke: var(--ink-3); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.track__more { margin: 4px 12px 10px 62px; font-size: 14px; color: var(--ink-2); }
+/* in a narrow side window the capsule says only the service (its name still reads "Listen on Spotify") */
+@container player (max-width: 299px) { .player__on { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
+/* inside a wide window (below 1360px), the card lies across it: the artwork beside the words */
+@container player (min-width: 520px) {
+  .player__now { grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: 1fr auto; column-gap: 24px; row-gap: 16px; align-items: end; }
+  .player__now > .art { grid-row: 1 / span 2; }
+  .player__keys { justify-content: flex-start; }
+  .player__listen { flex: none; }
+}
+@media (prefers-reduced-motion: reduce) { .player__now.is-turning > * { animation: none; } }
+@media (forced-colors: active) { .art { display: none; } .player__listen, .player__skip { border: 1px solid ButtonText; } .track__go[aria-current="true"] { outline: 2px solid Highlight; outline-offset: -2px; } }
 .cv { display: grid; gap: 10px; }
 .cv > li { padding: 15px 18px; border-radius: var(--r-row); background: var(--fill); }
 .cv__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
@@ -1072,7 +1125,7 @@ html:not(.js) .grab, html:not(.js) .hero { display: none; }
 @media print {
   html, body { background: #fff !important; }
   body { min-height: 0; font-size: 10pt; line-height: 1.38; }
-  .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue, .head__write, .devtoggles { display: none !important; }
+  .room, .tabs, .toolbar, .toolbar--inline, .grab, .hero, .skip, .close, .avatar, .card__tag, .srow i, .side__part:has(.toc), .hue, .head__write, .devtoggles, .player__now, .art { display: none !important; }
   .space, .win, .sheet, .side { position: static !important; inset: auto !important; transform: none !important; translate: none !important; width: auto !important; height: auto !important; max-height: none !important; overflow: visible !important; background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; margin: 0 0 14pt !important; opacity: 1 !important; filter: none !important; perspective: none !important; }   /* (no border: the CSS glass rim of a floating side window has no place on paper) */
   .sr-live { display: none; }   /* nothing to announce on paper, and its 1px box can reach past the page's foot */
   .space .print-contact { display: block !important; margin: 0 !important; white-space: nowrap; color: #000 !important; font-size: 10pt !important; }   /* the address a coach needs, where the avatar sits on screen: no added height */

@@ -190,18 +190,20 @@
 .mac__key:active, .mac__key.is-pressed { background: #C6C6C6; box-shadow: inset 1px 1px 2px rgba(0,0,0,.4); }
 .mac__key--eq:active, .mac__key--eq.is-pressed { background: #8A1F14; }
 .mac__key.is-on { box-shadow: inset 0 0 0 2px var(--pick); }   /* the operation waiting for its second number */
-/* the CD Player: a display and the track keys, then the cover beside the tracks */
-.mac__body--cd { width: 340px; max-width: 100%; }
+/* the CD Player: a display and the track keys, then the CD in the player beside the list of them (the disc as
+   site.css draws it, .cd); a new one comes in with a turn, still under reduced motion */
+.mac__body--cd { width: 380px; max-width: 100%; }
 .mac__cdface { display: flex; gap: 8px; }
 .mac__lcd { flex: 1; min-width: 0; display: flex; align-items: center; margin: 0; padding: 8px 10px; min-height: 42px; background: #191919; border: 1px solid var(--ink); box-shadow: inset 1px 1px 3px rgba(0,0,0,.6); color: #F2F2F2; font-weight: 700; letter-spacing: .03em; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mac__cdkeys { display: flex; gap: 6px; }
 .mac__cdb { display: flex; align-items: center; justify-content: center; width: 42px; border: 1px solid var(--ink); border-radius: 6px; background: linear-gradient(#FCFCFC, #E3E3E3); box-shadow: inset 1px 1px 0 #fff, 1px 1px 0 rgba(0,0,0,.35); }
 .mac__cdb svg { display: block; width: 9px; height: 12px; }
 .mac__cdb:disabled { color: #8A8A8A; box-shadow: none; cursor: default; }
-.mac__cdmain { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; margin-top: 10px; }
-.mac__cdart:empty { display: none; }
-.mac__cdmain:has(> .mac__cdart:empty) { grid-template-columns: minmax(0, 1fr); }
-.mac__cdart img { display: block; width: 96px; height: 96px; object-fit: cover; border: 1px solid var(--ink); }
+.mac__cdmain { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; margin-top: 10px; align-items: start; }
+.mac__cdart .cd { --cd: 140px; }
+.mac__cdart .cd.is-new .cd__disc { animation: mac-cd-in .55s var(--ease, cubic-bezier(.22, 1, .36, 1)); }
+@keyframes mac-cd-in { from { rotate: -80deg; opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .mac__cdart .cd.is-new .cd__disc { animation: none; } }
 .mac__tracks { margin: 0; padding: 0; list-style: none; max-height: 132px; overflow: auto; background: #fff; border: 1px solid var(--ink); }
 .mac__track { display: grid; grid-template-columns: 2.1em minmax(0, 1fr); column-gap: 4px; width: 100%; padding: 4px 8px; text-align: left; }
 .mac__track-n { grid-row: span 2; color: var(--mute); font-variant-numeric: tabular-nums; }

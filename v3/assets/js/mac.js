@@ -48,7 +48,7 @@
   };
   /* a card's kind picks its file's picture */
   var KIND = { games: 'games', 'music video': 'film', video: 'film', film: 'film', statistics: 'chart', arrangement: 'notes', music: 'notes', 'game design': 'maze', robotics: 'robot', rocketry: 'rocket',
-    song: 'song', single: 'song', album: 'disc', ep: 'disc', playlist: 'disc', mixtape: 'disc' };
+    song: 'disc', single: 'disc', album: 'disc', ep: 'disc', playlist: 'disc', mixtape: 'disc' };
   /* a document: a page with its top right corner folded over (the fold grey), a light edge inside its right and
      bottom sides, a shadow off them, and its emblem */
   function doc(name) {
@@ -464,8 +464,9 @@
       });
       return w;
     },
-    /* the songs and albums of the archive as a disc's tracks: the previous and next track, the track's cover and
-     artist, a way to listen (on the service it is on) and its file. With none, the drive is empty */
+    /* the songs and albums of the archive as CDs: the one in the player (the disc as the archive's cards draw it,
+     its title and artist written on it, or its cover as the case's insert), the previous and next, the list of them,
+     a way to listen (on the service it is on) and its file. With none, the drive is empty */
     cd: function () {
       var tracks = files.filter(function (f) { return f.music; }), at = 0;
       var lcd = el('p', 'mac__lcd', { 'aria-live': 'polite' });
@@ -478,13 +479,17 @@
         b.addEventListener('click', function () { cue(k); });
         listEl.appendChild(el('li', null, null, [b]));
       });
-      function cue(k) {
+      function cd(f) {
+        if (f.cover) return el('span', 'cd cd--insert', null, [f.cover.cloneNode(true)]);
+        return el('span', 'cd', { 'aria-hidden': 'true' }, [el('span', 'cd__disc', null, [el('span', 'cd__label', null, [el('b', null, null, [f.title]), f.by ? el('i', null, null, [f.by]) : null])])]);
+      }
+      function cue(k, first) {
         if (!tracks.length) return;
         at = (k + tracks.length) % tracks.length;
         var f = tracks[at];
         lcd.textContent = (at < 9 ? '0' : '') + (at + 1) + '  ' + f.title + (f.by ? ' · ' + f.by : '');
         Array.prototype.forEach.call(listEl.querySelectorAll('.mac__track'), function (b, i) { b.setAttribute('aria-current', i === at ? 'true' : 'false'); });
-        art.textContent = ''; if (f.cover) art.appendChild(f.cover.cloneNode(true));
+        art.textContent = ''; var disc = cd(f); if (!first) disc.classList.add('is-new'); art.appendChild(disc);
         go.textContent = '';
         if (f.listen) { var l = f.listen.cloneNode(true); l.className = 'mac__go'; go.appendChild(l); }
         var o = el('button', 'mac__go', { type: 'button' }, ['Open its file']);
@@ -495,7 +500,7 @@
       next.addEventListener('click', function () { cue(at + 1); });
       var deck = el('div', 'mac__cdface', null, [lcd, el('div', 'mac__cdkeys', null, [prev, next])]);
       var w = win('app cd', 'CD Player', el('div', 'mac__body mac__body--cd', null, tracks.length ? [deck, el('div', 'mac__cdmain', null, [art, el('div', null, null, [listEl, go])])] : [deck]));
-      if (tracks.length) cue(0);
+      if (tracks.length) cue(0, true);
       else { lcd.textContent = 'No disc'; prev.disabled = next.disabled = true; }
       return w;
     },

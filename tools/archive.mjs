@@ -17,7 +17,7 @@ export const REPO = fileURLToPath(new URL('../', import.meta.url));
 export const DIR = join(REPO, 'archive');
 
 // the fields an entry's head may hold (anything else is a typing slip, and stops the run)
-export const FIELDS = ['kind', 'title', 'by', 'year', 'line', 'listen', 'cover', 'alt', 'link', 'link-text', 'v3', 'v5', 'icon', 'draft'];
+export const FIELDS = ['kind', 'title', 'by', 'year', 'line', 'listen', 'cover', 'alt', 'link', 'link-text', 'v3', 'v5', 'icon', 'hue', 'draft'];
 // kinds that are music: they sit on the archive's Listening shelf, and v3's CD Player plays them
 export const MUSIC = ['song', 'album', 'ep', 'single', 'playlist', 'mixtape'];
 // where a listen link goes, by its address
@@ -64,8 +64,14 @@ export function parse(src, name = 'entry') {
   if (e.cover && !/^[\w.-]+\.(jpe?g|png|webp|gif)$/i.test(e.cover)) throw new Error(`archive/${name}: "cover" names a .jpg, .png, .webp or .gif file in archive/covers/`);
   if (e.cover && !e.alt) e.alt = e.music ? `Cover of ${e.title}${e.by ? ` by ${e.by}` : ''}` : '';
   if (e.cover && !e.alt) throw new Error(`archive/${name}: a cover needs "alt": what the picture shows, for anyone who cannot see it`);
+  // a song's or album's artwork on v5 is drawn, in a hue of its own: "hue" picks it (0 to 360, as on a colour wheel),
+  // or it comes from the entry's name
+  if (e.hue !== undefined && !(/^\d{1,3}$/.test(e.hue) && +e.hue <= 360)) throw new Error(`archive/${name}: "hue" is a number from 0 to 360`);
+  e.hue = e.hue !== undefined ? +e.hue : HUES[[...e.id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % HUES.length];
   return e;
 }
+// the hues an artwork takes when its entry names none: reds, pinks, violets, blues, cyans, greens, golds
+const HUES = [20, 340, 300, 270, 230, 200, 160, 120, 60];
 function service(url, name) {
   let host;
   try { host = new URL(url).hostname; } catch (err) { throw new Error(`archive/${name}: "listen" is not an address: ${url}`); }
@@ -131,11 +137,19 @@ export function v3Link(e, deck) {
   if (!s || !t) throw new Error(`archive/${e.id}.md: v3 has no sheet ${e.v3} with a folder in the index`);
   return { href: e.v3, text: `Sheet ${s.n}, ${t[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/\\s+/g, ' ').trim()}` };
 }
+// a song or an album is a CD on v3's wall: its cover as the insert of a jewel case or, with none, a burned disc on the
+// case's tray, its title and artist written on it in marker (drawn, not read: the card says both)
+function v3Disc(e, img, pad) {
+  if (img) return `${pad}<span class="cd cd--insert">${img}</span>`;
+  return `${pad}<span class="cd" aria-hidden="true"><span class="cd__disc"><span class="cd__label"><b>${esc(e.title)}</b>${e.by ? `<i>${esc(e.by)}</i>` : ''}</span></span></span>`;
+}
 export function v3Card(e, deck) {
   const c = cover(e), link = v3Link(e, deck), pad = '          ';
-  const out = [`        <li class="entry${e.music ? ' entry--music' : ''}"${e.icon ? ` data-icon="${esc(e.icon)}"` : ''}>`,
-    `${pad}<p class="entry__meta"><span class="entry__year">${esc(e.year)}</span><span class="entry__kind">${esc(e.kind)}</span></p>`];
-  if (c) out.push(`${pad}<img class="entry__cover" src="assets/img/archive/${esc(c.file)}" width="${c.w}" height="${c.h}" alt="${esc(c.alt)}" loading="lazy" decoding="async">`);
+  const img = c ? `<img class="entry__cover" src="assets/img/archive/${esc(c.file)}" width="${c.w}" height="${c.h}" alt="${esc(c.alt)}" loading="lazy" decoding="async">` : '';
+  const out = [`        <li class="entry${e.music ? ' entry--music' : ''}"${e.icon ? ` data-icon="${esc(e.icon)}"` : ''}>`];
+  if (e.music) out.push(v3Disc(e, img, pad));
+  out.push(`${pad}<p class="entry__meta"><span class="entry__year">${esc(e.year)}</span><span class="entry__kind">${esc(e.kind)}</span></p>`);
+  if (img && !e.music) out.push(`${pad}${img}`);
   out.push(`${pad}<h3 class="entry__title">${esc(e.title)}</h3>`);
   if (e.by) out.push(`${pad}<p class="entry__by">${esc(e.by)}</p>`);
   out.push(`${pad}<p class="entry__line">${esc(e.line)}.</p>`);
@@ -156,7 +170,8 @@ const V3_NOTE = `<!-- Written by tools/archive.mjs from archive/*.md, one file a
 const V3_RE = /<!-- (?:HOW TO ADD AN ENTRY|Written by tools\/archive\.mjs)[\s\S]*?<ul class="entries" aria-label="Archive entries">[\s\S]*?\n {6}<\/ul>/;
 export function renderV3(deck, all = entries()) {
   if (!V3_RE.test(deck)) throw new Error('archive: v3/index.html has no list of entries (<ul class="entries">) after its note');
-  const list = ['<ul class="entries" aria-label="Archive entries">', ...published(all).map(e => v3Card(e, deck)), '      </ul>'].join('\n');
+  // the things made first, newest first, then the CDs
+  const pub = published(all), list = ['<ul class="entries" aria-label="Archive entries">', ...[...pub.filter(e => !e.music), ...pub.filter(e => e.music)].map(e => v3Card(e, deck)), '      </ul>'].join('\n');
   return deck.replace(V3_RE, () => `${V3_NOTE}\n      ${list}`);
 }
 
@@ -178,7 +193,7 @@ export function forV5(all = entries()) {
   return published(all).map(e => {
     const c = cover(e);
     return {
-      id: e.id, year: e.year, kind: e.kind, title: e.title, by: e.by || '', line: e.line, text: e.text, facts: e.facts, music: e.music,
+      id: e.id, year: e.year, kind: e.kind, title: e.title, by: e.by || '', line: e.line, text: e.text, facts: e.facts, music: e.music, hue: e.hue,
       cover: c && { file: c.file, w: c.w, h: c.h, alt: c.alt },
       listen: e.listen ? { href: e.listen, service: e.service } : null,
       link: e.v5 ? { href: e.v5, text: v5LinkText(e.v5) } : null,

@@ -470,6 +470,50 @@ html:not(.js) .cover__code { display: none; }   /* without the script it stays a
 .entry__cover { display: block; width: 100%; height: auto; margin-top: .75rem; border: 1px solid var(--paper-2); }
 .entry--music .entry__cover { aspect-ratio: 1; object-fit: cover; }
 .entry__by { margin-top: .2rem; font-size: var(--small); font-weight: 700; line-height: 1.3; color: var(--ink-2); }
+/* a song or an album is a CD (2026-10-06): a jewel case, its black tray behind the clear lid (the light caught along
+   its edges and across it), the hinge down its left side, and on the tray the disc: a burned disc's silver label
+   side, the light turning round it, with a clear hub, the hole showing the tray's rosette, and its title and artist
+   written in marker (drawn, not read: the card says both). An album with a cover of its own has it as the insert.
+   The card holds it beside its words, two columns of the wall wide from 640px; pointing at the card turns the disc a
+   little. CSS only, so it shows without the script; left off paper and in forced colours (the words carry it). */
+.cd { --cd: 10rem; position: relative; display: block; flex: none; width: var(--cd); aspect-ratio: 1.06; border-radius: 3px 2px 2px 3px;
+  background: radial-gradient(circle at 53.8% 50%, #5a5a5a 0, #3a3a3a calc(var(--cd) * .03), #232323 calc(var(--cd) * .034), #191919 calc(var(--cd) * .05), rgba(25,25,25,0) calc(var(--cd) * .056)),
+    radial-gradient(120% 90% at 55% 30%, #2a2a2a, #101010 72%);
+  box-shadow: 0 1px 1px rgba(0,0,0,.35), 0 10px 20px rgba(0,0,0,.22); }
+.cd::before { content: ""; position: absolute; inset: 0 auto 0 0; z-index: 2; width: 7.5%; border-radius: 3px 0 0 3px; pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,.2) 0 1px, rgba(255,255,255,.05) 1px 3px), linear-gradient(90deg, #3b3b3b, #181818 60%, #2d2d2d);
+  box-shadow: inset -1px 0 0 rgba(255,255,255,.16); }
+.cd::after { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(118deg, rgba(255,255,255,.24) 0 13%, rgba(255,255,255,0) 13.5% 57%, rgba(255,255,255,.1) 57.5% 65%, rgba(255,255,255,0) 65.5%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.26), inset 0 1px 0 rgba(255,255,255,.4); }
+.cd__disc { position: absolute; left: 12.3%; top: 6%; width: 83%; aspect-ratio: 1; border-radius: 50%; container-type: inline-size;
+  background: radial-gradient(circle, rgba(0,0,0,0) 0 21.6%, rgba(0,0,0,.2) 22% 22.7%, rgba(0,0,0,0) 23.1%),
+    radial-gradient(circle, rgba(236,240,245,.42) 0 21.6%, rgba(0,0,0,0) 22%),
+    radial-gradient(circle, rgba(0,0,0,0) 0 97.5%, rgba(0,0,0,.22) 98.5%),
+    conic-gradient(from 200deg, #cdd2d9, #f5f6f8 9%, #b7bdc6 20%, #eef0f3 31%, #f2d8e5 37%, #d7e8f6 43%, #e1f0d4 48%, #c1c7cf 56%, #f7f8fa 69%, #b0b7c1 81%, #ebedf0 91%, #cdd2d9);
+  -webkit-mask: radial-gradient(circle, transparent 0 6.4%, #000 6.8%); mask: radial-gradient(circle, transparent 0 6.4%, #000 6.8%);
+  transition: rotate .9s var(--ease); }
+/* the title above the hub and the artist below it, each in its own band, as they are written on a disc */
+.cd__label { position: absolute; inset: 0; rotate: -6deg; font: 400 max(13px, 10.5cqi)/1 var(--hand); color: #141414; text-align: center; }
+.cd__label b, .cd__label i { position: absolute; left: 15%; right: 15%; height: 22%; display: grid; place-items: center; font-weight: 400; font-style: normal; text-wrap: balance; }
+.cd__label b { top: 5%; }
+.cd__label i { bottom: 5%; font-size: max(13px, 7.6cqi); color: var(--red-ink); }
+.cd--insert { overflow: hidden; }
+.cd--insert img { position: absolute; left: 7.5%; top: 0; width: 92.5%; height: 100%; margin: 0; border: 0; object-fit: cover; }
+/* on a phone the CD above its words; from 640px beside them, the card two columns of the wall wide */
+.entry--music { display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: min-content; align-content: start; column-gap: clamp(.9rem, 1.6vw, 1.4rem); }
+.entry--music > .cd { --cd: 11rem; margin: .35rem 0 .9rem; }
+.entry--music > :is(.entry__listen, .entry__link) { justify-self: start; margin-top: .4rem; }   /* (in the grid a link would take the column's width, its underline with it) */
+@media (min-width: 640px) {
+  .entry--music { grid-column: span 2; grid-template-columns: auto minmax(0, 1fr); }
+  .entry--music > * { grid-column: 2; }
+  .entry--music > .cd { --cd: clamp(8.5rem, 13vw, 10.5rem); grid-column: 1; grid-row: 1 / span 8; align-self: start; margin: .15rem 0 0; }
+}
+@media (hover: hover) and (pointer: fine) { .entry--music:hover .cd__disc { rotate: 34deg; } }
+.entry--music:focus-within .cd__disc { rotate: 34deg; }
+@media (prefers-reduced-motion: reduce) { .cd__disc { transition: none; } .entry--music:is(:hover, :focus-within) .cd__disc { rotate: none; } }
+@media print { .cd:not(.cd--insert) { display: none; } .entry--music { display: block; } }
+@media (forced-colors: active) { .cd:not(.cd--insert) { display: none; } }
 .js .entry { opacity: 0; translate: 0 8px; transition-property: opacity, translate, rotate, transform, box-shadow, background-color, color, z-index; transition-duration: 420ms, 420ms, var(--t-settle), var(--t-settle), var(--t-settle), 300ms, 300ms, 0s; transition-timing-function: var(--ease-out), var(--ease-out), var(--ease), var(--ease), var(--ease), ease, ease, linear; transition-delay: calc(160ms + var(--i, 0) * 50ms), calc(160ms + var(--i, 0) * 50ms), 0s, 0s, 0s, 0s, 0s, var(--t-open); }
 .js .is-in .entry { opacity: 1; translate: none; }
 /* The archive opens like the dim room's experiments, in paper. With the script a card on the wall shows its

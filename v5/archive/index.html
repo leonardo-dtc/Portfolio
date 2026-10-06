@@ -129,35 +129,22 @@
   <!-- Listening: the songs and albums in archive/*.md, written here by node tools/archive.mjs (with none, no window) -->
   <aside class="side glass" data-glass="window" data-side="right" data-inline="end" aria-labelledby="listening">
     <span class="probe" data-corner="0"></span><span class="probe" data-corner="1"></span><span class="probe" data-corner="2"></span><span class="probe" data-corner="3"></span>
-    <div class="side__part">
+    <div class="side__part player" data-player>
       <h2 id="listening">Listening</h2>
-      <ol class="arc arc--heard">
-        <li class="arc__item arc__item--music" id="basket-case">
-          <p class="arc__meta"><span class="arc__year">Now</span><span class="arc__kind">Song</span></p>
-          <h3 class="arc__title">Basket Case</h3>
-          <p class="arc__by">Green Day</p>
-          <p class="arc__line">From Dookie, 1994.</p>
-          <p class="arc__go">
-            <a class="btn" href="https://open.spotify.com/track/6L89mwZXSOwYl76YXfX13s" rel="noopener">Listen on Spotify<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10v10M19 5 6 18"/></svg></a>
-          </p>
+      <div class="player__now">
+        <span class="art" style="--h: 60" aria-hidden="true"><i>Green Day</i><b>Basket Case</b></span>
+        <div class="player__info"><h3 class="player__title">Basket Case</h3><p class="player__by">Green Day</p><p class="player__line">From Dookie, 1994.</p></div>
+        <p class="player__keys"><button class="player__skip" type="button" data-skip="-1" aria-label="Previous" data-hover><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 5.5v13M18 6.2v11.6a.8.8 0 0 1-1.25.66L9 12.66a.8.8 0 0 1 0-1.32l7.75-5.8A.8.8 0 0 1 18 6.2z"/></svg></button><a class="player__listen is-spotify" href="https://open.spotify.com/track/6L89mwZXSOwYl76YXfX13s" rel="noopener" data-hover><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg><span><span class="player__on">Listen on </span>Spotify</span></a><button class="player__skip" type="button" data-skip="1" aria-label="Next" data-hover><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 5.5v13M6 6.2v11.6a.8.8 0 0 0 1.25.66L15 12.66a.8.8 0 0 0 0-1.32L7.25 5.54A.8.8 0 0 0 6 6.2z"/></svg></button></p>
+      </div>
+      <ol class="tracks">
+        <li class="track is-current" id="basket-case" style="--h: 60" data-title="Basket Case" data-by="Green Day" data-line="From Dookie, 1994." data-href="https://open.spotify.com/track/6L89mwZXSOwYl76YXfX13s" data-service="Spotify">
+          <a class="track__go" href="https://open.spotify.com/track/6L89mwZXSOwYl76YXfX13s" rel="noopener" aria-current="true" data-hover><span class="art art--s" style="--h: 60" aria-hidden="true"></span><span class="track__t"><b>Basket Case</b><small>Green Day</small></span><span class="vh">, on Spotify</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10v10M19 5 6 18"/></svg></a>
         </li>
-        <li class="arc__item arc__item--music" id="creep">
-          <p class="arc__meta"><span class="arc__year">Now</span><span class="arc__kind">Song</span></p>
-          <h3 class="arc__title">Creep</h3>
-          <p class="arc__by">Radiohead</p>
-          <p class="arc__line">From Pablo Honey, 1993.</p>
-          <p class="arc__go">
-            <a class="btn" href="https://open.spotify.com/track/70LcF31zb1H0PyJoS1Sx1r" rel="noopener">Listen on Spotify<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10v10M19 5 6 18"/></svg></a>
-          </p>
+        <li class="track" id="creep" style="--h: 20" data-title="Creep" data-by="Radiohead" data-line="From Pablo Honey, 1993." data-href="https://open.spotify.com/track/70LcF31zb1H0PyJoS1Sx1r" data-service="Spotify">
+          <a class="track__go" href="https://open.spotify.com/track/70LcF31zb1H0PyJoS1Sx1r" rel="noopener" data-hover><span class="art art--s" style="--h: 20" aria-hidden="true"></span><span class="track__t"><b>Creep</b><small>Radiohead</small></span><span class="vh">, on Spotify</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10v10M19 5 6 18"/></svg></a>
         </li>
-        <li class="arc__item arc__item--music" id="pink-pony-club">
-          <p class="arc__meta"><span class="arc__year">Now</span><span class="arc__kind">Song</span></p>
-          <h3 class="arc__title">Pink Pony Club</h3>
-          <p class="arc__by">Chappell Roan</p>
-          <p class="arc__line">From The Rise and Fall of a Midwest Princess, 2023.</p>
-          <p class="arc__go">
-            <a class="btn" href="https://open.spotify.com/track/5tTtF1l1BkV2AVnwgmoVPx" rel="noopener">Listen on Spotify<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10v10M19 5 6 18"/></svg></a>
-          </p>
+        <li class="track" id="pink-pony-club" style="--h: 340" data-title="Pink Pony Club" data-by="Chappell Roan" data-line="From The Rise and Fall of a Midwest Princess, 2023." data-href="https://open.spotify.com/track/5tTtF1l1BkV2AVnwgmoVPx" data-service="Spotify">
+          <a class="track__go" href="https://open.spotify.com/track/5tTtF1l1BkV2AVnwgmoVPx" rel="noopener" data-hover><span class="art art--s" style="--h: 340" aria-hidden="true"></span><span class="track__t"><b>Pink Pony Club</b><small>Chappell Roan</small></span><span class="vh">, on Spotify</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h10v10M19 5 6 18"/></svg></a>
         </li>
       </ol>
     </div>

@@ -1,6 +1,6 @@
 # The archive
 
-One file here is one entry, and both editions are written from these files: v3's Macintosh (and its wall of cards), v5's Archive page and its Experiments rows. Things made sit together, newest first; songs and albums go on their own shelf (v5's Listening window, beside the Archive page's entries; v3's CD Player, which comes onto the Mac's desk with the first of them). The two newest things still being made (their year runs to now) also lie out on the Mac's desk.
+One file here is one entry, and both editions are written from these files: v3's Macintosh (and its wall of cards), v5's Archive page and its Experiments rows. Things made sit together, newest first; songs and albums go on their own shelf: on v5, the Archive page's Listening window, drawn after Spotify on Vision Pro (a card for one at a time, with Previous, Next and Listen on its service, then every one as a row); on v3, each is a CD, on its card (on the wall, after the things made) and in the CD Player, which comes onto the Mac's desk with the first of them. The two newest things still being made (their year runs to now) also lie out on the Mac's desk.
 
 ## Adding an entry
 
@@ -67,7 +67,8 @@ What it is and what you did, in a paragraph or two.
 | `line` | needed | One line, shown at rest, with no full stop at the end (each edition adds one where it needs it). |
 | `by` | | The artist, for music; for a project, who you made it with. |
 | `listen` | | The song's or album's page on Spotify, Apple Music, YouTube, Bandcamp, SoundCloud, Tidal or Deezer. The link reads "Listen on Spotify", and so on. |
-| `cover` | | A picture in `archive/covers/` (make the folder the first time; .jpg, .png, .webp or .gif; square for music, 600px is plenty). It is copied into both editions, and the copy goes again if the entry does. |
+| `cover` | | A picture in `archive/covers/` (make the folder the first time; .jpg, .png, .webp or .gif; square for music, 600px is plenty). It is copied into both editions, and the copy goes again if the entry does. For music, it is the CD case's insert on v3 and the artwork on v5, in place of the drawn ones; only a picture you may publish (your own photo or drawing), never a record's cover art. |
+| `hue` | | For music: the colour of its drawn artwork on v5, a number from 0 to 360 round the colour wheel (20 red, 60 orange, 140 green, 200 teal, 250 blue, 300 violet, 340 pink). Left out, one is picked from the file's name. |
 | `alt` | | What the picture shows, for anyone who cannot see it. A music cover that has none reads "Cover of (title) by (artist)". |
 | `link`, `link-text` | | A page elsewhere (a full `https://` address) and what its link says (its site's name if left out). |
 | `v3` | | One of v3's sheets, in quotes: `"#record"`, `"#music"`, `"#hockey"`, `"#loquar"`. The link reads as the deck names the sheet. |

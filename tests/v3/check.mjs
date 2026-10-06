@@ -585,12 +585,14 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const s0 = await page.evaluate(() => {
     const m = window.__v3mac, cards = [...document.querySelectorAll('#archive .entries > .entry')];
     const shown = [...document.querySelectorAll('.mac__grid > .mac__file')].map(b => window.__v3mac.files[+b.dataset.i].title);
-    return { n: cards.length, files: m ? m.files.map(f => f.title) : [], shown, titles: cards.map(c => c.querySelector('.entry__title').textContent.replace(/\s+/g, ' ').trim()), on: document.querySelector('.mac__screen').className, cards: getComputedStyle(document.querySelector('#archive .entries')).display, wins: m.windows.map(w => w.querySelector('.mac__title').textContent), year: document.querySelector('.mac__col--year').getAttribute('aria-pressed'), years: [...document.querySelectorAll('.mac__file .mac__year')].every(k => k.checkVisibility()),
+    return { n: cards.length, files: m ? m.files.map(f => f.title) : [], shown, titles: cards.map(c => c.querySelector('.entry__title').textContent.replace(/\s+/g, ' ').trim()),
+      /* newest first, files of the same year in the cards' order (the cards put the CDs after the things made) */
+      byYear: m ? m.files.slice().sort((a, b) => (b.key[0] - a.key[0]) || (b.key[1] - a.key[1]) || a.i - b.i).map(f => f.title) : [], on: document.querySelector('.mac__screen').className, cards: getComputedStyle(document.querySelector('#archive .entries')).display, wins: m.windows.map(w => w.querySelector('.mac__title').textContent), year: document.querySelector('.mac__col--year').getAttribute('aria-pressed'), years: [...document.querySelectorAll('.mac__file .mac__year')].every(k => k.checkVisibility()),
       /* the window opens beside the desk's icons, too narrow for the kind column; zoomed, it has it */
       kinds: (() => { const f = document.querySelector('.mac__win--finder'); m.zoom(f, true); const k = [...document.querySelectorAll('.mac__file .mac__kind')].every(x => x.checkVisibility()); m.zoom(f, false); return k; })() };
   });
   check(s0.n > 0 && s0.files.join('|') === s0.titles.join('|'), `one file on the Mac for each archive card (${s0.files.length} of ${s0.n})`);
-  check(s0.shown.join('|') === s0.titles.join('|') && s0.year === 'true' && s0.years && s0.kinds, 'the Archive window lists them with their year (and, zoomed, their kind), newest first by Year, as the cards stand', JSON.stringify(s0.shown));
+  check(s0.shown.join('|') === s0.byYear.join('|') && s0.year === 'true' && s0.years && s0.kinds, 'the Archive window lists them with their year (and, zoomed, their kind), newest first by Year, a year\'s files in the cards\' order', JSON.stringify(s0.shown));
   check(/is-on/.test(s0.on) && s0.cards === 'none' && s0.wins.join() === 'Archive', `the screen is on once the sheet arrives, the Archive window open, the cards given way (${s0.on}; ${s0.wins.join()})`);
   const st = () => page.evaluate(() => ({ active: document.activeElement && (document.activeElement.getAttribute('aria-label') || document.activeElement.textContent.trim().slice(0, 40)), doc: !!document.activeElement.closest('.mac__win--doc'), wins: window.__v3mac.windows.map(w => w.querySelector('.mac__title').textContent), cur: document.querySelector('.rail a[aria-current]')?.getAttribute('href') }));
   /* down the list: from the first file to the third */
@@ -640,7 +642,7 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   await page.click('.mac__col--name'); const za = await order();
   await page.click('.mac__col--year'); const ny = await order();
   const sorted = [...az].sort((a, b) => a.localeCompare(b));
-  check(az.join('|') === sorted.join('|') && za.join('|') === [...sorted].reverse().join('|') && ny.join('|') === s0.titles.map(t => t.toLowerCase()).join('|'), 'Name sorts A to Z, then Z to A; Year puts the newest first again', JSON.stringify({ az, za }));
+  check(az.join('|') === sorted.join('|') && za.join('|') === [...sorted].reverse().join('|') && ny.join('|') === s0.byYear.map(t => t.toLowerCase()).join('|'), 'Name sorts A to Z, then Z to A; Year puts the newest first again', JSON.stringify({ az, za }));
   await page.click('.mac__mt >> text=View'); await page.click('.mac__mi[data-act="icons"]');
   const icons = await page.evaluate(() => { const r = [...document.querySelectorAll('.mac__grid > .mac__file')].map(b => b.getBoundingClientRect()); return document.querySelector('.mac__grid').classList.contains('is-icons') && r.filter(x => Math.abs(x.top - r[0].top) < 2).length > 1; });
   await page.click('.mac__mt >> text=View'); await page.click('.mac__mi[data-act="list"]');
@@ -671,7 +673,7 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   const tiny = await page.evaluate(() => { window.__v3mac.open(window.__v3mac.files[0]); return [...document.querySelectorAll('.mac__screen *')].filter(e => e.childNodes.length && [...e.childNodes].some(n => n.nodeType === 3 && n.data.trim()) && e.checkVisibility() && parseFloat(getComputedStyle(e).fontSize) < 13).map(e => e.className + ' ' + getComputedStyle(e).fontSize); });
   check(tiny.length === 0, `nothing on the Mac's screen is set under 13px (${tiny.length})`, tiny.slice(0, 5).join(', '));
   /* Find, from the cover: a card's words open its file on the Mac */
-  const word = await page.evaluate(() => { const t = window.__v3mac.files[window.__v3mac.files.length - 1].kind; return t; });
+  const word = await page.evaluate(() => window.__v3mac.files.filter(f => !f.music).pop().kind);   /* the last thing made's kind */
   await page.evaluate(() => document.querySelector('.rail a[href="#cover"]').click()); await page.waitForTimeout(1200);
   await page.keyboard.press('/'); await page.waitForTimeout(400); await page.keyboard.type(word); await page.waitForTimeout(500); await page.keyboard.press('Enter'); await page.waitForTimeout(1800);
   s = await st();
@@ -733,6 +735,13 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
     await page.evaluate(() => window.__v3mac.app('cd')); await page.waitForTimeout(400);
     const cd = await page.evaluate(() => ({ lcd: document.querySelector('.mac__lcd').textContent, tracks: document.querySelectorAll('.mac__track').length }));
     check(cd.tracks === music && /^01 /.test(cd.lcd), `the CD Player holds the archive's ${music} songs and albums (${cd.tracks} tracks; ${cd.lcd})`);
+    /* and shows the CD in it: the disc with the track's title written on it (drawn, hidden from the reader); the next
+       one comes in on Next */
+    const disc = () => page.evaluate(() => { const c = document.querySelector('.mac__cdart .cd'); return c && { hidden: c.getAttribute('aria-hidden') === 'true', title: (c.querySelector('.cd__label b') || {}).textContent, lcd: document.querySelector('.mac__lcd').textContent }; });
+    const d0 = await disc();
+    await page.click('.mac__cdb[aria-label="Next track"]'); await page.waitForTimeout(300);
+    const d1 = await disc();
+    check(d0 && d0.hidden && d0.lcd.includes(d0.title) && d1 && d1.title !== d0.title && d1.lcd.includes(d1.title), `the CD Player shows the CD in it, its title written on the disc, and Next brings the next one (${d0 && d0.title}, then ${d1 && d1.title})`, JSON.stringify({ d0, d1 }));
   } else check(!(await page.$('.mac__icon--desk[data-key="cd"]')), 'with no songs or albums in the archive the CD Player stays off the desk');
   /* the Note Pad keeps its pages */
   await page.evaluate(() => window.__v3mac.app('notepad')); await page.waitForTimeout(400);
@@ -881,6 +890,10 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
   await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(1200);
   const v2 = await view(), kept = await page.evaluate(() => localStorage.getItem('v3:toggles'));
   check(v0.mac && v0.cards === 0 && !v1.mac && v1.cards === ENTRIES && !v2.mac && v2.cards === ENTRIES && /"archive":"cards"/.test(kept), `T17: the Mac by default; toggles.archive = 'cards' shows the wall of cards instead, kept in this browser across a reload`, JSON.stringify({ v0, v1, v2, kept }));
+  // on the wall a song or an album is a CD: after the things made, each with its disc (drawn, hidden from the reader),
+  // its title on the disc as on the card, the card two columns wide
+  const cds = await page.evaluate(() => { const all = [...document.querySelectorAll('.entries > .entry')], music = all.filter(e => e.matches('.entry--music')); return { after: music.length > 0 && all.indexOf(music[0]) === all.length - music.length, n: music.length, discs: music.filter(e => { const c = e.querySelector(':scope > .cd'); return c && c.checkVisibility() && (c.matches('.cd--insert') || (c.getAttribute('aria-hidden') === 'true' && c.querySelector('.cd__label b').textContent === e.querySelector('.entry__title').textContent)); }).length, wide: music.every(e => e.getBoundingClientRect().width > all[0].getBoundingClientRect().width * 1.5) }; });
+  check(cds.n > 0 && cds.after && cds.discs === cds.n && cds.wide, `on the wall the ${cds.n} songs and albums are CDs, after the things made, two columns wide`, JSON.stringify(cds));
   // Find with the cards goes to the card itself, not to a window on the Mac
   await page.evaluate(() => { document.querySelector('[data-index-open]').click(); });
   await page.waitForTimeout(400);
