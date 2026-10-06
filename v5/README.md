@@ -102,8 +102,14 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
   buttons to where the rest of it lives (the résumé's entry, a sheet, or a page
   elsewhere). Songs and albums (Request E) never go in the rows: they sit in the
   page's side window, Listening (inside the window, after the entries, below
-  1360 px), each with its artist, its cover and Listen on its service (Spotify,
-  Apple Music, YouTube, Bandcamp, SoundCloud, Tidal or Deezer). The Experiments
+  1360 px), drawn after Spotify on Vision Pro (Request G): a now playing card for
+  one at a time (its artwork, title, artist and line, and Listen on its service,
+  Spotify's green for Spotify, between Previous and Next), then every song or
+  album as a row that opens it where it plays (Spotify, Apple Music, YouTube,
+  Bandcamp, SoundCloud, Tidal or Deezer). The artwork is drawn, since a record's
+  cover is not mine to publish: a field of the entry's own colour (its `hue`) with
+  its artist and title set on it; a picture of my own in `archive/covers/` takes
+  its place. `archive/#creep` opens the card at that song. The Experiments
   heading on Home and Work carries "Archive" to the page. A row opens the page
   already at its entry, and the entry takes the landing wash, as a résumé entry
   does. Every fact is the site's own; what is not on file is left out.
@@ -534,6 +540,7 @@ Facts only; leave out what is not on file.
 | `assets/css/site.css` | The one stylesheet: Switzer's `@font-face`, tokens, the room, windows and ornaments, CSS glass, the hero, content components, sheets, layouts, preferences, print |
 | `assets/fonts/` | `switzer-variable.woff2` (Switzer, Indian Type Foundry, via Fontshare; weights 100 to 900) and its licence, `FFL-switzer.txt` (the ITF Free Font License allows self-hosting and wordmarks). The name only; everything else is the system face |
 | `assets/js/boot.js` | Entry: starts the room, the windows, the hero and navigation; the Work filters, print buttons, Groton's clock and the phone header's fold. Last, it marks the page `booted`: a page the scripts never finished (a file that failed to load, an error, a browser without modules) is put back to the page without scripts by the head script at `DOMContentLoaded`, rather than left hidden behind the hero |
+| `assets/js/listening.js` | The archive page's Listening window: Previous and Next step the card through the songs (its artwork, words and Listen link), mark the row it shows and say it to a screen reader; an address naming a song shows it. Delegated, so it works after a page swaps in |
 | `assets/js/room.js`, `shaders.js` | The WebGL2 room: scene, composite, glass panels, the hero's dark stage and the ink (its name in neon light); frame budget |
 | `assets/js/panels.js`, `geometry.js` | Where the glass is: element boxes and projected corners into inverse homographies |
 | `assets/js/windows.js` | Layout modes, the side window, tab bar, materialising, sheets, the window bar, the pointer's light and the room's lean, hover and press light, scrolling from anywhere |
@@ -559,7 +566,7 @@ above) and `tools/room-stills.mjs` regenerate the written name and the stills,
 ```sh
 node --test tests/v5/unit/*.test.mjs
 node tools/v5-chrome.mjs --check
-node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), launcher (its apps and the toggles), neon (its colour), nav, modes, contrast, keys, palettes, filters, perf, audit, fixes (the October 2026 bug audit's 21 findings, kept fixed)
+node tests/v5/e2e/pages.mjs   # then links, room, glass, layouts, hello (the hero), launcher (its apps and the toggles), neon (its colour), nav, modes, contrast, keys, palettes, filters, listening (the archive's Listening window), perf, audit, fixes (the October 2026 bug audit's 21 findings, kept fixed)
 node tests/v5/e2e/capture.mjs # screenshots of every page at five widths into .impeccable/review/v5/
 ```
 

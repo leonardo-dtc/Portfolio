@@ -263,7 +263,7 @@ The screen is Platinum in the poster's colours:
   header 13px, a file's page 15px (its title 22px, its line 16px). Nothing is under 13px.
 - **Pictures** 32 dots, at 1px a dot in the list and 2px as icons, in ink, white, three greys and vermilion: a
   page with its corner folded and a shadow, carrying an emblem chosen by the card's kind (music video, statistics,
-  arrangement, game design, robotics, rocketry, games; a song, or a disc for an album, EP, playlist or mixtape;
+  arrangement, game design, robotics, rocketry, games; a disc for music, a song, single, album, EP, playlist or mixtape;
   `data-icon` on the card names one; anything else is lines of text), the drive, the Trash, and the six
   accessories (a clock, a calculator, a CD player, a swatch of patterns, a note pad, the puzzle).
 
@@ -285,8 +285,9 @@ What is on the screen:
   - *Calculator:* its keys, or the keyboard with its window in front (digits, + − × ÷ or * /, Return or =,
     Backspace, Delete or C to clear); dividing by zero says Error.
   - *CD Player:* the archive's songs and albums as its tracks, an LCD with the one playing, back and forward, the
-    cover, Listen on (its service), and Open its file. With no music in the archive it is not on the desk or in
-    the menu.
+    CD in the player (140px, as the wall draws it; a new one turns in from 80 degrees back over 550ms, at once under
+    reduced motion), Listen on (its service), and Open its file. With no music in the archive it is not on the desk
+    or in the menu.
   - *Desktop Patterns:* six patterns for the desk (Dots, Checks, Graph paper, Staff, Rink, Maze), kept in this
     browser.
   - *Note Pad:* eight pages to write on, turned at its corner, kept in this browser.
@@ -330,7 +331,7 @@ colours.** Index cards taped to the paper, four across on desktop. A card is one
 (Anton, vermilion, 24px), its kind (a black tag), its title (the hand face), its line, its file
 (`.entry__more`: paragraphs and a details list) and its link.
 - *With the script* (screen, colours not forced) a card shows its year, kind, title and line (and a song's or
-  album's artist, cover and Listen link, over the card's own target); the file and the other links are the
+  album's CD, artist and Listen link, over the card's own target); the file and the other links are the
   card's file. The title is a button (`.entry__open`, its `::after` covering the card, so the whole
   card answers), and its focus ring rings the card. Pointing at a card straightens it to 0 degrees and lifts it
   4px while its tape presses (800ms), and steps the other cards back by colour, with no blur: `#F3F1F1` paper,
@@ -343,6 +344,16 @@ colours.** Index cards taped to the paper, four across on desktop. A card is one
   and the focus goes back to the card. Keys stay with it while it is open (the deck's arrows wait), and the deck
   behind does not scroll.
 - *Without the script, in print and in forced colours* every card shows its whole file under its line.
+- *A song or an album is a CD* (`.entry--music`, 2026-10-06), and the music comes after the things made on the
+  wall. The CD is a jewel case (`.cd`, 10rem by default, 1.06 times as wide as tall): a black tray with a rosette
+  at the hub, the hinge down its left side, and the clear lid's light along its edges and across it. On the tray
+  sits a burned disc (`.cd__disc`, 83% of the case): silver, the light turning round it, a clear hub, the hole
+  showing the tray. Its title is written above the hub and its artist below, in marker (the hand face, never under
+  13px; the artist in `--red-ink`), turned 6 degrees as a hand writes. It is drawn, not read (`aria-hidden`): the
+  card says both. An album with a cover of its own has it as the case's insert (`.cd--insert`). On a phone the CD
+  sits above the words (11rem); from 640px it sits beside them (8.5 to 10.5rem), the card two columns of the wall
+  wide. Pointing at the card, or focus inside it, turns the disc 34 degrees (900ms; not under reduced motion). CSS
+  only, so it shows without the script. Print and forced colours leave out the drawn CD; the words carry it.
 
 ## Phones (below 900px, and windows under 540px tall)
 
@@ -381,8 +392,8 @@ Each sheet keeps 64px more space at its foot, so the pill never covers its last 
 `archive/*.md`, one file an entry, which v5's archive reads too: add a file there as `archive/README.md` says
 and run `node tools/archive.mjs`, never edit the cards by hand (`--check`, and the unit test, name any drift).
 Tilt, tape, the card's file, the reveal order and Find all follow; so does the Mac: the entry is a file there,
-its kind picks its picture (`icon:` chooses one), a song or an album is a track on the CD Player, and an entry
-still being made may lie out on the desk.
+its kind picks its picture (`icon:` chooses one), a song or an album is a CD (on the wall, after the things made)
+and a track on the CD Player, and an entry still being made may lie out on the desk.
 
 **A file's wording.** Each folder's file is inside its link (`.folder__btn > .file`): edit its title,
 kicker and one line.

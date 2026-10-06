@@ -35,7 +35,8 @@ test('the archive comes from one list: Home shows the newest four things made, W
   assert.deepEqual(workExp, MADE.map(a => `../archive/#${a.id}`));
   const main = sheet.slice(sheet.indexOf('<main'), sheet.indexOf('</main>')), side = sheet.slice(sheet.indexOf('</main>'));
   for (const a of MADE) assert.match(main, new RegExp(`<li class="arc__item" id="${a.id}">`), `${a.id} in the archive's window`);
-  for (const a of HEARD) assert.match(side, new RegExp(`<li class="arc__item arc__item--music" id="${a.id}">`), `${a.id} in the Listening window`);
+  for (const a of HEARD) assert.match(side, new RegExp(`<li class="track(?: is-current)?" id="${a.id}"`), `${a.id} in the Listening window`);
+  assert.match(side, new RegExp(`<li class="track is-current" id="${HEARD[0] && HEARD[0].id}"`), 'the newest shows first');
   assert.equal(/<aside[^>]*aria-labelledby="listening"/.test(side), HEARD.length > 0, 'a Listening window only with music');
   assert.ok(!/snake|minesweeper/i.test(home.replace(/<!--[\s\S]*?-->/g, '') + work.replace(/<!--[\s\S]*?-->/g, '') + sheet), 'the class games stay out (T6)');
   for (const a of ARCHIVE) assert.ok(!/[–—]/.test(JSON.stringify(a)), `${a.id}: no en or em dashes`);

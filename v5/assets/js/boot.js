@@ -8,6 +8,7 @@ import { initHue } from './hue.js';
 import { initSpy } from './spy.js';
 import { prepareFlip, reflow } from './flip.js';
 import { initToggles } from './toggles.js';
+import { initListening } from './listening.js';
 
 const html = document.documentElement;
 html.classList.add('js');
@@ -80,6 +81,9 @@ document.addEventListener('click', (e) => {
   const p = e.target.closest && e.target.closest('[data-print]');
   if (p) { e.preventDefault(); print(); }
 });
+
+// the archive page's Listening window: Previous and Next step through its songs (listening.js)
+initListening();
 
 // GSAP, for Work's grid, loads once a page with one is idle (flip.js)
 prepareFlip();

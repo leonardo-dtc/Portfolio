@@ -90,10 +90,27 @@ test('v5: music goes in the archive page’s Listening window and never into its
   const list = archiveList('../', [made, song]), side = listening('../', [made, song]);
   assert.match(list, /<ol class="arc">[\s\S]*id="p"[\s\S]*<\/ol>/);
   assert.doesNotMatch(list, /id="s"/);
-  assert.match(side, /<aside class="side glass"[^>]*aria-labelledby="listening">[\s\S]*<h2 id="listening">Listening<\/h2>[\s\S]*<ol class="arc arc--heard">[\s\S]*id="s"[\s\S]*<\/aside>/);
-  assert.match(side, /<h3 class="arc__title">A song<\/h3>/);
-  assert.match(side, /<p class="arc__by">An artist<\/p>/);
-  assert.match(side, /href="https:\/\/open\.spotify\.com\/track\/abc" rel="noopener">Listen on Spotify/);
+  // the window, after Spotify on Vision Pro: a now playing card for the newest, then every song as a row
+  assert.match(side, /<aside class="side glass"[^>]*aria-labelledby="listening">[\s\S]*<h2 id="listening">Listening<\/h2>[\s\S]*<div class="player__now">[\s\S]*<ol class="tracks">[\s\S]*<li class="track is-current" id="s"[\s\S]*<\/aside>/);
+  assert.match(side, /<h3 class="player__title">A song<\/h3>/);
+  assert.match(side, /<p class="player__by">An artist<\/p>/);
+  assert.match(side, /<a class="player__listen is-spotify" href="https:\/\/open\.spotify\.com\/track\/abc" rel="noopener"[^>]*>[\s\S]*?<span class="player__on">Listen on <\/span>Spotify<\/span><\/a>/);
+  assert.match(side, /<a class="track__go" href="https:\/\/open\.spotify\.com\/track\/abc" rel="noopener" aria-current="true"/);
+  assert.match(side, /<button class="player__skip" type="button" data-skip="-1" aria-label="Previous"[\s\S]*<button class="player__skip" type="button" data-skip="1" aria-label="Next"/);
+  // an entry's hue colours its artwork; one without keeps the stylesheet's, never "undefined"
+  assert.doesNotMatch(side, /undefined/);
+  assert.match(listening('../', [{ ...song, hue: 120 }]), /<span class="art" style="--h: 120" aria-hidden="true">/);
+  // a cover of its own takes the drawn artwork's place, on the card and in its row, and the row carries it for Next
+  const covered = listening('../', [{ ...song, hue: 120, cover: { file: 'the-album.jpg', w: 600, h: 600, alt: 'x' } }]);
+  assert.match(covered, /<span class="art art--img" style="--h: 120" aria-hidden="true"><img src="\.\.\/assets\/img\/archive\/the-album\.jpg" width="600" height="600" alt="" loading="lazy" decoding="async"><i>An artist<\/i><b>A song<\/b><\/span>/);
+  assert.match(covered, /<li class="track is-current" id="s" style="--h: 120"[^>]* data-cover="\.\.\/assets\/img\/archive\/the-album\.jpg">/);
+  assert.match(covered, /<span class="art art--s art--img" style="--h: 120" aria-hidden="true"><img src="\.\.\/assets\/img\/archive\/the-album\.jpg"/);
+  // a song with nowhere to listen: the card's capsule waits hidden, and its row opens nothing
+  const quiet = listening('../', [{ ...song, id: 'q', listen: null }, song]);
+  assert.match(quiet, /<a class="player__listen" hidden data-hover>/);
+  // (and takes no light under the pointer: only what can be acted on answers it, as on visionOS)
+  assert.match(quiet, /<li class="track is-current" id="q"[^>]*>\s*<div class="track__go" aria-current="true">/);
+  assert.doesNotMatch(quiet.slice(quiet.indexOf('id="q"'), quiet.indexOf('id="s"')), /data-href/);
   assert.match(list, /href="https:\/\/example\.com" rel="noopener">example\.com/);
   assert.equal(listening('../', [made]), '');
   const rows = expRows('', Infinity, [made, song]);

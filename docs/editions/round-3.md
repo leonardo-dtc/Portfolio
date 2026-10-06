@@ -1214,3 +1214,106 @@ Ranked by what a visitor gains for the work it takes (S a few hours, M a day or 
 **Left out, and why:** a guestbook or live weather (a server or a third party); games (T6 took the class games out); a credits roll (Request E cut the colophons); badges with numbers on the apps (T36).
 
 **My pick, in order:** Spotlight (the biggest gain, and it completes v5's OS); the scouting card (it serves the readers who matter most to him now, coaches); "Saved." (the cheapest charm on the site). For v3, About This Macintosh and the code panel's files are an afternoon each.
+
+## 17. Spotify on Vision Pro, CDs, and what Vision Pro suggests for v5 (2026-10-06)
+
+Leonardo asked: "For the songs, I wanted it to actually use the spotify on Apple Vision Pro style for v5, and for the v3, i want it to show the CDs. Analyze more Vision Pro UI designs and list what could be changed to make v5 look better." So the CDs went to v3 rather than v5, where section 16's ninth idea had put them; v5 took Spotify's look.
+
+### What "Spotify on Vision Pro" looks like
+
+- **There is no Spotify app for visionOS** as of 6 October 2026. In January 2024 Spotify kept its iPad app off the headset and pointed listeners to Safari ([MacRumors](https://www.macrumors.com/2024/01/18/youtube-spotify-vision-pro/)). Coverage of YouTube's Vision Pro app in February 2026 still listed Spotify as missing ([tbreak](https://tbreak.com/youtube-vision-pro-app-spatial-video), seen only as a search excerpt).
+- **So the look is the designers' and the third-party clients'.**
+  - The most shared concept ([Yanko Design, 2023](https://www.yankodesign.com/2023/08/09/unofficial-spotify-interface-for-the-apple-vision-pro-brings-spatial-computing-to-the-music-app/)) and the others agree on four things: frosted glass over the room, a now playing panel with the artwork large, the controls in a bar below, and a vertical bar of tabs.
+  - The Vision Tunes client puts Spotify's controls in an ornament below its window.
+- **Apple Music on visionOS** does the same. Its player is an ornament below the window in every tab, and its tabs sit in the vertical bar ([HIG: Ornaments](https://developer.apple.com/design/human-interface-guidelines/ornaments), [WWDC23 session 10076](https://developer.apple.com/videos/play/wwdc2023/10076/)).
+
+### v5: Listening, as Spotify's now playing
+
+- **A now playing card** for one song at a time:
+  - its artwork, title, artist and line;
+  - **Listen on Spotify** in Spotify's green with black text (11:1), between Previous and Next (44px glass circles).
+- **The rows below** list every song, each with a small artwork, its title and artist, and the arrow out. The row on the card is marked, and a row opens its song on Spotify.
+- **Previous and Next** step round the songs. The artwork and words slide in 16px from the side they went, and a screen reader hears the title and artist.
+  - **They stay put** from song to song. Pink Pony Club's album name wraps to two lines and moved them 19px, so the line now always keeps room for two.
+  - **The address picks a song:** `archive/#creep` opens the card at Creep.
+  - **It works everywhere:** after a page swaps in, from the keyboard, and under reduced motion (the card changes in place).
+- **The artwork is drawn,** because a record's cover is not Leonardo's to publish.
+  - It is a field of the song's own colour, with the artist along its top and the title large at its foot.
+  - The colours: Pink Pony Club 340 (pink, set in its file); Creep 20 and Basket Case 60, picked from their file names.
+  - A new archive field, `hue`, sets the colour. A picture of his own in `archive/covers/` replaces the drawing, on the card and in the row.
+  - **Real covers need his decision.** They would mean Spotify's embed (a third-party request, which the site rules out) or publishing cover art he does not own. Neither is built.
+- **On narrower screens:**
+  - In the 260px side window the capsule reads "Spotify"; its name stays "Listen on Spotify".
+  - Below 1360px Listening moves inside the main window, and from 520px wide the card lies across it.
+- **Fixed along the way:**
+  - Previous and Next carried the browser's default button border, a white ring.
+  - A song without a link would have broken the capsule's label on the next press.
+  - An entry without a colour would have drawn a blank square.
+  - An unused class and style from the old list are gone.
+
+### v3: the songs as CDs
+
+- **On the wall, a song or album is a CD** in its jewel case:
+  - a black tray with the hinge down its side and the clear lid catching the light;
+  - on the tray, a burned disc, silver with the light turning round it, its title and artist written in marker;
+  - an album with a cover of its own would have it as the insert.
+- **How it shows:**
+  - In CSS only, so it shows without the script.
+  - On a phone the CD sits above the card's words. From 640px it sits beside them, on a card two columns wide.
+  - Pointing at the card turns the disc a little.
+- **The music comes after the things made,** so the wall opens on his own work.
+- **The Mac's CD Player** shows the CD in the player, and the next one turns in.
+- **Songs on the Mac** take the disc picture, as albums did.
+
+### What Vision Pro suggests for v5
+
+Two research passes went into this. One read Apple's Human Interface Guidelines and WWDC sessions directly. The other surveyed Apple Music, the music apps and the Apple Design Award winners, from search excerpts wherever a site would not load. Each change below was checked against v5 as built and against Leonardo's answers on the decision page.
+
+**Already as visionOS does it,** so nothing changes:
+- **The windows:** glass, never opaque, with white text and body text at Medium (500, at 19px).
+- **The tab bar:** vertical, off the window's leading edge, six items. On narrow desktops it opens after 120ms of pointing and closes 300ms after the pointer leaves.
+- **The window's furniture:** the toolbar is an ornament over the window's foot; the window bar and its close dot sit below the window.
+- **Sheets:** centred over a dimmed parent, with Close at the top left and an ornament for the next project.
+- **Hover:** the pointer's light, as visionOS's highlight "shows a light source", with no scaling on rows or cells. The player's keys shrink when pressed.
+
+**What could change,** ranked by what it does for the look against the work it takes (XS under an hour, S a few hours, M a day or two):
+
+| # | Change | Why, from visionOS | v5 now | Work |
+| --- | --- | --- | --- | --- |
+| 1 | **The hero's icons in layers.** Each white glyph on a layer of its own above its coloured disc, with a soft shadow between them and a glassy edge. On hover the glyph rises 2px and its shadow deepens; the disc stays still, so nothing grows. | An app icon is a background and one or two foreground layers; the system adds glass, specular highlights and shadows between the layers, and the icon answers a look ([HIG: App icons](https://developer.apple.com/design/human-interface-guidelines/app-icons)). visionOS 26 put Liquid Glass on these Home View icons and on nothing else but Control Center ([MacStories](https://www.macstories.net/stories/visionos-26-the-macstories-review/)). | Flat glass discs with outline glyphs; hover is light only (since Request F) | S to M |
+| 2 | **The tab bar: filled symbols, each icon before its name.** The names stay at rest where they fit (T21), left-aligned after their icons. | Tab bars use filled symbols ([HIG: Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars)); an open visionOS tab bar shows each symbol, then its name. | Outline symbols; the names right-aligned before their icons | S, plus S to M for six filled symbols |
+| 3 | **Write to me in the colour style instead of white,** as a toggle first. | A white fill with black content means selected; an action takes colour as a whole-button fill ([HIG: Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons)). | White with dark text, so it reads like a toggle that is on. T22 kept the card arrows "white like the primary button", so they would follow it. | S |
+| 4 | **Tooltips and a selected state.** A tooltip under each icon-only button after a short pause (Previous, Next, Close, the colour control); the colour control shows selected while its panel is open. | A button shows a tooltip below it after a dwell, and a button that opens a popover turns selected ([HIG: Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons), [WWDC23 session 10076](https://developer.apple.com/videos/play/wwdc2023/10076/)). | No tooltips (the colour control has a side label); the control looks the same open or shut | S |
+| 5 | **Words in the room set bold, titles at the system's spacing.** The hint becomes bold white. Page titles go from −0.012em to 0; the name in Switzer keeps its tight setting. | Text floating in space is bold, with no shadow; titles are Bold with slightly wider tracking ([HIG: Typography](https://developer.apple.com/design/human-interface-guidelines/typography)). | The hint at 500 in Ink 2; the titles tightened | XS |
+| 6 | **The glass edge lit from above:** brightest along the top, fading down the sides, faint at the foot. | Apple documents specular highlights on windows but not their exact form. This is a reading of how visionOS windows look, so it is a judgment call. | An even bright line all round | M |
+| 7 | **A Music Poster on Home,** if T39 goes to widgets: the newest song's artwork in a frame, opening Listening. | visionOS 26's Music Poster widget: framed artwork, in paper or glass, tapped to play ([WWDC25 session 255](https://developer.apple.com/videos/play/wwdc2025/255/)). | Nothing yet | M |
+| 8 | **Light from the artwork.** The room by the Listening window takes a faint wash of the song's colour, changing only on Previous or Next. | Apple TV's cinema spills its light onto the floor and ceiling ([WWDC23 session 10072](https://developer.apple.com/videos/play/wwdc2023/10072/)). | Nothing yet | M or more |
+| 9 | **Listening's keys in an ornament** below its window, as Apple Music and Vision Tunes have them. | Apple Music's player is an ornament below the window. | In the card | M. Not recommended: on a page the keys belong beside the artwork they change. |
+
+**Left out on purpose:**
+- **Tab names only on hover,** visionOS's way: T21 kept them at rest where they fit. The code is already there, and narrow desktops use it.
+- **60pt targets and Look to Scroll:** they are made for eyes, and a mouse or a finger needs neither. v5 keeps 44px.
+- **Windows to drag or resize,** which T37 ruled out, and **curved windows,** which visionOS 27 gives only Safari, Freeform and TV Multiview.
+- **Sound on a press,** which T38 ruled out.
+- **An immersive environment:** the room already is v5's.
+
+**On the hero's open question (Neon or Liquid Glass):** on Vision Pro, Apple used Liquid Glass for the Home View's icons and kept windows in frosted glass. That speaks for item 1, not for either title.
+
+**My pick:** 1, 2 and 5 together, about a day, so the hero and every page's tab bar read as visionOS. Then 3 as a toggle, to judge it beside the card arrows.
+
+### Checks
+
+- **Unit tests:** 40 of 40, now covering the player's markup (the card, the keys, the capsule, a cover in the drawing's place, a song with nowhere to listen, an entry with no colour). `node tools/archive.mjs --check` and `node tools/v5-chrome.mjs --check` find no drift.
+- **A new v5 suite, `tests/v5/e2e/listening.mjs`, 48 of 48.** It covers:
+  - the card and the marked row; Next and Previous going round; the screen reader's line; the keys staying put;
+  - the address picking a song, and the player after a page swaps in;
+  - Enter and Space; reduced motion; no word under 12px; every control 44px or more;
+  - a cover in the drawing's place; the page without the script, in print and in forced colours;
+  - contrast of 4.65:1 or more by Night and by Day, at 1440 and 390.
+- **The other v5 suites:** pages 108, links (275 on 13 pages), layouts 104, keys 19, nav 48, modes 58, contrast 12, palettes 71, filters 11, launcher 52, room 5, glass 3, fixes 29, and the visual audit at 12 sizes with no problems.
+- **Fixes was flaky; the cause was the test's timing, not the site.** The first run failed check 9 (Escape on a sheet loaded on its own); the second failed check 18 (the title within 500ms of a click).
+  - Check 9 missed one run in five on this branch and on 8ed68c4 alike. In the misses, the address had already changed to `work/` but Work's page had not yet swapped in when the test looked, 1.5 seconds after Escape. By 5 seconds focus was on the window title, as designed.
+  - Check 9 now waits for Work to be in place.
+  - Check 18 now times from the click itself rather than from before Playwright's own wait for the card to hold still: 60ms.
+- **v3:** `node tests/v3/check.mjs`, 157 of 157, with the two new CD checks: the CD Player's disc, and the wall's CDs after the things made, two columns wide.
+- **The staged deploy crawl:** 21 pages, 70 URLs, none failed; noindex on all 21; no link outside its own edition; the archive Mac's ten files; the Archive page reached from an Experiments row and from the old address.
