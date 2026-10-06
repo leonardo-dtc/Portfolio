@@ -1024,6 +1024,9 @@ html.no-room .hue, html:not(.js) .hue { display: none; }
 }
 /* under 400px six labelled tabs take the dock's whole width: the control's button joins the window's toolbar (its
    actions, inline at the foot of the page) as a fill like its neighbours, and the panel opens above the dock */
+/* under 360px the six names' own widths (12px, the floor) outgrow the bar with its padding, so the bar's sides and
+   the tabs' own padding tighten: at 320 every tab is still 44px or wider (Work's was 41px, the six overflowing) */
+@media (max-width: 359px) { .tabs { padding-inline: 5px; } .tabs a { padding-inline: 0; } }
 @media (max-width: 399px) {
   :root { --tab-w: calc(100vw - 20px); --dock-x: 10px; }
   .hue.hue--toolbar { left: calc(10px + env(safe-area-inset-left)); right: calc(10px + env(safe-area-inset-right)); bottom: calc(var(--dock-y) + var(--dock-h) + 10px); }

@@ -58,7 +58,8 @@ for (const [w, h, touch, named] of [[1280, 800, false, true], [1024, 620, false,
 }
 
 // Under 1360px the side window goes where it serves: Hockey's Measurables and coach contacts first, About's portrait
-// first and its Interests last, the Résumé's Sections as chips pinned under the window's head, Home's This fall last.
+// first and its Interests last, the Résumé's Sections as chips pinned under the window's head, Home's This fall last
+// (last of the content: a page's own actions, inline at its foot, close it).
 for (const [w, h] of [[1024, 620], [390, 844], [320, 640]]) {
   const { browser, page, errors } = await open({ width: w, height: h });
   const at = async (path) => {
@@ -68,7 +69,8 @@ for (const [w, h] of [[1024, 620], [390, 844], [320, 640]]) {
       const body = document.querySelector('#main .win__body'), top = el => el && Math.round(el.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop);
       const pin = document.querySelector('#main > .side__part--pin');
       // (the window carries has-pin for the pinned row's grid row, not :has(), which older browsers lack)
-      return { first: body.firstElementChild.matches('aside.side'), last: body.lastElementChild.matches('aside.side, .side__part'), measure: top(document.getElementById('measure-h')), coaches: top(document.getElementById('coaches-h')), interests: top(document.getElementById('likes-h')), essay: top(body.querySelector('aside.side ~ *')), pinned: !!pin && pin.nextElementSibling === body && !!pin.querySelector('.toc') && document.getElementById('main').classList.contains('has-pin') };
+      const kids = [...body.children].filter(k => !k.matches('.toolbar--inline')), tail = body.lastElementChild;
+      return { first: body.firstElementChild.matches('aside.side'), last: kids[kids.length - 1].matches('aside.side, .side__part') && (tail === kids[kids.length - 1] || tail.matches('.toolbar--inline')), measure: top(document.getElementById('measure-h')), coaches: top(document.getElementById('coaches-h')), interests: top(document.getElementById('likes-h')), essay: top(body.querySelector('aside.side ~ *')), pinned: !!pin && pin.nextElementSibling === body && !!pin.querySelector('.toc') && document.getElementById('main').classList.contains('has-pin') };
     });
   };
   const hockey = await at('hockey/');
