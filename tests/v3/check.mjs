@@ -61,6 +61,9 @@ const errors = [];
 const browser = await chromium.launch();
 /* the project files, v3/files/<slug>/: when you add a file, add its slug here */
 const FILES = ['aducanumab', 'genuvalens', 'loquar', 'ocapex', 'hockey', 'resume'];
+/* the archive's entries (archive/*.md, drafts left out): as many cards on the wall and files on the Mac */
+const { published } = await import('../../tools/archive.mjs');
+const ENTRIES = published().length;
 async function open({ width = 1440, height = 900, js = true, reduced = false, touch = false, path = '' } = {}) {
   const ctx = await browser.newContext({ viewport: { width, height }, javaScriptEnabled: js, reducedMotion: reduced ? 'reduce' : 'no-preference', ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const page = await ctx.newPage();
@@ -512,15 +515,67 @@ for (const [w, h] of [[1440, 900], [1024, 620]]) {
   await ph.context().close();
 
   /* touch screens: the routes and the chrome's name are 44px tall targets, and the whole height takes the tap
-     (measured along the word's own height: the hand line is tilted 3 degrees) */
+     (measured along the word's own height: the hand line is tilted 3 degrees); the chrome's name once the cover's
+     own has passed (on the cover it gives way to it, below) */
   const tp = await open({ width: 390, height: 844, touch: true });
-  const tt = await tp.evaluate(() => [...document.querySelectorAll('.route'), document.querySelector('.chrome a')].filter(a => a.getClientRects().length && a.checkVisibility()).map(a => {
+  const targets = () => tp.evaluate((sel) => [...document.querySelectorAll(sel)].filter(a => a.getClientRects().length && a.checkVisibility()).map(a => {
     const r = a.getClientRects()[0], cx = r.left + r.width / 2, cy = r.top + r.height / 2, h = a.offsetHeight;
     const hit = y => { const e = document.elementFromPoint(cx, y); return !!e && (e === a || a.contains(e)); };
     return { t: a.textContent.trim(), h, ends: hit(cy - h / 2 + 2) && hit(cy + h / 2 - 2) };
-  }));
+  }), '.route');
+  const tt = await targets();
+  /* past the cover, then a little way back up, which brings the chrome back (scrolling down puts it away) */
+  await tp.evaluate(() => window.scrollTo({ top: document.getElementById('cover').offsetHeight + 200, behavior: 'instant' }));
+  await tp.waitForTimeout(300);
+  await tp.evaluate(() => window.scrollTo({ top: document.getElementById('cover').offsetHeight + 100, behavior: 'instant' }));
+  await tp.waitForTimeout(600);
+  tt.push(...await tp.evaluate(() => [document.querySelector('.chrome a')].map(a => {
+    const r = a.getBoundingClientRect(), cx = r.left + r.width / 2, h = a.offsetHeight;
+    const hit = y => { const e = document.elementFromPoint(cx, y); return !!e && (e === a || a.contains(e)); };
+    return { t: a.textContent.trim(), h, ends: hit(r.top + 2) && hit(r.bottom - 2) };
+  })));
   check(tt.length >= 4 && tt.every(x => x.h >= 44 && x.ends), `touch: the cover's routes and the chrome's name take 44px (${tt.map(x => x.t + ' ' + x.h).join(', ')})`, JSON.stringify(tt));
   await tp.context().close();
+
+  /* the chrome's name gives way to the cover's own while that is on screen (it repeated it, small, above it), comes
+     back while it holds keyboard focus there, and again once the cover's name has passed */
+  const cv = await open({ width: 1440, height: 900 });
+  const nameState = () => cv.evaluate(() => { const a = document.querySelector('.chrome a'), cs = getComputedStyle(a); return { opacity: +cs.opacity, events: cs.pointerEvents }; });
+  const onCover = await nameState();
+  await cv.keyboard.press('Tab'); await cv.keyboard.press('Tab'); await cv.waitForTimeout(400);   /* skip, then the name */
+  const focused = { ...await nameState(), on: await cv.evaluate(() => document.activeElement === document.querySelector('.chrome a')) };
+  await cv.evaluate(() => { document.activeElement.blur(); window.scrollTo({ top: document.getElementById('cover').offsetHeight, behavior: 'instant' }); });
+  await cv.waitForTimeout(600);
+  const passed = await nameState();
+  await cv.context().close();
+  check(onCover.opacity === 0 && onCover.events === 'none' && focused.on && focused.opacity === 1 && passed.opacity === 1 && passed.events !== 'none', `the chrome's name gives way to the cover's (opacity ${onCover.opacity}), shows while focused there (${focused.opacity}) and once the cover is passed (${passed.opacity})`, JSON.stringify({ onCover, focused, passed }));
+
+  /* the cover, cleaner (2026-10-06): no tape over the title; the block as wide as the name (the hand line wraps inside
+     it); no line of the hand line ends on a dot; the code panel opens with a few lines in it */
+  const cov = [];
+  for (const [w, h] of [[1440, 900], [1024, 768], [900, 700], [390, 844], [320, 568]]) {
+    const cp = await open({ width: w, height: h });
+    await cp.evaluate(() => document.fonts.ready); await cp.waitForTimeout(300);
+    const r = await cp.evaluate(() => {
+      const hand = document.querySelector('.cover__hand'), blk = document.querySelector('.cover__block'), name = document.querySelector('.cover__title .name');
+      hand.style.rotate = 'none';
+      const rg = document.createRange(), top = el => { rg.selectNodeContents(el); const q = rg.getClientRects(); return q.length ? q[0].top : null; };
+      const routes = [...hand.querySelectorAll('.route')].filter(a => a.getClientRects().length);
+      // a dot left showing whose next word starts a line below it
+      const ends = [...hand.querySelectorAll('.hand__sep')].filter(sp => sp.getClientRects().length && getComputedStyle(sp).visibility !== 'hidden').filter(sp => { const nx = routes.find(a => sp.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING); return nx && top(nx) > top(sp) + 4; }).length;
+      const lines = new Set(routes.map(a => Math.round(top(a)))).size;
+      hand.style.rotate = '';
+      const B = blk.getBoundingClientRect(), pl = parseFloat(getComputedStyle(blk).paddingLeft);
+      return { tapes: document.querySelectorAll('.cover__title .tape').length, wider: Math.round(B.width - pl - name.getBoundingClientRect().width), ends, lines };
+    });
+    await cp.context().close();
+    if (r.tapes || r.wider > 1 || r.ends) cov.push(`${w}x${h}: ${JSON.stringify(r)}`);
+  }
+  check(cov.length === 0, 'the cover: no tape on the title, the block as wide as the name, and no line of the hand line ends on a dot (1440, 1024, 900, 390, 320 wide)', cov);
+  const cp = await open({ width: 1440, height: 900 });
+  const code = await cp.evaluate(() => document.querySelector('[data-code-out]').textContent.split('\n').length - 1);
+  await cp.context().close();
+  check(code >= 4, `the code panel opens with a few lines in it (${code} at the first look)`);
 }
 
 /* ---------- 6d. the archive's Macintosh (assets/js/mac.js) ---------- */
@@ -814,7 +869,7 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
   const mail = await page.evaluate(() => { const a = [...document.querySelectorAll('.chrome a')].find(x => /^mailto:/.test(x.getAttribute('href'))); return a && { text: a.textContent.trim(), href: a.getAttribute('href') }; });
   check(mail && mail.text === 'Email' && mail.href === 'mailto:leonardo.dtc2009@gmail.com', 'T4: the chrome carries Email, so a way to write shows on every sheet', JSON.stringify(mail));
   const games = await page.evaluate(() => ({ cards: [...document.querySelectorAll('.entries > .entry .entry__title')].map(e => e.textContent), mac: window.__v3mac ? window.__v3mac.files.length : 0, record: /Snake, Minesweeper/.test(document.getElementById('record').textContent), index: document.getElementById('file-archive').textContent }));
-  check(!games.cards.some(t => /snake|minesweeper/i.test(t)) && games.cards.length === 7 && games.mac === 7 && games.record && !/games/i.test(games.index), `T6: no class games in the archive (${games.cards.length} cards, ${games.mac} files on the Mac) or in its index card; The record keeps them as coursework`, JSON.stringify(games));
+  check(!games.cards.some(t => /snake|minesweeper/i.test(t)) && games.cards.length === ENTRIES && games.mac === ENTRIES && games.record && !/games/i.test(games.index), `T6: no class games in the archive (${games.cards.length} cards and ${games.mac} files on the Mac, for ${ENTRIES} entries) or in its index card; The record keeps them as coursework`, JSON.stringify(games));
   const def = await page.evaluate(() => ({ archive: document.documentElement.dataset.archive, cover: document.documentElement.dataset.cover, talk: document.documentElement.dataset.talk, words: document.documentElement.dataset.talkWords, api: typeof window.toggles, list: typeof window.toggles.list }));
   check(def.archive === 'mac' && def.cover === 'poster' && def.talk === 'clean' && def.words === 'lets-talk' && def.api === 'object' && def.list === 'function', `the toggles' defaults show on <html>: archive ${def.archive}, cover ${def.cover}, talk ${def.talk}, words ${def.words}`, JSON.stringify(def));
   // the archive: the Mac by default; the wall of cards from the console, kept across a reload; reset returns the Mac
@@ -825,7 +880,7 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
   const v1 = await view();
   await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(1200);
   const v2 = await view(), kept = await page.evaluate(() => localStorage.getItem('v3:toggles'));
-  check(v0.mac && v0.cards === 0 && !v1.mac && v1.cards === 7 && !v2.mac && v2.cards === 7 && /"archive":"cards"/.test(kept), `T17: the Mac by default; toggles.archive = 'cards' shows the wall of cards instead, kept in this browser across a reload`, JSON.stringify({ v0, v1, v2, kept }));
+  check(v0.mac && v0.cards === 0 && !v1.mac && v1.cards === ENTRIES && !v2.mac && v2.cards === ENTRIES && /"archive":"cards"/.test(kept), `T17: the Mac by default; toggles.archive = 'cards' shows the wall of cards instead, kept in this browser across a reload`, JSON.stringify({ v0, v1, v2, kept }));
   // Find with the cards goes to the card itself, not to a window on the Mac
   await page.evaluate(() => { document.querySelector('[data-index-open]').click(); });
   await page.waitForTimeout(400);
@@ -833,10 +888,12 @@ for (const [w, h] of [[390, 844], [320, 700]]) {
   await page.waitForTimeout(1600);
   const found = await page.evaluate(() => ({ card: !!document.querySelector('.entries > .entry.is-found'), files: window.__v3mac.windows.filter(w => !/finder|trash/.test(w.className)).length, file: (document.querySelector('dialog.entry-file[open] .entry-file__title') || {}).textContent }));
   check(found.card && found.files === 0 && /Rocketry/.test(found.file || ''), 'T17: with the cards, Find lights the card itself and opens its file on paper (no file opens on the hidden Mac)', JSON.stringify(found));
-  // the card's file: Escape puts it away and the focus goes back to its card; a press on the card opens it again
+  // the card's file: Escape puts it away and the focus goes back to its card; a press on the card opens it again (the
+  // first card with more to read: a song's card keeps all of it at rest)
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
-  await page.click('.entries > .entry:nth-child(2)'); await page.waitForTimeout(500);
-  const cardFile = await page.evaluate(() => { const dlg = document.querySelector('dialog.entry-file'), li = document.querySelector('.entries > .entry:nth-child(2)'); return { open: dlg.open, title: dlg.querySelector('.entry-file__title').textContent === li.querySelector('.entry__title').textContent.trim(), paras: dlg.querySelectorAll('.entry-file__more > p').length === li.querySelectorAll('.entry__more > p').length, link: !!dlg.querySelector('.entry-file__go a[href^="#"]'), inCard: getComputedStyle(li.querySelector('.entry__more')).display }; });
+  const nth = await page.evaluate(() => [...document.querySelectorAll('.entries > .entry')].findIndex(li => li.querySelector('.entry__more')) + 1);
+  await page.click(`.entries > .entry:nth-child(${nth})`); await page.waitForTimeout(500);
+  const cardFile = await page.evaluate((nth) => { const dlg = document.querySelector('dialog.entry-file'), li = document.querySelector(`.entries > .entry:nth-child(${nth})`); return { open: dlg.open, title: dlg.querySelector('.entry-file__title').textContent === li.querySelector('.entry__title').textContent.trim(), paras: dlg.querySelectorAll('.entry-file__more > p').length === li.querySelectorAll('.entry__more > p').length, link: !!dlg.querySelector('.entry-file__go a[href^="#"]'), inCard: getComputedStyle(li.querySelector('.entry__more')).display }; }, nth);
   await page.keyboard.press('Escape'); await page.waitForTimeout(300);
   const after = await page.evaluate(() => ({ open: document.querySelector('dialog.entry-file').open, focus: document.activeElement.className }));
   check(cardFile.open && cardFile.title && cardFile.paras && cardFile.link && cardFile.inCard === 'none' && !after.open && after.focus === 'entry__open', 'T17: a card on the wall shows its year, kind, title and line; pressing it opens its whole file, and Escape returns to the card', JSON.stringify({ cardFile, after }));
