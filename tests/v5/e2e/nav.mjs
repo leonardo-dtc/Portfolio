@@ -159,7 +159,8 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   await page.click('nav.tabs a[data-tab="resume"]');
   await page.waitForURL('**/v5/resume/');
   await settle(page);
-  check(await page.evaluate(() => !!document.querySelector('#main > .side__part--pin .toc') && document.querySelector('#main .win__body').lastElementChild.matches('aside.side') && document.querySelectorAll('aside.side').length === 1), 'phone: the Résumé’s Sections are pinned and its Contact closes the page');
+  // (the page's own actions follow it, inline at the foot)
+  check(await page.evaluate(() => { const kids = [...document.querySelector('#main .win__body').children].filter(k => !k.matches('.toolbar--inline')); return !!document.querySelector('#main > .side__part--pin .toc') && kids[kids.length - 1].matches('aside.side') && document.querySelectorAll('aside.side').length === 1; }), 'phone: the Résumé’s Sections are pinned and its Contact closes the page, before its actions');
   await page.click('nav.tabs a[data-tab="home"]');
   await page.waitForURL(u => u.pathname === '/v5/');
   await settle(page);
