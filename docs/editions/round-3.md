@@ -1151,10 +1151,12 @@ The toggle already existed (`heroName`, T41), but only in the browser's console.
 
 | | Before | After |
 | --- | --- | --- |
-| With the room, by night | 2.3 to 2.7:1 | 3.4 to 5.1:1 (all five styles measured) |
-| With the room, by day | 2.4 to 3.0:1 | 4.8 to 6.5:1 |
-| Without the room, by night | 4.4 to 6.4:1 | unchanged |
-| Without the room, by day | 1.2 to 1.9:1 | 5.6 to 8.7:1 |
+| With the room, by night | 2.3 to 2.7:1 | 3.4 to 5.1:1 |
+| With the room, by day | 2.4 to 3.0:1 | 4.8 to 6.8:1 |
+| Without the room, by night | 4.3 to 8.8:1 | unchanged |
+| Without the room, by day | 1.2 to 1.9:1 | 5.4 to 8.4:1 |
+
+(Cobalt at 1440 and 390 in `tests/v5/e2e/neon.mjs`, which now checks all eight; with the room, Graphite, Ember, Red and Violet were measured too, Red the lowest by night at 3.4:1.)
 
 - **By night** a soft shade of the style's deep colour lies right round the letters, under the light behind them; the faces are a touch brighter.
 - **By day** the letters are deep glass in the style's colour with a brighter bevel, on a pale halo, as tinted glass looks against a bright sky. The first fix tried, white glass on a dark pool (what section 14 proposed), was legible but read as a dark slab on a phone; the deep glass keeps the day room airy.

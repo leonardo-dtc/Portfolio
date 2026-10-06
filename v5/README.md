@@ -317,7 +317,7 @@ whatever steps back dims and never blurs. Rebuilt here in glass:
     letters, under that light; by day they are deep glass in the style's colour
     with a light rim, on a pale halo, as tinted glass looks against a bright sky
     (Request F: light glass on the bright day room measured 1.2 to 3.0:1; now
-    every face keeps 3.4:1 or more beside it, in every colour style).
+    every face keeps 3.4:1 or more beside it, in each colour style measured).
 
   Without WebGL each has its CSS version. The panel below switches them.
 - **Portrait tablets** set the name on two lines, as phones do, at
