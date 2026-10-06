@@ -189,9 +189,14 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
   .slide--paper .more:hover, .card .more:hover { color: var(--red-ink); } /* 13px on paper */
   .more:hover::after { animation: redraw 460ms var(--ease-out); }
   .linkrow a:hover { color: var(--red); background-size: 100% 2px; }
-  .chrome a { transition: letter-spacing 200ms var(--ease-out); }
+  .chrome a { transition: letter-spacing 200ms var(--ease-out), opacity 300ms var(--ease-out); }
   .chrome a:hover { letter-spacing: .16em; }
 }
+/* while the cover's giant name is on screen the chrome's name gives way to it (it said the same, small, above it); it
+   comes back once the name has passed, and while it holds keyboard focus (site.js sets on-cover; without the script it
+   stays) */
+.chrome a { transition: opacity 300ms var(--ease-out); }
+html.on-cover .chrome > a:first-child:not(:focus-visible) { opacity: 0; pointer-events: none; }
 .hand { font: 400 clamp(1.15rem, 1rem + 1.3vw, 2rem)/1.1 var(--hand); color: var(--fg); }
 
 /* ---------- Motifs: tape, tears, stickers ---------- */
@@ -235,7 +240,11 @@ html:not(.js) .rail::before { content: ""; grid-column: 2; grid-row: 1; } /* hol
 .cover .sheet__in { grid-template-rows: minmax(0, 1fr) auto; align-content: stretch; }
 .cover__stage { position: relative; display: grid; align-content: center; justify-items: center; padding-block: clamp(.5rem, 4vh, 3rem); }
 .cover__block { position: relative; display: grid; justify-items: start; width: max-content; max-width: 100%; padding-left: clamp(56px, 6.5vw, 104px); }
-.cover__hand { position: relative; z-index: 2; rotate: -3deg; margin: 0 0 .45em 2%; font-size: clamp(1.15rem, .9rem + 1.3vw, 2.1rem); text-wrap: balance; }
+/* the block takes the name's width: the hand line adds none of its own (contain), and wraps inside the name's (on one
+   line it had widened the block past the name by up to 59px, at 900 wide, pulling the name off centre). A dot that
+   would end a line is hidden (site.js marks it), so a wrapped line never ends on one */
+.cover__hand { position: relative; z-index: 2; rotate: -3deg; margin: 0 0 .45em 2%; font-size: clamp(1.15rem, .9rem + 1.3vw, 2.1rem); text-wrap: balance; contain: inline-size; justify-self: stretch; }
+.hand__sep.is-end { visibility: hidden; }
 /* the hand line's words are routes: a vermilion marker stroke lies under each, faint at rest; pointing at a
    word or focusing it draws the stroke through in 300ms (on touch screens it is drawn already). The line
    stacks above the title (z-index 2), whose line box reaches up under it, so the whole word takes the pointer. */
@@ -290,8 +299,6 @@ html:not(.js) .cover__code { display: none; }   /* without the script it stays a
 .strip-edge { transform: translate(4px, 5px); }
 .strip > .name { position: absolute; inset: 0; }
 .cover .sticker--mask { right: -15%; top: -30%; --rot: 8deg; transform: rotate(var(--rot)); width: clamp(120px, 14.5vw, 215px); height: auto; }
-.cover .tape--a { left: -4%; top: 6%; transform: rotate(-32deg); width: clamp(90px, 11vw, 150px); }
-.cover .tape--b { right: -4%; bottom: 6%; transform: rotate(-16deg); width: clamp(90px, 11vw, 150px); }
 .cover__foot { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-items: end; gap: 1rem; min-height: 72px; }   /* the tag alone now (the hint and the year gone): all the width, so it keeps to one line */
 .cover__foot .tag { justify-self: start; }
 .tag { position: relative; display: inline-block; background: var(--paper); color: var(--black); font-weight: 700; font-size: var(--small); letter-spacing: .12em; text-transform: uppercase; text-wrap: balance; padding: .95em 1.3em; --rot: -6deg; transform: rotate(var(--rot)); transform-origin: 20% 100%; margin-left: 2%; }
@@ -303,7 +310,6 @@ html:not(.js) .cover__code { display: none; }   /* without the script it stays a
   .cover__block { padding-left: 0; }
   .cover__code { display: none; }
   .cover .sticker--mask { right: -2%; left: auto; top: calc(100% + 6px); width: 72px; }   /* under the name, clear of its letters (over LEONARDO's last O it hid it) */
-  .cover .tape--b { right: 30%; bottom: -10%; }
   .cover__foot .tag { margin-bottom: .5rem; }
 }
 /* the narrowest phones: the tag on two lines of its own, its paper as wide as the longer (wrapped, it kept the whole
@@ -872,6 +878,7 @@ html:not([data-talk="collage"]) .end__btn { border-color: rgba(255,255,255,.85);
   .cover__stage { display: block; padding: 0; justify-items: normal; }   /* (centred there, the block shrank to its line and sat mid-page) */
   .cover__block { display: block; width: auto; padding-left: 0; }
   .cover__hand { rotate: none; max-width: none; margin: 0 0 .3rem; font: 700 9pt/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+  .hand__sep.is-end { visibility: visible; }   /* (marked for the screen's line breaks, not the page's) */
   .route { text-shadow: none; }
   .cover .tag { transform: none !important; margin: .8rem 0 0; }
   .panel h3, .numbers .n, .card--red .big { color: #000 !important; }

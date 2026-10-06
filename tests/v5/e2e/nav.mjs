@@ -159,11 +159,40 @@ const text = (page, sel) => page.evaluate(s => { const el = document.querySelect
   await page.click('nav.tabs a[data-tab="resume"]');
   await page.waitForURL('**/v5/resume/');
   await settle(page);
-  check(await page.evaluate(() => !!document.querySelector('#main > .side__part--pin .toc') && document.querySelector('#main .win__body').lastElementChild.matches('aside.side') && document.querySelectorAll('aside.side').length === 1), 'phone: the Résumé’s Sections are pinned and its Contact closes the page');
+  // (the page's own actions follow it, inline at the foot)
+  check(await page.evaluate(() => { const kids = [...document.querySelector('#main .win__body').children].filter(k => !k.matches('.toolbar--inline')); return !!document.querySelector('#main > .side__part--pin .toc') && kids[kids.length - 1].matches('aside.side') && document.querySelectorAll('aside.side').length === 1; }), 'phone: the Résumé’s Sections are pinned and its Contact closes the page, before its actions');
   await page.click('nav.tabs a[data-tab="home"]');
   await page.waitForURL(u => u.pathname === '/v5/');
   await settle(page);
   check(await page.evaluate(() => !document.querySelector('.side__part--pin') && document.querySelector('#main .win__body').lastElementChild.matches('aside.side')), 'phone: back on Home, nothing is pinned and This fall closes the page');
   check(errors.length === 0, 'no console errors ' + errors.join(' | '));
   await browser.close();
+}
+// phones: the six tabs fill the dock, apart and clear of the colour control; under 400px the control leaves the dock
+// for the front window's actions at its foot (on Work, whose inline toolbar is its filters, a row of its own at the
+// foot, not one more filter), and from 400px it keeps its corner
+{
+  const rows = [];
+  for (const [w, h] of [[360, 640], [375, 667], [390, 844], [430, 932]]) {
+    const { browser, page, errors } = await open({ width: w, height: h, touch: true });
+    for (const path of ['work/', 'hockey/']) {
+      await page.goto(BASE + path, { waitUntil: 'load' });
+      await settle(page, 900);
+      rows.push({ w, path, ...await page.evaluate(() => {
+        const bar = document.querySelector('.tabs').getBoundingClientRect(), tabs = [...document.querySelectorAll('.tabs a')].map(a => a.getBoundingClientRect());
+        const btn = document.querySelector('.hue__button'), b = btn.getBoundingClientRect(), home = btn.parentElement;
+        const over = (p, q) => Math.min(p.right, q.right) - Math.max(p.left, q.left) > 1 && Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top) > 1;
+        return {
+          six: tabs.length === 6, inside: tabs.every(t => t.left >= bar.left - 1 && t.right <= bar.right + 1),
+          apart: tabs.every((t, i) => tabs.every((u, j) => i === j || !over(t, u))), clear: tabs.every(t => !over(t, b)),
+          where: home.classList.contains('hue') ? 'corner' : home.classList.contains('hue__row') ? 'row' : home.classList.contains('filters') ? 'filters' : 'actions',
+          foot: !!home.closest('.win__body') && home.closest('.win__body').lastElementChild === home,
+        };
+      }) });
+    }
+    check(errors.length === 0, `phone ${w}: no console errors ` + errors.join(' | '));
+    await browser.close();
+  }
+  const bad = rows.filter(r => !r.six || !r.inside || !r.apart || !r.clear || (r.w < 400 ? (r.path === 'work/' ? r.where !== 'row' || !r.foot : r.where !== 'actions') : r.where !== 'corner'));
+  check(bad.length === 0, `phones: six tabs fill the dock apart and clear of the colour control, which under 400px joins the window's actions (on Work a row of its own at the foot) and from 400px keeps its corner (${rows.map(r => `${r.w} ${r.path} ${r.where}`).join(', ')})`, JSON.stringify(bad));
 }

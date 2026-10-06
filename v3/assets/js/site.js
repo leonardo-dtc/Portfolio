@@ -16,7 +16,7 @@
   var slides = Array.prototype.slice.call(d.querySelectorAll('.deck > .slide'));
   var dims = slides.map(function (s) { return s.querySelector('.slide__dim'); });
   var dots = Array.prototype.slice.call(d.querySelectorAll('.rail a'));
-  var cover = d.querySelector('.cover');
+  var cover = d.querySelector('.cover'), coverName = d.querySelector('.cover__title');
   if (!deck || !slides.length) return;
 
   /* ---- 1. wrap headlines so they can rise out of a clipped line box ---- */
@@ -151,8 +151,10 @@
 
   /* ---- 3. geometry: normal-flow tops, and which sheets are too tall to stick ---- */
   var tops = [], vh = window.innerHeight, current = 0, stacked = stackMQ.matches;
+  var chromeH = 52;
   function measure() {
     vh = window.innerHeight;
+    chromeH = parseFloat(getComputedStyle(html).getPropertyValue('--chrome')) || 52;
     slides.forEach(function (s, i) {
       s.classList.remove('is-tall'); s.style.transform = '';
       if (dims[i]) dims[i].style.opacity = '';
@@ -180,6 +182,14 @@
   function update() {
     ticking = false;
     var y = window.pageYOffset || html.scrollTop;
+    /* the chrome's name gives way to the cover's own while at least half of that shows: below the chrome and, where
+       the sheets stack, not yet under the sheet sliding over the cover (a covered sheet still intersects the
+       viewport, so this is read from the geometry too). The CSS keeps it while it holds keyboard focus. */
+    if (coverName) {
+      var nr = coverName.getBoundingClientRect(), shownTop = Math.max(nr.top, chromeH), shownBottom = nr.bottom;
+      if (stackMQ.matches && tops.length > 1) shownBottom = Math.min(shownBottom, tops[1] - y);
+      html.classList.toggle('on-cover', shownBottom - shownTop > nr.height * 0.5);
+    }
     /* current slide: the last one whose flow top has passed the middle of the viewport */
     var cur = 0;
     for (var i = 0; i < slides.length; i++) { if (tops[i] <= y + vh * 0.5) cur = i; }
@@ -336,6 +346,16 @@
     });
     var si = 0, ci = 0, span = null, paused = false, done = false, timer = 0;
     function atBottom() { body.scrollTop = body.scrollHeight; }
+    /* a few lines are there from the start, so the panel reads as a file being worked on (three seconds in, it held
+       one line) */
+    function prefill(lines) {
+      for (; si < segs.length && lines > 0; si++) {
+        var seg = segs[si];
+        if (seg.file) { if (fileEl) fileEl.textContent = seg.file; continue; }
+        var sp = d.createElement('span'); if (seg.cls) sp.className = seg.cls; sp.textContent = seg.text; out.appendChild(sp);
+        if (seg.text === '\n') lines--;
+      }
+    }
     function tick() {
       timer = 0;
       if (done) return;
@@ -376,9 +396,34 @@
       codeBox.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { paused = true; codeBox.classList.add('is-paused'); } });
       codeBox.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { paused = false; codeBox.classList.remove('is-paused'); atBottom(); } });
       codeBox.addEventListener('click', function () { if (tapped) { paused = !paused; codeBox.classList.toggle('is-paused', paused); if (!paused) atBottom(); } });
+      prefill(5);
       timer = setTimeout(tick, 1400);
     }
   }
+
+  /* ---- the cover's hand line: a dot that would end a line is hidden, so a wrapped line never ends on one (it stays
+     in place, so the line breaks where it did). Read with the line unturned (it is rotated 3 degrees), whenever its
+     size changes and once the fonts are in. ---- */
+  var hand = d.querySelector('.cover__hand');
+  if (hand) {
+    var seps = [].slice.call(hand.querySelectorAll('.hand__sep')), routes = [].slice.call(hand.querySelectorAll('.route'));
+    var rg = d.createRange();
+    var topOf = function (el) { rg.selectNodeContents(el); var r = rg.getClientRects(); return r.length ? r[0].top : null; };
+    var lineEnds = function () {
+      hand.style.rotate = 'none';
+      seps.forEach(function (sep) {
+        var next = null;
+        for (var i = 0; i < routes.length && !next; i++) if (sep.compareDocumentPosition(routes[i]) & Node.DOCUMENT_POSITION_FOLLOWING) next = routes[i];
+        var a = topOf(sep), b = next && topOf(next);
+        sep.classList.toggle('is-end', a !== null && b !== null && b > a + 4);
+      });
+      hand.style.rotate = '';
+    };
+    if ('ResizeObserver' in window) new ResizeObserver(lineEnds).observe(hand);
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(lineEnds);
+    lineEnds();
+  }
+
 
   /* ---- the rail and the cabinet ----
      The rail is always on screen: a dot per sheet, the current sheet's number and name, and the folder

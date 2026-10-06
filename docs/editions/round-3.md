@@ -1124,3 +1124,93 @@ An audit went through both at eight sizes, with and without WebGL and the script
 - **The cuts he may not want:** the cover's big red "2026" (only the top right's was named; both went), About's and the archive's subtitles, Home's Elite Prospects and NCSA rows (the toolbar has both), and the kept ones above (Home's clock, the Résumé's Honors).
 - **The hero improvements** above.
 - **T30:** the unused hello files, still in the repository.
+
+## 15. Three songs, the Archive found, Liquid Glass to compare, and the improvements applied (2026-10-06)
+
+Leonardo asked for five things: three songs in the archive (Creep by Radiohead, Pink Pony Club by Chappell Roan, Basket Case by Green Day), the v3 improvements from section 14 applied, a toggle among the development features between the Liquid Glass and the neon hero title in v5, the other improvements applied, and the v5 Archive made findable ("I still don't see the Archive/Personal Page on the v5"). Then, once done, a list of features that would add personality without costing the experience (section 16).
+
+### The songs
+
+Three files in `archive/`, each "Now", with its album and year (Pablo Honey, 1993; The Rise and Fall of a Midwest Princess, 2023; Dookie, 1994) and its Spotify track (each address checked to name the song). `node tools/archive.mjs` wrote them into both editions: v3's cards, three files on the Mac and three tracks in its CD Player; v5's Listening window. No cover art: only pictures Leonardo may publish go on the site.
+
+### v5: the Archive, a page you can find
+
+It was a sheet over Work, reached only from "Archive" beside the Experiments heading or from a row, so it did not read as a place of its own. Now:
+
+- **A page:** `archive/`, with its own tab (the sixth, after Résumé, on every size) and its own app on the hero ("What I make, and what I listen to").
+- **Its side window, Listening,** holds the songs and albums (inside the window, after the entries, below 1360 px).
+- **The old address** (`work/archive/`) sends a reader to the page with the anchor kept, so a link to an entry still lands on it.
+- **Six tabs on a phone:** they fill the dock under 400 px (five did under 360 px), so the colour control leaves the dock there for the window's actions at its foot. On Work, whose inline toolbar is its filters, it had joined them and read as one more filter; it now takes a row of its own at the foot.
+- **Six apps on the hero** fit every launcher style at every size from 320 by 568 to 1920 by 1080 (the widgets' spans and the desktop's columns made room).
+
+### Liquid Glass or neon: a panel to compare them
+
+The toggle already existed (`heroName`, T41), but only in the browser's console. Now `?dev` in the address opens a panel: every design toggle as a row of buttons, the one in use pressed (Hero title: Neon or Liquid Glass; Under the title; The apps; Room resolution), with Replay the hero and Reset. A press switches the title while the hero shows. It sits top right (at the foot on a phone, so the title shows above it), its heading folds it to a tab in the corner, and it stays in that browser until its Close (`?dev=0` forgets it too). Visitors never see it, and the hero's keys, wheel and swipe leave it alone.
+
+**The Liquid Glass title had to become legible first.** Measured against the ground right beside the letters (the faces' median against 0.06 to 0.15 em out):
+
+| | Before | After |
+| --- | --- | --- |
+| With the room, by night | 2.3 to 2.7:1 | 3.4 to 5.1:1 |
+| With the room, by day | 2.4 to 3.0:1 | 4.8 to 6.8:1 |
+| Without the room, by night | 4.3 to 8.8:1 | unchanged |
+| Without the room, by day | 1.2 to 1.9:1 | 5.4 to 8.4:1 |
+
+(Cobalt at 1440 and 390 in `tests/v5/e2e/neon.mjs`, which now checks all eight; with the room, Graphite, Ember, Red and Violet were measured too, Red the lowest by night at 3.4:1.)
+
+- **By night** a soft shade of the style's deep colour lies right round the letters, under the light behind them; the faces are a touch brighter.
+- **By day** the letters are deep glass in the style's colour with a brighter bevel, on a pale halo, as tinted glass looks against a bright sky. The first fix tried, white glass on a dark pool (what section 14 proposed), was legible but read as a dark slab on a phone; the deep glass keeps the day room airy.
+- **Without the room** by day, the CSS name is a deep gradient in the style's colour with a light rim outside the letters (a stroke drew Switzer's overlapping shapes inside them) on a pale halo.
+
+### The improvements, applied
+
+**v5:**
+- **Portrait tablets:** the name on two lines, at `min(15vw, 12svh, 150px)`: 115 px at 768 by 1024, where one line was 63 px. Every launcher style stays clear of it at six tablet sizes.
+- **The day pool without the room** now follows the letters, as the room's does (a copy of the name, its outline thickened and softened). Dropping the oval and keeping only the shade, as proposed, measured 1.0 to 1.9:1, so the shade alone could not carry it.
+- **Hover on the apps is light only:** a ring and a glow; nothing grows or lifts.
+- **"Groton School" and "Class of 2028"** stay together in the hero's line and Home's first words.
+- **Rendering at 2×: not built in, made measurable.** The room's frame budget takes its first look during the hero's first seconds; a phone that cannot hold 2× there would drop to 1× for the whole visit, worse than today's 1.5×. Measuring needs a real phone, so the panel carries a Room resolution test (1.5× or 2×) and reads the room's frame time beside it: under about 17 ms holds 60 frames a second.
+- **Left as his:** the hint's wording ("Click the title to proceed", his own; "Click my name to enter" was the suggestion) and T30.
+
+**v3:**
+- **The two tapes are off the title.**
+- **No line of the hand line ends on a dot.** One did at 320 wide and from 900 to 1200; the dot that would end a line is now hidden, in place, so the break does not move.
+- **The cover's block is as wide as the name:** the hand line had widened it past the name by 22, 59 and 12 px at 320, 900 and 1000 wide, pulling the name off centre.
+- **The code panel opens with five lines in it,** then types on.
+- **The chrome's name gives way on the cover** while at least half of the giant name shows; it comes back once that has passed, and whenever it holds keyboard focus.
+
+### Checks
+
+- `node tests/v3/check.mjs`: 155 of 155, with new checks for the cover (no tape on the title, the block as wide as the name and no line of the hand line ending on a dot at five widths, the code panel's first lines, the chrome's name giving way and coming back with focus), and the archive's counts now read from `archive/` (ten entries).
+- Unit tests: 40 of 40; `node tools/archive.mjs --check` and `node tools/v5-chrome.mjs --check` find no drift.
+- Every v5 browser suite, 16 of 16: fixes 29, pages 108, links, room 5, glass 3, layouts 104, hello 45, launcher 52, neon 65, nav 48, modes 58, contrast 12, keys 19, palettes 71, filters 11, and the visual audit at 12 sizes with no problems. The first run failed seven layouts checks, one each in launcher, nav and keys: their counts of five tabs and five apps, the side parts' order now that a page's actions close it, and Work's tab at 41 px on a 320 phone (fixed in the dock); all pass on the second run.
+- New v5 checks: the `?dev` panel (its buttons, the title switching while the hero shows, Space and Return kept from the hero, folding kept, Close forgetting, the room's resolution at 1.5× and 2× on a 3× phone); the Liquid Glass title's contrast with and without the room, by night and by day, at 1440 and 390; the phone dock (six tabs apart and clear of the colour control at 360, 375, 390 and 430, and where the control goes).
+- The launcher sweep: every style at 13 sizes, 52 of 52 clear; and at six portrait tablet sizes, 24 of 24.
+- The staged deploy crawl: 21 pages, 69 URLs, none failed; noindex on all 21; no link outside its own edition; an Experiments row lands on the Archive page with its tab current; the old address `work/archive/#robots` lands on `archive/#robots`.
+
+## 16. Personality that pays its way: ideas for Leonardo (2026-10-06)
+
+Asked for after section 15: features that add personality without costing the experience, and ideally add to it, in the spirit of v3's Macintosh. What made the Mac work is the test for each idea below: a metaphor that is his (a period, a ritual, a craft), doing real work (the Mac files the archive), and rewarding a closer look without slowing a first one. Every idea keeps the site's rules: no third-party requests, nothing invented, keyboard and screen reader first, nothing moving on its own, still under reduced motion, and no new words where an interaction can say it (his cut in Request E). None is built; each waits for his yes.
+
+Ranked by what a visitor gains for the work it takes (S a few hours, M a day or two):
+
+| # | Idea | Edition | Personality | What a visitor gains | Work |
+| --- | --- | --- | --- | --- | --- |
+| 1 | **Spotlight.** ⌘K or / opens a glass search over everything: pages, projects, archive entries, résumé lines, facts ("save percentage", "transcript", "email"). A result opens its window and lands on the entry with the landing wash. | v5 | The OS the room already is: the launcher's other half | The fastest route to any fact, for a coach or an admissions reader in a hurry | M |
+| 2 | **The scouting card.** The Hockey page opens on a card the size of a hockey card: position, catches, measurables, school and class, the season line with its sample size; Enter or a click turns it over to the coaches' contacts and film. It prints as a card. | v5, and v3 as a sticker-collage card | Hockey card culture, the thing a goalie grew up trading | The ten-second scan coaches actually do | M |
+| 3 | **"Saved."** A 404 page, styled as the edition it was asked for: in v5 a glass window in the room with the apps as the way out; in v3 the mask sticker over a giant SAVED. No other edition is shown or linked. | both | A goalie's answer to a missed page | A dead link becomes a way back | S |
+| 4 | **About This Macintosh.** The first item under the star menu: the classic About box, his name, Groton School, Class of 2028, and the four things the term goes to (hockey, orchestra, research, building), with no numbers unless he gives them. | v3 | The Mac's own first menu item | His essentials in one small dialog | S |
+| 5 | **Numbers you can handle.** On the drug-safety sheet, the three drugs' reports as bars: hover or focus one for its exact counts and the caveat ("proportions of reports, not patient risk"); a real table under it for screen readers and print. The same for the exoskeleton's simulation results if the sheet carries them. | both | A researcher who shows his work | The finding understood in seconds, the caveat where the eye is | M |
+| 6 | **The code panel's files.** Tabs on the cover's editor bar (analysis.py, the controller, the Loquar scene, labyrinth.lua) open each file whole; typing stays the default. | v3 | The coder, at his own desk | The real code readable on demand, not only as it types | S |
+| 7 | **Credits like a score.** The arrangements' credits set as a score's title block (the work, the composer, "arranged by Leonardo Carvalho", for whom), the instrumentation as the first system's labels, a staff for the section rule. | both | The violist and arranger | Who wrote it, who arranged it and for whom, at a glance | S |
+| 8 | **The labyrinth's map.** The Daedalus page's sections drawn as rooms of a small maze, each a link; its doors drawn again from a new seed on each visit (drawn once, never animated). | both | Daedalus's own idea: a labyrinth that changes while you are in it | A map of the page that is also its contents | M |
+| 9 | **Jewel cases.** The Listening window's songs as CD cases or spines set in type (no cover art); a press slides one out to its Listen link. v3's CD Player already plays this part. | v5 | The shelf of discs on a desk | A list that scans as objects, with the link where the hand goes | S to M |
+| 10 | **Keys, shown.** ? opens a small glass card of the keys (Down or Space to enter, ⌘K, 1 to 6 for the tabs, Escape), as an OS's keyboard viewer does. | v5 | The room's OS manners | Power readers find the fast ways | S |
+| 11 | **Taped as you go.** The rail's progress as a stick blade taped one turn per sheet, the current sheet's name on the tape; the numbers stay. A design toggle first. | v3 | The goalie's ritual of taping a stick | The same progress, with a reason to notice it | S to M |
+| 12 | **Sound, if asked for.** Soft synthesized taps and a launch chime (Web Audio, no files), off by default, a Sound switch in the colour panel. | v5 | visionOS's tactile sound | Feedback on a press, for those who want it | M |
+
+**Needs something from him first:** his signature (a scan) to close About and the Let's talk sheet; a playable three-word Loquar scene (real words from the product, so nothing is misrepresented); a game-day badge on Hockey (his schedule); a Scrapbook desk accessory on the Mac (more pictures he may publish).
+
+**Left out, and why:** a guestbook or live weather (a server or a third party); games (T6 took the class games out); a credits roll (Request E cut the colophons); badges with numbers on the apps (T36).
+
+**My pick, in order:** Spotlight (the biggest gain, and it completes v5's OS); the scouting card (it serves the readers who matter most to him now, coaches); "Saved." (the cheapest charm on the site). For v3, About This Macintosh and the code panel's files are an afternoon each.

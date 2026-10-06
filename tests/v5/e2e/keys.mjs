@@ -23,7 +23,7 @@ for (let i = 0; i < 70; i++) {
   if (!f.visible) hidden++;
 }
 check(trail[0] === 'skip', 'Tab starts at the skip link');
-check(trail.slice(1, 6).every(t => t === 'tabs') && trail[6] !== 'tabs', 'the five tabs come next, before the window (the tab bar is first in the source)');
+check(trail.slice(1, 7).every(t => t === 'tabs') && trail[7] !== 'tabs', 'the six tabs come next, before the window (the tab bar is first in the source)');
 for (const part of ['scroller', 'content', 'tabs', 'toolbar']) check(seen.has(part), `Tab reaches the ${part}`);
 check(hidden === 0, `focus never lands on something hidden (${hidden})`);
 
