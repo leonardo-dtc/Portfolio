@@ -593,7 +593,8 @@ by machine yet.
   motion. Reduced motion means no glide, focus pull, lean, drift or settle, and
   150 ms crossfades: transitions run only on opacity and colour, so the tab
   bubble, the tab bar's width and names and a sheet's parent jump to their places.
-- **Budget:** the room renders at up to 1.5× device pixels, 60 fps while
+- **Budget:** the room renders at up to 1.5× device pixels (2× with the
+  `roomRes` test toggle, to judge on a real phone), 60 fps while
   anything moves (the hero's light included), 30 fps while only the room
   drifts, and not at all when nothing moves under reduced motion. A machine
   whose first 90 drawn frames average over 22 ms drops to 1× and stops the

@@ -1181,7 +1181,12 @@ The toggle already existed (`heroName`, T41), but only in the browser's console.
 
 ### Checks
 
-(Filled in below once the suites have run.)
+- `node tests/v3/check.mjs`: 155 of 155, with new checks for the cover (no tape on the title, the block as wide as the name and no line of the hand line ending on a dot at five widths, the code panel's first lines, the chrome's name giving way and coming back with focus), and the archive's counts now read from `archive/` (ten entries).
+- Unit tests: 40 of 40; `node tools/archive.mjs --check` and `node tools/v5-chrome.mjs --check` find no drift.
+- Every v5 browser suite, 16 of 16: fixes 29, pages 108, links, room 5, glass 3, layouts 104, hello 45, launcher 52, neon 65, nav 48, modes 58, contrast 12, keys 19, palettes 71, filters 11, and the visual audit at 12 sizes with no problems. The first run failed seven layouts checks, one each in launcher, nav and keys: their counts of five tabs and five apps, the side parts' order now that a page's actions close it, and Work's tab at 41 px on a 320 phone (fixed in the dock); all pass on the second run.
+- New v5 checks: the `?dev` panel (its buttons, the title switching while the hero shows, Space and Return kept from the hero, folding kept, Close forgetting, the room's resolution at 1.5× and 2× on a 3× phone); the Liquid Glass title's contrast with and without the room, by night and by day, at 1440 and 390; the phone dock (six tabs apart and clear of the colour control at 360, 375, 390 and 430, and where the control goes).
+- The launcher sweep: every style at 13 sizes, 52 of 52 clear; and at six portrait tablet sizes, 24 of 24.
+- The staged deploy crawl: 21 pages, 69 URLs, none failed; noindex on all 21; no link outside its own edition; an Experiments row lands on the Archive page with its tab current; the old address `work/archive/#robots` lands on `archive/#robots`.
 
 ## 16. Personality that pays its way: ideas for Leonardo (2026-10-06)
 
