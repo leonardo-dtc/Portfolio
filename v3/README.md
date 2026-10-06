@@ -19,7 +19,7 @@ Then open `http://127.0.0.1:8778/v3/`.
 
 | Id | Sheet | Source of the copy |
 | --- | --- | --- |
-| `cover` | The name on two lines, sliced letter, torn red strip, goalie mask, a tilted code panel that types itself (or, by design toggle, a desk whose objects open the project files) | |
+| `cover` | The name on two lines, sliced letter, torn red strip, goalie mask (no tape over the title: white tape over white letters read as grey stubs), a tilted code panel that types itself (or, by design toggle, a desk whose objects open the project files) | |
 | `about` | About me, cutout portrait on a red arch with text curved along it | `v2/about/` |
 | `skills` | Skills, tools, how I work (red panel) | `v2/resume/#technical`, `v2/about/` |
 | `research` | Drug safety: aducanumab pharmacovigilance, ARIA chart | `v2/work/aducanumab/` |
@@ -194,6 +194,15 @@ for the deck. Either makes two systems for the same files.
   (`text-shadow`) round each word keeps the code panel's lines from running through
   it. On touch screens each word is a 44px target (vertical padding on the inline
   word, so no line moves; where the line wraps, the word below takes the overlap).
+  The line takes the name's width and wraps inside it (it adds none of its own, so
+  the block is always as wide as the name: on one line it had widened the block past
+  the name by up to 59px, pulling the name off centre), and a dot that would end a
+  line is hidden (`site.js` marks it from the line's own layout; it keeps its place,
+  so the line breaks where it did). Without the script it shows.
+- **The chrome's name gives way on the cover.** While at least half of the cover's
+  giant name is on screen (below the chrome, and not yet under the sheet sliding over
+  it) the small name above it fades out; it comes back once the cover's has passed,
+  and whenever it holds keyboard focus. Without the script it stays.
 - **The hover grammar.** The collage cards on drug safety, the knee exoskeleton and
   Loquar link where their sheet's own link goes. Pointing at one: the image settles
   in its still frame from 1.06 to 1 (800ms), the card eases toward flat and lifts
@@ -204,7 +213,8 @@ for the deck. Either makes two systems for the same files.
   back by colour, not opacity: its ink goes to the muted ink and the 486 card's
   vermilion pales, so its text keeps 4.5:1; only its pictures (a photograph, the
   sketch, the chart's bars) fade to .55. Nothing blurs. See `DESIGN.md`.
-- **The code panel.** The cover's tilted editor types a preset script character by
+- **The code panel.** The cover's tilted editor opens with the script's first five
+  lines in it (three seconds in, it used to hold one), then types the rest character by
   character: the aducanumab analysis with the real counts, the Genuvalens
   controller and its five-repetition simulation with the reported results, a
   Loquar scene function and a Daedalus labyrinth rebuild. Hovering pauses it and

@@ -1,10 +1,10 @@
 # The archive
 
-One file here is one entry, and both editions are written from these files: v3's Macintosh (and its wall of cards), v5's archive sheet and its Experiments rows. Things made sit together, newest first; songs and albums go on their own shelf (v5's Listening, v3's CD Player, which comes onto the Mac's desk with the first of them). The two newest things still being made (their year runs to now) also lie out on the Mac's desk.
+One file here is one entry, and both editions are written from these files: v3's Macintosh (and its wall of cards), v5's Archive page and its Experiments rows. Things made sit together, newest first; songs and albums go on their own shelf (v5's Listening window, beside the Archive page's entries; v3's CD Player, which comes onto the Mac's desk with the first of them). The two newest things still being made (their year runs to now) also lie out on the Mac's desk.
 
 ## Adding an entry
 
-1. Make a new file here named for the entry, in lower case with hyphens: `my-entry.md`. The name becomes its address on v5 (`work/archive/#my-entry`).
+1. Make a new file here named for the entry, in lower case with hyphens: `my-entry.md`. The name becomes its address on v5 (`archive/#my-entry`).
 2. Copy one of the three starts below into it and fill it in.
 3. From the repository, run `node tools/archive.mjs`, look at both editions, and commit.
 

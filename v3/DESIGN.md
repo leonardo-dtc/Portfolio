@@ -197,7 +197,9 @@ violin. Under each lies a vermilion marker stroke, faint (42%) at rest; hover or
 in 300ms (left to right, a clip); touch screens show it drawn. Focus also draws a 2px vermilion ring. The
 line stacks above the title so the whole word takes the pointer. A dark halo (`text-shadow: 0 0 4px, 0 0
 10px`, `#151515`) keeps the code panel's lines from running through the words. The words are inline, so
-each separator stays with the word before it when the line wraps. On touch screens each word takes 44px
+each separator stays with the word before it when the line wraps, and a separator that would then end a
+line is hidden (`visibility`, so the break does not move). The line adds no width of its own to the cover's
+block (`contain: inline-size`), which is as wide as the name; the line wraps inside it. On touch screens each word takes 44px
 with 12px of vertical padding, which moves no line (the stroke is offset to stay under the word). On phones
 "portfolio" is left out (the pill is the index there).
 
